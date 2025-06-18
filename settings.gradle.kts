@@ -35,3 +35,4 @@ plugins {
 }
 
 include(":composeApp")
+include(":libtwofac")
