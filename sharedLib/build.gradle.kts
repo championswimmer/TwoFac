@@ -1,61 +1,58 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.targets.js.KotlinWasmTargetType
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidKotlinMultiplatformLibrary)
 }
 
 kotlin {
 
-    // Target declarations - add or remove as needed below. These define
-    // which platforms this KMP module supports.
-    // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
-    androidLibrary {
-        namespace = "tech.arnav.twofac.sharedlib"
-        compileSdk = 35
-        minSdk = 24
+    val frameworkName = "TwoFacAuthKit"
+    val libraryName = "lib2fac"
 
-        withHostTestBuilder {
-        }
-
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }.configure {
-            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    // XCFramework for iOS targets
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = frameworkName
+            isStatic = true // Set to false if you want a dynamic framework
         }
     }
 
-    // For iOS targets, this is also where you should
-    // configure native binary output. For more information, see:
-    // https://kotlinlang.org/docs/multiplatform-build-native-binaries.html#build-xcframeworks
-
-    // A step-by-step guide on how to include this library in an XCode
-    // project can be found here:
-    // https://developer.android.com/kotlin/multiplatform/migrate
-    val xcfName = "sharedLibKit"
-
-    iosX64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
-    iosArm64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
-    iosSimulatorArm64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
+    // JVM library for Android and Desktop
     jvm {
-        // This is a JVM target that is used by desktop applications.
-        compilations.all {
-            kotlinOptions.jvmTarget = "11"
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
+
+    // Native libraries for Linux, macOS, and Windows
+    listOf(
+        linuxX64(),
+        linuxArm64(),
+        macosArm64(),
+        macosX64(),
+        mingwX64(),
+    ).forEach { nativeTarget ->
+        nativeTarget.binaries {
+            staticLib {
+                baseName = libraryName
+            }
+        }
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        outputModuleName = "${libraryName}.js"
+        binaries.library()
+        browser()
+    }
+
+
 
     // Source set declarations.
     // Declaring a target automatically creates a source set with the same name. By default, the
@@ -76,39 +73,33 @@ kotlin {
             }
         }
 
-        androidMain {
-            dependencies {
-                // Add Android-specific dependencies here. Note that this source set depends on
-                // commonMain by default and will correctly pull the Android artifacts of any KMP
-                // dependencies declared in commonMain.
-            }
+        appleMain {
+            dependsOn(commonMain.get())
+            dependencies {}
+        }
+        listOf(
+            iosX64Main,
+            iosArm64Main,
+            iosSimulatorArm64Main
+        ).forEach {
+            it.get().dependsOn(appleMain.get())
         }
 
-        jvmMain {
-            dependencies {
-                // Add JVM-specific dependencies here. This source set depends on commonMain by
-                // default and will correctly pull the JVM artifacts of any KMP dependencies
-                // declared in commonMain.
-            }
+        nativeMain {
+            dependsOn(commonMain.get())
+            dependencies {}
         }
 
-        getByName("androidDeviceTest") {
-            dependencies {
-                implementation(libs.androidx.runner)
-                implementation(libs.androidx.core)
-                implementation(libs.androidx.testExt.junit)
-            }
+        listOf(
+            linuxX64Main,
+            linuxArm64Main,
+            mingwX64Main,
+            macosArm64Main,
+            macosX64Main
+        ).forEach {
+            it.get().dependsOn(nativeMain.get())
         }
 
-        iosMain {
-            dependencies {
-                // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle
-                // Plugin (KGP) that each specific iOS target (e.g., iosX64) depends on as
-                // part of KMP’s default source set hierarchy. Note that this source set depends
-                // on common by default and will correctly pull the iOS artifacts of any
-                // KMP dependencies declared in commonMain.
-            }
-        }
     }
 
 }

@@ -1,3 +1,3 @@
 package tech.arnav.twofac.sharedlib
 
-actual fun platform() = "Android"
+actual fun platform() = "Darwin"
