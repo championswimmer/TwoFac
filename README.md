@@ -1,3 +1,5 @@
+
+## CODE STRUCTURE
 This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
 
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
@@ -19,3 +21,16 @@ channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
 If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
 
 You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+
+## DEPENDENCY STRUCTURE
+
+| App               | Codebase                       | Depends on sharedLib variant |
+|-------------------|--------------------------------|------------------------------|
+| Android           | `composeApp/androidMain`       | `jvm`                        |
+| iOS (+ Simulator) | `iosApp -> composeApp/iosMain` | `native` (as framework)      |
+| Desktop           | `composeApp/desktopMain`       | `jvm`                        |
+| Web               | `composeApp/wasmJsMain`        | `wasmJs`                     |
+| CLI               | `cliApp`                       | `native` (as static lib)     |
+
+
+

@@ -15,7 +15,9 @@ kotlin {
     listOf(
         iosX64(),
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
+        macosX64(),
+        macosArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = frameworkName
@@ -53,6 +55,7 @@ kotlin {
     }
 
 
+    applyDefaultHierarchyTemplate()
 
     // Source set declarations.
     // Declaring a target automatically creates a source set with the same name. By default, the
@@ -72,34 +75,6 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
-
-        appleMain {
-            dependsOn(commonMain.get())
-            dependencies {}
-        }
-        listOf(
-            iosX64Main,
-            iosArm64Main,
-            iosSimulatorArm64Main
-        ).forEach {
-            it.get().dependsOn(appleMain.get())
-        }
-
-        nativeMain {
-            dependsOn(commonMain.get())
-            dependencies {}
-        }
-
-        listOf(
-            linuxX64Main,
-            linuxArm64Main,
-            mingwX64Main,
-            macosArm64Main,
-            macosX64Main
-        ).forEach {
-            it.get().dependsOn(nativeMain.get())
-        }
-
     }
 
 }
