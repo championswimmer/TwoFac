@@ -36,3 +36,5 @@ plugins {
 
 include(":composeApp")
 include(":sharedLib")
+include(":cliApp")
+
