@@ -18,6 +18,8 @@ kotlinx-coroutines = "1.10.2"
 kotlinStdlib = "2.1.21"
 runner = "1.6.2"
 core = "1.6.1"
+koin-bom = "4.1.0"
+crypto-kt = "0.4.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -35,6 +37,15 @@ kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-s
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
+koin-core = { module = "io.insert-koin:koin-core" }
+koin-compose = { module = "io.insert-koin:koin-compose" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
+crypto-kt-core = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "crypto-kt" }
+crypto-kt-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "crypto-kt" }
+crypto-kt-openssl = { module = "dev.whyoleg.cryptography:cryptography-provider-openssl3-prebuilt", version.ref = "crypto-kt" }
+crypto-kt-web = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto", version.ref = "crypto-kt" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

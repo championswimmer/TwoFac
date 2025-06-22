@@ -53,6 +53,7 @@ kotlin {
         outputModuleName = "${libraryName}.js"
         binaries.library()
         browser()
+        nodejs()
     }
 
 
@@ -67,13 +68,31 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                // Add KMP dependencies here
+                implementation(project.dependencies.platform(libs.koin.bom))
+                implementation(libs.koin.core)
+                implementation(libs.crypto.kt.core)
             }
         }
 
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation(libs.crypto.kt.jdk)
+            }
+        }
+        nativeMain {
+            dependencies {
+                implementation(libs.crypto.kt.openssl)
+            }
+        }
+        wasmJsMain {
+            dependencies {
+                implementation(libs.crypto.kt.web)
             }
         }
     }
