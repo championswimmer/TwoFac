@@ -1,5 +1,6 @@
 package tech.arnav.twofac
-import tech.arnav.twofac.sharedlib.platform as sharedLibPlatform
+
+import tech.arnav.twofac.lib.libPlatform as sharedLibPlatform
 class Greeting {
     private val platform = getPlatform()
 

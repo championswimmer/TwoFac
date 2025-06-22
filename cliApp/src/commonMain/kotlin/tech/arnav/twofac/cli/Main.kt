@@ -5,5 +5,5 @@ package tech.arnav.twofac.cli
 fun main() {
     println("Hello, Kotlin CLI!")
     println("Running on: ${getPlatform().name}")
-    println("Using library: ${tech.arnav.twofac.sharedlib.platform()}")
+    println("Using library: ${tech.arnav.twofac.lib.libPlatform()}")
 }

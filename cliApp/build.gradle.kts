@@ -14,6 +14,7 @@ kotlin {
     ).forEach {
         it.apply {
             binaries.executable {
+                baseName = "2fac"
                 entryPoint = "tech.arnav.twofac.cli.main"
             }
         }

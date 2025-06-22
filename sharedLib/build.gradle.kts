@@ -1,6 +1,4 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.gradle.targets.js.KotlinWasmTargetType
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,8 +6,8 @@ plugins {
 
 kotlin {
 
-    val frameworkName = "TwoFacAuthKit"
-    val libraryName = "lib2fac"
+    val frameworkName = "TwoFacKit"
+    val libraryName = "twofac"
 
     // XCFramework for iOS targets
     listOf(
@@ -42,6 +40,9 @@ kotlin {
     ).forEach { nativeTarget ->
         nativeTarget.binaries {
             staticLib {
+                baseName = libraryName
+            }
+            sharedLib {
                 baseName = libraryName
             }
         }
