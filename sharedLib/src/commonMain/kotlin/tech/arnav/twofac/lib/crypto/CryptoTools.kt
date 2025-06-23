@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalNativeApi::class)
-
 package tech.arnav.twofac.lib.crypto
 
-import kotlin.experimental.ExperimentalNativeApi
-import kotlin.native.CName
+import kotlinx.io.bytestring.ByteString
 
 /**
  * All cryptographic tools we need for 2-factor authentication.
@@ -16,23 +13,24 @@ interface CryptoTools {
     /**
      * SHA algorithm types supported for HMAC operations
      */
-    enum class ShaAlgorithm {
+    enum class Algo {
         SHA1,
         SHA256,
         SHA512
     }
 
-    interface SigningKey {
+    public data class SigningKey(
         /**
          * The resulting key derived from the password and salt
          */
-        val key: ByteArray
+
+        val key: ByteString,
 
         /**
          * The salt used in the key derivation process
          */
-        val salt: ByteArray
-    }
+        val salt: ByteString
+    )
 
     /**
      * Generate an HMAC using the specified SHA algorithm
@@ -40,19 +38,17 @@ interface CryptoTools {
      * @param algorithm The SHA algorithm to use (SHA1, SHA128, or SHA256)
      * @param key The key to use for the HMAC
      * @param data The data to generate the HMAC for
-     * @return The generated HMAC as a ByteArray
+     * @return The generated HMAC as a ByteString
      */
-    @CName("hmac_sha")
-    suspend fun hmacSha(algorithm: ShaAlgorithm, key: ByteArray, data: ByteArray): ByteArray
+    suspend fun hmacSha(algorithm: Algo, key: ByteString, data: ByteString): ByteString
 
     /**
      * Derive a key from a password using PBKDF2
      *
      * @param passKey The password to derive the key from
      * @param salt The salt to use for key derivation
-     * @return The derived signing key as a ByteArray
+     * @return The derived signing key as a ByteString
      */
-    @CName("create_signing_key")
     suspend fun createSigningKey(passKey: String): SigningKey
 
     /**
@@ -60,18 +56,16 @@ interface CryptoTools {
      *
      * @param key The key to use for encryption
      * @param secret The data to encrypt
-     * @return The encrypted data as a ByteArray
+     * @return The encrypted data as a ByteString
      */
-    @CName("encrypt_data")
-    suspend fun encrypt(key: ByteArray, secret: ByteArray): ByteArray
+    suspend fun encrypt(key: ByteString, secret: ByteString): ByteString
 
     /**
      * Decrypt data using a key
      *
      * @param encryptedData The encrypted data to decrypt
      * @param key The key to use for decryption
-     * @return The decrypted data as a ByteArray
+     * @return The decrypted data as a ByteString
      */
-    @CName("decrypt_data")
-    suspend fun decrypt(encryptedData: ByteArray, key: ByteArray): ByteArray
+    suspend fun decrypt(encryptedData: ByteString, key: ByteString): ByteString
 }

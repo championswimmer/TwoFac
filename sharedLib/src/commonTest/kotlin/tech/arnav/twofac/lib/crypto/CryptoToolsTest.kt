@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib.crypto
 
 import dev.whyoleg.cryptography.CryptographyProvider
 import kotlinx.coroutines.test.runTest
+import kotlinx.io.bytestring.encodeToByteString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -12,19 +13,19 @@ class CryptoToolsTest {
     fun testEncryptDecrypt() = runTest {
         val tools = DefaultCryptoTools(CryptographyProvider.Default)
 
-        val signingKey = tools.createSigningKey("my-secret-password")
-        val data = "my-secret-data".encodeToByteArray()
+        val (signingKey, salt) = tools.createSigningKey("my-secret-password")
+        val data = "my-secret-data".encodeToByteString()
 
-        println("Signing Key: ${signingKey.key.toHexString()}")
+        println("Signing Key: ${signingKey}")
 
         // Encrypt the data
-        val encryptedData = tools.encrypt(signingKey.key, data)
+        val encryptedData = tools.encrypt(signingKey, data)
 
         // Decrypt the data
-        val decryptedData = tools.decrypt(encryptedData, signingKey.key)
+        val decryptedData = tools.decrypt(encryptedData, signingKey)
 
         // Assert that the decrypted data matches the original data
         assertEquals(data.size, decryptedData.size)
-        assertEquals(data.toHexString(), decryptedData.toHexString())
+        assertEquals(data, decryptedData)
     }
 }

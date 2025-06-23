@@ -1,13 +1,16 @@
-@file:OptIn(ExperimentalNativeApi::class)
-
 package tech.arnav.twofac.lib.crypto
 
 import dev.whyoleg.cryptography.BinarySize.Companion.bits
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
-import dev.whyoleg.cryptography.algorithms.*
+import dev.whyoleg.cryptography.algorithms.AES
+import dev.whyoleg.cryptography.algorithms.HMAC
+import dev.whyoleg.cryptography.algorithms.PBKDF2
+import dev.whyoleg.cryptography.algorithms.SHA1
+import dev.whyoleg.cryptography.algorithms.SHA256
+import dev.whyoleg.cryptography.algorithms.SHA512
 import dev.whyoleg.cryptography.random.CryptographyRandom
-import kotlin.experimental.ExperimentalNativeApi
+import kotlinx.io.bytestring.ByteString
 
 class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools {
     val hmac = cryptoProvider.get(HMAC)
@@ -16,15 +19,15 @@ class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools
 
 
     @OptIn(DelicateCryptographyApi::class)
-    override suspend fun hmacSha(algorithm: CryptoTools.ShaAlgorithm, key: ByteArray, data: ByteArray): ByteArray {
+    override suspend fun hmacSha(algorithm: CryptoTools.Algo, key: ByteString, data: ByteString): ByteString {
         val keyDecoder = when (algorithm) {
-            CryptoTools.ShaAlgorithm.SHA1 -> hmac.keyDecoder(SHA1)
-            CryptoTools.ShaAlgorithm.SHA256 -> hmac.keyDecoder(SHA256)
-            CryptoTools.ShaAlgorithm.SHA512 -> hmac.keyDecoder(SHA512)
+            CryptoTools.Algo.SHA1 -> hmac.keyDecoder(SHA1)
+            CryptoTools.Algo.SHA256 -> hmac.keyDecoder(SHA256)
+            CryptoTools.Algo.SHA512 -> hmac.keyDecoder(SHA512)
         }
-        val key = keyDecoder.decodeFromByteArray(HMAC.Key.Format.RAW, key)
-        val signature = key.signatureGenerator().generateSignature(data)
-        return signature
+        val hmacKey = keyDecoder.decodeFromByteString(HMAC.Key.Format.RAW, key)
+        val signature = hmacKey.signatureGenerator().generateSignature(data.toByteArray())
+        return ByteString(signature)
     }
 
     override suspend fun createSigningKey(passKey: String): CryptoTools.SigningKey {
@@ -33,25 +36,22 @@ class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools
         // derive a key using PBKDF2
         val secretDerivation = pbkdf2.secretDerivation(SHA256, 200, 256.bits, salt)
         val signingKey = secretDerivation.deriveSecretToByteArray(passKey.encodeToByteArray())
-        return object : CryptoTools.SigningKey {
-            override val key: ByteArray = signingKey
-            override val salt: ByteArray = salt
-        }
+        return CryptoTools.SigningKey(key = ByteString(signingKey), salt = ByteString(salt))
     }
 
-    override suspend fun encrypt(key: ByteArray, secret: ByteArray): ByteArray {
+    override suspend fun encrypt(key: ByteString, secret: ByteString): ByteString {
         val keyDecoder = aesGcm.keyDecoder()
-        val signingKey = keyDecoder.decodeFromByteArray(AES.Key.Format.RAW, key)
+        val signingKey = keyDecoder.decodeFromByteString(AES.Key.Format.RAW, key)
         val cipher = signingKey.cipher()
-        val cipherText = cipher.encrypt(secret)
-        return cipherText
+        val cipherText = cipher.encrypt(secret.toByteArray())
+        return ByteString(cipherText)
     }
 
-    override suspend fun decrypt(encryptedData: ByteArray, key: ByteArray): ByteArray {
+    override suspend fun decrypt(encryptedData: ByteString, key: ByteString): ByteString {
         val keyDecoder = aesGcm.keyDecoder()
-        val signingKey = keyDecoder.decodeFromByteArray(AES.Key.Format.RAW, key)
+        val signingKey = keyDecoder.decodeFromByteString(AES.Key.Format.RAW, key)
         val cipher = signingKey.cipher()
-        val plainText = cipher.decrypt(encryptedData)
-        return plainText
+        val plainText = cipher.decrypt(encryptedData.toByteArray())
+        return ByteString(plainText)
     }
 }
