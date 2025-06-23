@@ -77,6 +77,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
 
@@ -93,6 +94,7 @@ kotlin {
         wasmJsMain {
             dependencies {
                 implementation(libs.crypto.kt.web)
+                implementation(libs.kotlinx.browser)
             }
         }
     }
