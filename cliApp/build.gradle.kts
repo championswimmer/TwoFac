@@ -26,6 +26,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":sharedLib"))
+                implementation(project.dependencies.platform(libs.koin.bom))
+                implementation(libs.koin.core)
             }
         }
         commonTest {}

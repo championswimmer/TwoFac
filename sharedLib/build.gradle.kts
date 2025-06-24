@@ -76,8 +76,6 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                implementation(project.dependencies.platform(libs.koin.bom))
-                implementation(libs.koin.core)
                 implementation(libs.crypto.kt.core)
             }
         }

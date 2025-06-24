@@ -7,4 +7,4 @@ Do not use emojis in commit messages.
 When writing commit messages, please follow these guidelines to ensure clarity and consistency:
 
 - Use a short single line summary (50 characters or less) to describe the change.
-- Add detailed explanations in the body if necessary. Use bullet points for clarity.
+- Add detailed explanations in the body. Use bullet points for clarity.
