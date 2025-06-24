@@ -86,4 +86,20 @@ object Encoding {
 
         return output.toString()
     }
+
+    /**
+     * Decode an ASCII string into a byte array.
+     *
+     * @param ascii The ASCII string to decode.
+     * @return The decoded byte array.
+     */
+    @JvmStatic
+    @JsStatic
+    @CName("decode_ascii")
+    fun decodeAscii(ascii: String): ByteArray {
+        // Convert ASCII string to byte array
+        return ByteArray(ascii.length) { i ->
+            ascii[i].code.toByte()
+        }
+    }
 }

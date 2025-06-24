@@ -13,6 +13,12 @@ import dev.whyoleg.cryptography.random.CryptographyRandom
 import kotlinx.io.bytestring.ByteString
 
 class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools {
+    companion object {
+        const val SALT_LENGTH = 16 // 128 bits
+        const val HASH_ITERATIONS = 200 // Number of iterations for PBKDF2
+
+    }
+
     val hmac = cryptoProvider.get(HMAC)
     val pbkdf2 = cryptoProvider.get(PBKDF2)
     val aesGcm = cryptoProvider.get(AES.GCM)
@@ -32,9 +38,9 @@ class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools
 
     override suspend fun createSigningKey(passKey: String): CryptoTools.SigningKey {
         // generate a salt
-        val salt = CryptographyRandom.nextBytes(16) // 128-bit salt
+        val salt = CryptographyRandom.nextBytes(SALT_LENGTH) // 128-bit salt
         // derive a key using PBKDF2
-        val secretDerivation = pbkdf2.secretDerivation(SHA256, 200, 256.bits, salt)
+        val secretDerivation = pbkdf2.secretDerivation(SHA256, HASH_ITERATIONS, 256.bits, salt)
         val signingKey = secretDerivation.deriveSecretToByteArray(passKey.encodeToByteArray())
         return CryptoTools.SigningKey(key = ByteString(signingKey), salt = ByteString(salt))
     }
