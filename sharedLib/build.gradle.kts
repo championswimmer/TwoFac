@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinxKover)
 }
 
 kotlin {
@@ -38,6 +39,13 @@ kotlin {
         macosX64(),
         mingwX64(),
     ).forEach { nativeTarget ->
+        nativeTarget.compilations.getByName("main") {
+            cinterops {
+                create("zlib") {
+                    defFile(project.file("src/nativeMain/cinterop/zlib.def"))
+                }
+            }
+        }
         nativeTarget.binaries {
             staticLib {
                 baseName = libraryName
@@ -88,6 +96,7 @@ kotlin {
         }
         nativeMain {
             dependencies {
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.crypto.kt.openssl)
             }
         }

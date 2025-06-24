@@ -23,7 +23,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
-      - name: Run Windows CLI App
+      - name: Run Windows Tests
         run: ./gradlew :sharedLib:mingwX64Test
 
   test-macos:
@@ -41,7 +41,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
-      - name: Run macOS CLI App
+      - name: Run macOS and iOS Tests
         run: |
           ./gradlew :sharedLib:macosArm64Test
           ./gradlew :sharedLib:iosSimulatorArm64Test
@@ -61,7 +61,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
-      - name: Run Linux CLI App
+      - name: Run Linux and JVM Tests
         run: |
           ./gradlew :sharedLib:linuxX64Test
           ./gradlew :sharedLib:jvmTest

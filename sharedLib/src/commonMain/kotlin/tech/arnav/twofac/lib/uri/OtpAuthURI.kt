@@ -26,7 +26,7 @@ import kotlin.native.CName
 object OtpAuthURI {
 
     const val DEFAULT_DIGITS = 6
-    const val DEFAULT_PERIOD = 30 // Default period for TOTP in seconds
+    const val DEFAULT_PERIOD = 30L // Default period for TOTP in seconds
 
     /**
      * OTP type (TOTP or HOTP)
@@ -130,7 +130,7 @@ object OtpAuthURI {
         // Create the appropriate OTP object
         return when (type) {
             Type.TOTP -> {
-                val period = params["period"]?.toIntOrNull() ?: DEFAULT_PERIOD
+                val period = params["period"]?.toLongOrNull() ?: DEFAULT_PERIOD
                 TOTP(
                     digits = digits,
                     algorithm = algorithm,
@@ -162,7 +162,7 @@ object OtpAuthURI {
         private var algorithm: CryptoTools.Algo = CryptoTools.Algo.SHA1
         private var digits: Int = DEFAULT_DIGITS
         private var counter: Long = 0L // Default counter for HOTP
-        private var period: Int = DEFAULT_PERIOD
+        private var period: Long = DEFAULT_PERIOD
 
         /**
          * Set the OTP type (TOTP or HOTP).
@@ -223,7 +223,7 @@ object OtpAuthURI {
         /**
          * Set the period (time interval) for TOTP.
          */
-        fun period(period: Int): Builder {
+        fun period(period: Long): Builder {
             this.period = period
             return this
         }
@@ -267,7 +267,7 @@ object OtpAuthURI {
                 params.add("counter=$counter")
             }
 
-            if (type == Type.TOTP && period != 30) {
+            if (type == Type.TOTP && period != 30L) {
                 params.add("period=$period")
             }
 

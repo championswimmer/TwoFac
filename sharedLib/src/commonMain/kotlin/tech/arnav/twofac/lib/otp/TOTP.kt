@@ -19,7 +19,7 @@ class TOTP(
      * Time interval in seconds for TOTP generation.
      * Default is 30 seconds, which is the standard for TOTP.
      */
-    val timeInterval: Int = 30
+    val timeInterval: Long = 30
 ) : OTP {
 
     // Use HOTP internally for the actual OTP generation
