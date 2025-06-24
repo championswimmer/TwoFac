@@ -12,7 +12,7 @@ import kotlin.math.pow
 class HOTP(
     override val digits: Int = 6,
     override val algorithm: CryptoTools.Algo = CryptoTools.Algo.SHA1,
-    override val secret: String
+    override val secret: String,
 ) : OTP {
     companion object {
         private const val MSB_MASK = 0x7F // most significant bit mask 01111111

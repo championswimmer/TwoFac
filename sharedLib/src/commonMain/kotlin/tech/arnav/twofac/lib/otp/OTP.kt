@@ -11,9 +11,21 @@ import tech.arnav.twofac.lib.crypto.CryptoTools
  */
 interface OTP {
 
-    val digits: Int // Number of digits in the OTP; default is 6
-    val algorithm: CryptoTools.Algo // Algo used for HOTP; default is SHA1
-    val secret: String // Base32-encoded secret key for generating the OTP
+    /**
+     * The number of digits in the generated OTP. Default is 6.
+     */
+    val digits: Int
+
+    /**
+     * The algorithm used with HMAC for generating the OTP.
+     * Default is SHA1, but can be changed to SHA256 or SHA512 if needed.
+     */
+    val algorithm: CryptoTools.Algo
+
+    /**
+     * The secret key used for generating the OTP. Base32-encoded string.
+     */
+    val secret: String
 
     /**
      * Generate a new OTP based on the current counter.

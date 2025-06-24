@@ -139,7 +139,6 @@ class TOTPTest {
     @Test
     fun testRFC6238Vectors() = runTest {
         // Define the test vectors from RFC 6238
-        @Suppress("detekt:MaxLineLength")
         val testVectors = listOf(
             RFC6238TestVector(59, "1970-01-01 00:00:59", "12345678901234567890", CryptoTools.Algo.SHA1, "94287082"),
             RFC6238TestVector(
