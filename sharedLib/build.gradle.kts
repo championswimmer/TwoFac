@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -49,15 +50,20 @@ kotlin {
         nativeTarget.binaries {
             staticLib {
                 baseName = libraryName
+                if (buildType == NativeBuildType.DEBUG) { // skip linking for debug builds
+                    linkTaskProvider.configure { enabled = false }
+                }
             }
             sharedLib {
                 baseName = libraryName
+                if (buildType == NativeBuildType.DEBUG) { // skip linking for debug builds
+                    linkTaskProvider.configure { enabled = false }
+                }
             }
         }
     }
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
+    @OptIn(ExperimentalWasmDsl::class) wasmJs {
         outputModuleName = "${libraryName}.js"
         binaries.library()
         browser()
