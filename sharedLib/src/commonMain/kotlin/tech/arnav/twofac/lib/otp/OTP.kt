@@ -1,6 +1,5 @@
 package tech.arnav.twofac.lib.otp
 
-import kotlinx.io.bytestring.ByteString
 import tech.arnav.twofac.lib.crypto.CryptoTools
 
 /**
@@ -14,7 +13,7 @@ interface OTP {
 
     val digits: Int // Number of digits in the OTP; default is 6
     val algorithm: CryptoTools.Algo // Algo used for HOTP; default is SHA1
-    val secret: ByteString // Secret key for generating the OTP, in bytes[]
+    val secret: String // Base32-encoded secret key for generating the OTP
 
     /**
      * Generate a new OTP based on the current counter.
@@ -23,7 +22,7 @@ interface OTP {
      * @param counter The current counter value, which is used to generate the OTP.
      * @return The generated OTP is a string with [digits] length.
      */
-    fun generateOTP(counter: Long): String
+    suspend fun generateOTP(counter: Long): String
 
     /**
      * Validate an OTP against the expected value for a given counter.
@@ -32,6 +31,6 @@ interface OTP {
      * @param counter The counter value used to generate the expected OTP.
      * @return True if the OTP is valid for the given counter, false otherwise.
      */
-    fun validateOTP(otp: String, counter: Long): Boolean
+    suspend fun validateOTP(otp: String, counter: Long): Boolean
 
 }
