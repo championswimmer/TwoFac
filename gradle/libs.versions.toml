@@ -21,6 +21,7 @@ runner = "1.6.2"
 core = "1.6.1"
 koin-bom = "4.1.0"
 crypto-kt = "0.4.0"
+mosaic = "0.17.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -49,6 +50,7 @@ crypto-kt-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk",
 crypto-kt-openssl = { module = "dev.whyoleg.cryptography:cryptography-provider-openssl3-prebuilt", version.ref = "crypto-kt" }
 crypto-kt-web = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto", version.ref = "crypto-kt" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
+mosaic-runtime = { module = "com.jakewharton.mosaic:mosaic-runtime", version.ref = "mosaic" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

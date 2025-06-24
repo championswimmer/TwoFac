@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 group = "tech.arnav.twofac"
@@ -28,6 +29,7 @@ kotlin {
                 implementation(project(":sharedLib"))
                 implementation(project.dependencies.platform(libs.koin.bom))
                 implementation(libs.koin.core)
+                implementation(libs.mosaic.runtime)
             }
         }
         commonTest {}
