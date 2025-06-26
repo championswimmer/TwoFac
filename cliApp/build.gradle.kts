@@ -28,8 +28,16 @@ kotlin {
                 implementation(project(":sharedLib"))
                 implementation(project.dependencies.platform(libs.koin.bom))
                 implementation(libs.koin.core)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.clikt)
+                implementation(libs.kotlin.multiplatform.appdirs)
             }
         }
-        commonTest {}
+        commonTest {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
+            }
+        }
     }
 }
