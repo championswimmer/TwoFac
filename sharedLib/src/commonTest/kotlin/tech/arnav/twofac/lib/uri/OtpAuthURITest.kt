@@ -19,10 +19,12 @@ class OtpAuthURITest {
             digits = 6,
             algorithm = CryptoTools.Algo.SHA1,
             secret = testSecret,
-            timeInterval = 30
+            timeInterval = 30,
+            accountName = "alice@example.com",
+            issuer = "Example"
         )
 
-        val uri = OtpAuthURI.create(totp, "Example:alice@example.com", "Example")
+        val uri = OtpAuthURI.create(totp)
 
         // Verify the URI format
         assertTrue(
@@ -38,10 +40,12 @@ class OtpAuthURITest {
         val hotp = HOTP(
             digits = 6,
             algorithm = CryptoTools.Algo.SHA1,
-            secret = testSecret
+            secret = testSecret,
+            accountName = "bob@example.com",
+            issuer = "Example"
         )
 
-        val uri = OtpAuthURI.create(hotp, "Example:bob@example.com", "Example")
+        val uri = OtpAuthURI.create(hotp)
 
         // Verify the URI format
         assertTrue(
@@ -135,12 +139,14 @@ class OtpAuthURITest {
         val originalTotp = TOTP(
             digits = 8,
             algorithm = CryptoTools.Algo.SHA256,
-            secret = testSecret
+            secret = testSecret,
+            accountName = "user@example.com",
+            issuer = "Test"
             // Using default timeInterval (30)
         )
 
         // Convert to URI
-        val uri = OtpAuthURI.create(originalTotp, "Test:user@example.com", "Test")
+        val uri = OtpAuthURI.create(originalTotp)
 
         // Parse back to OTP
         val parsedOtp = OtpAuthURI.parse(uri)

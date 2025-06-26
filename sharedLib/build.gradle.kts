@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinxKover)
+    id("org.jetbrains.dokka") version "2.0.0"
 }
 
 kotlin {

@@ -25,7 +25,9 @@ fun genHOTP(
             HashAlgo.SHA1 -> CryptoTools.Algo.SHA1
             HashAlgo.SHA256 -> CryptoTools.Algo.SHA256
             HashAlgo.SHA512 -> CryptoTools.Algo.SHA512
-        }
+        },
+        accountName = "user@example.com",
+        issuer = "TwoFac"
     )
     val otp = runBlocking { hotp.generateOTP(counter) }
     return otp
@@ -57,7 +59,9 @@ fun genTOTP(
             HashAlgo.SHA1 -> CryptoTools.Algo.SHA1
             HashAlgo.SHA256 -> CryptoTools.Algo.SHA256
             HashAlgo.SHA512 -> CryptoTools.Algo.SHA512
-        }
+        },
+        accountName = "user@example.com",
+        issuer = "TwoFac"
     )
     val currentTimeSeconds = kotlin.time.TimeSource.Monotonic.markNow().elapsedNow().inWholeSeconds
     return runBlocking { totp.generateOTP(currentTimeSeconds) }

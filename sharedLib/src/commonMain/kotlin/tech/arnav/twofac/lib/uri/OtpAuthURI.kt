@@ -1,6 +1,7 @@
 package tech.arnav.twofac.lib.uri
 
 import tech.arnav.twofac.lib.crypto.CryptoTools
+import tech.arnav.twofac.lib.crypto.Encoding.encodeURIComponent
 import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.OTP
 import tech.arnav.twofac.lib.otp.TOTP
@@ -51,17 +52,15 @@ object OtpAuthURI {
     @JsStatic
     @OptIn(ExperimentalNativeApi::class)
     @CName("create_otp_auth_uri")
-    fun create(otp: OTP, label: String, issuer: String? = null): String {
+    fun create(otp: OTP): String {
         val builder = Builder()
             .type(if (otp is TOTP) Type.TOTP else Type.HOTP)
-            .label(label)
+            .label("${otp.issuer?.let { "$it:" } ?: ""}${otp.accountName}")
             .secret(otp.secret)
             .digits(otp.digits)
             .algorithm(otp.algorithm)
 
-        if (issuer != null) {
-            builder.issuer(issuer)
-        }
+        otp.issuer?.let { builder.issuer(it) }
 
         if (otp is HOTP) {
             // For HOTP, we need a counter
@@ -105,6 +104,14 @@ object OtpAuthURI {
         val labelEndIndex = uri.indexOf("?", typeEndIndex)
         require(labelEndIndex != -1) { "Invalid otpauth URI: $uri" }
         val label = uri.substring(typeEndIndex + 1, labelEndIndex)
+        require(label.isNotEmpty()) { "Label cannot be empty" }
+
+
+        // Extract the issuer from the label if present
+        val labelIssuer = label.substringBefore(":", "")
+        val accountName = label.substringAfter(":", label).trim()
+
+
 
         // Parse the parameters
         val paramsStr = uri.substring(labelEndIndex + 1)
@@ -116,6 +123,13 @@ object OtpAuthURI {
 
         // Extract required parameters
         val secret = params["secret"] ?: throw IllegalArgumentException("Missing required parameter: secret")
+        val issuer = params["issuer"] ?: labelIssuer // Use label as issuer if not provided
+
+        require(issuer.isNotEmpty()) { "Issuer cannot be empty" }
+        // Only check if labelIssuer is not empty
+        if (labelIssuer.isNotEmpty()) {
+            require(issuer == labelIssuer) { "Issuer does not match label: $issuer != $labelIssuer" }
+        }
 
         // Extract optional parameters with defaults
         val digits = params["digits"]?.toIntOrNull() ?: DEFAULT_DIGITS
@@ -135,7 +149,9 @@ object OtpAuthURI {
                     digits = digits,
                     algorithm = algorithm,
                     secret = secret,
-                    timeInterval = period
+                    timeInterval = period,
+                    accountName = accountName,
+                    issuer = issuer
                 )
             }
 
@@ -144,7 +160,9 @@ object OtpAuthURI {
                 HOTP(
                     digits = digits,
                     algorithm = algorithm,
-                    secret = secret
+                    secret = secret,
+                    accountName = accountName,
+                    issuer = issuer
                 )
                 // Note: The counter is not used in the HOTP constructor, but it's a required parameter in the URI
             }
@@ -276,19 +294,5 @@ object OtpAuthURI {
             return uri.toString()
         }
 
-        /**
-         * Encode a string for use in a URI.
-         */
-        private fun encodeURIComponent(s: String): String {
-            return s.replace(" ", "%20")
-                .replace(":", "%3A")
-                .replace("/", "%2F")
-                .replace("?", "%3F")
-                .replace("&", "%26")
-                .replace("=", "%3D")
-                .replace("+", "%2B")
-                .replace("#", "%23")
-                .replace("@", "%40")
-        }
     }
 }

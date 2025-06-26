@@ -13,7 +13,9 @@ class HOTPTest {
         // Base32 encoded: "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"
         val hotp = HOTP(
             digits = 6,
-            secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"
+            secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
+            accountName = "test@example.com",
+            issuer = "Test"
         )
 
         // Test vectors from RFC 4226 (Appendix D)
@@ -42,7 +44,9 @@ class HOTPTest {
     fun testValidateOTP() = runTest {
         val hotp = HOTP(
             digits = 6,
-            secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"
+            secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
+            accountName = "test@example.com",
+            issuer = "Test"
         )
 
         // Test validation with a known OTP

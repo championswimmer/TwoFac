@@ -10,6 +10,8 @@ class TOTP(
     override val digits: Int = 6,
     override val algorithm: CryptoTools.Algo = CryptoTools.Algo.SHA1,
     override val secret: String,
+    override val accountName: String,
+    override val issuer: String?,
     /**
      * Base time in seconds from which the TOTP counter starts.
      * Default is 0, which means the epoch (1970-01-01T00:00:00Z).
@@ -23,7 +25,7 @@ class TOTP(
 ) : OTP {
 
     // Use HOTP internally for the actual OTP generation
-    private val hotp = HOTP(digits, algorithm, secret)
+    private val hotp = HOTP(digits, algorithm, secret, accountName, issuer)
 
     /**
      * Converts a timestamp to a counter value.

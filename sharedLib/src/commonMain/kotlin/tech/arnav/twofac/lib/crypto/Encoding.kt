@@ -102,4 +102,34 @@ object Encoding {
             ascii[i].code.toByte()
         }
     }
+
+    /**
+     * Encode a string for use in a URI.
+     */
+    internal fun encodeURIComponent(s: String): String {
+        return s.replace(" ", "%20")
+            .replace(":", "%3A")
+            .replace("/", "%2F")
+            .replace("?", "%3F")
+            .replace("&", "%26")
+            .replace("=", "%3D")
+            .replace("+", "%2B")
+            .replace("#", "%23")
+            .replace("@", "%40")
+    }
+
+    /**
+     * Decode a URI-encoded string.
+     */
+    internal fun decodeURIComponent(s: String): String {
+        return s.replace("%20", " ")
+            .replace("%3A", ":")
+            .replace("%2F", "/")
+            .replace("%3F", "?")
+            .replace("%26", "&")
+            .replace("%3D", "=")
+            .replace("%2B", "+")
+            .replace("%23", "#")
+            .replace("%40", "@")
+    }
 }

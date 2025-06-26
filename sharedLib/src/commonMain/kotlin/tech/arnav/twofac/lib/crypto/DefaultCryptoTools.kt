@@ -13,6 +13,8 @@ import dev.whyoleg.cryptography.random.CryptographyRandom
 import kotlinx.io.bytestring.ByteString
 
 class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools {
+
+    // TODO: make a CryptoConfig class to hold these constants and pass in
     companion object {
         const val SALT_LENGTH = 16 // 128 bits
         const val HASH_ITERATIONS = 200 // Number of iterations for PBKDF2

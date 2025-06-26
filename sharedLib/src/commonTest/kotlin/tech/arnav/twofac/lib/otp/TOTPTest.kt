@@ -17,7 +17,9 @@ class TOTPTest {
             digits = 6,
             secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
             baseTime = 0,
-            timeInterval = 30
+            timeInterval = 30,
+            accountName = "test@example.com",
+            issuer = "Test"
         )
 
         // Test with specific timestamps
@@ -44,7 +46,9 @@ class TOTPTest {
             digits = 6,
             secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
             baseTime = 0,
-            timeInterval = 30
+            timeInterval = 30,
+            accountName = "test@example.com",
+            issuer = "Test"
         )
 
         // Test validation with a known OTP at exact time
@@ -66,7 +70,9 @@ class TOTPTest {
             digits = 6,
             secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
             baseTime = 0,
-            timeInterval = 30
+            timeInterval = 30,
+            accountName = "test@example.com",
+            issuer = "Test"
         )
 
         // Test validation with previous time window
@@ -100,7 +106,9 @@ class TOTPTest {
             digits = 6,
             secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
             baseTime = 100,  // Start at time 100
-            timeInterval = 60  // 60-second intervals
+            timeInterval = 60,  // 60-second intervals
+            accountName = "test@example.com",
+            issuer = "Test"
         )
 
         // For time = 100, counter = 0, expected OTP = "755224"
@@ -212,7 +220,9 @@ class TOTPTest {
                 algorithm = vector.algorithm,
                 secret = base32Key, // Use Base32-encoded key
                 baseTime = 0,
-                timeInterval = 30
+                timeInterval = 30,
+                accountName = "test@example.com",
+                issuer = "Test"
             )
 
             // Generate OTP and verify it matches the expected code

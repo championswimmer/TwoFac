@@ -28,6 +28,19 @@ interface OTP {
     val secret: String
 
     /**
+     * The account name associated with the OTP.
+     * This is typically the username or email for which the OTP is generated.
+     */
+    val accountName: String
+
+    /**
+     * The issuer of the OTP, which is usually the service or application that provides the OTP.
+     * This can be null if not specified.
+     */
+    val issuer: String?
+
+
+    /**
      * Generate a new OTP based on the current counter.
      * The counter is typically incremented for each OTP generation.
      *

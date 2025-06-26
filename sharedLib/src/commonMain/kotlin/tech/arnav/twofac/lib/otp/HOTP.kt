@@ -13,8 +13,10 @@ class HOTP(
     override val digits: Int = 6,
     override val algorithm: CryptoTools.Algo = CryptoTools.Algo.SHA1,
     override val secret: String,
+    override val accountName: String,
+    override val issuer: String?,
 ) : OTP {
-    companion object {
+    private companion object {
         private const val MSB_MASK = 0x7F // most significant bit mask 01111111
         private const val BYTE_MASK = 0xFF // byte mask 11111111
     }
