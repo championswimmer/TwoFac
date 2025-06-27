@@ -52,6 +52,15 @@ interface CryptoTools {
     suspend fun createSigningKey(passKey: String): SigningKey
 
     /**
+     * Create a hash of the passKey using the specified SHA algorithm
+     *
+     * @param passKey The password to hash
+     * @param algorithm The SHA algorithm to use (SHA1, SHA256, or SHA512)
+     * @return The resulting hash as a ByteString
+     */
+    suspend fun createHash(passKey: String, algorithm: CryptoTools.Algo): ByteString
+
+    /**
      * Encrypt data using a key
      *
      * @param key The key to use for encryption

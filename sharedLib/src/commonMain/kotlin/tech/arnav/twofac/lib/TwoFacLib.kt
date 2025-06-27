@@ -1,12 +1,16 @@
 package tech.arnav.twofac.lib
 
-class TwoFacLib private constructor() {
+import tech.arnav.twofac.lib.storage.Storage
+
+class TwoFacLib private constructor(
+    val storage: Storage
+) {
 
     companion object {
 
-        fun initialise(): TwoFacLib {
+        fun initialise(storage: Storage): TwoFacLib {
             // Initialize any necessary components here
-            return TwoFacLib()
+            return TwoFacLib(storage)
         }
     }
 }

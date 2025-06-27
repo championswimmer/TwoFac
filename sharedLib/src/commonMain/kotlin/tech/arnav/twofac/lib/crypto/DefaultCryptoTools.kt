@@ -47,6 +47,17 @@ class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools
         return CryptoTools.SigningKey(key = ByteString(signingKey), salt = ByteString(salt))
     }
 
+    @OptIn(DelicateCryptographyApi::class)
+    override suspend fun createHash(passKey: String, algorithm: CryptoTools.Algo): ByteString {
+        val hashFunction = when (algorithm) {
+            CryptoTools.Algo.SHA1 -> cryptoProvider.get(SHA1)
+            CryptoTools.Algo.SHA256 -> cryptoProvider.get(SHA256)
+            CryptoTools.Algo.SHA512 -> cryptoProvider.get(SHA512)
+        }
+        val hash = hashFunction.hasher().hash(passKey.encodeToByteArray())
+        return ByteString(hash)
+    }
+
     override suspend fun encrypt(key: ByteString, secret: ByteString): ByteString {
         val keyDecoder = aesGcm.keyDecoder()
         val signingKey = keyDecoder.decodeFromByteString(AES.Key.Format.RAW, key)
