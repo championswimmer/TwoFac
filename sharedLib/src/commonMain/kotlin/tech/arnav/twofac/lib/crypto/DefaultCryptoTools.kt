@@ -38,13 +38,13 @@ class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools
         return ByteString(signature)
     }
 
-    override suspend fun createSigningKey(passKey: String): CryptoTools.SigningKey {
+    override suspend fun createSigningKey(passKey: String, salt: ByteString?): CryptoTools.SigningKey {
         // generate a salt
-        val salt = CryptographyRandom.nextBytes(SALT_LENGTH) // 128-bit salt
+        val saltBytes = salt?.toByteArray() ?: CryptographyRandom.nextBytes(SALT_LENGTH) // 128-bit salt
         // derive a key using PBKDF2
-        val secretDerivation = pbkdf2.secretDerivation(SHA256, HASH_ITERATIONS, 256.bits, salt)
+        val secretDerivation = pbkdf2.secretDerivation(SHA256, HASH_ITERATIONS, 256.bits, saltBytes)
         val signingKey = secretDerivation.deriveSecretToByteArray(passKey.encodeToByteArray())
-        return CryptoTools.SigningKey(key = ByteString(signingKey), salt = ByteString(salt))
+        return CryptoTools.SigningKey(key = ByteString(signingKey), salt = ByteString(saltBytes))
     }
 
     @OptIn(DelicateCryptographyApi::class)

@@ -28,4 +28,15 @@ class CryptoToolsTest {
         assertEquals(data.size, decryptedData.size)
         assertEquals(data, decryptedData)
     }
+
+    fun testRoundTripCreateSigningKey() = runTest {
+        val tools = DefaultCryptoTools(CryptographyProvider.Default)
+
+        // Create a signing key with a password
+        val (signingKey, salt) = tools.createSigningKey("my-secret-password")
+        val (signingKey2, salt2) = tools.createSigningKey("my-secret-password", salt)
+
+        // Assert that the keys are equal
+        assertEquals(signingKey, signingKey2)
+    }
 }

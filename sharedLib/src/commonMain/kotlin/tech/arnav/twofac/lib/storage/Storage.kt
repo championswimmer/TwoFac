@@ -1,13 +1,11 @@
 package tech.arnav.twofac.lib.storage
 
-import tech.arnav.twofac.lib.otp.OTP
-
 interface Storage {
 
-    fun getAccountList(): List<OTP>
+    fun getAccountList(): List<StoredAccount>
 
-    fun getAccount(accountLabel: String): OTP?
+    fun getAccount(accountLabel: String): StoredAccount?
 
-    fun saveAccount(account: OTP): Boolean
+    fun saveAccount(account: StoredAccount): Boolean
 
 }

@@ -46,10 +46,10 @@ interface CryptoTools {
      * Derive a key from a password using PBKDF2
      *
      * @param passKey The password to derive the key from
-     * @param salt The salt to use for key derivation
+     * @param salt The salt to use for key derivation. If null, a random salt will be generated
      * @return The derived signing key as a ByteString
      */
-    suspend fun createSigningKey(passKey: String): SigningKey
+    suspend fun createSigningKey(passKey: String, salt: ByteString? = null): SigningKey
 
     /**
      * Create a hash of the passKey using the specified SHA algorithm
