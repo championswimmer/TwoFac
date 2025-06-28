@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalNativeApi::class)
+@file:OptIn(ExperimentalNativeApi::class, ExperimentalTime::class)
 
 package twofac
 
@@ -8,6 +8,8 @@ import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.TOTP
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.experimental.ExperimentalNativeApi
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 enum class HashAlgo { SHA1, SHA256, SHA512 }
 
@@ -63,13 +65,13 @@ fun genTOTP(
         accountName = "user@example.com",
         issuer = "TwoFac"
     )
-    val currentTimeSeconds = kotlin.time.TimeSource.Monotonic.markNow().elapsedNow().inWholeSeconds
+    val currentTimeSeconds = Clock.System.now().epochSeconds
     return runBlocking { totp.generateOTP(currentTimeSeconds) }
 }
 
 @CName("gen_totp_from_uri")
 fun genTOTPFromUri(otpauthUri: String): String {
     val totp = OtpAuthURI.parse(otpauthUri) as TOTP
-    val currentTimeSeconds = kotlin.time.TimeSource.Monotonic.markNow().elapsedNow().inWholeSeconds
+    val currentTimeSeconds = Clock.System.now().epochSeconds
     return runBlocking { totp.generateOTP(currentTimeSeconds) }
 }
