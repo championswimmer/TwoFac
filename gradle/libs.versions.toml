@@ -23,6 +23,7 @@ koin-bom = "4.1.0"
 crypto-kt = "0.4.0"
 clikt = "5.0.3"
 kmp-appdirs = "2.0.0"
+kstore = "1.0.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

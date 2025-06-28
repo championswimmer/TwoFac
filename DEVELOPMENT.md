@@ -88,7 +88,7 @@ TwoFac/
 **Targets**:
 
 - `androidTarget` - Android application
-- `iosX64`, `iosArm64`, `iosSimulatorArm64` - iOS framework
+- `iosArm64`, `iosSimulatorArm64` - iOS framework
 - `jvm("desktop")` - Desktop application (JVM)
 - `wasmJs` - Web application
 
