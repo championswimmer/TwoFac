@@ -7,6 +7,8 @@ import kotlinx.io.bytestring.decodeToString
 import kotlinx.io.bytestring.encodeToByteString
 import tech.arnav.twofac.lib.crypto.CryptoTools
 import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
+import tech.arnav.twofac.lib.crypto.Encoding.toByteString
+import tech.arnav.twofac.lib.crypto.Encoding.toHexString
 import tech.arnav.twofac.lib.otp.OTP
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.uuid.ExperimentalUuidApi
@@ -24,13 +26,13 @@ object StorageUtils {
         return StoredAccount(
             accountID = accountID,
             accountLabel = "${issuer?.let { "$it:" } ?: ""}${accountName}",
-            salt = signingKey.salt,
-            encryptedURI = encryptedURI
+            salt = signingKey.salt.toHexString(),
+            encryptedURI = encryptedURI.toHexString()
         )
     }
 
     suspend fun StoredAccount.toOTP(signingKey: CryptoTools.SigningKey): OTP {
-        val decryptedURI = cryptoTools.decrypt(encryptedURI, signingKey.key)
+        val decryptedURI = cryptoTools.decrypt(encryptedURI.toByteString(), signingKey.key)
         return OtpAuthURI.parse(decryptedURI.decodeToString())
     }
 }

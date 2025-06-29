@@ -19,6 +19,7 @@ pluginManagement {
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositories {
+        mavenLocal() // TODO: remove when KStore 2.0.0 is released
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")

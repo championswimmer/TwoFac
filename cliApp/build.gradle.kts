@@ -31,6 +31,8 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.clikt)
                 implementation(libs.kotlin.multiplatform.appdirs)
+                implementation(libs.kstore)
+                implementation(libs.kstore.file)
             }
         }
         commonTest {

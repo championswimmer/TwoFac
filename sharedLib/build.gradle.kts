@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinxKover)
+    alias(libs.plugins.kotlinxSerialization)
     id("org.jetbrains.dokka") version "2.0.0"
 }
 
@@ -86,6 +87,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.crypto.kt.core)
+                api(libs.kotlinx.serialization.core)
             }
         }
 

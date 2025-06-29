@@ -1,5 +1,7 @@
 package tech.arnav.twofac.lib.crypto
 
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.ByteStringBuilder
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.js.ExperimentalJsStatic
 import kotlin.js.JsStatic
@@ -132,4 +134,61 @@ object Encoding {
             .replace("%23", "#")
             .replace("%40", "@")
     }
+
+    /**
+     * Convert a hexadecimal string to a ByteString.
+     *
+     * @param this The hexadecimal string to convert.
+     * @return The resulting ByteString.
+     * @throws NumberFormatException If the string is not a valid hexadecimal representation.
+     */
+    @Throws(NumberFormatException::class)
+    internal fun String.toByteString(): ByteString {
+        require(length % 2 == 0) { "Hex string must have an even length" }
+        return ByteStringBuilder().apply {
+            chunked(2).forEach {
+                append(it.toInt(16).toByte())
+            }
+        }.toByteString()
+    }
+
+    /**
+     * Convert a ByteString to a hexadecimal string.
+     *
+     * @return The hexadecimal representation of the ByteString.
+     */
+    internal fun ByteString.toHexString(): String {
+        return this.toByteArray().joinToString("") { byte ->
+            byte.toUByte().toString(16).padStart(2, '0')
+        }
+    }
+
+    /**
+     * Wrapper function for testing: Convert a hexadecimal string to a ByteString.
+     *
+     * @param hexString The hexadecimal string to convert.
+     * @return The resulting ByteString.
+     * @throws NumberFormatException If the string is not a valid hexadecimal representation.
+     */
+    @JvmStatic
+    @JsStatic
+    @CName("hex_to_bytestring")
+    @Throws(NumberFormatException::class)
+    fun hexToByteString(hexString: String): ByteString {
+        return hexString.toByteString()
+    }
+
+    /**
+     * Wrapper function for testing: Convert a ByteString to a hexadecimal string.
+     *
+     * @param byteString The ByteString to convert.
+     * @return The hexadecimal representation of the ByteString.
+     */
+    @JvmStatic
+    @JsStatic
+    @CName("bytestring_to_hex")
+    fun byteStringToHex(byteString: ByteString): String {
+        return byteString.toHexString()
+    }
+
 }

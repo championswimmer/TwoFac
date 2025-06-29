@@ -7,7 +7,6 @@ class MemoryStorage : Storage {
     // This is a simple in-memory storage implementation.
     // In a real application, you would implement the methods to store and retrieve accounts.
 
-
     private val accounts = mutableListOf<StoredAccount>()
 
     override fun getAccountList(): List<StoredAccount> {

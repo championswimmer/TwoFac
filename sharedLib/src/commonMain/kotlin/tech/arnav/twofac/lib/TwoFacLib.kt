@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib
 
 import dev.whyoleg.cryptography.CryptographyProvider
 import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
+import tech.arnav.twofac.lib.crypto.Encoding.toByteString
 import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.TOTP
 import tech.arnav.twofac.lib.storage.MemoryStorage
@@ -23,6 +24,15 @@ class TwoFacLib private constructor(
         fun initialise(
             storage: Storage = MemoryStorage(), passKey: String
         ): TwoFacLib {
+            require(passKey.isNotBlank()) { "Password key cannot be blank" }
+            if (storage is MemoryStorage) {
+                println(
+                    """
+                    ⚠️[WARNING]: Using in-memory storage. This will not persist data across application restarts.
+                    Use a persistent storage implementation for production use.
+                """.trimIndent()
+                )
+            }
             return TwoFacLib(storage, passKey)
         }
     }
@@ -37,7 +47,7 @@ class TwoFacLib private constructor(
     suspend fun getAllAccountOTPs(): List<Pair<StoredAccount.DisplayAccount, String>> {
         return storage.getAccountList().map { account ->
             val otpGen = account.toOTP(
-                cryptoTools.createSigningKey(passKey, account.salt),
+                cryptoTools.createSigningKey(passKey, account.salt.toByteString()),
             )
             val timeNow = Clock.System.now().epochSeconds
             println("Time now: $timeNow")

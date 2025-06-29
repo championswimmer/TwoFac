@@ -1,6 +1,7 @@
 package tech.arnav.twofac.cli
 
 import kotlinx.coroutines.runBlocking
+import tech.arnav.twofac.cli.storage.AppDirUtils
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.libPlatform
 
@@ -25,5 +26,7 @@ fun main() {
         val otps = twoFacLib.getAllAccountOTPs()
         println("OTPs: $otps")
     }
+
+    println("Storage file path: ${AppDirUtils.getStorageFilePath()}")
 
 }

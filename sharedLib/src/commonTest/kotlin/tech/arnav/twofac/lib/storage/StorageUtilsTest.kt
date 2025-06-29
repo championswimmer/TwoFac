@@ -3,6 +3,7 @@ package tech.arnav.twofac.lib.storage
 import dev.whyoleg.cryptography.CryptographyProvider
 import kotlinx.coroutines.test.runTest
 import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
+import tech.arnav.twofac.lib.crypto.Encoding.toHexString
 import tech.arnav.twofac.lib.otp.TOTP
 import tech.arnav.twofac.lib.storage.StorageUtils.toOTP
 import tech.arnav.twofac.lib.storage.StorageUtils.toStoredAccount
@@ -37,7 +38,7 @@ class StorageUtilsTest {
         // Verify the stored account properties
         assertNotNull(storedAccount.accountID)
         assertEquals("Test:test@example.com", storedAccount.accountLabel)
-        assertEquals(signingKey.salt, storedAccount.salt)
+        assertEquals(signingKey.salt.toHexString(), storedAccount.salt)
         assertNotNull(storedAccount.encryptedURI)
     }
 
