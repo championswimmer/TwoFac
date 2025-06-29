@@ -12,11 +12,11 @@ object AppDirUtils {
         appAuthor = "tech.arnav"
     }
 
-    fun getStorageFilePath(forceCreate: Boolean = false): String {
+    fun getStorageFilePath(forceCreate: Boolean = false): Path {
         val dir = appDirs.getUserDataDir()
         if (forceCreate) {
             SystemFileSystem.createDirectories(Path(dir))
         }
-        return Path(dir, ACCOUNTS_STORAGE_FILE_NAME).toString()
+        return Path(dir, ACCOUNTS_STORAGE_FILE_NAME)
     }
 }

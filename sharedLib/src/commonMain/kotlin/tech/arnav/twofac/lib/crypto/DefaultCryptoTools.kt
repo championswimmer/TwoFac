@@ -70,6 +70,7 @@ class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools
         val keyDecoder = aesGcm.keyDecoder()
         val signingKey = keyDecoder.decodeFromByteString(AES.Key.Format.RAW, key)
         val cipher = signingKey.cipher()
+        // TODO: Handle decryption errors gracefully
         val plainText = cipher.decrypt(encryptedData.toByteArray())
         return ByteString(plainText)
     }

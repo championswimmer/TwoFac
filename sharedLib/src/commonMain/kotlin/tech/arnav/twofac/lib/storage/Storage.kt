@@ -5,13 +5,13 @@ import kotlin.uuid.Uuid
 
 interface Storage {
 
-    fun getAccountList(): List<StoredAccount>
+    suspend fun getAccountList(): List<StoredAccount>
 
-    fun getAccount(accountLabel: String): StoredAccount?
+    suspend fun getAccount(accountLabel: String): StoredAccount?
 
     @OptIn(ExperimentalUuidApi::class)
-    fun getAccount(accountID: Uuid): StoredAccount?
+    suspend fun getAccount(accountID: Uuid): StoredAccount?
 
-    fun saveAccount(account: StoredAccount): Boolean
+    suspend fun saveAccount(account: StoredAccount): Boolean
 
 }

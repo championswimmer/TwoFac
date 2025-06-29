@@ -2,6 +2,7 @@ package tech.arnav.twofac.cli
 
 import kotlinx.coroutines.runBlocking
 import tech.arnav.twofac.cli.storage.AppDirUtils
+import tech.arnav.twofac.cli.storage.FileStorage
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.libPlatform
 
@@ -16,17 +17,24 @@ fun main() {
         println("Cache Directory: ${getUserCacheDir()}")
     }
 
-    val twoFacLib = TwoFacLib.initialise(passKey = "234567")
-    println("TwoFacLib initialized: $twoFacLib")
 
     runBlocking {
+        val storagePath = AppDirUtils.getStorageFilePath(forceCreate = true)
+        println("Storage file path: $storagePath")
+
+        val storage = FileStorage(storagePath)
+
+        val twoFacLib = TwoFacLib.initialise(passKey = "234567", storage = storage)
+        println("TwoFacLib initialized: $twoFacLib")
+
         twoFacLib.addAccount("otpauth://totp/Example:user@test.com?secret=JBSWY3DPEHPK3PXP")
         val accounts = twoFacLib.getAllAccounts()
         println("Accounts: $accounts")
         val otps = twoFacLib.getAllAccountOTPs()
-        println("OTPs: $otps")
+        otps.forEach {
+            println("Account: ${it.first}, OTP: ${it.second}")
+        }
     }
 
-    println("Storage file path: ${AppDirUtils.getStorageFilePath()}")
 
 }

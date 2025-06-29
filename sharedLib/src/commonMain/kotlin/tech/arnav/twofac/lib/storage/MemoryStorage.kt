@@ -9,24 +9,24 @@ class MemoryStorage : Storage {
 
     private val accounts = mutableListOf<StoredAccount>()
 
-    override fun getAccountList(): List<StoredAccount> {
+    override suspend fun getAccountList(): List<StoredAccount> {
         // Return a copy of the list to prevent external modification
         return accounts.toList()
     }
 
-    override fun getAccount(accountLabel: String): StoredAccount? {
+    override suspend fun getAccount(accountLabel: String): StoredAccount? {
         // Find the account by label
         return accounts.find { it.accountLabel == accountLabel }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getAccount(accountID: Uuid): StoredAccount? {
+    override suspend fun getAccount(accountID: Uuid): StoredAccount? {
         // Find the account by ID
         return accounts.find { it.accountID == accountID }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun saveAccount(account: StoredAccount): Boolean {
+    override suspend fun saveAccount(account: StoredAccount): Boolean {
         // Check if the account already exists
         val existingAccountIndex = accounts.indexOfFirst { it.accountID == account.accountID }
 

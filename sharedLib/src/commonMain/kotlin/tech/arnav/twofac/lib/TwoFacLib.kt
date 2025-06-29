@@ -39,7 +39,7 @@ class TwoFacLib private constructor(
 
     private val cryptoTools = DefaultCryptoTools(CryptographyProvider.Default)
 
-    fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
+    suspend fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
         return storage.getAccountList().map(StoredAccount::forDisplay)
     }
 
@@ -50,7 +50,6 @@ class TwoFacLib private constructor(
                 cryptoTools.createSigningKey(passKey, account.salt.toByteString()),
             )
             val timeNow = Clock.System.now().epochSeconds
-            println("Time now: $timeNow")
             val otpString: String = when (otpGen) {
                 is HOTP -> otpGen.generateOTP(0)
                 is TOTP -> otpGen.generateOTP(timeNow)
