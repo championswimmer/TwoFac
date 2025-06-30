@@ -16,12 +16,14 @@ data class StoredAccount constructor(
     data class DisplayAccount(
         val accountID: String,
         val accountLabel: String,
+        val nextCodeAt: Long = 0L,
     )
 
-    fun forDisplay(): DisplayAccount {
+    fun forDisplay(nextCodeAt: Long? = 0L): DisplayAccount {
         return DisplayAccount(
             accountID = accountID.toString(),
-            accountLabel = accountLabel
+            accountLabel = accountLabel,
+            nextCodeAt = nextCodeAt ?: 0L,
         )
     }
 }

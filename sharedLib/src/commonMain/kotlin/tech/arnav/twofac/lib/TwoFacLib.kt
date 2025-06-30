@@ -11,20 +11,23 @@ import tech.arnav.twofac.lib.storage.StorageUtils.toOTP
 import tech.arnav.twofac.lib.storage.StorageUtils.toStoredAccount
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.lib.uri.OtpAuthURI
+import kotlin.concurrent.Volatile
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class TwoFacLib private constructor(
     val storage: Storage,
-    val passKey: String,
+    @Volatile private var passKey: String?,
 ) {
 
     companion object {
 
         fun initialise(
-            storage: Storage = MemoryStorage(), passKey: String
+            storage: Storage = MemoryStorage(), passKey: String? = null
         ): TwoFacLib {
-            require(passKey.isNotBlank()) { "Password key cannot be blank" }
+            passKey?.let {
+                require(it.isNotBlank()) { "Password key cannot be blank" }
+            }
             if (storage is MemoryStorage) {
                 println(
                     """
@@ -39,15 +42,32 @@ class TwoFacLib private constructor(
 
     private val cryptoTools = DefaultCryptoTools(CryptographyProvider.Default)
 
+    /**
+     * Unlocks the library with the provided passkey
+     */
+    fun unlock(passKey: String) {
+        require(passKey.isNotBlank()) { "Password key cannot be blank" }
+        this.passKey = passKey
+    }
+
+    /**
+     * Checks if the library is unlocked (passkey is set)
+     */
+    fun isUnlocked(): Boolean {
+        return passKey != null
+    }
+
     suspend fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
         return storage.getAccountList().map(StoredAccount::forDisplay)
     }
 
     @OptIn(ExperimentalTime::class)
     suspend fun getAllAccountOTPs(): List<Pair<StoredAccount.DisplayAccount, String>> {
+        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         return storage.getAccountList().map { account ->
             val otpGen = account.toOTP(
-                cryptoTools.createSigningKey(passKey, account.salt.toByteString()),
+                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
             )
             val timeNow = Clock.System.now().epochSeconds
             val otpString: String = when (otpGen) {
@@ -55,15 +75,22 @@ class TwoFacLib private constructor(
                 is TOTP -> otpGen.generateOTP(timeNow)
                 else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
             }
+            val nextCodeAt = when (otpGen) {
+                is HOTP -> 0L // HOTP does not have a next code time
+                is TOTP -> otpGen.nextCodeAt(timeNow)
+                else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
+            }
             return@map Pair(
-                account.forDisplay(), otpString
+                account.forDisplay(nextCodeAt), otpString
             )
         }
     }
 
     suspend fun addAccount(accountURI: String): Boolean {
+        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val otp = OtpAuthURI.parse(accountURI)
-        val signingKey = cryptoTools.createSigningKey(passKey)
+        val signingKey = cryptoTools.createSigningKey(currentPassKey)
         val account = otp.toStoredAccount(signingKey)
         return storage.saveAccount(account)
     }

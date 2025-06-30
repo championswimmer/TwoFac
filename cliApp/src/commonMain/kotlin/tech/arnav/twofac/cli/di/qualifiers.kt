@@ -4,4 +4,4 @@ package tech.arnav.twofac.cli.di
 
 
 @Target(AnnotationTarget.PROPERTY)
-annotation class AppDirPath
+annotation class StorageFilePath

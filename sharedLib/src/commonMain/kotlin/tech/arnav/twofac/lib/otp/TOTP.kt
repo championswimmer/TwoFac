@@ -37,6 +37,10 @@ class TOTP(
         return (currentTime - baseTime) / timeInterval
     }
 
+    fun nextCodeAt(currentTime: Long): Long {
+        return currentTime + (timeInterval - (currentTime - baseTime) % timeInterval)
+    }
+
 
     /**
      * Generate a new OTP based on the current time.
