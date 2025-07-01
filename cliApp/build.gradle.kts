@@ -30,6 +30,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.clikt)
+                implementation(libs.mordant.coroutines)
                 implementation(libs.kotlin.multiplatform.appdirs)
                 implementation(libs.kstore)
                 implementation(libs.kstore.file)

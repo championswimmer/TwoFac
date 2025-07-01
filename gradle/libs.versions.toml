@@ -23,6 +23,7 @@ core = "1.6.1"
 koin-bom = "4.1.0"
 crypto-kt = "0.4.0"
 clikt = "5.0.3"
+mordant = "3.0.2"
 kmp-appdirs = "2.0.0"
 kstore = "2.0.0" #
 
@@ -57,6 +58,7 @@ crypto-kt-openssl = { module = "dev.whyoleg.cryptography:cryptography-provider-o
 crypto-kt-web = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto", version.ref = "crypto-kt" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
+mordant-coroutines = { module = "com.github.ajalt.mordant:mordant-coroutines", version.ref = "mordant" }
 kotlin-multiplatform-appdirs = { module = "ca.gosyer:kotlin-multiplatform-appdirs", version.ref = "kmp-appdirs" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "kstore" }

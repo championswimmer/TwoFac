@@ -1,3 +1,28 @@
+# TwoFac
+
+##### Open Source, Native, Cross-Platform 2FA App for Watch, Mobile, Desktop, Web, CLI
+
+[![Kotlin](https://img.shields.io/badge/kotlin-2.2.0-blue.svg?logo=kotlin)](https://kotlinlang.org/)
+[![Compose Multiplatform](https://img.shields.io/badge/compose-multiplatform-blue.svg?logo=jetbrains)](https://github.com/JetBrains/compose-multiplatform)
+
+## ROADMAP
+
+- [ ] Common functionality
+    - [x] Add new accounts
+    - [x] Display accounts with 2FA codes
+    - [x] Save accounts to a storage
+    - [ ] Backup & Restore via a backup transport
+    - [ ] Export & Import accounts (encrypted with passkey)
+    - [ ] Import from other 2FA apps
+        - [ ] Authy
+        - [ ] 2FAS
+        - [ ] Ente
+- [ ] Mobile App
+- [ ] Desktop App
+- [ ] Web Extension
+- [ ] CLI App
+    - [ ] Add new accounts
+    - [x] Display 2FA codes with auto-refresh
 
 ## CODE STRUCTURE
 This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
@@ -12,15 +37,17 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
 * `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
   you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+* `/cliApp` contains the command-line interface application code.
+  It uses the shared library to provide 2FA functionality through terminal commands.
+  The CLI is built using Clikt framework and provides features like:
+    - Display 2FA codes with auto-refresh
+    - Add new accounts
+    - Show platform information
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack
-channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
-
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+* `/sharedLib` is a shared library that contains the core 2FA functionality.
+  It is used by all applications and provides the logic for managing 2FA accounts,
+  generating codes, and handling encryption.
+  The library is written in Kotlin and can be used across different platforms.
 
 ## DEPENDENCY STRUCTURE
 
