@@ -1,16 +1,12 @@
 package tech.arnav.twofac.cli.storage
 
-import ca.gosyer.appdirs.AppDirs
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import tech.arnav.twofac.cli.getPlatform
 
 object AppDirUtils {
     const val ACCOUNTS_STORAGE_FILE_NAME = "accounts.json"
-    private val appDirs = AppDirs {
-        macOs { useSpaceBetweenAuthorAndApp = false }
-        appName = "2fac"
-        appAuthor = "tech.arnav"
-    }
+    private val appDirs get() = getPlatform().appDirs
 
     fun getStorageFilePath(forceCreate: Boolean = false): Path {
         val dir = appDirs.getUserDataDir()

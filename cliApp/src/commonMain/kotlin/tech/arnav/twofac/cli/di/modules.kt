@@ -4,6 +4,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import tech.arnav.twofac.cli.storage.AppDirUtils
 import tech.arnav.twofac.cli.storage.FileStorage
+import tech.arnav.twofac.cli.viewmodels.AccountsViewModel
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.Storage
 
@@ -24,5 +25,9 @@ val appModule = module {
         TwoFacLib.initialise(
             storage = get(),
         )
+    }
+
+    single<AccountsViewModel> {
+        AccountsViewModel(twoFacLib = get())
     }
 }
