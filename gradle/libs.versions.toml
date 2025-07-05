@@ -8,26 +8,28 @@ androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
 androidx-core = "1.16.0"
 androidx-espresso = "3.6.1"
-androidx-lifecycle = "2.9.0"
+androidx-lifecycle = "2.9.1"
+androidx-navigation = "2.9.0-beta03"
 androidx-testExt = "1.2.1"
-composeHotReload = "1.0.0-alpha10"
-composeMultiplatform = "1.8.1"
+composeHotReload = "1.0.0-beta03"
+composeMultiplatform = "1.8.2"
 junit = "4.13.2"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
-kotlinStdlib = "2.1.21"
+kotlinStdlib = "2.2.0"
 kotlinx-browser = "0.3"
-kotlinx-serialization = "1.8.1"
+kotlinx-serialization = "1.9.0"
 runner = "1.6.2"
 core = "1.6.1"
 koin-bom = "4.1.0"
-crypto-kt = "0.4.0"
+crypto-kt = "0.5.0"
 clikt = "5.0.3"
 mordant = "3.0.2"
 kmp-appdirs = "2.0.0"
 kstore = "2.0.0" #
 
 [libraries]
+
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -39,6 +41,7 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
@@ -65,6 +68,7 @@ kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "ks
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 
 [plugins]
+
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
