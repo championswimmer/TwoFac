@@ -1,47 +1,67 @@
 package tech.arnav.twofac
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-import twofac.composeapp.generated.resources.Res
-import twofac.composeapp.generated.resources.compose_multiplatform
+import tech.arnav.twofac.navigation.AccountDetail
+import tech.arnav.twofac.navigation.Accounts
+import tech.arnav.twofac.navigation.AddAccount
+import tech.arnav.twofac.navigation.Home
+import tech.arnav.twofac.navigation.Settings
+import tech.arnav.twofac.screens.AccountDetailScreen
+import tech.arnav.twofac.screens.AccountsScreen
+import tech.arnav.twofac.screens.AddAccountScreen
+import tech.arnav.twofac.screens.HomeScreen
+import tech.arnav.twofac.screens.SettingsScreen
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        val navController = rememberNavController()
+
+        NavHost(
+            navController = navController,
+            startDestination = Home
         ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+            composable<Home> {
+                HomeScreen(
+                    onNavigateToAccounts = { navController.navigate(Accounts) },
+                    onNavigateToSettings = { navController.navigate(Settings) }
+                )
             }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
+
+            composable<Accounts> {
+                AccountsScreen(
+                    onNavigateToAddAccount = { navController.navigate(AddAccount) },
+                    onNavigateToAccountDetail = { accountId ->
+                        navController.navigate(AccountDetail(accountId))
+                    }
+                )
+            }
+
+            composable<AccountDetail> { backStackEntry ->
+                val accountDetail = backStackEntry.toRoute<AccountDetail>()
+                AccountDetailScreen(
+                    accountId = accountDetail.accountId,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable<Settings> {
+                SettingsScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable<AddAccount> {
+                AddAccountScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
         }
     }
