@@ -72,6 +72,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
 
+            implementation(libs.kstore)
             implementation(project(":sharedLib"))
         }
         commonTest.dependencies {
@@ -80,11 +81,21 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.kstore.file)
+            implementation(libs.kotlin.multiplatform.appdirs)
+        }
+        iosMain.dependencies {
+            implementation(libs.kstore.file)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.kstore.file)
+            implementation(libs.kotlin.multiplatform.appdirs)
             implementation(project(":sharedLib"))
+        }
+        wasmJsMain.dependencies {
+            implementation(libs.kstore.storage)
         }
     }
 }

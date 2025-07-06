@@ -11,21 +11,31 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.koin.compose.viewmodel.koinViewModel
+import tech.arnav.twofac.viewmodels.AccountsViewModel
 
 @Composable
 fun AccountsScreen(
     onNavigateToAddAccount: () -> Unit,
-    onNavigateToAccountDetail: (String) -> Unit
+    onNavigateToAccountDetail: (String) -> Unit,
+    viewModel: AccountsViewModel = koinViewModel()
 ) {
+    val accounts by viewModel.accounts.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToAddAccount) {
@@ -45,22 +55,40 @@ fun AccountsScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(listOf("Example Account 1", "Example Account 2")) { account ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { onNavigateToAccountDetail(account) }
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+
+                error != null -> {
+                    Text(
+                        text = "Error: $error",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
+                else -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = account,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
+                        items(accounts) { account ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = { onNavigateToAccountDetail(account.accountID) }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = account.accountLabel,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
                         }
                     }
                 }
