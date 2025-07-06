@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun PasskeyDialog(
@@ -130,4 +131,16 @@ fun PasskeyDialog(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PasskeyDialogPreview() {
+    PasskeyDialog(
+        isVisible = true,
+        isLoading = false,
+        error = null,
+        onPasskeySubmit = {},
+        onDismiss = {}
+    )
 }

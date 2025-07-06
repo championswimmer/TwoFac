@@ -2,16 +2,27 @@ package tech.arnav.twofac.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.StoredAccount
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class AccountsViewModel(
     private val twoFacLib: TwoFacLib
 ) : ViewModel() {
+
+    companion object {
+        const val REFRESH_DEBOUNCE = 100L // milliseconds
+    }
 
     private val _accounts = MutableStateFlow<List<StoredAccount.DisplayAccount>>(emptyList())
     val accounts: StateFlow<List<StoredAccount.DisplayAccount>> = _accounts.asStateFlow()
@@ -25,8 +36,19 @@ class AccountsViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val _refreshTrigger = MutableStateFlow(0L)
+
+    @OptIn(FlowPreview::class)
+    private val triggerRefreshFlow = _refreshTrigger
+        .filter { it > 0 }
+        .debounce(REFRESH_DEBOUNCE)
+
     init {
         loadAccounts()
+
+        triggerRefreshFlow
+            .onEach { refreshOtpsInternal() }
+            .launchIn(viewModelScope)
     }
 
     fun loadAccounts() {
@@ -94,14 +116,17 @@ class AccountsViewModel(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun refreshOtps() {
-        viewModelScope.launch {
-            try {
-                val accountOtpList = twoFacLib.getAllAccountOTPs()
-                _accountOtps.value = accountOtpList
-            } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to refresh OTPs"
-            }
+        _refreshTrigger.value = Clock.System.now().toEpochMilliseconds()
+    }
+
+    private suspend fun refreshOtpsInternal() {
+        try {
+            val accountOtpList = twoFacLib.getAllAccountOTPs()
+            _accountOtps.value = accountOtpList
+        } catch (e: Exception) {
+            _error.value = e.message ?: "Failed to refresh OTPs"
         }
     }
 

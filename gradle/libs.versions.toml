@@ -27,7 +27,7 @@ crypto-kt = "0.5.0"
 clikt = "5.0.3"
 mordant = "3.0.2"
 kmp-appdirs = "2.0.0"
-kstore = "2.0.0" #
+kstore = "2.0.0"
 
 [libraries]
 
