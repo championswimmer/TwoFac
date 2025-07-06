@@ -43,7 +43,7 @@ class DisplayCommand : CliktCommand(), KoinComponent {
         val animation = terminal.animation<DisplayAccountsStatic> { displayAccounts ->
             createTable(displayAccounts)
         }
-
+        echo("\n")
         repeat(2.minutes.inWholeSeconds.toInt()) {
             animation.update(accountsViewModel.showAllAccountOTPs())
             delay(1.seconds.inWholeMilliseconds)

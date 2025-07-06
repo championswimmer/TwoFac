@@ -21,7 +21,7 @@ private fun getDocumentDirectory(): String {
 actual fun createAccountsStore(): KStore<List<StoredAccount>> {
     val dir = getDocumentDirectory()
     SystemFileSystem.createDirectories(Path(dir))
-    val filePath = Path(dir, "accounts.json")
+    val filePath = Path(dir, ACCOUNTS_STORAGE_FILE)
 
     return storeOf(
         file = filePath,
@@ -31,5 +31,5 @@ actual fun createAccountsStore(): KStore<List<StoredAccount>> {
 
 actual fun getStoragePath(): String {
     val dir = getDocumentDirectory()
-    return Path(dir, "accounts.json").toString()
+    return Path(dir, ACCOUNTS_STORAGE_FILE).toString()
 }

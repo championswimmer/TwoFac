@@ -9,7 +9,7 @@ interface Platform {
 
     companion object {
         private val _appDirs = AppDirs {
-            appName = "2fac"
+            appName = "TwoFac"
             appAuthor = "tech.arnav"
             macOS.useSpaceBetweenAuthorAndApp = false
         }
