@@ -40,7 +40,8 @@ fun App() {
                     onNavigateToAddAccount = { navController.navigate(AddAccount) },
                     onNavigateToAccountDetail = { accountId ->
                         navController.navigate(AccountDetail(accountId))
-                    }
+                    },
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
 
