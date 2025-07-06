@@ -94,6 +94,17 @@ class AccountsViewModel(
         }
     }
 
+    fun refreshOtps() {
+        viewModelScope.launch {
+            try {
+                val accountOtpList = twoFacLib.getAllAccountOTPs()
+                _accountOtps.value = accountOtpList
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to refresh OTPs"
+            }
+        }
+    }
+
     fun clearError() {
         _error.value = null
     }
