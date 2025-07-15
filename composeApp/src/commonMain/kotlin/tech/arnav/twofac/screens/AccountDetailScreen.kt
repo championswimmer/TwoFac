@@ -40,6 +40,8 @@ fun AccountDetailScreen(
 
     val accounts by viewModel.accounts.collectAsState()
     val error by viewModel.error.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val isLibUnlocked = viewModel.twoFacLibUnnocked
 
     val account = accounts.find { it.accountID == accountId }
 
@@ -64,51 +66,61 @@ fun AccountDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
 
-        account?.let { acc ->
-            Text(
-                text = "Account: ${acc.accountLabel}",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            OutlinedTextField(
-                value = passkeyText,
-                onValueChange = { passkeyText = it },
-                label = { Text("Passkey") },
-                placeholder = { Text("Enter your passkey") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Button(
-                onClick = {
-                    if (passkeyText.isNotBlank()) {
-                        currentOtp = viewModel.getOtpForAccount(accountId, passkeyText)
-                    }
-                },
-                enabled = passkeyText.isNotBlank()
-            ) {
-                Text("Generate OTP")
+            if (isLoading) {
+                Text(
+                    text = "Loading account details...",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                return@Column
             }
 
-            currentOtp?.let { otp ->
+            if (account != null) {
                 Text(
-                    text = "OTP: $otp",
-                    style = MaterialTheme.typography.headlineSmall
+                    text = "Account: ${account.accountLabel}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                if (!isLibUnlocked) {
+                    OutlinedTextField(
+                        value = passkeyText,
+                        onValueChange = { passkeyText = it },
+                        label = { Text("Passkey") },
+                        placeholder = { Text("Enter your passkey") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        val passkey = if (isLibUnlocked) "" else passkeyText
+                        currentOtp = viewModel.getOtpForAccount(accountId, passkey)
+                    },
+                    enabled = isLibUnlocked || passkeyText.isNotBlank()
+                ) {
+                    Text("Generate OTP")
+                }
+
+                currentOtp?.let { otp ->
+                    Text(
+                        text = "OTP: $otp",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                }
+
+                error?.let { errorMessage ->
+                    Text(
+                        text = "Error: $errorMessage",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            } else {
+                Text(
+                    text = "Account not found",
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
 
-            error?.let { errorMessage ->
-                Text(
-                    text = "Error: $errorMessage",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-        } ?: run {
-            Text(
-                text = "Account not found",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
         }
     }
 }

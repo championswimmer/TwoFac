@@ -36,6 +36,8 @@ class AccountsViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    val twoFacLibUnnocked: Boolean get() = twoFacLib.isUnlocked()
+
     private val _refreshTrigger = MutableStateFlow(0L)
 
     @OptIn(FlowPreview::class)
@@ -67,21 +69,29 @@ class AccountsViewModel(
         }
     }
 
-    fun loadAccountsWithOtps(passkey: String) {
+    fun loadAccountsWithOtps(passkey: String?) {
+        if (!twoFacLibUnnocked) {
+            if (passkey.isNullOrBlank()) {
+                _error.value = "Passkey is required to load accounts with OTPs"
+                return
+            } else {
+                try {
+                    twoFacLib.unlock(passkey)
+                } catch (e: Exception) {
+                    _error.value = e.message ?: "Failed to unlock with passkey"
+                    return
+                }
+            }
+        }
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
 
-            try {
-                twoFacLib.unlock(passkey)
-                val accountOtpList = twoFacLib.getAllAccountOTPs()
-                _accountOtps.value = accountOtpList
-                _accounts.value = accountOtpList.map { it.first }
-            } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to load accounts with OTPs"
-            } finally {
-                _isLoading.value = false
-            }
+            val accountOtpList = twoFacLib.getAllAccountOTPs()
+            _accountOtps.value = accountOtpList
+            _accounts.value = accountOtpList.map { it.first }
+
+            _isLoading.value = false
         }
     }
 
@@ -106,14 +116,21 @@ class AccountsViewModel(
         }
     }
 
-    fun getOtpForAccount(accountId: String, passkey: String): String? {
-        return try {
-            twoFacLib.unlock(passkey)
-            _accountOtps.value.find { it.first.accountID == accountId }?.second
-        } catch (e: Exception) {
-            _error.value = e.message ?: "Failed to generate OTP"
-            null
+    fun getOtpForAccount(accountId: String, passkey: String?): String? {
+        if (!twoFacLibUnnocked) {
+            if (passkey.isNullOrBlank()) {
+                _error.value = "Passkey is required to generate OTP"
+                return null
+            } else {
+                try {
+                    twoFacLib.unlock(passkey)
+                } catch (e: Exception) {
+                    _error.value = e.message ?: "Failed to unlock with passkey"
+                    return null
+                }
+            }
         }
+        return _accountOtps.value.find { it.first.accountID == accountId }?.second
     }
 
     @OptIn(ExperimentalTime::class)
