@@ -2,7 +2,11 @@
 
 package tech.arnav.twofac.cli
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.sizeOf
 import platform.windows.GetVersionExW
 import platform.windows.OSVERSIONINFOW
 

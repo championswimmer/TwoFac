@@ -1,11 +1,12 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.plugin.mpp.DefaultCInteropSettings
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinxKover)
     alias(libs.plugins.kotlinxSerialization)
-    id("org.jetbrains.dokka") version "2.0.0"
+    alias(libs.plugins.dokka)
 }
 
 group = "tech.arnav.twofac"
@@ -46,8 +47,10 @@ kotlin {
     ).forEach { nativeTarget ->
         nativeTarget.compilations.getByName("main") {
             cinterops {
-                create("zlib") {
-                    defFile(project.file("src/nativeMain/cinterop/zlib.def"))
+                val zlib by creating {}
+                zlib.apply {
+                    packageName = "zlib"
+                    definitionFile.set(project.file("src/nativeMain/cinterop/zlib.def"))
                 }
             }
         }
