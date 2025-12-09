@@ -12,7 +12,7 @@ class KoinVerificationTest : KoinTest {
     fun shouldInjectKoinModules() {
         koinApplication {
             printLogger(Level.INFO)
-            modules(storageModule)
+            modules(appModule, storageModule)
             checkModules()
         }
     }

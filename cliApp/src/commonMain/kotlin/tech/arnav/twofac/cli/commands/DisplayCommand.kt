@@ -20,7 +20,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tech.arnav.twofac.cli.viewmodels.AccountsViewModel
 import tech.arnav.twofac.cli.viewmodels.DisplayAccountsStatic
-import kotlin.system.exitProcess
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -35,7 +34,11 @@ class DisplayCommand : CliktCommand(), KoinComponent {
 
     val passkey by option("-p", "--passkey", help = "Passkey to display").prompt("Enter passkey", hideInput = true)
 
-    override fun run() = runBlocking {
+    override fun run() {
+        if (passkey.isBlank()) {
+            echo("Passkey cannot be blank")
+            return
+        }
         // Unlock the library with the provided passkey
         accountsViewModel.unlock(passkey)
 
@@ -44,12 +47,14 @@ class DisplayCommand : CliktCommand(), KoinComponent {
             createTable(displayAccounts)
         }
         echo("\n")
-        repeat(2.minutes.inWholeSeconds.toInt()) {
-            animation.update(accountsViewModel.showAllAccountOTPs())
-            delay(1.seconds.inWholeMilliseconds)
+        runBlocking {
+            repeat(2.minutes.inWholeSeconds.toInt()) {
+                animation.update(accountsViewModel.showAllAccountOTPs())
+                delay(1.seconds.inWholeMilliseconds)
+            }
+            terminal.warning("Exiting display command after 2 minutes of inactivity.")
+            return@runBlocking
         }
-        terminal.warning("Exiting display command after 2 minutes of inactivity.")
-        exitProcess(0)
     }
 
     @OptIn(ExperimentalTime::class)

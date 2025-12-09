@@ -5,6 +5,7 @@ import io.github.xxfast.kstore.extensions.plus
 import io.github.xxfast.kstore.file.extensions.listStoreOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.async
 import kotlinx.io.files.Path
 import tech.arnav.twofac.lib.storage.Storage
@@ -18,7 +19,7 @@ class FileStorage(
     private val kstore = listStoreOf<StoredAccount>(storageFilePath)
 
     // TODO: need to use IO dispatcher for file operations
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     override suspend fun getAccountList(): List<StoredAccount> = coroutineScope.async {
         kstore.getOrEmpty()
