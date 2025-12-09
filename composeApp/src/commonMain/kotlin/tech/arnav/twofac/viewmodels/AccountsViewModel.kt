@@ -97,6 +97,7 @@ class AccountsViewModel(
                 throw e
             } catch (e: InvalidPasskeyException) {
                 twoFacLib.lock()
+                _accounts.value = emptyList()
                 _accountOtps.value = emptyList()
                 _error.value = e.message ?: "Incorrect passkey. Please try again."
             } catch (e: Exception) {

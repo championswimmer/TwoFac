@@ -82,6 +82,7 @@ class TwoFacLib private constructor(
             } catch (e: Exception) {
                 when (e) {
                     is CancellationException -> throw e
+                    // Crypto provider surfaces bad keys/bad tags as IllegalArgumentException / IllegalStateException
                     is IllegalArgumentException, is IllegalStateException -> throw InvalidPasskeyException(
                         cause = e
                     )
