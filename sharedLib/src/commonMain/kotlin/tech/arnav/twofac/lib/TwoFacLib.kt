@@ -80,15 +80,12 @@ class TwoFacLib private constructor(
                     cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
                 )
             } catch (e: Exception) {
-                when (e) {
-                    is CancellationException -> throw e
-                    // Crypto provider surfaces bad keys/bad tags as IllegalArgumentException / IllegalStateException
-                    is IllegalArgumentException, is IllegalStateException -> throw InvalidPasskeyException(
-                        cause = e
-                    )
-
-                    else -> throw e
+                if (e is CancellationException) throw e
+                // Crypto provider surfaces bad keys/bad tags as IllegalArgumentException / IllegalStateException
+                if (e is IllegalArgumentException || e is IllegalStateException) {
+                    throw InvalidPasskeyException(cause = e)
                 }
+                throw e
             }
             val timeNow = Clock.System.now().epochSeconds
             val otpString: String = when (otpGen) {

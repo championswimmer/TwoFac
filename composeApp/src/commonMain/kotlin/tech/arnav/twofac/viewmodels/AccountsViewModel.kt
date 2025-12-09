@@ -97,8 +97,7 @@ class AccountsViewModel(
                 throw e
             } catch (e: InvalidPasskeyException) {
                 twoFacLib.lock()
-                _accounts.value = emptyList()
-                _accountOtps.value = emptyList()
+                clearAccountData()
                 _error.value = e.message ?: "Incorrect passkey. Please try again."
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to load accounts with OTPs"
@@ -158,6 +157,11 @@ class AccountsViewModel(
         } catch (e: Exception) {
             _error.value = e.message ?: "Failed to refresh OTPs"
         }
+    }
+
+    private fun clearAccountData() {
+        _accounts.value = emptyList()
+        _accountOtps.value = emptyList()
     }
 
     fun clearError() {
