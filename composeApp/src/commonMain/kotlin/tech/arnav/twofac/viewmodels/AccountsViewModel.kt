@@ -93,12 +93,13 @@ class AccountsViewModel(
                 val accountOtpList = twoFacLib.getAllAccountOTPs()
                 _accountOtps.value = accountOtpList
                 _accounts.value = accountOtpList.map { it.first }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: InvalidPasskeyException) {
                 twoFacLib.lock()
                 _accountOtps.value = emptyList()
                 _error.value = e.message ?: "Incorrect passkey. Please try again."
             } catch (e: Exception) {
-                if (e is CancellationException) throw e
                 _error.value = e.message ?: "Failed to load accounts with OTPs"
             } finally {
                 _isLoading.value = false

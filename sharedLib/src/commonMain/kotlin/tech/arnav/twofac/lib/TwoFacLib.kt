@@ -79,12 +79,15 @@ class TwoFacLib private constructor(
                 account.toOTP(
                     cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
                 )
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: IllegalArgumentException) {
-                throw InvalidPasskeyException(cause = e)
-            } catch (e: IllegalStateException) {
-                throw InvalidPasskeyException(cause = e)
+            } catch (e: Exception) {
+                when (e) {
+                    is CancellationException -> throw e
+                    is IllegalArgumentException, is IllegalStateException -> throw InvalidPasskeyException(
+                        cause = e
+                    )
+
+                    else -> throw e
+                }
             }
             val timeNow = Clock.System.now().epochSeconds
             val otpString: String = when (otpGen) {

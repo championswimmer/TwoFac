@@ -1,12 +1,11 @@
 package tech.arnav.twofac.lib
 
-import kotlinx.coroutines.test.runTest
-import tech.arnav.twofac.lib.InvalidPasskeyException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.test.runTest
 
 class TwoFacLibTest {
 
