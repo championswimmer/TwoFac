@@ -1,7 +1,5 @@
 @file:OptIn(ExperimentalNativeApi::class, ExperimentalTime::class)
 
-package twofac
-
 import kotlinx.coroutines.runBlocking
 import tech.arnav.twofac.lib.crypto.CryptoTools
 import tech.arnav.twofac.lib.otp.HOTP
