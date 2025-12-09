@@ -89,6 +89,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.crypto.kt.core)
                 api(libs.kotlinx.serialization.core)
             }
