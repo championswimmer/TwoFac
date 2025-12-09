@@ -41,7 +41,7 @@ fun AccountDetailScreen(
     val accounts by viewModel.accounts.collectAsState()
     val error by viewModel.error.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val isLibUnlocked = viewModel.twoFacLibUnnocked
+    val isLibUnlocked = viewModel.twoFacLibUnlocked
 
     val account = accounts.find { it.accountID == accountId }
 

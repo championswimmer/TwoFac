@@ -38,7 +38,7 @@ class AccountsViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
-    val twoFacLibUnnocked: Boolean get() = twoFacLib.isUnlocked()
+    val twoFacLibUnlocked: Boolean get() = twoFacLib.isUnlocked()
 
     private val _refreshTrigger = MutableStateFlow(0L)
 
@@ -72,7 +72,7 @@ class AccountsViewModel(
     }
 
     fun loadAccountsWithOtps(passkey: String?) {
-        if (!twoFacLibUnnocked) {
+        if (!twoFacLibUnlocked) {
             if (passkey.isNullOrBlank()) {
                 _error.value = "Passkey is required to load accounts with OTPs"
                 return
@@ -129,7 +129,7 @@ class AccountsViewModel(
     }
 
     fun getOtpForAccount(accountId: String, passkey: String?): String? {
-        if (!twoFacLibUnnocked) {
+        if (!twoFacLibUnlocked) {
             if (passkey.isNullOrBlank()) {
                 _error.value = "Passkey is required to generate OTP"
                 return null
