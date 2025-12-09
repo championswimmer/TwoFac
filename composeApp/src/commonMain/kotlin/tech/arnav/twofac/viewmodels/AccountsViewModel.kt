@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.InvalidPasskeyException
 import tech.arnav.twofac.lib.storage.StoredAccount
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -92,11 +93,13 @@ class AccountsViewModel(
                 val accountOtpList = twoFacLib.getAllAccountOTPs()
                 _accountOtps.value = accountOtpList
                 _accounts.value = accountOtpList.map { it.first }
-            } catch (e: Exception) {
-                if (e is CancellationException) throw e
+            } catch (e: InvalidPasskeyException) {
                 twoFacLib.lock()
                 _accountOtps.value = emptyList()
-                _error.value = "Incorrect passkey. Please try again."
+                _error.value = e.message ?: "Incorrect passkey. Please try again."
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _error.value = e.message ?: "Failed to load accounts with OTPs"
             } finally {
                 _isLoading.value = false
             }

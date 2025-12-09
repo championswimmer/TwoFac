@@ -1,6 +1,7 @@
 package tech.arnav.twofac.lib
 
 import kotlinx.coroutines.test.runTest
+import tech.arnav.twofac.lib.InvalidPasskeyException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -78,6 +79,21 @@ class TwoFacLibTest {
         // Should not throw exception when unlocked
         val otps = lib.getAllAccountOTPs()
         assertEquals(0, otps.size, "Should return empty list when no accounts are added")
+    }
+
+    @Test
+    fun testGetAllAccountOTPsWithWrongPasskeyThrows() = runTest {
+        val lib = TwoFacLib.initialise()
+        lib.unlock("correct-passkey")
+
+        lib.addAccount("otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example")
+
+        lib.lock()
+        lib.unlock("wrong-passkey")
+
+        assertFailsWith<InvalidPasskeyException> {
+            lib.getAllAccountOTPs()
+        }
     }
 
     @Test

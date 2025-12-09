@@ -1,6 +1,7 @@
 package tech.arnav.twofac.lib
 
 import dev.whyoleg.cryptography.CryptographyProvider
+import kotlinx.coroutines.CancellationException
 import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
 import tech.arnav.twofac.lib.crypto.Encoding.toByteString
 import tech.arnav.twofac.lib.otp.HOTP
@@ -14,6 +15,9 @@ import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.concurrent.Volatile
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+
+class InvalidPasskeyException(message: String = "Incorrect passkey", cause: Throwable? = null) :
+    Exception(message, cause)
 
 class TwoFacLib private constructor(
     val storage: Storage,
@@ -69,10 +73,16 @@ class TwoFacLib private constructor(
     suspend fun getAllAccountOTPs(): List<Pair<StoredAccount.DisplayAccount, String>> {
         check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
-        return storage.getAccountList().map { account ->
-            val otpGen = account.toOTP(
-                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
-            )
+        val accounts = storage.getAccountList()
+        return accounts.map { account ->
+            val otpGen = try {
+                account.toOTP(
+                    cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
+                )
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                throw InvalidPasskeyException(cause = e)
+            }
             val timeNow = Clock.System.now().epochSeconds
             val otpString: String = when (otpGen) {
                 is HOTP -> otpGen.generateOTP(0)
