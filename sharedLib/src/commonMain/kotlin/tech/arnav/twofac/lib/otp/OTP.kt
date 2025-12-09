@@ -1,5 +1,6 @@
 package tech.arnav.twofac.lib.otp
 
+import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.crypto.CryptoTools
 
 /**
@@ -9,6 +10,7 @@ import tech.arnav.twofac.lib.crypto.CryptoTools
  * - TOTP (Time-based One-Time Password) based on RFC 6238 (extension of HOTP)
  *
  */
+@PublicApi
 interface OTP {
 
     /**

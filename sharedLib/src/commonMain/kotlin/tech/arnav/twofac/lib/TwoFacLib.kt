@@ -15,6 +15,7 @@ import kotlin.concurrent.Volatile
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+@PublicApi
 class TwoFacLib private constructor(
     val storage: Storage,
     @Volatile private var passKey: String?,

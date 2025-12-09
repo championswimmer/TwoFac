@@ -3,9 +3,11 @@
 package tech.arnav.twofac.lib.storage
 
 import kotlinx.serialization.Serializable
+import tech.arnav.twofac.lib.PublicApi
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+@PublicApi
 @Serializable
 data class StoredAccount constructor(
     val accountID: Uuid,

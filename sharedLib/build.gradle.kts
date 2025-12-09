@@ -1,5 +1,7 @@
+@file:OptIn(ExperimentalAbiValidation::class)
+
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.plugin.mpp.DefaultCInteropSettings
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
@@ -77,8 +79,19 @@ kotlin {
         nodejs()
     }
 
-
     applyDefaultHierarchyTemplate()
+
+    abiValidation {
+        enabled.set(true)
+        filters {
+            included {
+                annotatedWith.add("tech.arnav.twofac.lib.PublicApi")
+            }
+            excluded {
+                annotatedWith.add("tech.arnav.twofac.lib.InternalApi")
+            }
+        }
+    }
 
     // Source set declarations.
     // Declaring a target automatically creates a source set with the same name. By default, the

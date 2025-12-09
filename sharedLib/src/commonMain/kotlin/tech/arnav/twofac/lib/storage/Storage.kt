@@ -1,8 +1,10 @@
 package tech.arnav.twofac.lib.storage
 
+import tech.arnav.twofac.lib.PublicApi
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+@PublicApi
 interface Storage {
 
     suspend fun getAccountList(): List<StoredAccount>

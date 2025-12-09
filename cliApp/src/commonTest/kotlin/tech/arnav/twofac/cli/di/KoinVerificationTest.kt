@@ -13,6 +13,7 @@ class KoinVerificationTest : KoinTest {
         koinApplication {
             printLogger(Level.INFO)
             modules(appModule, storageModule)
+            @Suppress("DEPRECATION") // verify() not supported outside JVM yet
             checkModules()
         }
     }

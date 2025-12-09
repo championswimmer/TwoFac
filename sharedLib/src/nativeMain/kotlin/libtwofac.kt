@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalNativeApi::class, ExperimentalTime::class)
 
 import kotlinx.coroutines.runBlocking
+import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.crypto.CryptoTools
 import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.TOTP
@@ -9,8 +10,10 @@ import kotlin.experimental.ExperimentalNativeApi
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+@PublicApi
 enum class HashAlgo { SHA1, SHA256, SHA512 }
 
+@PublicApi
 @CName("gen_hotp")
 fun genHOTP(
     secret: String,
@@ -33,6 +36,7 @@ fun genHOTP(
     return otp
 }
 
+@PublicApi
 @CName("gen_hotp_from_uri")
 fun genHOTPFromUri(otpauthUri: String): String {
     val hotp = OtpAuthURI.parse(otpauthUri) as HOTP
@@ -44,6 +48,7 @@ fun genHOTPFromUri(otpauthUri: String): String {
     }
 }
 
+@PublicApi
 @CName("gen_totp")
 fun genTOTP(
     secret: String,
@@ -67,6 +72,7 @@ fun genTOTP(
     return runBlocking { totp.generateOTP(currentTimeSeconds) }
 }
 
+@PublicApi
 @CName("gen_totp_from_uri")
 fun genTOTPFromUri(otpauthUri: String): String {
     val totp = OtpAuthURI.parse(otpauthUri) as TOTP

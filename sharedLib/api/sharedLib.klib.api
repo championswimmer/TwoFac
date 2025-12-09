@@ -1,0 +1,35 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, wasmJs]
+// Alias: native => [iosArm64, iosSimulatorArm64, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <tech.arnav.twofac:sharedLib>
+abstract interface tech.arnav.twofac.lib.otp/OTP // tech.arnav.twofac.lib.otp/OTP|null[0]
+
+abstract interface tech.arnav.twofac.lib.storage/Storage // tech.arnav.twofac.lib.storage/Storage|null[0]
+
+final class tech.arnav.twofac.lib.storage/StoredAccount // tech.arnav.twofac.lib.storage/StoredAccount|null[0]
+
+final class tech.arnav.twofac.lib/TwoFacLib // tech.arnav.twofac.lib/TwoFacLib|null[0]
+
+// Targets: [native]
+final enum class /HashAlgo : kotlin/Enum</HashAlgo> { // /HashAlgo|null[0]
+    enum entry SHA1 // /HashAlgo.SHA1|null[0]
+    enum entry SHA256 // /HashAlgo.SHA256|null[0]
+    enum entry SHA512 // /HashAlgo.SHA512|null[0]
+}
+
+// Targets: [native]
+final fun /genHOTP(kotlin/String, kotlin/Long, kotlin/Int = ..., /HashAlgo = ...): kotlin/String // /genHOTP|genHOTP(kotlin.String;kotlin.Long;kotlin.Int;HashAlgo){}[0]
+
+// Targets: [native]
+final fun /genHOTPFromUri(kotlin/String): kotlin/String // /genHOTPFromUri|genHOTPFromUri(kotlin.String){}[0]
+
+// Targets: [native]
+final fun /genTOTP(kotlin/String, kotlin/Long = ..., kotlin/Int = ..., /HashAlgo = ...): kotlin/String // /genTOTP|genTOTP(kotlin.String;kotlin.Long;kotlin.Int;HashAlgo){}[0]
+
+// Targets: [native]
+final fun /genTOTPFromUri(kotlin/String): kotlin/String // /genTOTPFromUri|genTOTPFromUri(kotlin.String){}[0]
