@@ -2,6 +2,7 @@ package tech.arnav.twofac.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -87,11 +88,18 @@ class AccountsViewModel(
             _isLoading.value = true
             _error.value = null
 
-            val accountOtpList = twoFacLib.getAllAccountOTPs()
-            _accountOtps.value = accountOtpList
-            _accounts.value = accountOtpList.map { it.first }
-
-            _isLoading.value = false
+            try {
+                val accountOtpList = twoFacLib.getAllAccountOTPs()
+                _accountOtps.value = accountOtpList
+                _accounts.value = accountOtpList.map { it.first }
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                twoFacLib.lock()
+                _accountOtps.value = emptyList()
+                _error.value = "Incorrect passkey. Please try again."
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 

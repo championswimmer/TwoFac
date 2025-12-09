@@ -31,6 +31,15 @@ class TwoFacLibTest {
     }
 
     @Test
+    fun testLockFunction() {
+        val lib = TwoFacLib.initialise(passKey = "testpasskey")
+        assertTrue(lib.isUnlocked(), "Library should be unlocked when initialized with passkey")
+
+        lib.lock()
+        assertFalse(lib.isUnlocked(), "Library should not be unlocked after calling lock()")
+    }
+
+    @Test
     fun testUnlockWithBlankPasskey() {
         val lib = TwoFacLib.initialise()
 

@@ -50,6 +50,10 @@ class TwoFacLib private constructor(
         this.passKey = passKey
     }
 
+    fun lock() {
+        this.passKey = null
+    }
+
     /**
      * Checks if the library is unlocked (passkey is set)
      */
