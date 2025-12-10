@@ -43,12 +43,17 @@ class TwoFacLib private constructor(
 
     private val cryptoTools = DefaultCryptoTools(CryptographyProvider.Default)
 
+    @Volatile
+    private var accountList: List<StoredAccount>? = null
+
     /**
-     * Unlocks the library with the provided passkey
+     * Unlocks the library with the provided passkey and loads accounts into memory
      */
-    fun unlock(passKey: String) {
+    suspend fun unlock(passKey: String) {
         require(passKey.isNotBlank()) { "Password key cannot be blank" }
         this.passKey = passKey
+        // Load accounts from storage into memory
+        this.accountList = storage.getAccountList()
     }
 
     /**
@@ -58,15 +63,18 @@ class TwoFacLib private constructor(
         return passKey != null
     }
 
-    suspend fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
-        return storage.getAccountList().map(StoredAccount::forDisplay)
+    fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
+        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+        return accounts.map(StoredAccount::forDisplay)
     }
 
     @OptIn(ExperimentalTime::class)
     suspend fun getAllAccountOTPs(): List<Pair<StoredAccount.DisplayAccount, String>> {
         check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
-        return storage.getAccountList().map { account ->
+        val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+        return accounts.map { account ->
             val otpGen = account.toOTP(
                 cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
             )
@@ -93,6 +101,11 @@ class TwoFacLib private constructor(
         val otp = OtpAuthURI.parse(accountURI)
         val signingKey = cryptoTools.createSigningKey(currentPassKey)
         val account = otp.toStoredAccount(signingKey)
-        return storage.saveAccount(account)
+        val success = storage.saveAccount(account)
+        if (success) {
+            // Refresh the in-memory account list
+            accountList = storage.getAccountList()
+        }
+        return success
     }
 }

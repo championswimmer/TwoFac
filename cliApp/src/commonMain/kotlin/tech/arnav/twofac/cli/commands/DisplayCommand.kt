@@ -39,8 +39,6 @@ class DisplayCommand : CliktCommand(), KoinComponent {
             echo("Passkey cannot be blank")
             return
         }
-        // Unlock the library with the provided passkey
-        accountsViewModel.unlock(passkey)
 
         // Fetch and display all account OTPs
         val animation = terminal.animation<DisplayAccountsStatic> { displayAccounts ->
@@ -48,6 +46,9 @@ class DisplayCommand : CliktCommand(), KoinComponent {
         }
         echo("\n")
         runBlocking {
+            // Unlock the library with the provided passkey
+            accountsViewModel.unlock(passkey)
+
             repeat(2.minutes.inWholeSeconds.toInt()) {
                 animation.update(accountsViewModel.showAllAccountOTPs())
                 delay(1.seconds.inWholeMilliseconds)

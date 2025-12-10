@@ -7,7 +7,7 @@ typealias DisplayAccountsStatic = List<Pair<StoredAccount.DisplayAccount, String
 
 class AccountsViewModel(val twoFacLib: TwoFacLib) {
 
-    fun unlock(passkey: String) {
+    suspend fun unlock(passkey: String) {
         return twoFacLib.unlock(passkey)
     }
 

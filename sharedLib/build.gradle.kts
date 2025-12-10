@@ -82,6 +82,7 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     abiValidation {
+        // TODO: fix the gradle task name in github actions https://youtrack.jetbrains.com/projects/KT/issues/KT-80674
         enabled.set(true)
         filters {
             included {

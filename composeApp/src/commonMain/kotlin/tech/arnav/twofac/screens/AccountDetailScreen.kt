@@ -41,7 +41,7 @@ fun AccountDetailScreen(
     val accounts by viewModel.accounts.collectAsState()
     val error by viewModel.error.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val isLibUnlocked = viewModel.twoFacLibUnnocked
+    val isLibUnlocked = viewModel.twoFacLibUnlocked
 
     val account = accounts.find { it.accountID == accountId }
 
@@ -92,8 +92,7 @@ fun AccountDetailScreen(
 
                 Button(
                     onClick = {
-                        val passkey = if (isLibUnlocked) "" else passkeyText
-                        currentOtp = viewModel.getOtpForAccount(accountId, passkey)
+                        currentOtp = viewModel.getOtpForAccount(accountId)
                     },
                     enabled = isLibUnlocked || passkeyText.isNotBlank()
                 ) {

@@ -3,10 +3,10 @@ public final class tech/arnav/twofac/lib/TwoFacLib {
 	public synthetic fun <init> (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun addAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAllAccountOTPs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getAllAccounts (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getAllAccounts ()Ljava/util/List;
 	public final fun getStorage ()Ltech/arnav/twofac/lib/storage/Storage;
 	public final fun isUnlocked ()Z
-	public final fun unlock (Ljava/lang/String;)V
+	public final fun unlock (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class tech/arnav/twofac/lib/otp/OTP {

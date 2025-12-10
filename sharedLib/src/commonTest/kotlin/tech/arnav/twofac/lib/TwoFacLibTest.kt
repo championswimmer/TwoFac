@@ -22,7 +22,7 @@ class TwoFacLibTest {
     }
 
     @Test
-    fun testUnlockFunction() {
+    fun testUnlockFunction() = runTest {
         val lib = TwoFacLib.initialise()
         assertFalse(lib.isUnlocked(), "Library should not be unlocked initially")
 
@@ -31,7 +31,7 @@ class TwoFacLibTest {
     }
 
     @Test
-    fun testUnlockWithBlankPasskey() {
+    fun testUnlockWithBlankPasskey() = runTest {
         val lib = TwoFacLib.initialise()
 
         assertFailsWith<IllegalArgumentException> {
@@ -72,7 +72,7 @@ class TwoFacLibTest {
     }
 
     @Test
-    fun testThreadSafetyOfUnlockAndIsUnlocked() {
+    fun testThreadSafetyOfUnlockAndIsUnlocked() = runTest {
         val lib = TwoFacLib.initialise()
 
         // Test that multiple calls to unlock and isUnlocked work correctly
