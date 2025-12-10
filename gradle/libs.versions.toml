@@ -1,4 +1,5 @@
 [versions]
+
 agp = "8.12.3"
 android-compileSdk = "36"
 android-minSdk = "24"
@@ -29,7 +30,21 @@ dokka = "2.1.0"
 mordant = "3.0.2"
 kmp-appdirs = "2.0.0"
 kstore = "2.0.4"
-kover = "0.9.3"
+kover = "0.9.4"
+
+[plugins]
+
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+kotlinxKover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+
 
 [libraries]
 
@@ -70,16 +85,3 @@ kotlin-multiplatform-appdirs = { module = "ca.gosyer:kotlin-multiplatform-appdir
 kstore = { module = "tech.arnav:kstore", version.ref = "kstore" }
 kstore-storage = { module = "tech.arnav:kstore-storage", version.ref = "kstore" }
 kstore-file = { module = "tech.arnav:kstore-file", version.ref = "kstore" }
-
-[plugins]
-
-androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
-composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
-composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
-composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
-kotlinxKover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
