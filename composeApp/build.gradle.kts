@@ -104,8 +104,6 @@ android {
     defaultConfig {
         applicationId = "tech.arnav.twofac"
         minSdk = libs.versions.android.minSdk.get().toInt()
-        @Suppress("detekt:ForbiddenComment")
-        //noinspection OldTargetApi // TODO: Update to SDK 36
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"

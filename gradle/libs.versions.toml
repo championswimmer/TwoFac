@@ -2,7 +2,7 @@
 
 agp = "8.12.3"
 android-compileSdk = "36"
-android-minSdk = "24"
+android-minSdk = "30"
 android-targetSdk = "36"
 androidx-activity = "1.12.1"
 androidx-appcompat = "1.7.1"
@@ -31,6 +31,12 @@ mordant = "3.0.2"
 kmp-appdirs = "2.0.0"
 kstore = "2.0.4"
 kover = "0.9.4"
+playServicesWearable = "19.0.0"
+composeBom = "2025.12.00"
+composeMaterial = "1.5.6"
+composeFoundation = "1.5.6"
+wearToolingPreview = "1.0.0"
+coreSplashscreen = "1.2.0"
 
 [plugins]
 
@@ -44,6 +50,7 @@ androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.lib
 kotlinxKover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
 
 [libraries]
@@ -85,3 +92,15 @@ kotlin-multiplatform-appdirs = { module = "ca.gosyer:kotlin-multiplatform-appdir
 kstore = { module = "tech.arnav:kstore", version.ref = "kstore" }
 kstore-storage = { module = "tech.arnav:kstore-storage", version.ref = "kstore" }
 kstore-file = { module = "tech.arnav:kstore-file", version.ref = "kstore" }
+play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
+androidx-compose-foundation = { group = "androidx.wear.compose", name = "compose-foundation", version.ref = "composeFoundation" }
+androidx-wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
