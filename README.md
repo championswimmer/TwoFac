@@ -13,10 +13,10 @@
     - [x] Save accounts to a storage
     - [ ] Backup & Restore via a backup transport
     - [ ] Export & Import accounts (encrypted with passkey)
-    - [ ] Import from other 2FA apps
-        - [ ] Authy
-        - [ ] 2FAS
-        - [ ] Ente
+    - [x] Import from other 2FA apps
+        - [x] Authy (JSON format)
+        - [x] 2FAS (JSON format)
+        - [x] Ente (plaintext otpauth:// URIs)
 - [ ] Mobile App
 - [ ] Desktop App
 - [ ] Web Extension
@@ -59,5 +59,10 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
 | Web               | `composeApp/wasmJsMain`        | `wasmJs`                     |
 | CLI               | `cliApp`                       | `native` (as static lib)     |
 
+
+## Documentation
+
+- **[Importing from Other Apps](docs/IMPORTING.md)** - Guide to importing 2FA secrets from Authy, 2FAS, Ente Auth, and other authenticator apps
+- **[Development Guide](DEVELOPMENT.md)** - Setup, building, and contributing to the project
 
 
