@@ -82,10 +82,16 @@ class TwoFasImportAdapter : ImportAdapter {
 
     private fun convertToOtpAuthUri(service: TwoFasService): String? {
         try {
+            // Helper function to get value from service or otp section
+            fun <T> getField(serviceField: T?, otpField: T?, default: T): T {
+                return serviceField ?: otpField ?: default
+            }
+
             // Get values from either top level or otp section
-            val digits = service.digits ?: service.otpSection?.digits ?: OtpAuthURI.DEFAULT_DIGITS
-            val period = (service.period ?: service.otpSection?.period ?: OtpAuthURI.DEFAULT_PERIOD).toLong()
-            val algorithm = when ((service.algorithm ?: service.otpSection?.algorithm ?: "SHA1").uppercase()) {
+            val digits = getField(service.digits, service.otpSection?.digits, OtpAuthURI.DEFAULT_DIGITS)
+            val period = getField(service.period, service.otpSection?.period, OtpAuthURI.DEFAULT_PERIOD).toLong()
+            val algorithmStr = getField(service.algorithm, service.otpSection?.algorithm, "SHA1")
+            val algorithm = when (algorithmStr.uppercase()) {
                 "SHA1" -> CryptoTools.Algo.SHA1
                 "SHA256" -> CryptoTools.Algo.SHA256
                 "SHA512" -> CryptoTools.Algo.SHA512

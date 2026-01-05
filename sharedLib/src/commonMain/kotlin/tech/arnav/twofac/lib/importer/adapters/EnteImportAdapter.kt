@@ -89,11 +89,8 @@ class EnteImportAdapter : ImportAdapter {
         // Check if this is an encrypted export
         if (export.encryptedData != null) {
             return ImportResult.Failure(
-                "Encrypted Ente Auth exports are not yet supported. " +
-                        "Please export as plaintext (otpauth:// URIs) from Ente Auth settings, " +
-                        "or decrypt the export file using Ente Auth first. " +
-                        "Encrypted format requires Argon2id KDF and XChaCha20-Poly1305 encryption " +
-                        "which are not currently implemented in this library."
+                "Encrypted Ente Auth exports are not supported. " +
+                        "Please export as plaintext from Ente Auth or see documentation for alternatives."
             )
         }
 

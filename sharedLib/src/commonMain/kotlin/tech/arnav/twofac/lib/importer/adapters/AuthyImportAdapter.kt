@@ -29,6 +29,10 @@ import tech.arnav.twofac.lib.uri.OtpAuthURI
 @PublicApi
 class AuthyImportAdapter : ImportAdapter {
 
+    companion object {
+        private const val DEFAULT_HOTP_COUNTER = 0L
+    }
+
     @Serializable
     private data class AuthyToken(
         val secret: String,
@@ -93,7 +97,7 @@ class AuthyImportAdapter : ImportAdapter {
             if (type == OtpAuthURI.Type.TOTP) {
                 builder.period(period)
             } else {
-                builder.counter(0) // Default counter for HOTP
+                builder.counter(DEFAULT_HOTP_COUNTER)
             }
 
             return builder.build()

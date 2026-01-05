@@ -9,6 +9,7 @@ import tech.arnav.twofac.lib.storage.MemoryStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class ImportIntegrationTest {
 
@@ -109,7 +110,7 @@ class ImportIntegrationTest {
 
         try {
             lib.importAccounts(adapter, twoFasExport)
-            throw AssertionError("Should throw when library is not unlocked")
+            fail("Should throw when library is not unlocked")
         } catch (e: IllegalStateException) {
             assertTrue(e.message?.contains("not unlocked") == true, "Error should mention unlocking")
         }
