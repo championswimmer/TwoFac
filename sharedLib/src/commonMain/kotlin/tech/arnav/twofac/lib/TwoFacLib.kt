@@ -3,6 +3,8 @@ package tech.arnav.twofac.lib
 import dev.whyoleg.cryptography.CryptographyProvider
 import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
 import tech.arnav.twofac.lib.crypto.Encoding.toByteString
+import tech.arnav.twofac.lib.importer.ImportAdapter
+import tech.arnav.twofac.lib.importer.ImportResult
 import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.TOTP
 import tech.arnav.twofac.lib.storage.MemoryStorage
@@ -107,5 +109,54 @@ class TwoFacLib private constructor(
             accountList = storage.getAccountList()
         }
         return success
+    }
+
+    /**
+     * Import accounts from an external authenticator app using an ImportAdapter
+     *
+     * @param adapter The ImportAdapter for the specific authenticator app format
+     * @param fileContent The raw content of the export file
+     * @param password Optional password for encrypted exports
+     * @return ImportResult containing success count or failure information
+     */
+    suspend fun importAccounts(
+        adapter: ImportAdapter,
+        fileContent: String,
+        password: String? = null
+    ): ImportResult {
+        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+
+        // Parse the export file using the adapter
+        val parseResult = adapter.parse(fileContent, password)
+
+        return when (parseResult) {
+            is ImportResult.Success -> {
+                // Import each URI
+                val successfulImports = mutableListOf<String>()
+                val failedImports = mutableListOf<String>()
+
+                parseResult.otpAuthUris.forEach { uri ->
+                    try {
+                        val success = addAccount(uri)
+                        if (success) {
+                            successfulImports.add(uri)
+                        } else {
+                            failedImports.add(uri)
+                        }
+                    } catch (e: Exception) {
+                        failedImports.add(uri)
+                    }
+                }
+
+                if (failedImports.isEmpty()) {
+                    ImportResult.Success(successfulImports)
+                } else {
+                    ImportResult.Failure(
+                        "Imported ${successfulImports.size} accounts, but ${failedImports.size} failed"
+                    )
+                }
+            }
+            is ImportResult.Failure -> parseResult
+        }
     }
 }
