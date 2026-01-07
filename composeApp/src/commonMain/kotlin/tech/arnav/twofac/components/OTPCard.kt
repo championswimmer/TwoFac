@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import tech.arnav.twofac.lib.storage.StoredAccount
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -137,6 +138,19 @@ fun OTPCard(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun OTPCardPreview() {
+    OTPCard(
+        account = StoredAccount.DisplayAccount(
+            "arnav@gmail.com",
+            accountLabel = "Google",
+        ),
+        otpCode = "123456",
+        onRefreshOTP = {},
+    )
 }
 
 private fun formatOTPCode(code: String): String {

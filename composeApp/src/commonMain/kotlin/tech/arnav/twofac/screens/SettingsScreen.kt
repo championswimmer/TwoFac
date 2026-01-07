@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import tech.arnav.twofac.storage.getStoragePath
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,4 +83,10 @@ fun SettingsScreen(
         }
         }
     }
+}
+
+@Preview
+@Composable
+private fun SettingsScreenPreview() {
+    SettingsScreen(onNavigateBack = {})
 }
