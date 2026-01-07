@@ -89,7 +89,7 @@ class EnteImportAdapter : ImportAdapter {
         // Check if this is an encrypted export
         if (export.encryptedData != null) {
             return ImportResult.Failure(
-                "Encrypted Ente Auth exports are not supported. " +
+                "Encrypted Ente Auth exports are not yet supported. " +
                         "Please export as plaintext from Ente Auth or see documentation for alternatives."
             )
         }
