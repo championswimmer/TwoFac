@@ -46,3 +46,12 @@ kotlin {
         }
     }
 }
+
+tasks.withType<Exec> {
+    if (name.startsWith("runDebugExecutable")) {
+        val runArgs = project.findProperty("runArgs") as? String
+        if (!runArgs.isNullOrEmpty()) {
+            args(runArgs.split(" "))
+        }
+    }
+}
