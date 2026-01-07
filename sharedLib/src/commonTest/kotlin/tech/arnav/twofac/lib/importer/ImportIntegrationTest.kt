@@ -8,6 +8,7 @@ import tech.arnav.twofac.lib.importer.adapters.TwoFasImportAdapter
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -91,7 +92,7 @@ class ImportIntegrationTest {
 
     @Test
     fun testImportWithoutUnlock() = runTest {
-        val lib = TwoFacLib.initialise(MemoryStorage(), "test-password")
+        val lib = TwoFacLib.initialise(MemoryStorage())
         // Don't unlock the library
 
         val twoFasExport = """
@@ -108,12 +109,10 @@ class ImportIntegrationTest {
 
         val adapter = TwoFasImportAdapter()
 
-        try {
+        val ex = assertFailsWith<IllegalStateException> {
             lib.importAccounts(adapter, twoFasExport)
-            fail("Should throw when library is not unlocked")
-        } catch (e: IllegalStateException) {
-            assertTrue(e.message?.contains("not unlocked") == true, "Error should mention unlocking")
         }
+        assertTrue(ex.message?.contains("not unlocked") == true, "Error should mention unlocking")
     }
 
     @Test
