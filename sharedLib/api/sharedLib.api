@@ -5,8 +5,47 @@ public final class tech/arnav/twofac/lib/TwoFacLib {
 	public final fun getAllAccountOTPs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAllAccounts ()Ljava/util/List;
 	public final fun getStorage ()Ltech/arnav/twofac/lib/storage/Storage;
+	public final fun importAccounts (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun importAccounts$default (Ltech/arnav/twofac/lib/TwoFacLib;Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun isUnlocked ()Z
 	public final fun unlock (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class tech/arnav/twofac/lib/importer/ImportAdapter {
+	public abstract fun getName ()Ljava/lang/String;
+	public abstract fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parse$default (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public fun requiresPassword ()Z
+}
+
+public final class tech/arnav/twofac/lib/importer/ImportAdapter$DefaultImpls {
+	public static synthetic fun parse$default (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun requiresPassword (Ltech/arnav/twofac/lib/importer/ImportAdapter;)Z
+}
+
+public abstract class tech/arnav/twofac/lib/importer/ImportResult {
+}
+
+public final class tech/arnav/twofac/lib/importer/adapters/AuthyImportAdapter : tech/arnav/twofac/lib/importer/ImportAdapter {
+	public static final field Companion Ltech/arnav/twofac/lib/importer/adapters/AuthyImportAdapter$Companion;
+	public fun <init> ()V
+	public fun getName ()Ljava/lang/String;
+	public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun requiresPassword ()Z
+}
+
+public final class tech/arnav/twofac/lib/importer/adapters/EnteImportAdapter : tech/arnav/twofac/lib/importer/ImportAdapter {
+	public fun <init> ()V
+	public fun getName ()Ljava/lang/String;
+	public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun requiresPassword ()Z
+}
+
+public final class tech/arnav/twofac/lib/importer/adapters/TwoFasImportAdapter : tech/arnav/twofac/lib/importer/ImportAdapter {
+	public fun <init> ()V
+	public fun getName ()Ljava/lang/String;
+	public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun requiresPassword ()Z
 }
 
 public abstract interface class tech/arnav/twofac/lib/otp/OTP {

@@ -2,9 +2,9 @@ name: CLI App Run
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch: # For manual triggering
 
 jobs:
@@ -16,14 +16,14 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
       - name: Run Windows CLI App
-        run: ./gradlew :cliApp:runDebugExecutableMingwX64
+        run: ./gradlew :cliApp:runDebugExecutableMingwX64 -PrunArgs="--help -v"
 
   run-cli-macos:
     runs-on: macos-latest
@@ -33,14 +33,14 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
       - name: Run macOS CLI App
-        run: ./gradlew :cliApp:runDebugExecutableMacosArm64
+        run: ./gradlew :cliApp:runDebugExecutableMacosArm64 -PrunArgs="--help -v"
 
   run-cli-ubuntu:
     runs-on: ubuntu-latest
@@ -50,11 +50,11 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
       - name: Run Linux CLI App
-        run: ./gradlew :cliApp:runDebugExecutableLinuxX64
+        run: ./gradlew :cliApp:runDebugExecutableLinuxX64 -PrunArgs="--help -v"
