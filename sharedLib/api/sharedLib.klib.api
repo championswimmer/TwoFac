@@ -7,13 +7,23 @@
 // - Show declarations: true
 
 // Library unique name: <tech.arnav.twofac:sharedLib>
+abstract interface tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer/ImportAdapter|null[0]
+
 abstract interface tech.arnav.twofac.lib.otp/OTP // tech.arnav.twofac.lib.otp/OTP|null[0]
 
 abstract interface tech.arnav.twofac.lib.storage/Storage // tech.arnav.twofac.lib.storage/Storage|null[0]
 
+final class tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter|null[0]
+
+final class tech.arnav.twofac.lib.importer.adapters/EnteImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/EnteImportAdapter|null[0]
+
+final class tech.arnav.twofac.lib.importer.adapters/TwoFasImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/TwoFasImportAdapter|null[0]
+
 final class tech.arnav.twofac.lib.storage/StoredAccount // tech.arnav.twofac.lib.storage/StoredAccount|null[0]
 
 final class tech.arnav.twofac.lib/TwoFacLib // tech.arnav.twofac.lib/TwoFacLib|null[0]
+
+sealed class tech.arnav.twofac.lib.importer/ImportResult // tech.arnav.twofac.lib.importer/ImportResult|null[0]
 
 // Targets: [native]
 final enum class /HashAlgo : kotlin/Enum</HashAlgo> { // /HashAlgo|null[0]
