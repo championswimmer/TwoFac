@@ -105,6 +105,7 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.crypto.kt.core)
                 api(libs.kotlinx.serialization.core)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
 
