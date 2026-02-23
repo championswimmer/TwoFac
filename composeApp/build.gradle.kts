@@ -105,8 +105,8 @@ android {
         applicationId = "tech.arnav.twofac"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = rootProject.extra["appVersionCode"] as Int
+        versionName = rootProject.extra["appVersionName"] as String
     }
     packaging {
         resources {
@@ -135,7 +135,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "tech.arnav.twofac"
-            packageVersion = "1.0.0"
+            packageVersion = rootProject.extra["appVersionName"] as String
         }
     }
 }
