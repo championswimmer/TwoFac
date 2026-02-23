@@ -11,5 +11,5 @@ plugins {
 }
 
 // Centralized app versioning — all subprojects inherit from here
-extra["appVersionCode"] = 1
-extra["appVersionName"] = "1.0.0"
+extra["appVersionCode"] = 260200001
+extra["appVersionName"] = "0.0.1"
