@@ -4,6 +4,7 @@ import kotlinx.io.Buffer
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readByteArray
 import tech.arnav.twofac.lib.backup.BackupBlob
 import tech.arnav.twofac.lib.backup.BackupDescriptor
 import tech.arnav.twofac.lib.backup.BackupResult
