@@ -104,7 +104,7 @@ class BackupServiceTest {
 
     @Test
     fun testExportAccountURIsRequiresUnlock() = runTest {
-        val lib = buildLib()
+        val lib = TwoFacLib.initialise(MemoryStorage())
         // Not unlocked
         try {
             lib.exportAccountURIs()

@@ -1,3 +1,7 @@
+---
+name: Module Routing
+description: Guidelines for where to place different types of code in a Kotlin Multiplatform project.
+---
 # Skill: Module Routing
 
 Use this when deciding where a change belongs.

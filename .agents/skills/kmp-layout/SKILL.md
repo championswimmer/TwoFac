@@ -1,3 +1,7 @@
+---
+name: Kotlin Multiplatform Layout
+description: A guide to the standard source-set layout for Kotlin Multiplatform projects.
+---
 # Skill: Kotlin Multiplatform Layout
 
 This repository follows standard Kotlin Multiplatform source-set conventions.

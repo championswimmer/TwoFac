@@ -240,6 +240,7 @@ jobs:
   release:
     name: "Create GitHub Release"
     needs: [build-ubuntu, build-windows, build-macos]
+    if: always() && (needs.build-ubuntu.result == 'success' || needs.build-windows.result == 'success' || needs.build-macos.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -248,21 +249,32 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           path: artifacts/
 
       - name: Zip Web Distribution
+        continue-on-error: true
         run: |
           cd artifacts/web-distribution
           zip -r ../web-distribution.zip .
           cd ../..
 
       - name: Package *nix CLI binaries as tar.gz to preserve executable bit
+        continue-on-error: true
         run: |
-          tar -czf artifacts/2fac-linux-x64.tar.gz -C artifacts/cli-linux-x64 2fac.kexe
-          tar -czf artifacts/2fac-macos-arm64.tar.gz -C artifacts/cli-macos-arm64 2fac.kexe
-          tar -czf artifacts/2fac-macos-x64.tar.gz -C artifacts/cli-macos-x64 2fac.kexe
-          mv artifacts/cli-windows-x64/2fac.exe artifacts/2fac-windows-x64.exe
+          if [ -d "artifacts/cli-linux-x64" ]; then
+            tar -czf artifacts/2fac-linux-x64.tar.gz -C artifacts/cli-linux-x64 2fac.kexe
+          fi
+          if [ -d "artifacts/cli-macos-arm64" ]; then
+            tar -czf artifacts/2fac-macos-arm64.tar.gz -C artifacts/cli-macos-arm64 2fac.kexe
+          fi
+          if [ -d "artifacts/cli-macos-x64" ]; then
+            tar -czf artifacts/2fac-macos-x64.tar.gz -C artifacts/cli-macos-x64 2fac.kexe
+          fi
+          if [ -d "artifacts/cli-windows-x64" ]; then
+            mv artifacts/cli-windows-x64/2fac.exe artifacts/2fac-windows-x64.exe
+          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

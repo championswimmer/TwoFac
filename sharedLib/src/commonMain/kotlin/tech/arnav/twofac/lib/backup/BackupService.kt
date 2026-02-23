@@ -13,6 +13,7 @@ import kotlin.time.ExperimentalTime
  */
 @PublicApi
 class BackupService(private val twoFacLib: TwoFacLib) {
+    private var backupSequence = 0L
 
     @OptIn(ExperimentalTime::class)
     suspend fun createBackup(transport: BackupTransport): BackupResult<BackupDescriptor> {
@@ -25,7 +26,7 @@ class BackupService(private val twoFacLib: TwoFacLib) {
         val createdAt = Clock.System.now().epochSeconds
         val payload = BackupPayload(createdAt = createdAt, accounts = uris)
         val bytes = BackupPayloadCodec.encode(payload)
-        val id = "twofac-backup-$createdAt.json"
+        val id = "twofac-backup-$createdAt-${backupSequence++}.json"
         val descriptor = BackupDescriptor(
             id = id,
             transportId = transport.id,
