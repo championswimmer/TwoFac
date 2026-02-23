@@ -51,6 +51,14 @@ class BackupService(
                 null
             }
         }
+        if (accounts.isNotEmpty() && snapshots.isEmpty()) {
+            return BackupResult.Failure(
+                BackupError(
+                    code = BackupErrorCode.ValidationError,
+                    message = "Unable to decrypt existing accounts with the provided passkey",
+                )
+            )
+        }
 
         val encodedResult = payloadCodec.encode(
             accounts = snapshots,
