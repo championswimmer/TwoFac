@@ -2,9 +2,12 @@ package tech.arnav.twofac
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import tech.arnav.twofac.di.desktopBackupModule
 
 fun main() {
-    initKoin()
+    initKoin {
+        modules(desktopBackupModule)
+    }
 
     application {
         Window(

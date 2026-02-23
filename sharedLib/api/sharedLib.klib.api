@@ -7,11 +7,23 @@
 // - Show declarations: true
 
 // Library unique name: <tech.arnav.twofac:sharedLib>
+abstract interface tech.arnav.twofac.lib.backup/BackupTransport // tech.arnav.twofac.lib.backup/BackupTransport|null[0]
+
 abstract interface tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer/ImportAdapter|null[0]
 
 abstract interface tech.arnav.twofac.lib.otp/OTP // tech.arnav.twofac.lib.otp/OTP|null[0]
 
 abstract interface tech.arnav.twofac.lib.storage/Storage // tech.arnav.twofac.lib.storage/Storage|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupBlob // tech.arnav.twofac.lib.backup/BackupBlob|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupDescriptor // tech.arnav.twofac.lib.backup/BackupDescriptor|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupPayload // tech.arnav.twofac.lib.backup/BackupPayload|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupPayloadCodec // tech.arnav.twofac.lib.backup/BackupPayloadCodec|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupService // tech.arnav.twofac.lib.backup/BackupService|null[0]
 
 final class tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter|null[0]
 
@@ -22,6 +34,8 @@ final class tech.arnav.twofac.lib.importer.adapters/TwoFasImportAdapter : tech.a
 final class tech.arnav.twofac.lib.storage/StoredAccount // tech.arnav.twofac.lib.storage/StoredAccount|null[0]
 
 final class tech.arnav.twofac.lib/TwoFacLib // tech.arnav.twofac.lib/TwoFacLib|null[0]
+
+sealed class tech.arnav.twofac.lib.backup/BackupResult // tech.arnav.twofac.lib.backup/BackupResult|null[0]
 
 sealed class tech.arnav.twofac.lib.importer/ImportResult // tech.arnav.twofac.lib.importer/ImportResult|null[0]
 

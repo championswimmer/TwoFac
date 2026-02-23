@@ -9,6 +9,7 @@ import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.TOTP
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import tech.arnav.twofac.lib.storage.Storage
+import tech.arnav.twofac.lib.storage.StorageUtils.toDecryptedURI
 import tech.arnav.twofac.lib.storage.StorageUtils.toOTP
 import tech.arnav.twofac.lib.storage.StorageUtils.toStoredAccount
 import tech.arnav.twofac.lib.storage.StoredAccount
@@ -157,6 +158,24 @@ class TwoFacLib private constructor(
                 }
             }
             is ImportResult.Failure -> parseResult
+        }
+    }
+
+    /**
+     * Exports all stored account URIs as decrypted otpauth:// strings.
+     *
+     * Requires the library to be unlocked so secrets can be decrypted.
+     *
+     * @return List of plaintext otpauth:// URIs for all accounts
+     */
+    suspend fun exportAccountURIs(): List<String> {
+        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
+        val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+        return accounts.map { account ->
+            account.toDecryptedURI(
+                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString())
+            )
         }
     }
 }
