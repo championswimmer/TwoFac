@@ -1,162 +1,162 @@
 public final class tech/arnav/twofac/lib/TwoFacLib {
-public static final field Companion Ltech/arnav/twofac/lib/TwoFacLib$Companion;
-public synthetic fun <init> (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-public final fun addAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public final fun exportAccountURIs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public final fun getAllAccountOTPs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public final fun getAllAccounts ()Ljava/util/List;
-public final fun getStorage ()Ltech/arnav/twofac/lib/storage/Storage;
-public final fun importAccounts (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public static synthetic fun importAccounts$default (Ltech/arnav/twofac/lib/TwoFacLib;Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-public final fun isUnlocked ()Z
-public final fun unlock (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final field Companion Ltech/arnav/twofac/lib/TwoFacLib$Companion;
+	public synthetic fun <init> (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun addAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun exportAccountURIs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getAllAccountOTPs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getAllAccounts ()Ljava/util/List;
+	public final fun getStorage ()Ltech/arnav/twofac/lib/storage/Storage;
+	public final fun importAccounts (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun importAccounts$default (Ltech/arnav/twofac/lib/TwoFacLib;Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun isUnlocked ()Z
+	public final fun unlock (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class tech/arnav/twofac/lib/backup/BackupBlob {
-public fun <init> ([BLtech/arnav/twofac/lib/backup/BackupDescriptor;)V
-public final fun component1 ()[B
-public final fun component2 ()Ltech/arnav/twofac/lib/backup/BackupDescriptor;
-public final fun copy ([BLtech/arnav/twofac/lib/backup/BackupDescriptor;)Ltech/arnav/twofac/lib/backup/BackupBlob;
-public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupBlob;[BLtech/arnav/twofac/lib/backup/BackupDescriptor;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupBlob;
-public fun equals (Ljava/lang/Object;)Z
-public final fun getContent ()[B
-public final fun getDescriptor ()Ltech/arnav/twofac/lib/backup/BackupDescriptor;
-public fun hashCode ()I
-public fun toString ()Ljava/lang/String;
+	public fun <init> ([BLtech/arnav/twofac/lib/backup/BackupDescriptor;)V
+	public final fun component1 ()[B
+	public final fun component2 ()Ltech/arnav/twofac/lib/backup/BackupDescriptor;
+	public final fun copy ([BLtech/arnav/twofac/lib/backup/BackupDescriptor;)Ltech/arnav/twofac/lib/backup/BackupBlob;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupBlob;[BLtech/arnav/twofac/lib/backup/BackupDescriptor;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupBlob;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContent ()[B
+	public final fun getDescriptor ()Ltech/arnav/twofac/lib/backup/BackupDescriptor;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class tech/arnav/twofac/lib/backup/BackupDescriptor {
-public fun <init> (Ljava/lang/String;Ljava/lang/String;JIJ)V
-public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;JIJILkotlin/jvm/internal/DefaultConstructorMarker;)V
-public final fun component1 ()Ljava/lang/String;
-public final fun component2 ()Ljava/lang/String;
-public final fun component3 ()J
-public final fun component4 ()I
-public final fun component5 ()J
-public final fun copy (Ljava/lang/String;Ljava/lang/String;JIJ)Ltech/arnav/twofac/lib/backup/BackupDescriptor;
-public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupDescriptor;Ljava/lang/String;Ljava/lang/String;JIJILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupDescriptor;
-public fun equals (Ljava/lang/Object;)Z
-public final fun getByteSize ()J
-public final fun getCreatedAt ()J
-public final fun getId ()Ljava/lang/String;
-public final fun getSchemaVersion ()I
-public final fun getTransportId ()Ljava/lang/String;
-public fun hashCode ()I
-public fun toString ()Ljava/lang/String;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;JIJ)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;JIJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()J
+	public final fun component4 ()I
+	public final fun component5 ()J
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;JIJ)Ltech/arnav/twofac/lib/backup/BackupDescriptor;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupDescriptor;Ljava/lang/String;Ljava/lang/String;JIJILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupDescriptor;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getByteSize ()J
+	public final fun getCreatedAt ()J
+	public final fun getId ()Ljava/lang/String;
+	public final fun getSchemaVersion ()I
+	public final fun getTransportId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class tech/arnav/twofac/lib/backup/BackupPayload {
-public fun <init> (IJLjava/util/List;)V
-public synthetic fun <init> (IJLjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-public final fun component1 ()I
-public final fun component2 ()J
-public final fun component3 ()Ljava/util/List;
-public final fun copy (IJLjava/util/List;)Ltech/arnav/twofac/lib/backup/BackupPayload;
-public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupPayload;IJLjava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupPayload;
-public fun equals (Ljava/lang/Object;)Z
-public final fun getAccounts ()Ljava/util/List;
-public final fun getCreatedAt ()J
-public final fun getSchemaVersion ()I
-public fun hashCode ()I
-public fun toString ()Ljava/lang/String;
+	public fun <init> (IJLjava/util/List;)V
+	public synthetic fun <init> (IJLjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2 ()J
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (IJLjava/util/List;)Ltech/arnav/twofac/lib/backup/BackupPayload;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupPayload;IJLjava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupPayload;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAccounts ()Ljava/util/List;
+	public final fun getCreatedAt ()J
+	public final fun getSchemaVersion ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class tech/arnav/twofac/lib/backup/BackupPayloadCodec {
-public static final field INSTANCE Ltech/arnav/twofac/lib/backup/BackupPayloadCodec;
-public final fun decode ([B)Ltech/arnav/twofac/lib/backup/BackupPayload;
-public final fun encode (Ltech/arnav/twofac/lib/backup/BackupPayload;)[B
+	public static final field INSTANCE Ltech/arnav/twofac/lib/backup/BackupPayloadCodec;
+	public final fun decode ([B)Ltech/arnav/twofac/lib/backup/BackupPayload;
+	public final fun encode (Ltech/arnav/twofac/lib/backup/BackupPayload;)[B
 }
 
 public abstract class tech/arnav/twofac/lib/backup/BackupResult {
 }
 
 public final class tech/arnav/twofac/lib/backup/BackupService {
-public fun <init> (Ltech/arnav/twofac/lib/TwoFacLib;)V
-public final fun createBackup (Ltech/arnav/twofac/lib/backup/BackupTransport;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public final fun listBackups (Ltech/arnav/twofac/lib/backup/BackupTransport;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public final fun restoreBackup (Ltech/arnav/twofac/lib/backup/BackupTransport;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun <init> (Ltech/arnav/twofac/lib/TwoFacLib;)V
+	public final fun createBackup (Ltech/arnav/twofac/lib/backup/BackupTransport;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun listBackups (Ltech/arnav/twofac/lib/backup/BackupTransport;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun restoreBackup (Ltech/arnav/twofac/lib/backup/BackupTransport;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class tech/arnav/twofac/lib/backup/BackupTransport {
-public abstract fun delete (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public abstract fun download (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public abstract fun getId ()Ljava/lang/String;
-public abstract fun isAvailable (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public abstract fun listBackups (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public abstract fun upload ([BLtech/arnav/twofac/lib/backup/BackupDescriptor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun delete (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun download (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getId ()Ljava/lang/String;
+	public abstract fun isAvailable (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun listBackups (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun upload ([BLtech/arnav/twofac/lib/backup/BackupDescriptor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class tech/arnav/twofac/lib/importer/ImportAdapter {
-public abstract fun getName ()Ljava/lang/String;
-public abstract fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public static synthetic fun parse$default (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-public fun requiresPassword ()Z
+	public abstract fun getName ()Ljava/lang/String;
+	public abstract fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parse$default (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public fun requiresPassword ()Z
 }
 
 public final class tech/arnav/twofac/lib/importer/ImportAdapter$DefaultImpls {
-public static synthetic fun parse$default (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-public static fun requiresPassword (Ltech/arnav/twofac/lib/importer/ImportAdapter;)Z
+	public static synthetic fun parse$default (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun requiresPassword (Ltech/arnav/twofac/lib/importer/ImportAdapter;)Z
 }
 
 public abstract class tech/arnav/twofac/lib/importer/ImportResult {
 }
 
 public final class tech/arnav/twofac/lib/importer/adapters/AuthyImportAdapter : tech/arnav/twofac/lib/importer/ImportAdapter {
-public static final field Companion Ltech/arnav/twofac/lib/importer/adapters/AuthyImportAdapter$Companion;
-public fun <init> ()V
-public fun getName ()Ljava/lang/String;
-public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public fun requiresPassword ()Z
+	public static final field Companion Ltech/arnav/twofac/lib/importer/adapters/AuthyImportAdapter$Companion;
+	public fun <init> ()V
+	public fun getName ()Ljava/lang/String;
+	public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun requiresPassword ()Z
 }
 
 public final class tech/arnav/twofac/lib/importer/adapters/EnteImportAdapter : tech/arnav/twofac/lib/importer/ImportAdapter {
-public fun <init> ()V
-public fun getName ()Ljava/lang/String;
-public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public fun requiresPassword ()Z
+	public fun <init> ()V
+	public fun getName ()Ljava/lang/String;
+	public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun requiresPassword ()Z
 }
 
 public final class tech/arnav/twofac/lib/importer/adapters/TwoFasImportAdapter : tech/arnav/twofac/lib/importer/ImportAdapter {
-public fun <init> ()V
-public fun getName ()Ljava/lang/String;
-public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public fun requiresPassword ()Z
+	public fun <init> ()V
+	public fun getName ()Ljava/lang/String;
+	public fun parse (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun requiresPassword ()Z
 }
 
 public abstract interface class tech/arnav/twofac/lib/otp/OTP {
-public abstract fun generateOTP (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public abstract fun getAccountName ()Ljava/lang/String;
-public abstract fun getAlgorithm ()Ltech/arnav/twofac/lib/crypto/CryptoTools$Algo;
-public abstract fun getDigits ()I
-public abstract fun getIssuer ()Ljava/lang/String;
-public abstract fun getSecret ()Ljava/lang/String;
-public abstract fun validateOTP (Ljava/lang/String;JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun generateOTP (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAccountName ()Ljava/lang/String;
+	public abstract fun getAlgorithm ()Ltech/arnav/twofac/lib/crypto/CryptoTools$Algo;
+	public abstract fun getDigits ()I
+	public abstract fun getIssuer ()Ljava/lang/String;
+	public abstract fun getSecret ()Ljava/lang/String;
+	public abstract fun validateOTP (Ljava/lang/String;JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class tech/arnav/twofac/lib/storage/Storage {
-public abstract fun getAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public abstract fun getAccount (Lkotlin/uuid/Uuid;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public abstract fun getAccountList (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-public abstract fun saveAccount (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAccount (Lkotlin/uuid/Uuid;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAccountList (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun saveAccount (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class tech/arnav/twofac/lib/storage/StoredAccount {
-public static final field Companion Ltech/arnav/twofac/lib/storage/StoredAccount$Companion;
-public fun <init> (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-public final fun component1 ()Lkotlin/uuid/Uuid;
-public final fun component2 ()Ljava/lang/String;
-public final fun component3 ()Ljava/lang/String;
-public final fun component4 ()Ljava/lang/String;
-public final fun copy (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount;
-public static synthetic fun copy$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount;
-public fun equals (Ljava/lang/Object;)Z
-public final fun forDisplay (Ljava/lang/Long;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
-public static synthetic fun forDisplay$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Ljava/lang/Long;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
-public final fun getAccountID ()Lkotlin/uuid/Uuid;
-public final fun getAccountLabel ()Ljava/lang/String;
-public final fun getEncryptedURI ()Ljava/lang/String;
-public final fun getSalt ()Ljava/lang/String;
-public fun hashCode ()I
-public fun toString ()Ljava/lang/String;
+	public static final field Companion Ltech/arnav/twofac/lib/storage/StoredAccount$Companion;
+	public fun <init> (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Lkotlin/uuid/Uuid;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun forDisplay (Ljava/lang/Long;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
+	public static synthetic fun forDisplay$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Ljava/lang/Long;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
+	public final fun getAccountID ()Lkotlin/uuid/Uuid;
+	public final fun getAccountLabel ()Ljava/lang/String;
+	public final fun getEncryptedURI ()Ljava/lang/String;
+	public final fun getSalt ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
