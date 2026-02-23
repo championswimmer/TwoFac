@@ -21,8 +21,6 @@ final class tech.arnav.twofac.lib.backup/BackupDescriptor // tech.arnav.twofac.l
 
 final class tech.arnav.twofac.lib.backup/BackupPayload // tech.arnav.twofac.lib.backup/BackupPayload|null[0]
 
-final class tech.arnav.twofac.lib.backup/BackupPayloadCodec // tech.arnav.twofac.lib.backup/BackupPayloadCodec|null[0]
-
 final class tech.arnav.twofac.lib.backup/BackupService // tech.arnav.twofac.lib.backup/BackupService|null[0]
 
 final class tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter|null[0]
@@ -35,9 +33,11 @@ final class tech.arnav.twofac.lib.storage/StoredAccount // tech.arnav.twofac.lib
 
 final class tech.arnav.twofac.lib/TwoFacLib // tech.arnav.twofac.lib/TwoFacLib|null[0]
 
-sealed class tech.arnav.twofac.lib.backup/BackupResult // tech.arnav.twofac.lib.backup/BackupResult|null[0]
+sealed class <#A: out kotlin/Any?> tech.arnav.twofac.lib.backup/BackupResult // tech.arnav.twofac.lib.backup/BackupResult|null[0]
 
 sealed class tech.arnav.twofac.lib.importer/ImportResult // tech.arnav.twofac.lib.importer/ImportResult|null[0]
+
+final object tech.arnav.twofac.lib.backup/BackupPayloadCodec // tech.arnav.twofac.lib.backup/BackupPayloadCodec|null[0]
 
 // Targets: [native]
 final enum class /HashAlgo : kotlin/Enum</HashAlgo> { // /HashAlgo|null[0]
