@@ -6,7 +6,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonDecodingException
 import kotlinx.serialization.json.JsonEncodingException
-import kotlin.time.Clock
+import kotlin.system.getTimeMillis
 
 class BackupPayloadCodec(
     private val json: Json = Json {
@@ -27,11 +27,11 @@ class BackupPayloadCodec(
         val backupName: String,
     )
 
-    fun encode(
+    suspend fun encode(
         accounts: List<BackupAccountSnapshot>,
         appVersion: String? = null,
     ): BackupResult<EncodedBackupPayload> = try {
-        val createdAt = Clock.System.now().toEpochMilliseconds()
+        val createdAt = getTimeMillis()
         val payload = BackupPayload(
             schemaVersion = CURRENT_SCHEMA_VERSION,
             createdAtMillis = createdAt,
@@ -62,44 +62,47 @@ class BackupPayloadCodec(
         )
     }
 
-    fun decode(blob: BackupBlob): BackupResult<BackupPayload> = try {
-        val payload = json.decodeFromString<BackupPayload>(blob.bytes.decodeToString())
-        if (payload.schemaVersion != CURRENT_SCHEMA_VERSION) {
-            return BackupResult.Failure(
+    fun decode(blob: BackupBlob): BackupResult<BackupPayload> {
+        return try {
+            val payload = json.decodeFromString<BackupPayload>(blob.bytes.decodeToString())
+            if (payload.schemaVersion != CURRENT_SCHEMA_VERSION) {
+                BackupResult.Failure(
+                    BackupError(
+                        code = BackupErrorCode.ValidationError,
+                        message = "Unsupported backup schema version ${payload.schemaVersion}",
+                    )
+                )
+            } else {
+                BackupResult.Success(payload)
+            }
+        } catch (e: JsonDecodingException) {
+            BackupResult.Failure(
                 BackupError(
-                    code = BackupErrorCode.ValidationError,
-                    message = "Unsupported backup schema version ${payload.schemaVersion}",
+                    code = BackupErrorCode.SerializationError,
+                    message = "Failed to decode backup payload: ${e.message}",
+                    cause = e,
+                )
+            )
+        } catch (e: JsonEncodingException) {
+            BackupResult.Failure(
+                BackupError(
+                    code = BackupErrorCode.SerializationError,
+                    message = "Invalid backup payload: ${e.message}",
+                    cause = e,
+                )
+            )
+        } catch (e: Exception) {
+            BackupResult.Failure(
+                BackupError(
+                    code = BackupErrorCode.Unknown,
+                    message = "Failed to decode backup payload",
+                    cause = e,
                 )
             )
         }
-        BackupResult.Success(payload)
-    } catch (e: JsonDecodingException) {
-        BackupResult.Failure(
-            BackupError(
-                code = BackupErrorCode.SerializationError,
-                message = "Failed to decode backup payload: ${e.message}",
-                cause = e,
-            )
-        )
-    } catch (e: JsonEncodingException) {
-        BackupResult.Failure(
-            BackupError(
-                code = BackupErrorCode.SerializationError,
-                message = "Invalid backup payload: ${e.message}",
-                cause = e,
-            )
-        )
-    } catch (e: Exception) {
-        BackupResult.Failure(
-            BackupError(
-                code = BackupErrorCode.Unknown,
-                message = "Failed to decode backup payload",
-                cause = e,
-            )
-        )
     }
 
-    private fun checksum(bytes: ByteArray): String {
+    private suspend fun checksum(bytes: ByteArray): String {
         val hasher = cryptoProvider.get(SHA256)
         val digest = hasher.hasher().hash(bytes)
         return digest.joinToString("") { each ->

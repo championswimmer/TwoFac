@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package tech.arnav.twofac.lib.backup
 
 import dev.whyoleg.cryptography.CryptographyProvider
@@ -5,7 +7,9 @@ import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
 import tech.arnav.twofac.lib.crypto.Encoding.toByteString
 import tech.arnav.twofac.lib.storage.Storage
 import tech.arnav.twofac.lib.storage.StorageUtils.toOTP
+import tech.arnav.twofac.lib.storage.StorageUtils.toStoredAccount
 import tech.arnav.twofac.lib.uri.OtpAuthURI
+import kotlin.uuid.ExperimentalUuidApi
 
 class BackupService(
     private val storage: Storage,

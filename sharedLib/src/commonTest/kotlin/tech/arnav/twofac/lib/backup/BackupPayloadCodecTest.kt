@@ -1,5 +1,6 @@
 package tech.arnav.twofac.lib.backup
 
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -13,7 +14,7 @@ class BackupPayloadCodecTest {
     )
 
     @Test
-    fun `encode and decode round trip`() {
+    fun `encode and decode round trip`() = runTest {
         val codec = BackupPayloadCodec()
         val encoded = codec.encode(listOf(sampleSnapshot), appVersion = "1.0.0")
         assertTrue(encoded is BackupResult.Success)
