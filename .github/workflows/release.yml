@@ -1,0 +1,273 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-ubuntu:
+    name: "Build Android, Linux Desktop, Web, CLI (Linux)"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+
+      - name: Build Android APK
+        run: ./gradlew :composeApp:assembleRelease
+
+      - name: Build Linux Desktop (Deb)
+        run: ./gradlew :composeApp:packageDeb
+
+      - name: Build Web Distribution
+        run: ./gradlew :composeApp:wasmJsBrowserDistribution
+
+      - name: Build CLI (Linux x64)
+        run: ./gradlew :cliApp:linkReleaseExecutableLinuxX64
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: composeApp/build/outputs/apk/release/*.apk
+
+      - name: Upload Linux Desktop (Deb)
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-desktop-deb
+          path: composeApp/build/compose/binaries/main/deb/*.deb
+
+      - name: Upload Web Distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-distribution
+          path: composeApp/build/dist/wasmJs/productionExecutable/
+
+      - name: Upload CLI (Linux x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-linux-x64
+          path: cliApp/build/bin/linuxX64/releaseExecutable/2fac.kexe
+
+  build-windows:
+    name: "Build Windows Desktop and CLI"
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+
+      - name: Build Windows Desktop (MSI)
+        run: .\gradlew.bat :composeApp:packageMsi
+
+      - name: Build CLI (Windows)
+        run: .\gradlew.bat :cliApp:linkReleaseExecutableMingwX64
+
+      - name: Upload Windows Desktop (MSI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-desktop-msi
+          path: composeApp/build/compose/binaries/main/msi/*.msi
+
+      - name: Upload CLI (Windows)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-windows-x64
+          path: cliApp/build/bin/mingwX64/releaseExecutable/2fac.exe
+
+  build-macos:
+    name: "Build macOS Desktop, iOS Framework and App, CLI (macOS)"
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+
+      - name: Build macOS Desktop (DMG)
+        run: ./gradlew :composeApp:packageDmg
+
+      - name: Build iOS frameworks (arm64, simulator)
+        run: ./gradlew :composeApp:linkReleaseFrameworkIosArm64 :composeApp:linkReleaseFrameworkIosSimulatorArm64
+
+      - name: Create and zip iOS XCFramework
+        run: |
+          mkdir -p composeApp/build/XCFrameworks/release
+          xcodebuild -create-xcframework \
+            -framework composeApp/build/bin/iosArm64/releaseFramework/ComposeApp.framework \
+            -framework composeApp/build/bin/iosSimulatorArm64/releaseFramework/ComposeApp.framework \
+            -output composeApp/build/XCFrameworks/release/ComposeApp.xcframework
+          cd composeApp/build/XCFrameworks/release
+          zip -r ComposeApp.xcframework.zip ComposeApp.xcframework
+
+      - name: Import signing certificate
+        if: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12_BASE64 != '' }}
+        env:
+          CERTIFICATE_P12: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_SIGNING_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 16)
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          echo "$CERTIFICATE_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+
+      - name: Import provisioning profile
+        if: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 != '' }}
+        env:
+          PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+        run: |
+          PP_PATH=$RUNNER_TEMP/profile.mobileprovision
+          echo "$PROVISION_PROFILE" | base64 --decode > "$PP_PATH"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Archive iOS app
+        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        run: |
+          xcodebuild archive \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath "$RUNNER_TEMP/TwoFac.xcarchive" \
+            DEVELOPMENT_TEAM="${{ secrets.IOS_TEAM_ID }}"
+
+      - name: Export iOS IPA (ad-hoc)
+        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        run: |
+          cat > $RUNNER_TEMP/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>ad-hoc</string>
+              <key>teamID</key>
+              <string>${{ secrets.IOS_TEAM_ID }}</string>
+              <key>compileBitcode</key>
+              <false/>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/TwoFac.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/ipa"
+
+      - name: Build CLI (macOS arm64)
+        run: ./gradlew :cliApp:linkReleaseExecutableMacosArm64
+
+      - name: Build CLI (macOS x64)
+        run: ./gradlew :cliApp:linkReleaseExecutableMacosX64
+
+      - name: Upload macOS Desktop (DMG)
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-desktop-dmg
+          path: composeApp/build/compose/binaries/main/dmg/*.dmg
+
+      - name: Upload iOS XCFramework
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcframework
+          path: composeApp/build/XCFrameworks/release/ComposeApp.xcframework.zip
+
+      - name: Upload iOS IPA
+        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: ${{ runner.temp }}/ipa/*.ipa
+
+      - name: Upload CLI (macOS arm64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-macos-arm64
+          path: cliApp/build/bin/macosArm64/releaseExecutable/2fac.kexe
+
+      - name: Upload CLI (macOS x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-macos-x64
+          path: cliApp/build/bin/macosX64/releaseExecutable/2fac.kexe
+
+  release:
+    name: "Create GitHub Release"
+    needs: [build-ubuntu, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Zip Web Distribution
+        run: |
+          cd artifacts/web-distribution
+          zip -r ../web-distribution.zip .
+          cd ../..
+
+      - name: Package *nix CLI binaries as tar.gz to preserve executable bit
+        run: |
+          tar -czf artifacts/2fac-linux-x64.tar.gz -C artifacts/cli-linux-x64 2fac.kexe
+          tar -czf artifacts/2fac-macos-arm64.tar.gz -C artifacts/cli-macos-arm64 2fac.kexe
+          tar -czf artifacts/2fac-macos-x64.tar.gz -C artifacts/cli-macos-x64 2fac.kexe
+          mv artifacts/cli-windows-x64/2fac.exe artifacts/2fac-windows-x64.exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          fail_on_unmatched_files: false
+          files: |
+            artifacts/android-apk/*.apk
+            artifacts/linux-desktop-deb/*.deb
+            artifacts/web-distribution.zip
+            artifacts/2fac-linux-x64.tar.gz
+            artifacts/windows-desktop-msi/*.msi
+            artifacts/2fac-windows-x64.exe
+            artifacts/macos-desktop-dmg/*.dmg
+            artifacts/ios-xcframework/ComposeApp.xcframework.zip
+            artifacts/ios-ipa/*.ipa
+            artifacts/2fac-macos-arm64.tar.gz
+            artifacts/2fac-macos-x64.tar.gz
