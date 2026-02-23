@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "tech.arnav.twofac"
-version = "1.0-SNAPSHOT"
+version = rootProject.extra["appVersionName"] as String
 
 kotlin {
     listOf(

@@ -9,3 +9,7 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
     alias(libs.plugins.kotlinAndroid) apply false
 }
+
+// Centralized app versioning — all subprojects inherit from here
+extra["appVersionCode"] = 1
+extra["appVersionName"] = "1.0.0"
