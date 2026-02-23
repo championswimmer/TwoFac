@@ -82,10 +82,10 @@ jobs:
         uses: gradle/gradle-build-action@v3
 
       - name: Build Windows Desktop (MSI)
-        run: ./gradlew :composeApp:packageMsi
+        run: .\gradlew.bat :composeApp:packageMsi
 
       - name: Build CLI (Windows)
-        run: ./gradlew :cliApp:linkReleaseExecutableMingwX64
+        run: .\gradlew.bat :cliApp:linkReleaseExecutableMingwX64
 
       - name: Upload Windows Desktop (MSI)
         uses: actions/upload-artifact@v4
@@ -100,7 +100,7 @@ jobs:
           path: cliApp/build/bin/mingwX64/releaseExecutable/2fac.exe
 
   build-macos:
-    name: "Build macOS Desktop, iOS Framework, CLI (macOS)"
+    name: "Build macOS Desktop, iOS Framework and App, CLI (macOS)"
     runs-on: macos-latest
     permissions:
       contents: read
@@ -119,13 +119,76 @@ jobs:
       - name: Build macOS Desktop (DMG)
         run: ./gradlew :composeApp:packageDmg
 
-      - name: Build iOS XCFramework
-        run: ./gradlew :composeApp:assembleReleaseXCFramework
+      - name: Build iOS frameworks (arm64, simulator)
+        run: ./gradlew :composeApp:linkReleaseFrameworkIosArm64 :composeApp:linkReleaseFrameworkIosSimulatorArm64
 
-      - name: Zip iOS XCFramework
+      - name: Create and zip iOS XCFramework
         run: |
+          mkdir -p composeApp/build/XCFrameworks/release
+          xcodebuild -create-xcframework \
+            -framework composeApp/build/bin/iosArm64/releaseFramework/ComposeApp.framework \
+            -framework composeApp/build/bin/iosSimulatorArm64/releaseFramework/ComposeApp.framework \
+            -output composeApp/build/XCFrameworks/release/ComposeApp.xcframework
           cd composeApp/build/XCFrameworks/release
           zip -r ComposeApp.xcframework.zip ComposeApp.xcframework
+
+      - name: Import signing certificate
+        if: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12_BASE64 != '' }}
+        env:
+          CERTIFICATE_P12: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_SIGNING_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 16)
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          echo "$CERTIFICATE_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+
+      - name: Import provisioning profile
+        if: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 != '' }}
+        env:
+          PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+        run: |
+          PP_PATH=$RUNNER_TEMP/profile.mobileprovision
+          echo "$PROVISION_PROFILE" | base64 --decode > "$PP_PATH"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Archive iOS app
+        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        run: |
+          xcodebuild archive \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath "$RUNNER_TEMP/TwoFac.xcarchive" \
+            DEVELOPMENT_TEAM="${{ secrets.IOS_TEAM_ID }}"
+
+      - name: Export iOS IPA (ad-hoc)
+        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        run: |
+          cat > $RUNNER_TEMP/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>ad-hoc</string>
+              <key>teamID</key>
+              <string>${{ secrets.IOS_TEAM_ID }}</string>
+              <key>compileBitcode</key>
+              <false/>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/TwoFac.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/ipa"
 
       - name: Build CLI (macOS arm64)
         run: ./gradlew :cliApp:linkReleaseExecutableMacosArm64
@@ -144,6 +207,13 @@ jobs:
         with:
           name: ios-xcframework
           path: composeApp/build/XCFrameworks/release/ComposeApp.xcframework.zip
+
+      - name: Upload iOS IPA
+        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: ${{ runner.temp }}/ipa/*.ipa
 
       - name: Upload CLI (macOS arm64)
         uses: actions/upload-artifact@v4
@@ -177,25 +247,27 @@ jobs:
           zip -r ../web-distribution.zip .
           cd ../..
 
-      - name: Rename CLI binaries to avoid filename conflicts
+      - name: Package *nix CLI binaries as tar.gz to preserve executable bit
         run: |
-          mv artifacts/cli-linux-x64/2fac.kexe artifacts/cli-linux-x64/2fac-linux-x64
-          mv artifacts/cli-macos-arm64/2fac.kexe artifacts/cli-macos-arm64/2fac-macos-arm64
-          mv artifacts/cli-macos-x64/2fac.kexe artifacts/cli-macos-x64/2fac-macos-x64
-          mv artifacts/cli-windows-x64/2fac.exe artifacts/cli-windows-x64/2fac-windows-x64.exe
+          tar -czf artifacts/2fac-linux-x64.tar.gz -C artifacts/cli-linux-x64 2fac.kexe
+          tar -czf artifacts/2fac-macos-arm64.tar.gz -C artifacts/cli-macos-arm64 2fac.kexe
+          tar -czf artifacts/2fac-macos-x64.tar.gz -C artifacts/cli-macos-x64 2fac.kexe
+          mv artifacts/cli-windows-x64/2fac.exe artifacts/2fac-windows-x64.exe
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+          fail_on_unmatched_files: false
           files: |
             artifacts/android-apk/*.apk
             artifacts/linux-desktop-deb/*.deb
             artifacts/web-distribution.zip
-            artifacts/cli-linux-x64/2fac-linux-x64
+            artifacts/2fac-linux-x64.tar.gz
             artifacts/windows-desktop-msi/*.msi
-            artifacts/cli-windows-x64/2fac-windows-x64.exe
+            artifacts/2fac-windows-x64.exe
             artifacts/macos-desktop-dmg/*.dmg
             artifacts/ios-xcframework/ComposeApp.xcframework.zip
-            artifacts/cli-macos-arm64/2fac-macos-arm64
-            artifacts/cli-macos-x64/2fac-macos-x64
+            artifacts/ios-ipa/*.ipa
+            artifacts/2fac-macos-arm64.tar.gz
+            artifacts/2fac-macos-x64.tar.gz
