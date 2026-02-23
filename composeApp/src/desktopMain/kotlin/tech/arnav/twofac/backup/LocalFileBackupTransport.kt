@@ -99,7 +99,7 @@ class LocalFileBackupTransport(private val directory: Path) : BackupTransport {
         val buffer = Buffer()
         SystemFileSystem.source(path).buffered().use { it.transferTo(buffer) }
         val result = ByteArray(buffer.size.toInt())
-        buffer.readTo(result)
+        buffer.readTo(result, 0, result.size)
         return result
     }
 
