@@ -12,8 +12,8 @@ android {
         applicationId = "tech.arnav.twofac.watch"
         minSdk = 30
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = rootProject.extra["appVersionCode"] as Int
+        versionName = rootProject.extra["appVersionName"] as String
 
     }
 
