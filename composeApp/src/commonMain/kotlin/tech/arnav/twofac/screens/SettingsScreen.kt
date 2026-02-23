@@ -28,7 +28,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    backupSettingsContent: (@Composable () -> Unit)? = null
 ) {
     Scaffold(
         topBar = {
@@ -48,7 +49,7 @@ fun SettingsScreen(
                 .padding(paddingValues)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
         ) {
 
         Card(
@@ -81,6 +82,8 @@ fun SettingsScreen(
                 )
             }
         }
+
+        backupSettingsContent?.invoke()
         }
     }
 }

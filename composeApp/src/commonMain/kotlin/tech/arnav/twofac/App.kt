@@ -20,7 +20,9 @@ import tech.arnav.twofac.screens.SettingsScreen
 
 @Composable
 @Preview
-fun App() {
+fun App(
+    backupSettingsContent: (@Composable () -> Unit)? = null
+) {
     MaterialTheme {
         val navController = rememberNavController()
 
@@ -55,7 +57,8 @@ fun App() {
 
             composable<Settings> {
                 SettingsScreen(
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { navController.popBackStack() },
+                    backupSettingsContent = backupSettingsContent
                 )
             }
 

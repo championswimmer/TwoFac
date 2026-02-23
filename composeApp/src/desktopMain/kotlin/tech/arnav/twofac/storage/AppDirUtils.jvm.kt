@@ -12,6 +12,7 @@ private val appDirs = AppDirs {
     appAuthor = "tech.arnav"
     macOS.useSpaceBetweenAuthorAndApp = false
 }
+private const val DEFAULT_BACKUP_FILE = "twofac-backup.json"
 
 actual fun createAccountsStore(): KStore<List<StoredAccount>> {
     val dir = appDirs.getUserDataDir()
@@ -27,4 +28,18 @@ actual fun createAccountsStore(): KStore<List<StoredAccount>> {
 actual fun getStoragePath(): String {
     val dir = appDirs.getUserDataDir()
     return Path(dir, ACCOUNTS_STORAGE_FILE).toString()
+}
+
+fun getBackupDir(forceCreate: Boolean = false): Path {
+    val dir = appDirs.getUserDataDir()
+    val path = Path(dir)
+    if (forceCreate) {
+        SystemFileSystem.createDirectories(path)
+    }
+    return path
+}
+
+fun getDefaultBackupFilePath(forceCreate: Boolean = false): Path {
+    val dir = getBackupDir(forceCreate)
+    return Path(dir, DEFAULT_BACKUP_FILE)
 }
