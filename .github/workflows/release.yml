@@ -5,6 +5,12 @@ on:
     tags:
       - 'v*'
 
+env:
+  IOS_SIGNING_CERTIFICATE_P12_BASE64: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12_BASE64 }}
+  IOS_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.IOS_SIGNING_CERTIFICATE_PASSWORD }}
+  IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+  IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+
 jobs:
   build-ubuntu:
     name: "Build Android, Linux Desktop, Web, CLI (Linux)"
@@ -133,10 +139,10 @@ jobs:
           zip -r ComposeApp.xcframework.zip ComposeApp.xcframework
 
       - name: Import signing certificate
-        if: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12_BASE64 != '' }}
+        if: ${{ env.IOS_SIGNING_CERTIFICATE_P12_BASE64 != '' }}
         env:
-          CERTIFICATE_P12: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12_BASE64 }}
-          CERTIFICATE_PASSWORD: ${{ secrets.IOS_SIGNING_CERTIFICATE_PASSWORD }}
+          CERTIFICATE_P12: ${{ env.IOS_SIGNING_CERTIFICATE_P12_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ env.IOS_SIGNING_CERTIFICATE_PASSWORD }}
         run: |
           KEYCHAIN_PATH=$RUNNER_TEMP/signing.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -base64 16)
@@ -148,9 +154,9 @@ jobs:
           security list-keychain -d user -s "$KEYCHAIN_PATH"
 
       - name: Import provisioning profile
-        if: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 != '' }}
+        if: ${{ env.IOS_PROVISION_PROFILE_BASE64 != '' }}
         env:
-          PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+          PROVISION_PROFILE: ${{ env.IOS_PROVISION_PROFILE_BASE64 }}
         run: |
           PP_PATH=$RUNNER_TEMP/profile.mobileprovision
           echo "$PROVISION_PROFILE" | base64 --decode > "$PP_PATH"
@@ -158,7 +164,9 @@ jobs:
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Archive iOS app
-        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        if: ${{ env.IOS_TEAM_ID != '' }}
+        env:
+          TEAM_ID: ${{ env.IOS_TEAM_ID }}
         run: |
           xcodebuild archive \
             -project iosApp/iosApp.xcodeproj \
@@ -166,10 +174,12 @@ jobs:
             -configuration Release \
             -destination "generic/platform=iOS" \
             -archivePath "$RUNNER_TEMP/TwoFac.xcarchive" \
-            DEVELOPMENT_TEAM="${{ secrets.IOS_TEAM_ID }}"
+            DEVELOPMENT_TEAM="$TEAM_ID"
 
       - name: Export iOS IPA (ad-hoc)
-        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        if: ${{ env.IOS_TEAM_ID != '' }}
+        env:
+          TEAM_ID: ${{ env.IOS_TEAM_ID }}
         run: |
           cat > $RUNNER_TEMP/ExportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -179,7 +189,7 @@ jobs:
               <key>method</key>
               <string>ad-hoc</string>
               <key>teamID</key>
-              <string>${{ secrets.IOS_TEAM_ID }}</string>
+              <string>$TEAM_ID</string>
               <key>compileBitcode</key>
               <false/>
           </dict>
@@ -209,7 +219,7 @@ jobs:
           path: composeApp/build/XCFrameworks/release/ComposeApp.xcframework.zip
 
       - name: Upload iOS IPA
-        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        if: ${{ env.IOS_TEAM_ID != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
