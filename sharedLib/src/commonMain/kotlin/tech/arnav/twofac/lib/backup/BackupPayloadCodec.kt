@@ -4,8 +4,7 @@ import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.algorithms.SHA256
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonDecodingException
-import kotlinx.serialization.json.JsonEncodingException
+import kotlinx.serialization.SerializationException
 import kotlin.system.getTimeMillis
 
 class BackupPayloadCodec(
@@ -27,6 +26,7 @@ class BackupPayloadCodec(
         val backupName: String,
     )
 
+    @Suppress("DEPRECATION")
     suspend fun encode(
         accounts: List<BackupAccountSnapshot>,
         appVersion: String? = null,
@@ -75,19 +75,11 @@ class BackupPayloadCodec(
             } else {
                 BackupResult.Success(payload)
             }
-        } catch (e: JsonDecodingException) {
+        } catch (e: SerializationException) {
             BackupResult.Failure(
                 BackupError(
                     code = BackupErrorCode.SerializationError,
                     message = "Failed to decode backup payload: ${e.message}",
-                    cause = e,
-                )
-            )
-        } catch (e: JsonEncodingException) {
-            BackupResult.Failure(
-                BackupError(
-                    code = BackupErrorCode.SerializationError,
-                    message = "Invalid backup payload: ${e.message}",
                     cause = e,
                 )
             )
