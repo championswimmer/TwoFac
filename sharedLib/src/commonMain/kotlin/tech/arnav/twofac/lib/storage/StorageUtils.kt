@@ -35,4 +35,9 @@ object StorageUtils {
         val decryptedURI = cryptoTools.decrypt(encryptedURI.toByteString(), signingKey.key)
         return OtpAuthURI.parse(decryptedURI.decodeToString())
     }
+
+    suspend fun StoredAccount.toDecryptedURI(signingKey: CryptoTools.SigningKey): String {
+        val decryptedURI = cryptoTools.decrypt(encryptedURI.toByteString(), signingKey.key)
+        return decryptedURI.decodeToString()
+    }
 }
