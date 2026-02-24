@@ -75,4 +75,4 @@ class AndroidWatchSyncCoordinator(
 }
 
 const val WATCH_SYNC_PERIODIC_WORK_NAME = "twofac-watch-sync-periodic"
-const val WATCH_SYNC_PERIODIC_INTERVAL_MINUTES = 15L
+const val WATCH_SYNC_PERIODIC_INTERVAL_MINUTES = 30L

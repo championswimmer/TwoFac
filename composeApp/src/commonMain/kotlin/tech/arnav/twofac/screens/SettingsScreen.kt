@@ -205,7 +205,7 @@ fun SettingsScreen(
                             },
                             enabled = isSyncToWatchEnabled(
                                 isCompanionActive = isWatchCompanionActive,
-                                isSyncInProgress = isWatchSyncInProgress || isLoading,
+                                isSyncInProgress = isWatchSyncInProgress,
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
