@@ -21,6 +21,9 @@ val appModule = module {
 
 val viewModelModule = module {
     single<AccountsViewModel> {
-        AccountsViewModel(twoFacLib = get())
+        AccountsViewModel(
+            twoFacLib = get(),
+            watchSyncCoordinator = getOrNull(),
+        )
     }
 }

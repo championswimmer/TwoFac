@@ -37,6 +37,7 @@ composeMaterial = "1.5.6"
 composeFoundation = "1.5.6"
 wearToolingPreview = "1.0.0"
 coreSplashscreen = "1.2.0"
+androidxWork = "2.10.5"
 
 [plugins]
 
@@ -104,3 +105,4 @@ androidx-compose-material = { group = "androidx.wear.compose", name = "compose-m
 androidx-compose-foundation = { group = "androidx.wear.compose", name = "compose-foundation", version.ref = "composeFoundation" }
 androidx-wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidxWork" }
