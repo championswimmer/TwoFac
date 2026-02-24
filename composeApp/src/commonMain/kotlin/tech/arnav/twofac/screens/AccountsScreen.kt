@@ -51,7 +51,11 @@ fun AccountsScreen(
     val requiresUnlock = !viewModel.twoFacLibUnlocked
 
     LaunchedEffect(requiresUnlock) {
-        showPasskeyDialog = requiresUnlock
+        if (requiresUnlock) {
+            showPasskeyDialog = true
+        } else {
+            showPasskeyDialog = false
+        }
     }
 
     Scaffold(
