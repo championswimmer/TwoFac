@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 android {
@@ -46,6 +47,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
 
+    implementation(libs.kstore)
     implementation(libs.kstore.file)
     implementation(libs.kotlin.multiplatform.appdirs)
     implementation(project(":sharedLib"))

@@ -19,12 +19,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import androidx.wear.tooling.preview.devices.WearDevices
+import kotlinx.coroutines.launch
 import tech.arnav.twofac.watch.R
 import tech.arnav.twofac.watch.presentation.theme.TwofacTheme
+import tech.arnav.twofac.watch.storage.WatchSyncSnapshotRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +36,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setTheme(android.R.style.Theme_DeviceDefault)
+        lifecycleScope.launch {
+            WatchSyncSnapshotRepository.get(applicationContext).initialize()
+        }
 
         setContent {
             WearApp("Android")

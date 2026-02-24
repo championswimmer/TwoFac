@@ -25,6 +25,9 @@
         <meta-data
                 android:name="com.google.android.wearable.standalone"
                 android:value="false"/>
+        <meta-data
+                android:name="com.google.android.gms.wearable.capabilities"
+                android:resource="@array/android_wear_capabilities" />
 
         <activity
                 android:name=".presentation.MainActivity"
@@ -37,6 +40,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <service
+                android:name=".datalayer.WatchSyncListenerService"
+                android:enabled="true"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+
+                <data
+                        android:scheme="wear"
+                        android:host="*"
+                        android:pathPrefix="/twofac/sync" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
