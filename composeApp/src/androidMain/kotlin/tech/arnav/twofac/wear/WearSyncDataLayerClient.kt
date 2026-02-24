@@ -19,6 +19,11 @@ class WearSyncDataLayerClient(context: Context) {
     fun getReachableWatchNodes(): Task<Set<Node>> {
         return capabilityClient
             .getCapability(WatchSyncContract.WATCH_CAPABILITY, CapabilityClient.FILTER_REACHABLE)
-            .continueWith { task -> task.result?.nodes ?: emptySet() }
+            .continueWith { task ->
+                if (!task.isSuccessful) {
+                    throw task.exception ?: IllegalStateException("Failed to query watch capability")
+                }
+                task.result?.nodes ?: emptySet()
+            }
     }
 }
