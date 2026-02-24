@@ -78,6 +78,7 @@ From Apple WatchConnectivity docs and sample docs:
 4. Finalize payload contract version (`v1`) and migration strategy.
 
 ## Phase 1 — Shape `TwoFacKit` for Swift interop
+> Alignment note with plan `01-wearos-companion-sync-plan.md`: `sharedLib` should expose **one shared companion sync contract** for both Wear OS and watchOS, instead of diverging DTO families.
 1. Audit exported APIs from `sharedLib` for Swift friendliness:
    - avoid Kotlin-only types at public boundary where possible.
    - provide thin `@PublicApi` facades for Swift-consumable methods.
@@ -86,9 +87,10 @@ From Apple WatchConnectivity docs and sample docs:
    - list account view models (id, issuer, name, period, digits),
    - generate current code + remaining seconds,
    - clear all secrets.
-3. Add stable DTOs for interchange:
-   - `SecretRecordDto`, `SecretBundleDto`, `SyncEnvelopeDto` (schemaVersion, generatedAt, records).
-4. Add deterministic serialization for sync payload + integrity check support.
+3. Reuse/extend the same `sharedLib` sync payload package planned for Wear (`watchsync`), keeping one versioned snapshot model across companion platforms:
+   - `WatchSyncSnapshot(version, generatedAtEpochSec, accounts)`
+   - `WatchSyncAccount(accountId, issuer, accountLabel, otpAuthUri)`
+4. Add deterministic serialization + version validation tests in `sharedLib` (common tests), and only add Swift-facing facades on top where needed.
 
 ## Phase 2 — Add watchOS app target in `iosApp` Xcode project
 1. Add new targets:
@@ -201,8 +203,8 @@ From Apple WatchConnectivity docs and sample docs:
 ## Concrete code-change checklist (repo-focused)
 
 1. **`sharedLib`**
-   - add/adjust Swift-friendly public APIs for secret import/list/code generation.
-   - add sync DTO + serialization tests.
+   - keep a single companion sync contract shared with plan 01 (`watchsync` models + codec), not a separate watchOS-only DTO hierarchy.
+   - add/adjust Swift-friendly public APIs for secret import/list/code generation as thin facades over shared models.
 2. **`iosApp`**
    - update `iosApp.xcodeproj` with watch targets/capabilities.
    - add Swift files for `WatchSyncCoordinator` and delegate handlers.
