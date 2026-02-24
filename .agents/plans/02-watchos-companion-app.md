@@ -67,14 +67,14 @@ From Apple WatchConnectivity docs and sample docs:
 
 ## Phase 0 — Product + security decisions
 1. Confirm supported watchOS/iOS versions (recommend watchOS 10+ for vertical page style).
-2. Decide sync trigger policy:
-   - on iOS app foreground,
-   - on secret CRUD events,
-   - periodic background push from iOS,
-   - watch manual pull action.
+2. Confirm sync trigger policy:
+   - no secret CRUD-triggered sync is required.
+   - sync whenever possible (including delayed async/background deliveries).
+   - on first watch app open, if watch has no secrets, trigger phone fetch/full sync.
+   - once watch has secrets, passive updates are sufficient.
 3. Decide storage policy on watch:
    - encrypted-at-rest cache only,
-   - optional “Require unlock before revealing code” gate.
+   - require watch-side passcode/pattern unlock before revealing codes.
 4. Finalize payload contract version (`v1`) and migration strategy.
 
 ## Phase 1 — Shape `TwoFacKit` for Swift interop
@@ -110,10 +110,12 @@ From Apple WatchConnectivity docs and sample docs:
    - `updateApplicationContext` for latest snapshot metadata (quick state signal)
    - `transferUserInfo` for guaranteed snapshot deliveries
    - `sendMessage` for immediate manual refresh when reachable
-3. Add de-duplication/versioning:
+3. Ensure first-open bootstrap behavior:
+   - if watch reports empty local store, phone prioritizes a full snapshot push.
+4. Add de-duplication/versioning:
    - monotonic `revision` and payload hash.
-4. Add iOS-side queueing/backoff when not activated or app state is constrained.
-5. Handle multi-watch switching in iOS delegate:
+5. Add iOS-side queueing/backoff when not activated or app state is constrained.
+6. Handle multi-watch switching in iOS delegate:
    - `sessionDidBecomeInactive`, `sessionDidDeactivate`, then `activate()`.
 
 ## Phase 4 — Implement watch extension connectivity intake
@@ -150,7 +152,7 @@ From Apple WatchConnectivity docs and sample docs:
 3. Add optional controls:
    - pull-to-refresh or button to request phone sync (`sendMessage`).
 4. Empty/error states:
-   - “Open iPhone app to sync accounts” when none available,
+   - first-open with no local secrets should auto-request sync from phone, then show “Open iPhone app to sync accounts” fallback when unavailable,
    - explicit connectivity last error message.
 
 ## Phase 7 — iOS app integration updates needed
@@ -159,8 +161,8 @@ From Apple WatchConnectivity docs and sample docs:
    - last sync timestamp/status,
    - “Sync now” action.
 2. Trigger sync events from iOS app lifecycle:
-   - after account add/edit/delete/import,
-   - on iOS app foreground.
+   - on iOS app foreground and opportunistic background windows,
+   - no dedicated secret CRUD-triggered sync requirement.
 3. Respect privacy/security settings:
    - if user disables watch sync, send wipe signal to watch + clear watch store.
 4. Add migration behavior:
@@ -171,7 +173,8 @@ From Apple WatchConnectivity docs and sample docs:
 2. Encrypt payload before transfer when possible (application-layer encryption key derived/stored in shared group/keychain).
 3. Add replay/stale protection (revision + generatedAt + hash).
 4. Protect logs: never log secrets or OTPs.
-5. Add local wipe pathways:
+5. Require watch-side passcode/pattern gate before revealing any OTP/account list content.
+6. Add local wipe pathways:
    - phone unpair/account sign-out/watch sync disable.
 
 ## Phase 9 — Testing strategy
