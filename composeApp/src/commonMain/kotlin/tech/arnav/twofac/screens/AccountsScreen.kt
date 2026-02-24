@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -22,12 +23,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
+import tech.arnav.twofac.components.PasskeyDialog
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,6 +47,20 @@ fun AccountsScreen(
     val accounts by viewModel.accounts.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    var showPasskeyDialog by remember { mutableStateOf(false) }
+    val requiresUnlock = error?.contains("not unlocked", ignoreCase = true) == true && !viewModel.twoFacLibUnlocked
+
+    LaunchedEffect(requiresUnlock) {
+        if (requiresUnlock) {
+            showPasskeyDialog = true
+        }
+    }
+
+    LaunchedEffect(accounts) {
+        if (viewModel.twoFacLibUnlocked && accounts.isNotEmpty()) {
+            showPasskeyDialog = false
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -71,6 +91,21 @@ fun AccountsScreen(
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
+                }
+
+                requiresUnlock -> {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Vault is locked. Unlock to manage accounts.",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Button(onClick = { showPasskeyDialog = true }) {
+                            Text("Unlock Vault")
+                        }
+                    }
                 }
 
                 error != null -> {
@@ -106,4 +141,16 @@ fun AccountsScreen(
             }
         }
     }
+
+    PasskeyDialog(
+        isVisible = showPasskeyDialog,
+        isLoading = isLoading,
+        error = error,
+        onPasskeySubmit = { passkey ->
+            viewModel.loadAccountsWithOtps(passkey)
+        },
+        onDismiss = {
+            showPasskeyDialog = false
+        }
+    )
 }
