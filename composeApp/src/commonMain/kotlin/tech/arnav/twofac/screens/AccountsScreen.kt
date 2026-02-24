@@ -48,18 +48,10 @@ fun AccountsScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     var showPasskeyDialog by remember { mutableStateOf(false) }
-    val requiresUnlock = error?.contains("not unlocked", ignoreCase = true) == true && !viewModel.twoFacLibUnlocked
+    val requiresUnlock = !viewModel.twoFacLibUnlocked
 
     LaunchedEffect(requiresUnlock) {
-        if (requiresUnlock) {
-            showPasskeyDialog = true
-        }
-    }
-
-    LaunchedEffect(accounts) {
-        if (viewModel.twoFacLibUnlocked && accounts.isNotEmpty()) {
-            showPasskeyDialog = false
-        }
+        showPasskeyDialog = requiresUnlock
     }
 
     Scaffold(
