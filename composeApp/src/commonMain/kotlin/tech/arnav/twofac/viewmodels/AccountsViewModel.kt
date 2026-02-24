@@ -101,13 +101,19 @@ class AccountsViewModel(
         }
     }
 
-    fun addAccount(uri: String, passkey: String) {
+    fun addAccount(uri: String, passkey: String?) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
 
             try {
-                twoFacLib.unlock(passkey)
+                if (!twoFacLibUnlocked) {
+                    if (passkey.isNullOrBlank()) {
+                        _error.value = "Passkey is required to add an account while vault is locked"
+                        return@launch
+                    }
+                    twoFacLib.unlock(passkey)
+                }
                 val success = twoFacLib.addAccount(uri)
                 if (success) {
                     watchSyncCoordinator?.onAccountsChanged()

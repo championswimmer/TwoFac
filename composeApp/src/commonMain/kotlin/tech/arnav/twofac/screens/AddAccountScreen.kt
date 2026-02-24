@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,6 +36,7 @@ fun AddAccountScreen(
 ) {
     var uriText by remember { mutableStateOf("") }
     var passkeyText by remember { mutableStateOf("") }
+    val requiresUnlock = !viewModel.twoFacLibUnlocked
 
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -70,13 +70,15 @@ fun AddAccountScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
-            value = passkeyText,
-            onValueChange = { passkeyText = it },
-            label = { Text("Passkey") },
-            placeholder = { Text("Enter your passkey") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            if (requiresUnlock) {
+                OutlinedTextField(
+                    value = passkeyText,
+                    onValueChange = { passkeyText = it },
+                    label = { Text("Passkey") },
+                    placeholder = { Text("Enter your passkey") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
         error?.let { errorMessage ->
             Text(
@@ -88,14 +90,14 @@ fun AddAccountScreen(
 
             Button(
                 onClick = {
-                    if (uriText.isNotBlank() && passkeyText.isNotBlank()) {
-                        viewModel.addAccount(uriText, passkeyText)
+                    if (uriText.isNotBlank() && (!requiresUnlock || passkeyText.isNotBlank())) {
+                        viewModel.addAccount(uriText, passkeyText.ifBlank { null })
                         if (viewModel.error.value == null) {
                             onNavigateBack()
                         }
                     }
                 },
-                enabled = !isLoading && uriText.isNotBlank() && passkeyText.isNotBlank()
+                enabled = !isLoading && uriText.isNotBlank() && (!requiresUnlock || passkeyText.isNotBlank())
             ) {
                 Text(if (isLoading) "Adding..." else "Add Account")
             }
