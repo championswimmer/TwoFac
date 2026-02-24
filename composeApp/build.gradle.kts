@@ -78,6 +78,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.play.services.wearable)
             implementation(libs.kstore.file)
             implementation(libs.kotlin.multiplatform.appdirs)
         }
