@@ -54,12 +54,12 @@ From Horologist `DataLayerAppHelper`:
 
 ## Recommended target architecture
 
-## 1) Responsibility split
+### 1) Responsibility split
 - `sharedLib`: all reusable account/OTP logic + serialization helpers for sync payload model.
 - `composeApp` (`androidMain`): source-of-truth publisher for watch sync + pairing/discovery UI/status.
 - `watchApp`: Wear-only sync receiver, persistence, OTP UI.
 
-## 2) Data model for sync
+### 2) Data model for sync
 Create a watch sync payload model (in `sharedLib`, commonMain), e.g.:
 - `WatchSyncSnapshot(version, generatedAtEpochSec, accounts: List<WatchSyncAccount>)`
 - `WatchSyncAccount(accountId, issuer, accountLabel, otpAuthUri)`
@@ -69,14 +69,14 @@ Notes:
 - Include only fields required for OTP rendering on watch.
 - Phone computes payload from `TwoFacLib.exportAccountURIs()` + display metadata.
 
-## 3) Sync transport contract
+### 3) Sync transport contract
 - Use `DataClient` for snapshot replication path, e.g. `/twofac/sync/snapshot`.
 - Use `MessageClient` optional command path, e.g. `/twofac/sync/request_now`, for watch-triggered refresh.
 - Use `CapabilityClient` with app capabilities:
   - phone capability: `twofac_mobile`
   - watch capability: `twofac_watch`
 
-## 4) Security model (minimum acceptable)
+### 4) Security model (minimum acceptable)
 - In-transit: rely on Wearable Data Layer transport.
 - At rest on watch: persist synced snapshot in watch local storage with encrypted secret fields where practical.
 - Keep payload scope minimal (only needed secret material + display metadata).
@@ -86,7 +86,7 @@ Notes:
 
 ## Step-by-step implementation plan
 
-## Phase A — Foundation and companion wiring
+### Phase A — Foundation and companion wiring
 1. **Manifest and capability wiring**
    - `watchApp/src/main/AndroidManifest.xml`
      - change `com.google.android.wearable.standalone` to `false`.
@@ -109,7 +109,7 @@ Notes:
      - `Wearable.getCapabilityClient(context)`
    - Add node discovery method: reachable watch nodes with `twofac_watch` capability.
 
-## Phase B — Phone publishes snapshots
+### Phase B — Phone publishes snapshots
 4. **Build snapshot from current app data**
    - Add phone-side mapper that builds `WatchSyncSnapshot` from `TwoFacLib` data:
      - unlock guard,
@@ -128,7 +128,7 @@ Notes:
    - Add "Sync to watch now" action + last sync status text.
    - Show basic pairing state (watch reachable / app installed capability present).
 
-## Phase C — Watch receives and persists
+### Phase C — Watch receives and persists
 8. **Watch listener implementation**
    - Add `WearableListenerService` in `watchApp` to receive:
      - data item updates for snapshot path,
@@ -145,7 +145,7 @@ Notes:
    - Generate current OTP and next refresh epoch per account.
    - Drive a per-second/per-period refresh loop for visible page(s).
 
-## Phase D — Wear UI (vertical swipe account pages)
+### Phase D — Wear UI (vertical swipe account pages)
 11. **Replace skeleton greeting screen**
    - Implement `VerticalPager` UI (`VerticalPagerScaffold`) with one page per account.
    - Each page: issuer, account label, OTP code, countdown/progress, sync freshness indicator.
@@ -159,7 +159,7 @@ Notes:
    - Optional rotary support with pager snap behavior.
    - Haptic/visual cue on code rollover.
 
-## Phase E — Pairing + install/launch UX on phone
+### Phase E — Pairing + install/launch UX on phone
 14. **Pairing status card in Android app**
    - Show if Wear APIs available.
    - Show connected nodes and whether `twofac_watch` capability exists.
@@ -169,7 +169,7 @@ Notes:
    - Send `/twofac/app/start` message to watch capability node(s) to foreground watch app.
    - Keep this as best-effort; do not block sync.
 
-## Phase F — Validation and rollout hardening
+### Phase F — Validation and rollout hardening
 16. **Tests**
    - `sharedLib` unit tests for payload codec and mapping.
    - Android unit tests for phone snapshot builder and sync trigger logic.
