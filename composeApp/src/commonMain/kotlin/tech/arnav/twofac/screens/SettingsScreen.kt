@@ -22,6 +22,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,8 @@ import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.BackupTransport
 import tech.arnav.twofac.storage.getStoragePath
+import tech.arnav.twofac.wear.WatchSyncCoordinator
+import tech.arnav.twofac.wear.isSyncToWatchEnabled
 
 private enum class BackupAction { EXPORT, IMPORT }
 
@@ -56,10 +59,19 @@ fun SettingsScreen(
     val backupService = remember { koin.getOrNull<BackupService>() }
     val backupTransport = remember { koin.getOrNull<BackupTransport>() }
     val twoFacLib = remember { koin.getOrNull<TwoFacLib>() }
+    val watchSyncCoordinator = remember { koin.getOrNull<WatchSyncCoordinator>() }
 
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var isWatchCompanionActive by remember { mutableStateOf(false) }
+    var isWatchSyncInProgress by remember { mutableStateOf(false) }
+
+    LaunchedEffect(watchSyncCoordinator) {
+        if (watchSyncCoordinator != null) {
+            isWatchCompanionActive = watchSyncCoordinator.isCompanionActive()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -150,6 +162,58 @@ fun SettingsScreen(
                     }
                 }
             }
+
+            if (watchSyncCoordinator != null) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Watch Sync",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            text = if (isWatchCompanionActive) {
+                                "Watch companion is active."
+                            } else {
+                                "Watch companion is not active."
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    try {
+                                        isWatchSyncInProgress = true
+                                        val synced = watchSyncCoordinator.syncNow(manual = true)
+                                        if (synced) {
+                                            snackbarHostState.showSnackbar("Sync sent to watch")
+                                        } else {
+                                            snackbarHostState.showSnackbar("Unable to sync to watch right now")
+                                        }
+                                        isWatchCompanionActive = watchSyncCoordinator.isCompanionActive()
+                                    } finally {
+                                        isWatchSyncInProgress = false
+                                    }
+                                }
+                            },
+                            enabled = isSyncToWatchEnabled(
+                                isCompanionActive = isWatchCompanionActive,
+                                isSyncInProgress = isWatchSyncInProgress,
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Sync to Watch")
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -200,6 +264,9 @@ fun SettingsScreen(
                                         "Import failed: ${result.message}"
                                 }
                                 snackbarHostState.showSnackbar(message)
+                                if (result is BackupResult.Success) {
+                                    watchSyncCoordinator?.onAccountsChanged()
+                                }
                                 pendingAction = null
                             }
                         }

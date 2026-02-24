@@ -13,11 +13,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.wear.WatchSyncCoordinator
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class AccountsViewModel(
-    private val twoFacLib: TwoFacLib
+    private val twoFacLib: TwoFacLib,
+    private val watchSyncCoordinator: WatchSyncCoordinator? = null,
 ) : ViewModel() {
 
     companion object {
@@ -93,6 +95,7 @@ class AccountsViewModel(
             val accountOtpList = twoFacLib.getAllAccountOTPs()
             _accountOtps.value = accountOtpList
             _accounts.value = accountOtpList.map { it.first }
+            watchSyncCoordinator?.onAccountsUnlocked()
 
             _isLoading.value = false
         }
@@ -107,6 +110,7 @@ class AccountsViewModel(
                 twoFacLib.unlock(passkey)
                 val success = twoFacLib.addAccount(uri)
                 if (success) {
+                    watchSyncCoordinator?.onAccountsChanged()
                     loadAccounts()
                 } else {
                     _error.value = "Failed to add account"
