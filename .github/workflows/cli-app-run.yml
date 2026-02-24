@@ -20,7 +20,7 @@ jobs:
           distribution: "temurin"
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Run Windows CLI App
         run: ./gradlew :cliApp:runDebugExecutableMingwX64 -PrunArgs="--help -v"
@@ -37,7 +37,7 @@ jobs:
           distribution: "temurin"
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Run macOS CLI App
         run: ./gradlew :cliApp:runDebugExecutableMacosArm64 -PrunArgs="--help -v"
@@ -54,7 +54,7 @@ jobs:
           distribution: "temurin"
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Run Linux CLI App
         run: ./gradlew :cliApp:runDebugExecutableLinuxX64 -PrunArgs="--help -v"

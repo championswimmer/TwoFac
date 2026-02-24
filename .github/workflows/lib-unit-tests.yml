@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Run Windows Tests
         run: ./gradlew :sharedLib:mingwX64Test
@@ -41,7 +41,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Run macOS and iOS Tests
         run: |
@@ -66,7 +66,7 @@ jobs:
           node-version: '22'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Check ABI Compatibility
         run: ./gradlew :sharedLib:checkLegacyAbi
