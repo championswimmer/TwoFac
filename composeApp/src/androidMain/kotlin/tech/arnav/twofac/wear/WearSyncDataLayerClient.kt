@@ -1,6 +1,7 @@
 package tech.arnav.twofac.wear
 
 import android.content.Context
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.CapabilityClient
@@ -21,6 +22,7 @@ class WearSyncDataLayerClient(context: Context) {
     val dataClient: DataClient = Wearable.getDataClient(appContext)
     val messageClient: MessageClient = Wearable.getMessageClient(appContext)
     val capabilityClient: CapabilityClient = Wearable.getCapabilityClient(appContext)
+    val nodeClient = Wearable.getNodeClient(appContext)
 
     fun getReachableWatchNodes(): Task<Set<Node>> {
         return capabilityClient
@@ -34,7 +36,11 @@ class WearSyncDataLayerClient(context: Context) {
     }
 
     suspend fun hasReachableWatchCompanion(): Boolean = withContext(Dispatchers.IO) {
-        Tasks.await(getReachableWatchNodes()).isNotEmpty()
+        val hasReachable = Tasks.await(getReachableWatchNodes()).isNotEmpty()
+        if (!hasReachable) {
+            logWatchAvailabilityIssue("sync")
+        }
+        hasReachable
     }
 
     suspend fun forceDiscoverWatchCompanion(): Boolean = withContext(Dispatchers.IO) {
@@ -45,6 +51,7 @@ class WearSyncDataLayerClient(context: Context) {
             )
         ).nodes
         if (nodes.isEmpty()) {
+            logWatchAvailabilityIssue("discover")
             return@withContext false
         }
         nodes.forEach { node ->
@@ -77,4 +84,35 @@ class WearSyncDataLayerClient(context: Context) {
         Tasks.await(dataClient.putDataItem(dataRequest))
         true
     }
+
+    private fun logWatchAvailabilityIssue(operation: String) {
+        val pairedNodes =
+            runCatching { Tasks.await(nodeClient.connectedNodes) }.getOrDefault(emptyList())
+        val capableNodes = runCatching {
+            Tasks.await(
+                capabilityClient.getCapability(
+                    WatchSyncContract.WATCH_CAPABILITY,
+                    CapabilityClient.FILTER_ALL
+                )
+            ).nodes
+        }.getOrDefault(emptySet())
+        if (pairedNodes.isEmpty()) {
+            Log.w(TAG, "Unable to $operation: no paired/reachable watch nodes found from phone.")
+            return
+        }
+        if (capableNodes.isEmpty()) {
+            val nodeNames = pairedNodes.joinToString { "${it.displayName}(${it.id})" }
+            Log.w(
+                TAG,
+                "Unable to $operation: paired watch node(s) found but TwoFac watch capability '${WatchSyncContract.WATCH_CAPABILITY}' missing. Nodes=$nodeNames"
+            )
+            return
+        }
+        Log.w(
+            TAG,
+            "Unable to $operation: TwoFac watch capability found, but no reachable watch node is currently available."
+        )
+    }
 }
+
+private const val TAG = "WearSyncDataLayer"

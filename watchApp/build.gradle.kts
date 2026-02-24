@@ -10,7 +10,7 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "tech.arnav.twofac.watch"
+        applicationId = "tech.arnav.twofac"
         minSdk = 30
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = rootProject.extra["appVersionCode"] as Int
