@@ -583,7 +583,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-				WK_COMPANION_APP_BUNDLE_IDENTIFIER = "tech.arnav.twofac.twofac$(TEAM_ID)";
+				WK_COMPANION_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac;
 			};
 			name = Debug;
 		};
@@ -602,7 +602,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-				WK_COMPANION_APP_BUNDLE_IDENTIFIER = "tech.arnav.twofac.twofac$(TEAM_ID)";
+				WK_COMPANION_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac;
 			};
 			name = Release;
 		};
