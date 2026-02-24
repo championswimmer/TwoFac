@@ -44,7 +44,7 @@ import tech.arnav.twofac.storage.getStoragePath
 import tech.arnav.twofac.wear.WatchSyncCoordinator
 import tech.arnav.twofac.wear.isSyncToWatchEnabled
 
-private enum class BackupAction { EXPORT, IMPORT }
+private enum class BackupAction { EXPORT, IMPORT, SYNC_WATCH }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -189,6 +189,10 @@ fun SettingsScreen(
                         )
                         Button(
                             onClick = {
+                                if (twoFacLib != null && !twoFacLib.isUnlocked()) {
+                                    pendingAction = BackupAction.SYNC_WATCH
+                                    return@Button
+                                }
                                 coroutineScope.launch {
                                     try {
                                         isWatchSyncInProgress = true
@@ -292,6 +296,35 @@ fun SettingsScreen(
                                 snackbarHostState.showSnackbar(message)
                                 if (result is BackupResult.Success) {
                                     watchSyncCoordinator?.onAccountsChanged()
+                                }
+                                pendingAction = null
+                            }
+
+                            BackupAction.SYNC_WATCH -> {
+                                if (watchSyncCoordinator == null || twoFacLib == null) {
+                                    snackbarHostState.showSnackbar("Watch sync is unavailable")
+                                    pendingAction = null
+                                    return@launch
+                                }
+                                val hasAccounts = twoFacLib.getAllAccounts().isNotEmpty()
+                                if (!hasAccounts) {
+                                    snackbarHostState.showSnackbar("No accounts to sync to watch")
+                                    pendingAction = null
+                                    return@launch
+                                }
+                                try {
+                                    isWatchSyncInProgress = true
+                                    val synced = watchSyncCoordinator.syncNow(manual = true)
+                                    val message = if (synced) {
+                                        "Sync sent to watch"
+                                    } else {
+                                        "Unable to sync to watch right now"
+                                    }
+                                    snackbarHostState.showSnackbar(message)
+                                    isWatchCompanionActive =
+                                        watchSyncCoordinator.isCompanionActive()
+                                } finally {
+                                    isWatchSyncInProgress = false
                                 }
                                 pendingAction = null
                             }

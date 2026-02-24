@@ -1,6 +1,7 @@
 package tech.arnav.twofac.wear
 
 import android.content.Context
+import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -27,11 +28,17 @@ class AndroidWatchSyncCoordinator(
 
     @OptIn(ExperimentalTime::class)
     override suspend fun syncNow(manual: Boolean): Boolean = withContext(Dispatchers.IO) {
-        if (!twoFacLib.isUnlocked() || !dataLayerClient.hasReachableWatchCompanion()) {
+        if (!twoFacLib.isUnlocked()) {
+            Log.w(TAG, "Sync aborted: library is locked. Unlock TwoFac before syncing to watch.")
+            return@withContext false
+        }
+        if (!dataLayerClient.hasReachableWatchCompanion()) {
+            Log.w(TAG, "Sync aborted: no reachable watch companion.")
             return@withContext false
         }
         val accounts = twoFacLib.getAllAccounts()
         if (accounts.isEmpty()) {
+            Log.w(TAG, "Sync aborted: no accounts available to sync.")
             return@withContext false
         }
         val uris = twoFacLib.exportAccountURIs()
@@ -46,7 +53,9 @@ class AndroidWatchSyncCoordinator(
             sourceAccounts = sourceAccounts,
             generatedAtEpochSec = Clock.System.now().epochSeconds,
         )
-        dataLayerClient.publishSnapshot(snapshot, manual)
+        runCatching { dataLayerClient.publishSnapshot(snapshot, manual) }
+            .onFailure { Log.w(TAG, "Sync failed while publishing snapshot.", it) }
+            .getOrDefault(false)
     }
 
     override suspend fun onAccountsUnlocked() {
@@ -80,3 +89,4 @@ class AndroidWatchSyncCoordinator(
 
 const val WATCH_SYNC_PERIODIC_WORK_NAME = "twofac-watch-sync-periodic"
 const val WATCH_SYNC_PERIODIC_INTERVAL_MINUTES = 30L
+private const val TAG = "AndroidWatchSync"
