@@ -6,6 +6,7 @@ import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
 
 interface WatchSyncCoordinator {
     suspend fun isCompanionActive(): Boolean
+    suspend fun forceDiscoverCompanion(): Boolean = isCompanionActive()
     suspend fun syncNow(manual: Boolean): Boolean
     suspend fun onAccountsUnlocked()
     suspend fun onAccountsChanged()

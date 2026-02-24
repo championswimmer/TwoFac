@@ -7,9 +7,9 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import tech.arnav.twofac.lib.TwoFacLib
+import java.util.concurrent.TimeUnit
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import java.util.concurrent.TimeUnit
 
 class AndroidWatchSyncCoordinator(
     private val appContext: Context,
@@ -19,6 +19,10 @@ class AndroidWatchSyncCoordinator(
 
     override suspend fun isCompanionActive(): Boolean {
         return runCatching { dataLayerClient.hasReachableWatchCompanion() }.getOrDefault(false)
+    }
+
+    override suspend fun forceDiscoverCompanion(): Boolean {
+        return runCatching { dataLayerClient.forceDiscoverWatchCompanion() }.getOrDefault(false)
     }
 
     @OptIn(ExperimentalTime::class)

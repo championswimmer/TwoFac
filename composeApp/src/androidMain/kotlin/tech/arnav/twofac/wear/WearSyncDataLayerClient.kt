@@ -1,8 +1,8 @@
 package tech.arnav.twofac.wear
 
 import android.content.Context
-import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.MessageClient
@@ -35,6 +35,33 @@ class WearSyncDataLayerClient(context: Context) {
 
     suspend fun hasReachableWatchCompanion(): Boolean = withContext(Dispatchers.IO) {
         Tasks.await(getReachableWatchNodes()).isNotEmpty()
+    }
+
+    suspend fun forceDiscoverWatchCompanion(): Boolean = withContext(Dispatchers.IO) {
+        val nodes = Tasks.await(
+            capabilityClient.getCapability(
+                WatchSyncContract.WATCH_CAPABILITY,
+                CapabilityClient.FILTER_ALL
+            )
+        ).nodes
+        if (nodes.isEmpty()) {
+            return@withContext false
+        }
+        nodes.forEach { node ->
+            runCatching {
+                Tasks.await(
+                    messageClient.sendMessage(
+                        node.id,
+                        WatchSyncContract.REQUEST_SYNC_NOW_MESSAGE_PATH,
+                        ByteArray(0),
+                    )
+                )
+            }
+        }
+        val reachableAfterDiscover =
+            runCatching { Tasks.await(getReachableWatchNodes()).isNotEmpty() }
+                .getOrDefault(false)
+        reachableAfterDiscover || nodes.isNotEmpty()
     }
 
     suspend fun publishSnapshot(snapshot: WatchSyncSnapshot, manual: Boolean): Boolean = withContext(Dispatchers.IO) {

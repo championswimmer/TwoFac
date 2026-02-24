@@ -66,6 +66,7 @@ fun SettingsScreen(
     var isLoading by remember { mutableStateOf(false) }
     var isWatchCompanionActive by remember { mutableStateOf(false) }
     var isWatchSyncInProgress by remember { mutableStateOf(false) }
+    var isWatchDiscoveryInProgress by remember { mutableStateOf(false) }
 
     LaunchedEffect(watchSyncCoordinator) {
         if (watchSyncCoordinator != null) {
@@ -210,6 +211,31 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Sync to Watch")
+                        }
+                        OutlinedButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    try {
+                                        isWatchDiscoveryInProgress = true
+                                        isWatchCompanionActive =
+                                            watchSyncCoordinator.forceDiscoverCompanion()
+                                        val message = if (isWatchCompanionActive) {
+                                            "Watch app discovered"
+                                        } else {
+                                            "Unable to discover watch app"
+                                        }
+                                        snackbarHostState.showSnackbar(message)
+                                    } finally {
+                                        isWatchDiscoveryInProgress = false
+                                    }
+                                }
+                            },
+                            enabled = !isWatchSyncInProgress && !isWatchDiscoveryInProgress,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            Text("Force Discover Watch App")
                         }
                     }
                 }
