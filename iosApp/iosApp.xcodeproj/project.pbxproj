@@ -6,8 +6,57 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C1A000012EC1000000A4DA20 /* TwoFacWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = C1A000032EC1000000A4DA20 /* TwoFacWatch.app */; };
+		C1A000022EC1000000A4DA20 /* TwoFacWatchExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C1A000042EC1000000A4DA20 /* TwoFacWatchExtension.appex */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C1A0001C2EC1000000A4DA20 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B9DA97A92DC1472C00A4DA20 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1A0000D2EC1000000A4DA20;
+			remoteInfo = watchApp;
+		};
+		C1A0001D2EC1000000A4DA20 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B9DA97A92DC1472C00A4DA20 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1A0000E2EC1000000A4DA20;
+			remoteInfo = watchAppExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C1A000092EC1000000A4DA20 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				C1A000012EC1000000A4DA20 /* TwoFacWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1A0000A2EC1000000A4DA20 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C1A000022EC1000000A4DA20 /* TwoFacWatchExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		B9DA97B12DC1472C00A4DA20 /* twofac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = twofac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1A000032EC1000000A4DA20 /* TwoFacWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TwoFacWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1A000042EC1000000A4DA20 /* TwoFacWatchExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TwoFacWatchExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -17,6 +66,20 @@
 				Info.plist,
 			);
 			target = B9DA97B02DC1472C00A4DA20 /* iosApp */;
+		};
+		C1A000052EC1000000A4DA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C1A0000D2EC1000000A4DA20 /* watchApp */;
+		};
+		C1A000062EC1000000A4DA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C1A0000E2EC1000000A4DA20 /* watchAppExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -34,10 +97,40 @@
 			path = Configuration;
 			sourceTree = "<group>";
 		};
+		C1A000072EC1000000A4DA20 /* watchApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C1A000052EC1000000A4DA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			path = watchApp;
+			sourceTree = "<group>";
+		};
+		C1A000082EC1000000A4DA20 /* watchAppExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C1A000062EC1000000A4DA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			path = watchAppExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		B9DA97AE2DC1472C00A4DA20 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1A0000B2EC1000000A4DA20 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1A0000C2EC1000000A4DA20 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -52,6 +145,8 @@
 			children = (
 				B9DA98002DC14AA900A4DA20 /* Configuration */,
 				B9DA97B32DC1472C00A4DA20 /* iosApp */,
+				C1A000072EC1000000A4DA20 /* watchApp */,
+				C1A000082EC1000000A4DA20 /* watchAppExtension */,
 				B9DA97B22DC1472C00A4DA20 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -60,6 +155,8 @@
 			isa = PBXGroup;
 			children = (
 				B9DA97B12DC1472C00A4DA20 /* twofac.app */,
+				C1A000032EC1000000A4DA20 /* TwoFacWatch.app */,
+				C1A000042EC1000000A4DA20 /* TwoFacWatchExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,10 +172,12 @@
 				B9DA97AD2DC1472C00A4DA20 /* Sources */,
 				B9DA97AE2DC1472C00A4DA20 /* Frameworks */,
 				B9DA97AF2DC1472C00A4DA20 /* Resources */,
+				C1A000092EC1000000A4DA20 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C1A0000F2EC1000000A4DA20 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				B9DA97B32DC1472C00A4DA20 /* iosApp */,
@@ -89,6 +188,53 @@
 			productName = iosApp;
 			productReference = B9DA97B12DC1472C00A4DA20 /* twofac.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C1A0000D2EC1000000A4DA20 /* watchApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1A0001A2EC1000000A4DA20 /* Build configuration list for PBXNativeTarget "watchApp" */;
+			buildPhases = (
+				C1A000132EC1000000A4DA20 /* Sources */,
+				C1A0000B2EC1000000A4DA20 /* Frameworks */,
+				C1A000112EC1000000A4DA20 /* Resources */,
+				C1A0000A2EC1000000A4DA20 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C1A000102EC1000000A4DA20 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C1A000072EC1000000A4DA20 /* watchApp */,
+			);
+			name = watchApp;
+			packageProductDependencies = (
+			);
+			productName = watchApp;
+			productReference = C1A000032EC1000000A4DA20 /* TwoFacWatch.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		C1A0000E2EC1000000A4DA20 /* watchAppExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1A0001B2EC1000000A4DA20 /* Build configuration list for PBXNativeTarget "watchAppExtension" */;
+			buildPhases = (
+				C1A000152EC1000000A4DA20 /* Compile TwoFacKit Framework */,
+				C1A000142EC1000000A4DA20 /* Sources */,
+				C1A0000C2EC1000000A4DA20 /* Frameworks */,
+				C1A000122EC1000000A4DA20 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C1A000082EC1000000A4DA20 /* watchAppExtension */,
+			);
+			name = watchAppExtension;
+			packageProductDependencies = (
+			);
+			productName = watchAppExtension;
+			productReference = C1A000042EC1000000A4DA20 /* TwoFacWatchExtension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -101,6 +247,12 @@
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					B9DA97B02DC1472C00A4DA20 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					C1A0000D2EC1000000A4DA20 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					C1A0000E2EC1000000A4DA20 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
@@ -120,12 +272,28 @@
 			projectRoot = "";
 			targets = (
 				B9DA97B02DC1472C00A4DA20 /* iosApp */,
+				C1A0000D2EC1000000A4DA20 /* watchApp */,
+				C1A0000E2EC1000000A4DA20 /* watchAppExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B9DA97AF2DC1472C00A4DA20 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1A000112EC1000000A4DA20 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1A000122EC1000000A4DA20 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -154,6 +322,25 @@
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
 		};
+		C1A000152EC1000000A4DA20 /* Compile TwoFacKit Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Compile TwoFacKit Framework";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :sharedLib:embedAndSignAppleFrameworkForXcode\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -164,7 +351,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1A000132EC1000000A4DA20 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1A000142EC1000000A4DA20 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C1A0000F2EC1000000A4DA20 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1A0000D2EC1000000A4DA20 /* watchApp */;
+			targetProxy = C1A0001C2EC1000000A4DA20 /* PBXContainerItemProxy */;
+		};
+		C1A000102EC1000000A4DA20 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1A0000E2EC1000000A4DA20 /* watchAppExtension */;
+			targetProxy = C1A0001D2EC1000000A4DA20 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		B9DA97BD2DC1472D00A4DA20 /* Debug */ = {
@@ -294,6 +508,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = iosApp/iOSApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 9UV5DX2Q64;
@@ -327,6 +542,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = iosApp/iOSApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
@@ -352,6 +568,112 @@
 			};
 			name = Release;
 		};
+		C1A000162EC1000000A4DA20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = watchApp/watchApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9UV5DX2Q64;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = watchApp/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				WK_COMPANION_APP_BUNDLE_IDENTIFIER = "tech.arnav.twofac.twofac$(TEAM_ID)";
+			};
+			name = Debug;
+		};
+		C1A000172EC1000000A4DA20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = watchApp/watchApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = watchApp/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				WK_COMPANION_APP_BUNDLE_IDENTIFIER = "tech.arnav.twofac.twofac$(TEAM_ID)";
+			};
+			name = Release;
+		};
+		C1A000182EC1000000A4DA20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9UV5DX2Q64;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../sharedLib/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = watchAppExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					TwoFacKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				WK_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp;
+			};
+			name = Debug;
+		};
+		C1A000192EC1000000A4DA20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../sharedLib/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = watchAppExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					TwoFacKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				WK_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -369,6 +691,24 @@
 			buildConfigurations = (
 				B9DA97C02DC1472D00A4DA20 /* Debug */,
 				B9DA97C12DC1472D00A4DA20 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C1A0001A2EC1000000A4DA20 /* Build configuration list for PBXNativeTarget "watchApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1A000162EC1000000A4DA20 /* Debug */,
+				C1A000172EC1000000A4DA20 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C1A0001B2EC1000000A4DA20 /* Build configuration list for PBXNativeTarget "watchAppExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1A000182EC1000000A4DA20 /* Debug */,
+				C1A000192EC1000000A4DA20 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
