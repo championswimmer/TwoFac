@@ -67,7 +67,7 @@ fun HomeScreen(
 
     // If auto-unlock failed (error set while we tried), clear saved passkey and show the passkey dialog
     LaunchedEffect(error) {
-        if (autoUnlockAttempted && error != null && !isUnlocked) {
+        if (autoUnlockAttempted && error != null && !viewModel.twoFacLibUnlocked) {
             autoUnlockAttempted = false
             viewModel.clearSavedPasskey()
             showPasskeyDialog = true
