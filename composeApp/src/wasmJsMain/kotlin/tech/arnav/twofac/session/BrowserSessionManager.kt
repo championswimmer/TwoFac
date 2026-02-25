@@ -66,21 +66,14 @@ class BrowserSessionManager : SessionManager {
 
 /* ---- thin JS interop wrappers around window.localStorage ---- */
 
-@JsFun("(key) => { const v = window.localStorage.getItem(key); return v === null ? '' : v; }")
-private external fun localStorageGetItemRaw(key: String): String
+@JsFun("(key) => window.localStorage.getItem(key)")
+private external fun localStorageGetItem(key: String): String?
 
 @JsFun("(key, value) => { window.localStorage.setItem(key, value); }")
 private external fun localStorageSetItem(key: String, value: String)
 
 @JsFun("(key) => { window.localStorage.removeItem(key); }")
 private external fun localStorageRemoveItem(key: String)
-
-@JsFun("(key) => { return window.localStorage.getItem(key) !== null; }")
-private external fun localStorageHasItem(key: String): Boolean
-
-private fun localStorageGetItem(key: String): String? {
-    return if (localStorageHasItem(key)) localStorageGetItemRaw(key) else null
-}
 
 @JsFun("() => { try { window.localStorage.setItem('twofac_ls_test', '1'); window.localStorage.removeItem('twofac_ls_test'); return true; } catch(e) { return false; } }")
 private external fun isLocalStorageAccessible(): Boolean
