@@ -4,12 +4,17 @@
 [![Kotlin](https://img.shields.io/badge/kotlin-2.2.0-blue.svg?logo=kotlin)](https://kotlinlang.org/)
 [![Compose Multiplatform](https://img.shields.io/badge/compose-multiplatform-blue.svg?logo=jetbrains)](https://github.com/JetBrains/compose-multiplatform)
 
-[![Android](https://img.shields.io/badge/platform-android-3DDC84.svg?logo=android)](https://developer.android.com/)
-[![iOS](https://img.shields.io/badge/platform-ios-000000.svg?logo=apple)](https://developer.apple.com/ios/)
-[![Desktop](https://img.shields.io/badge/platform-desktop-2496ED.svg?logo=openjdk)](https://openjdk.org/)
+[![Android](https://img.shields.io/badge/android-11%2B-3DDC84.svg?logo=android)](https://developer.android.com/)
+[![iOS](https://img.shields.io/badge/iOS-18.2%2B-000000.svg?logo=apple)](https://developer.apple.com/ios/)
+[![watchOS](https://img.shields.io/badge/watchOS-10%2B-000000.svg?logo=apple)](https://developer.apple.com/watchos/)
+[![Wear OS](https://img.shields.io/badge/wearOS-11%2B-4285F4.svg?logo=wearos)](https://wearos.google.com/)
+[![macOS](https://img.shields.io/badge/macOS-16%2B-000000.svg?logo=apple)](https://www.apple.com/macos/)
+[![Windows](https://img.shields.io/badge/Windows-10%2B-0078D4.svg?logo=windows)](https://www.microsoft.com/windows/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%2B-E95420.svg?logo=ubuntu)](https://ubuntu.com/)
 [![Web](https://img.shields.io/badge/platform-web-F7DF1E.svg?logo=webassembly)](https://webassembly.org/)
-[![CLI](https://img.shields.io/badge/platform-cli-4EAA25.svg?logo=gnubash)](https://en.wikipedia.org/wiki/Command-line_interface)
-[![Wear OS](https://img.shields.io/badge/platform-wearos-4285F4.svg?logo=wearos)](https://wearos.google.com/)
+[![CLI macOS](https://img.shields.io/badge/CLI-macOS-000000.svg?logo=apple)](https://www.apple.com/macos/)
+[![CLI Windows](https://img.shields.io/badge/CLI-Windows-0078D4.svg?logo=windows)](https://www.microsoft.com/windows/)
+[![CLI Linux](https://img.shields.io/badge/CLI-Linux-4EAA25.svg?logo=gnubash)](https://en.wikipedia.org/wiki/Command-line_interface)
 
 ![two-fac-demo](https://github.com/user-attachments/assets/b95f3bc8-b27b-42c7-8dce-041ea9465dcb)
 
