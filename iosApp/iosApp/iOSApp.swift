@@ -5,6 +5,11 @@ class PhoneSessionDelegate: NSObject, WCSessionDelegate {
     static let shared = PhoneSessionDelegate()
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        if let error = error {
+            print("WCSession activation failed with state \(activationState) and error: \(error.localizedDescription)")
+        } else {
+            print("WCSession activation completed with state \(activationState) and no error.")
+        }
     }
 
     func sessionDidBecomeInactive(_ session: WCSession) {
