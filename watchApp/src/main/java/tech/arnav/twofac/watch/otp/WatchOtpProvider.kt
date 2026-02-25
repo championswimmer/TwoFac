@@ -34,6 +34,7 @@ class WatchOtpProvider(
                         accountLabel = account.accountLabel,
                         otpCode = otp.generateOTP(nowEpochSec),
                         nextRefreshAtEpochSec = otp.nextCodeAt(nowEpochSec),
+                        periodSec = otp.timeInterval,
                     )
 
                     is HOTP -> WatchOtpEntry.Valid(
@@ -42,6 +43,7 @@ class WatchOtpProvider(
                         accountLabel = account.accountLabel,
                         otpCode = otp.generateOTP(0),
                         nextRefreshAtEpochSec = null,
+                        periodSec = null,
                     )
 
                     else -> WatchOtpEntry.Invalid(
@@ -89,6 +91,7 @@ sealed interface WatchOtpEntry {
         override val accountLabel: String,
         val otpCode: String,
         val nextRefreshAtEpochSec: Long?,
+        val periodSec: Long?,
     ) : WatchOtpEntry
 
     data class Invalid(
