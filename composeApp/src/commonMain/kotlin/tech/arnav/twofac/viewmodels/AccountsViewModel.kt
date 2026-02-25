@@ -45,6 +45,9 @@ class AccountsViewModel(
     /** Return a passkey previously persisted by the session manager, or null. */
     fun getSavedPasskey(): String? = sessionManager?.getSavedPasskey()
 
+    /** Clear any saved passkey from the session manager. */
+    fun clearSavedPasskey() { sessionManager?.clearPasskey() }
+
     private val _refreshTrigger = MutableStateFlow(0L)
 
     @OptIn(FlowPreview::class)
@@ -97,17 +100,21 @@ class AccountsViewModel(
                 }
             }
 
-            val accountOtpList = twoFacLib.getAllAccountOTPs()
-            _accountOtps.value = accountOtpList
-            _accounts.value = accountOtpList.map { it.first }
-            watchSyncCoordinator?.onAccountsUnlocked()
+            try {
+                val accountOtpList = twoFacLib.getAllAccountOTPs()
+                _accountOtps.value = accountOtpList
+                _accounts.value = accountOtpList.map { it.first }
+                watchSyncCoordinator?.onAccountsUnlocked()
 
-            // Persist the passkey for session auto-unlock (if the user opted in)
-            if (passkey != null) {
-                sessionManager?.savePasskey(passkey)
+                // Persist the passkey for session auto-unlock (if the user opted in)
+                if (passkey != null) {
+                    sessionManager?.savePasskey(passkey)
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to load accounts with OTPs"
+            } finally {
+                _isLoading.value = false
             }
-
-            _isLoading.value = false
         }
     }
 

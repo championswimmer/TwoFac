@@ -13,34 +13,54 @@ class BrowserSessionManager : SessionManager {
         private const val SESSION_PASSKEY_KEY = "twofac_session_passkey"
     }
 
-    override fun isAvailable(): Boolean = true
+    override fun isAvailable(): Boolean = isLocalStorageAccessible()
 
     override fun isRememberPasskeyEnabled(): Boolean {
-        return localStorageGetItem(REMEMBER_PASSKEY_KEY) == "true"
+        return try {
+            localStorageGetItem(REMEMBER_PASSKEY_KEY) == "true"
+        } catch (_: Throwable) {
+            false
+        }
     }
 
     override fun setRememberPasskey(enabled: Boolean) {
-        if (enabled) {
-            localStorageSetItem(REMEMBER_PASSKEY_KEY, "true")
-        } else {
-            localStorageRemoveItem(REMEMBER_PASSKEY_KEY)
-            clearPasskey()
+        try {
+            if (enabled) {
+                localStorageSetItem(REMEMBER_PASSKEY_KEY, "true")
+            } else {
+                localStorageRemoveItem(REMEMBER_PASSKEY_KEY)
+                clearPasskey()
+            }
+        } catch (_: Throwable) {
+            // localStorage inaccessible – silently ignore
         }
     }
 
     override fun getSavedPasskey(): String? {
-        if (!isRememberPasskeyEnabled()) return null
-        return localStorageGetItem(SESSION_PASSKEY_KEY)
+        return try {
+            if (!isRememberPasskeyEnabled()) null
+            else localStorageGetItem(SESSION_PASSKEY_KEY)
+        } catch (_: Throwable) {
+            null
+        }
     }
 
     override fun savePasskey(passkey: String) {
-        if (isRememberPasskeyEnabled()) {
-            localStorageSetItem(SESSION_PASSKEY_KEY, passkey)
+        try {
+            if (isRememberPasskeyEnabled()) {
+                localStorageSetItem(SESSION_PASSKEY_KEY, passkey)
+            }
+        } catch (_: Throwable) {
+            // localStorage inaccessible – silently ignore
         }
     }
 
     override fun clearPasskey() {
-        localStorageRemoveItem(SESSION_PASSKEY_KEY)
+        try {
+            localStorageRemoveItem(SESSION_PASSKEY_KEY)
+        } catch (_: Throwable) {
+            // localStorage inaccessible – silently ignore
+        }
     }
 }
 
@@ -61,3 +81,6 @@ private external fun localStorageHasItem(key: String): Boolean
 private fun localStorageGetItem(key: String): String? {
     return if (localStorageHasItem(key)) localStorageGetItemRaw(key) else null
 }
+
+@JsFun("() => { try { window.localStorage.setItem('__test__', '1'); window.localStorage.removeItem('__test__'); return true; } catch(e) { return false; } }")
+private external fun isLocalStorageAccessible(): Boolean
