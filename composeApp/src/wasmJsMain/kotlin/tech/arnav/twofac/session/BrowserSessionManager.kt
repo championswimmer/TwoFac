@@ -82,5 +82,5 @@ private fun localStorageGetItem(key: String): String? {
     return if (localStorageHasItem(key)) localStorageGetItemRaw(key) else null
 }
 
-@JsFun("() => { try { window.localStorage.setItem('__test__', '1'); window.localStorage.removeItem('__test__'); return true; } catch(e) { return false; } }")
+@JsFun("() => { try { window.localStorage.setItem('twofac_ls_test', '1'); window.localStorage.removeItem('twofac_ls_test'); return true; } catch(e) { return false; } }")
 private external fun isLocalStorageAccessible(): Boolean
