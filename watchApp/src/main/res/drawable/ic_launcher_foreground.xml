@@ -1,31 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:aapt="http://schemas.android.com/aapt"
-        android:width="108dp"
-        android:height="108dp"
-        android:viewportWidth="108"
-        android:viewportHeight="108">
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Top-left QR finder pattern (evenOdd: outer ring - inner gap + center dot) -->
     <path
-            android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                    android:startY="49.59793"
-                    android:startX="42.9492"
-                    android:endY="92.4963"
-                    android:endX="85.84757"
-                    android:type="linear">
-                <item
-                        android:color="#44000000"
-                        android:offset="0.0"/>
-                <item
-                        android:color="#00000000"
-                        android:offset="1.0"/>
-            </gradient>
-        </aapt:attr>
-    </path>
+        android:name="finder_tl"
+        android:fillColor="#1E2626"
+        android:fillType="evenOdd"
+        android:pathData="M12.9,13.7h20.1v19.3h-20.1z M16.3,17.2h13.2v12.3h-13.2z M19.7,20.6h6.6v5.7h-6.6z"/>
+
+    <!-- Bottom-left QR finder pattern -->
     <path
-            android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
-            android:fillColor="#FFFFFF"
-            android:fillType="nonZero"
-            android:strokeWidth="1"
-            android:strokeColor="#00000000"/>
+        android:name="finder_bl"
+        android:fillColor="#1E2626"
+        android:fillType="evenOdd"
+        android:pathData="M12.9,57.0h23.7v20.0h-23.7z M16.3,60.4h16.8v13.1h-16.8z M19.8,63.8h9.8v6.3h-9.8z"/>
+
+    <!-- QR data modules - carefully placed blocks matching reference -->
+    <path
+        android:name="qr_data"
+        android:fillColor="#1E2626"
+        android:pathData="
+            M37.9,13.7h4.2v3.5h-4.2z
+            M37.9,24.3h4.2v8.7h-4.2z
+            M41.0,17.9h1.1v6.4h-1.1z
+            M48.8,13.7h7.6v3.5h-7.6z
+            M44.5,35.9h3.3v4.2h-3.3z
+            M31.6,36.9h5.5v5.1h-5.5z
+            M44.5,36.9h8.0v5.1h-8.0z
+            M31.6,40.1h1.5v4.2h-1.5z
+            M41.2,40.1h14.6v4.2h-14.6z
+            M41.2,44.3h3.2v3.2h-3.2z
+            M48.0,44.3h3.8v3.2h-3.8z
+            M31.6,47.5h5.0v3.1h-5.0z
+            M33.1,50.6h3.5v6.4h-3.5z
+            M41.2,50.6h3.2v6.4h-3.2z
+            M41.2,53.8h6.6v3.2h-6.6z
+            M44.5,58.0h10.8v3.2h-10.8z"/>
+
+    <!-- Padlock body - ellipse -->
+    <path
+        android:name="padlock_body"
+        android:fillColor="#3B82C4"
+        android:pathData="M76.4,36.9 C87.2,36.9 94.9,44.2 94.9,52.0 C94.9,59.8 87.2,67.0 76.4,67.0 C65.6,67.0 57.8,59.8 57.8,52.0 C57.8,44.2 65.6,36.9 76.4,36.9z"/>
+
+    <!-- Padlock shackle - arch shape -->
+    <path
+        android:name="padlock_shackle"
+        android:fillColor="#3B82C4"
+        android:pathData="
+            M67.5,36.9 L61.9,36.9 L61.9,24.6
+            C61.9,17.8 68.4,12.2 76.4,12.2
+            C84.4,12.2 90.8,17.8 90.8,24.6
+            L90.8,36.9 L85.2,36.9 L85.2,24.6
+            C85.2,20.9 81.2,17.9 76.4,17.9
+            C71.5,17.9 67.5,20.9 67.5,24.6 Z"/>
+
+    <!-- Keyhole circle (cut out of padlock body) -->
+    <path
+        android:name="keyhole"
+        android:fillColor="#FAF9F7"
+        android:pathData="
+            M76.5,37.5
+            C79.9,37.5 82.8,40.4 82.8,43.8
+            C82.8,47.2 79.9,50.1 76.5,50.1
+            C73.1,50.1 70.2,47.2 70.2,43.8
+            C70.2,40.4 73.1,37.5 76.5,37.5z
+            M74.0,49.0 L79.0,49.0 L77.8,59.1 L75.2,59.1 Z"/>
+
+    <!-- Asterisk 1 -->
+    <path
+        android:name="asterisk1"
+        android:fillColor="#1E2626"
+        android:pathData="
+            M18.5,87.0 L21.1,87.0 L21.1,80.5 L18.5,80.5z
+            M18.5,87.0 L21.1,87.0 L21.1,93.5 L18.5,93.5z
+            M13.3,84.3 L14.6,82.0 L20.5,85.5 L19.2,87.8z
+            M19.2,86.2 L20.5,88.5 L14.6,92.0 L13.3,89.7z
+            M21.1,86.2 L19.8,88.5 L25.7,92.0 L27.0,89.7z
+            M27.0,84.3 L25.7,82.0 L19.8,85.5 L21.1,87.8z"/>
+
+    <!-- Asterisk 2 -->
+    <path
+        android:name="asterisk2"
+        android:fillColor="#1E2626"
+        android:pathData="
+            M33.1,87.0 L35.7,87.0 L35.7,80.5 L33.1,80.5z
+            M33.1,87.0 L35.7,87.0 L35.7,93.5 L33.1,93.5z
+            M27.9,84.3 L29.2,82.0 L35.1,85.5 L33.8,87.8z
+            M33.8,86.2 L35.1,88.5 L29.2,92.0 L27.9,89.7z
+            M35.7,86.2 L34.4,88.5 L40.3,92.0 L41.6,89.7z
+            M41.6,84.3 L40.3,82.0 L34.4,85.5 L35.7,87.8z"/>
+
+    <!-- Asterisk 3 -->
+    <path
+        android:name="asterisk3"
+        android:fillColor="#1E2626"
+        android:pathData="
+            M47.5,87.0 L50.1,87.0 L50.1,80.5 L47.5,80.5z
+            M47.5,87.0 L50.1,87.0 L50.1,93.5 L47.5,93.5z
+            M42.3,84.3 L43.6,82.0 L49.5,85.5 L48.2,87.8z
+            M48.2,86.2 L49.5,88.5 L43.6,92.0 L42.3,89.7z
+            M50.1,86.2 L48.8,88.5 L54.7,92.0 L56.0,89.7z
+            M56.0,84.3 L54.7,82.0 L48.8,85.5 L50.1,87.8z"/>
+
+    <!-- Asterisk 4 -->
+    <path
+        android:name="asterisk4"
+        android:fillColor="#1E2626"
+        android:pathData="
+            M62.0,87.0 L64.6,87.0 L64.6,80.5 L62.0,80.5z
+            M62.0,87.0 L64.6,87.0 L64.6,93.5 L62.0,93.5z
+            M56.8,84.3 L58.1,82.0 L64.0,85.5 L62.7,87.8z
+            M62.7,86.2 L64.0,88.5 L58.1,92.0 L56.8,89.7z
+            M64.6,86.2 L63.3,88.5 L69.2,92.0 L70.5,89.7z
+            M70.5,84.3 L69.2,82.0 L63.3,85.5 L64.6,87.8z"/>
+
+    <!-- Dash 1 -->
+    <path
+        android:name="dash1"
+        android:fillColor="#1E2626"
+        android:pathData="M73.1,83.8h9.3v2.7h-9.3z"/>
+
+    <!-- Dash 2 -->
+    <path
+        android:name="dash2"
+        android:fillColor="#1E2626"
+        android:pathData="M84.8,83.8h9.2v2.7h-9.2z"/>
+
 </vector>
