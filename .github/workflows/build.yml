@@ -1,0 +1,61 @@
+name: Build
+
+# For now just have manual builds (whenever required to build and check)
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  #   paths-ignore:
+  #     - 'docs/**'
+  #     - '**.md'
+  #     - '.agents/**'
+  # pull_request:
+  #   branches: [main]
+  #   paths-ignore:
+  #     - 'docs/**'
+  #     - '**.md'
+  #     - '.agents/**'
+
+jobs:
+  build-web-pwa-and-extensions:
+    name: "Build Web PWA + Browser Extensions"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build Web PWA + Browser Extensions
+        run: ./gradlew :composeApp:packageBrowserExtensions
+
+      - name: Upload Web PWA Distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-pwa-distribution
+          path: composeApp/build/dist/wasmJs/productionExecutable/
+
+      - name: Upload Chrome Extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: composeApp/build/extension/dist/twofac-chrome-extension-*.zip
+
+      - name: Upload Firefox Extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension
+          path: composeApp/build/extension/dist/twofac-firefox-extension-*.zip

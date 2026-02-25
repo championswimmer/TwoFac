@@ -13,7 +13,7 @@ env:
 
 jobs:
   build-ubuntu:
-    name: "Build Android, Linux Desktop, Web, CLI (Linux)"
+    name: "Build Android, Linux Desktop, Web PWA + Extensions, CLI (Linux)"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -40,8 +40,8 @@ jobs:
       - name: Build Linux Desktop (Deb)
         run: ./gradlew :composeApp:packageDeb
 
-      - name: Build Web Distribution
-        run: ./gradlew :composeApp:wasmJsBrowserDistribution
+      - name: Build Web PWA + Browser Extensions
+        run: ./gradlew :composeApp:packageBrowserExtensions
 
       - name: Build CLI (Linux x64)
         run: ./gradlew :cliApp:linkReleaseExecutableLinuxX64
@@ -58,11 +58,23 @@ jobs:
           name: linux-desktop-deb
           path: composeApp/build/compose/binaries/main/deb/*.deb
 
-      - name: Upload Web Distribution
+      - name: Upload Web PWA Distribution
         uses: actions/upload-artifact@v4
         with:
-          name: web-distribution
+          name: web-pwa-distribution
           path: composeApp/build/dist/wasmJs/productionExecutable/
+
+      - name: Upload Chrome Extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: composeApp/build/extension/dist/twofac-chrome-extension-*.zip
+
+      - name: Upload Firefox Extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension
+          path: composeApp/build/extension/dist/twofac-firefox-extension-*.zip
 
       - name: Upload CLI (Linux x64)
         uses: actions/upload-artifact@v4
@@ -253,11 +265,11 @@ jobs:
         with:
           path: artifacts/
 
-      - name: Zip Web Distribution
+      - name: Zip Web PWA Distribution
         continue-on-error: true
         run: |
-          cd artifacts/web-distribution
-          zip -r ../web-distribution.zip .
+          cd artifacts/web-pwa-distribution
+          zip -r ../web-pwa-distribution.zip .
           cd ../..
 
       - name: Package *nix CLI binaries as tar.gz to preserve executable bit
@@ -284,7 +296,9 @@ jobs:
           files: |
             artifacts/android-apk/*.apk
             artifacts/linux-desktop-deb/*.deb
-            artifacts/web-distribution.zip
+            artifacts/web-pwa-distribution.zip
+            artifacts/chrome-extension/*.zip
+            artifacts/firefox-extension/*.zip
             artifacts/2fac-linux-x64.tar.gz
             artifacts/windows-desktop-msi/*.msi
             artifacts/2fac-windows-x64.exe
