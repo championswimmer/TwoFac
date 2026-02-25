@@ -155,7 +155,7 @@ fun SettingsScreen(
                             )
                         }
                         Text(
-                            text = "Keep the passkey saved so you don't have to enter it every time the extension is opened.",
+                            text = "Keep the passkey saved so you don't have to enter it every time the extension is opened. Only enable this on devices you trust.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp)

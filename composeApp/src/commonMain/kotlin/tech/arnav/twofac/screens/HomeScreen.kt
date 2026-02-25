@@ -66,7 +66,7 @@ fun HomeScreen(
     }
 
     // If auto-unlock failed (error set while we tried), show the passkey dialog
-    LaunchedEffect(error, autoUnlockAttempted) {
+    LaunchedEffect(error) {
         if (autoUnlockAttempted && error != null && !isUnlocked) {
             autoUnlockAttempted = false
             showPasskeyDialog = true
