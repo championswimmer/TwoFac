@@ -5,6 +5,43 @@ package tech.arnav.twofac.session
  *
  * Uses the browser's `localStorage` to persist the "remember passkey" preference
  * and the passkey itself so the user is not prompted every time the extension is opened.
+ *
+ * ⚠️ **SECURITY WARNING: Plaintext Storage** ⚠️
+ *
+ * This implementation stores the user's passkey in **plaintext** in `localStorage`.
+ * While `localStorage` is origin-sandboxed to `chrome-extension://...`, this approach
+ * has known security limitations:
+ *
+ * **Risks:**
+ * - **XSS Vulnerability:** Malicious scripts executing in the extension context can read `localStorage`
+ * - **Persistence:** Passkey survives browser restarts and is written to disk
+ * - **No Encryption:** No cryptographic protection for the stored passkey
+ *
+ * **Future Improvements to Consider:**
+ *
+ * 1. **Service Worker Memory Storage:**
+ *    - Store passkey in the memory of a background service worker (Manifest v3)
+ *    - Passkey cleared when browser closes, reducing exposure window
+ *    - Not accessible via DOM/XSS, safer than `localStorage`
+ *    - Implementation: Use service worker as state holder, message passing for popup access
+ *
+ * 2. **Browser Credential Management API / Web Authentication (WebAuthn):**
+ *    - Use `navigator.credentials` API or platform authenticators
+ *    - Leverage OS-level secure storage and biometric authentication
+ *    - Passkey never exposed to JavaScript as plaintext
+ *    - Better user experience with browser-integrated password managers
+ *
+ * 3. **Encrypted Storage (IndexedDB + Web Crypto):**
+ *    - Derive encryption key from user interaction (e.g., PIN) using Web Crypto API
+ *    - Store encrypted passkey in IndexedDB
+ *    - Adds encryption layer, though key management remains a challenge
+ *
+ * **Current Trade-off:**
+ * This implementation prioritizes **user convenience** for an opt-in feature with
+ * explicit UI warnings. Users must acknowledge the risk ("Only enable this on devices you trust").
+ * Migrating to service worker memory or credential APIs is recommended for future releases.
+ *
+ * @see SessionManager for architectural security discussion
  */
 class BrowserSessionManager : SessionManager {
 
