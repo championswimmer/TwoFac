@@ -576,14 +576,14 @@
 				DEVELOPMENT_TEAM = 9UV5DX2Q64;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watchApp/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-				WK_COMPANION_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac;
+				WK_COMPANION_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.app;
 			};
 			name = Debug;
 		};
@@ -595,14 +595,14 @@
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watchApp/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-				WK_COMPANION_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac;
+				WK_COMPANION_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.app;
 			};
 			name = Release;
 		};
@@ -629,14 +629,14 @@
 					"-framework",
 					TwoFacKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp.watchkitextension;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-				WK_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp;
+				WK_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp;
 			};
 			name = Debug;
 		};
@@ -663,14 +663,14 @@
 					"-framework",
 					TwoFacKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp.watchkitextension;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-				WK_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.twofac.watchkitapp;
+				WK_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp;
 			};
 			name = Release;
 		};
