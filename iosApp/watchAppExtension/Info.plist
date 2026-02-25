@@ -10,6 +10,6 @@
     <key>WKApplication</key>
     <true/>
     <key>WKWatchOnly</key>
-    <true/>
+    <false/>
 </dict>
 </plist>
