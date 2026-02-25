@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.wear.WatchSyncCoordinator
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -20,6 +21,7 @@ import kotlin.time.ExperimentalTime
 class AccountsViewModel(
     private val twoFacLib: TwoFacLib,
     private val watchSyncCoordinator: WatchSyncCoordinator? = null,
+    private val sessionManager: SessionManager? = null,
 ) : ViewModel() {
 
     companion object {
@@ -39,6 +41,9 @@ class AccountsViewModel(
     val error: StateFlow<String?> = _error.asStateFlow()
 
     val twoFacLibUnlocked: Boolean get() = twoFacLib.isUnlocked()
+
+    /** Return a passkey previously persisted by the session manager, or null. */
+    fun getSavedPasskey(): String? = sessionManager?.getSavedPasskey()
 
     private val _refreshTrigger = MutableStateFlow(0L)
 
@@ -96,6 +101,11 @@ class AccountsViewModel(
             _accountOtps.value = accountOtpList
             _accounts.value = accountOtpList.map { it.first }
             watchSyncCoordinator?.onAccountsUnlocked()
+
+            // Persist the passkey for session auto-unlock (if the user opted in)
+            if (passkey != null) {
+                sessionManager?.savePasskey(passkey)
+            }
 
             _isLoading.value = false
         }

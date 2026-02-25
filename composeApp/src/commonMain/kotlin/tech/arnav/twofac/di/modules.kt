@@ -24,6 +24,7 @@ val viewModelModule = module {
         AccountsViewModel(
             twoFacLib = get(),
             watchSyncCoordinator = getOrNull(),
+            sessionManager = getOrNull(),
         )
     }
 }

@@ -43,6 +43,7 @@ fun HomeScreen(
     var showPasskeyDialog by remember { mutableStateOf(false) }
     var isUnlocked by remember { mutableStateOf(false) }
     var hasCheckedAccounts by remember { mutableStateOf(false) }
+    var autoUnlockAttempted by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadAccounts()
@@ -52,8 +53,23 @@ fun HomeScreen(
         if (!isLoading && !hasCheckedAccounts) {
             hasCheckedAccounts = true
             if (accounts.isNotEmpty()) {
-                showPasskeyDialog = true
+                // Try auto-unlock from saved session passkey first
+                val savedPasskey = viewModel.getSavedPasskey()
+                if (savedPasskey != null) {
+                    viewModel.loadAccountsWithOtps(savedPasskey)
+                    autoUnlockAttempted = true
+                } else {
+                    showPasskeyDialog = true
+                }
             }
+        }
+    }
+
+    // If auto-unlock failed (error set while we tried), show the passkey dialog
+    LaunchedEffect(error, autoUnlockAttempted) {
+        if (autoUnlockAttempted && error != null && !isUnlocked) {
+            autoUnlockAttempted = false
+            showPasskeyDialog = true
         }
     }
 
