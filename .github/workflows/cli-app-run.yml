@@ -16,6 +16,36 @@ on:
   workflow_dispatch: # For manual triggering
 
 jobs:
+  detect-apple-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      apple_changed: ${{ steps.filter.outputs.apple }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Detect Apple-specific changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            apple:
+              - 'iosApp/**'
+              - '**/src/iosMain/**'
+              - '**/src/iosTest/**'
+              - '**/src/macosMain/**'
+              - '**/src/macosTest/**'
+              - '**/src/watchosMain/**'
+              - '**/src/watchosTest/**'
+              - '**/*.xcodeproj/**'
+              - '**/*.xcworkspace/**'
+              - '**/*.xcconfig'
+              - '**/*.swift'
+              - '**/*.plist'
+              - '**/*.entitlements'
+              - 'sharedLib/build.gradle.kts'
+              - 'composeApp/build.gradle.kts'
+              - 'cliApp/build.gradle.kts'
+              - '.github/workflows/cli-app-run.yml'
+
   run-cli-windows:
     runs-on: windows-latest
     steps:
@@ -34,6 +64,8 @@ jobs:
         run: ./gradlew :cliApp:runDebugExecutableMingwX64 -PrunArgs="--help -v"
 
   run-cli-macos:
+    needs: detect-apple-changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.detect-apple-changes.outputs.apple_changed == 'true' }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
