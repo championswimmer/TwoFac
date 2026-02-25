@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.BackupTransport
+import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.storage.getStoragePath
 import tech.arnav.twofac.wear.WatchSyncCoordinator
 import tech.arnav.twofac.wear.isSyncToWatchEnabled
@@ -60,6 +62,7 @@ fun SettingsScreen(
     val backupTransport = remember { koin.getOrNull<BackupTransport>() }
     val twoFacLib = remember { koin.getOrNull<TwoFacLib>() }
     val watchSyncCoordinator = remember { koin.getOrNull<WatchSyncCoordinator>() }
+    val sessionManager = remember { koin.getOrNull<SessionManager>() }
 
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
@@ -67,6 +70,9 @@ fun SettingsScreen(
     var isWatchCompanionActive by remember { mutableStateOf(false) }
     var isWatchSyncInProgress by remember { mutableStateOf(false) }
     var isWatchDiscoveryInProgress by remember { mutableStateOf(false) }
+    var isRememberPasskeyEnabled by remember {
+        mutableStateOf(sessionManager?.isRememberPasskeyEnabled() ?: false)
+    }
 
     LaunchedEffect(watchSyncCoordinator) {
         if (watchSyncCoordinator != null) {
@@ -120,6 +126,41 @@ fun SettingsScreen(
                         modifier = Modifier.padding(top = 4.dp),
                         textAlign = TextAlign.Start
                     )
+                }
+            }
+
+            if (sessionManager != null && sessionManager.isAvailable()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Remember Passkey",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Switch(
+                                checked = isRememberPasskeyEnabled,
+                                onCheckedChange = { enabled ->
+                                    sessionManager.setRememberPasskey(enabled)
+                                    isRememberPasskeyEnabled = enabled
+                                }
+                            )
+                        }
+                        Text(
+                            text = "Keep the passkey saved so you don't have to enter it every time the extension is opened. Only enable this on devices you trust.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             }
 
