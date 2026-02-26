@@ -89,6 +89,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            export(projects.sharedLib)
         }
     }
 
@@ -131,7 +132,7 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
 
             implementation(libs.kstore)
-            implementation(project(":sharedLib"))
+            api(project(":sharedLib"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -1,6 +1,7 @@
 import Foundation
+import SwiftUI
 import WatchConnectivity
-import TwoFacKit
+import ComposeApp
 
 class WatchSyncCoordinator: NSObject, ObservableObject, WCSessionDelegate {
     static let shared = WatchSyncCoordinator()
