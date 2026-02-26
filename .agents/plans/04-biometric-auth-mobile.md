@@ -265,11 +265,11 @@ This keeps a single interface while allowing platforms that support biometrics t
 ```kotlin
 androidMain.dependencies {
     // ... existing dependencies ...
-    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    implementation("androidx.biometric:biometric:1.4.0-alpha05")
 }
 ```
 
-> **Note:** Use the `-alpha05` version for `BiometricPrompt.AuthenticationCallback` with `CryptoObject` support and `Class 3` biometric requirement. Alternatively, use stable `1.1.0` which is sufficient for basic biometric prompt.
+> **Note:** Use the `1.4.0-alpha05` version for `BiometricPrompt.AuthenticationCallback` with `CryptoObject` support and `Class 3` biometric requirement. Alternatively, use stable `1.1.0` which is sufficient for basic biometric prompt.
 
 ### 1.2 Create BiometricSessionManager
 
@@ -310,11 +310,13 @@ Two-tier storage:
 │  Algorithm: AES/GCM/NoPadding                   │
 │  Purpose:   ENCRYPT | DECRYPT                   │
 │  Auth:      setUserAuthenticationRequired(true)  │
+│             setUserAuthenticationValidity...     │
+│               (AUTH_VALIDITY_SECONDS)            │
 │             setInvalidatedByBiometricEnrollment  │
 │               (true)                             │
 │                                                 │
-│  → Key can only be used after BiometricPrompt   │
-│    authentication succeeds                      │
+│  → Key usable for 15 min after BiometricPrompt  │
+│    authentication succeeds (no re-prompt)       │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -334,6 +336,11 @@ class AndroidBiometricSessionManager(
         private const val KEY_ENCRYPTED_PASSKEY = "encrypted_passkey"
         private const val KEY_PASSKEY_IV = "passkey_iv"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+
+        /** Time-based validity window for biometric auth (seconds). After a successful
+         *  biometric authentication, the Keystore key remains usable for this duration
+         *  without re-prompting. Can be made a user setting later. */
+        private const val AUTH_VALIDITY_SECONDS = 15 * 60  // 15 minutes
     }
 
     private val prefs by lazy {
@@ -513,6 +520,7 @@ class AndroidBiometricSessionManager(
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                 .setKeySize(256)
                 .setUserAuthenticationRequired(true)
+                .setUserAuthenticationValidityDurationSeconds(AUTH_VALIDITY_SECONDS)
                 .setInvalidatedByBiometricEnrollment(true)
                 .build()
         )
@@ -572,7 +580,7 @@ startKoin {
 | **CryptoObject binding** | The `BiometricPrompt` is bound to a `CryptoObject` (cipher), meaning the system verifies that the biometric authentication actually unlocked the key before allowing decryption. This prevents relay attacks. |
 | **Activity lifecycle** | `BiometricPrompt` requires a `FragmentActivity`. The activity reference must be valid when the prompt is shown. Using an `activityProvider` lambda ensures we get the current activity. |
 | **Negative button** | "Use passkey instead" as the negative button text gives users a clear escape hatch to the manual passkey flow. |
-| **`setUserAuthenticationRequired(true)`** | Requires fresh biometric auth for every use of the key. No time-based validity window — each decrypt operation requires a new biometric prompt. |
+| **`setUserAuthenticationRequired(true)` + validity** | Biometric auth is required to use the key, with a 15-minute time-based validity window (`AUTH_VALIDITY_SECONDS = 15 * 60`). After a successful biometric prompt, the key remains usable for 15 minutes without re-prompting. This constant can be made a user-configurable setting later. |
 
 ---
 
@@ -854,7 +862,7 @@ if (sessionManager?.isBiometricAvailable() == true) {
 | ❌ | — | ❌ | Manual passkey entry every time |
 | ❌ | — | ✅ | N/A (no biometric toggle shown) |
 | ✅ | ❌ | ❌ | Manual passkey entry every time |
-| ✅ | ❌ | ✅ | Passkey auto-saved (platform decides storage) |
+| ✅ | ❌ | ✅ | No auto-save — passkey remains in memory for current process lifecycle only (no SessionManager persists it without biometric) |
 | ✅ | ✅ | (auto ✅) | Biometric prompt → auto-unlock; fail → passkey dialog |
 
 ### 3.3 HomeScreen Flow Update
