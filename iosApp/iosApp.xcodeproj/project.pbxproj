@@ -508,6 +508,7 @@
 				CODE_SIGN_ENTITLEMENTS = iosApp/iOSApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_ARCHS = "x86_64";
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 9UV5DX2Q64;
 				ENABLE_PREVIEWS = YES;
@@ -543,6 +544,7 @@
 				CODE_SIGN_ENTITLEMENTS = iosApp/iOSApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_ARCHS = "x86_64";
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
@@ -573,6 +575,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = watchApp/watchApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_ARCHS = "x86_64";
 				DEVELOPMENT_TEAM = 9UV5DX2Q64;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watchApp/Info.plist;
@@ -592,6 +595,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = watchApp/watchApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_ARCHS = "x86_64";
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watchApp/Info.plist;
@@ -610,6 +614,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				EXCLUDED_ARCHS = "x86_64";
 				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9UV5DX2Q64;
@@ -644,6 +649,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				EXCLUDED_ARCHS = "x86_64";
 				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
