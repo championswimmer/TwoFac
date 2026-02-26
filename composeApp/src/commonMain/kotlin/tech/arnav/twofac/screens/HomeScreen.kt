@@ -43,7 +43,7 @@ fun HomeScreen(
     var showPasskeyDialog by remember { mutableStateOf(false) }
     var hasTriggeredUnlockFlow by remember { mutableStateOf(false) }
     var autoUnlockAttempted by remember { mutableStateOf(false) }
-    val isUnlocked = viewModel.twoFacLibUnlocked
+    val isUnlocked by viewModel.twoFacLibUnlocked.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadAccounts()
