@@ -53,7 +53,7 @@ interface SessionManager {
     fun setRememberPasskey(enabled: Boolean)
 
     /** Return the previously saved passkey, or null if none is stored or the feature is disabled. */
-    fun getSavedPasskey(): String?
+    suspend fun getSavedPasskey(): String?
 
     /** Persist the passkey (only effective when the feature is enabled). */
     fun savePasskey(passkey: String)
