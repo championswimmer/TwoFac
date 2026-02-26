@@ -32,12 +32,13 @@ This repository is a Kotlin Multiplatform 2FA project with multiple app frontend
 | CLI               | `cliApp`                       | `native` (as static lib) |
 | Wear OS           | `watchApp`                     | `jvm`                    |
 
-## Build and test entry points
+## Agent skills
 
-- Baseline checks: `./gradlew check`
-- Shared library tests: `./gradlew :sharedLib:test`
-- CLI tests: `./gradlew :cliApp:test`
-- Compose tests: `./gradlew :composeApp:test`
+Use the dedicated skills for detailed command and routing guidance:
+
+- `.agents/skills/gradle-build/SKILL.md`
+- `.agents/skills/module-routing/SKILL.md`
+- `.agents/skills/kmp-modules/SKILL.md`
 
 ## Agent navigation
 
