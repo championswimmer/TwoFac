@@ -39,6 +39,8 @@ sealed class tech.arnav.twofac.lib.importer/ImportResult // tech.arnav.twofac.li
 
 final object tech.arnav.twofac.lib.backup/BackupPayloadCodec // tech.arnav.twofac.lib.backup/BackupPayloadCodec|null[0]
 
+final object tech.arnav.twofac.lib.watchsync/IosWatchSyncHelper // tech.arnav.twofac.lib.watchsync/IosWatchSyncHelper|null[0]
+
 // Targets: [native]
 final enum class /HashAlgo : kotlin/Enum</HashAlgo> { // /HashAlgo|null[0]
     enum entry SHA1 // /HashAlgo.SHA1|null[0]
