@@ -1,6 +1,9 @@
 package tech.arnav.twofac.storage
 
 import io.github.xxfast.kstore.KStore
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import tech.arnav.twofac.lib.storage.StoredAccount
 
 const val ACCOUNTS_STORAGE_KEY = "twofac_accounts"
@@ -9,3 +12,11 @@ const val ACCOUNTS_STORAGE_FILE = "accounts.json"
 expect fun createAccountsStore(): KStore<List<StoredAccount>>
 
 expect fun getStoragePath(): String
+
+internal fun ensureStorageFileExists(filePath: Path) {
+    if (SystemFileSystem.exists(filePath)) return
+    SystemFileSystem.sink(filePath).buffered().use { sink ->
+        sink.write("[]".encodeToByteArray())
+        sink.flush()
+    }
+}

@@ -118,7 +118,7 @@ class AccountsViewModel(
         }
     }
 
-    fun addAccount(uri: String, passkey: String?) {
+    fun addAccount(uri: String, passkey: String?, onComplete: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
@@ -127,6 +127,7 @@ class AccountsViewModel(
                 if (!twoFacLibUnlocked) {
                     if (passkey.isNullOrBlank()) {
                         _error.value = "Passkey is required to add an account while vault is locked"
+                        onComplete(false)
                         return@launch
                     }
                     twoFacLib.unlock(passkey)
@@ -135,11 +136,14 @@ class AccountsViewModel(
                 if (success) {
                     companionSyncCoordinator?.onAccountsChanged()
                     loadAccounts()
+                    onComplete(true)
                 } else {
                     _error.value = "Failed to add account"
+                    onComplete(false)
                 }
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to add account"
+                onComplete(false)
             } finally {
                 _isLoading.value = false
             }

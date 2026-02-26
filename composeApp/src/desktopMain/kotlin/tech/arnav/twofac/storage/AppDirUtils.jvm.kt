@@ -17,6 +17,7 @@ actual fun createAccountsStore(): KStore<List<StoredAccount>> {
     val dir = appDirs.getUserDataDir()
     SystemFileSystem.createDirectories(Path(dir))
     val filePath = Path(dir, ACCOUNTS_STORAGE_FILE)
+    ensureStorageFileExists(filePath)
 
     return storeOf(
         file = filePath,

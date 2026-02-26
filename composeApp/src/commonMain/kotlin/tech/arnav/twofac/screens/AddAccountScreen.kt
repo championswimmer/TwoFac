@@ -91,10 +91,15 @@ fun AddAccountScreen(
             Button(
                 onClick = {
                     if (uriText.isNotBlank() && (!requiresUnlock || passkeyText.isNotBlank())) {
-                        viewModel.addAccount(uriText, passkeyText.ifBlank { null })
-                        if (viewModel.error.value == null) {
-                            onNavigateBack()
-                        }
+                        viewModel.addAccount(
+                            uri = uriText,
+                            passkey = passkeyText.ifBlank { null },
+                            onComplete = { success ->
+                                if (success) {
+                                    onNavigateBack()
+                                }
+                            }
+                        )
                     }
                 },
                 enabled = !isLoading && uriText.isNotBlank() && (!requiresUnlock || passkeyText.isNotBlank())
