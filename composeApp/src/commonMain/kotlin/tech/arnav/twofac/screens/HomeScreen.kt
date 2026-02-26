@@ -41,26 +41,24 @@ fun HomeScreen(
     val error by viewModel.error.collectAsState()
 
     var showPasskeyDialog by remember { mutableStateOf(false) }
-    var isUnlocked by remember { mutableStateOf(false) }
-    var hasCheckedAccounts by remember { mutableStateOf(false) }
+    var hasTriggeredUnlockFlow by remember { mutableStateOf(false) }
     var autoUnlockAttempted by remember { mutableStateOf(false) }
+    val isUnlocked by viewModel.twoFacLibUnlocked.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadAccounts()
     }
 
-    LaunchedEffect(accounts, isLoading) {
-        if (!isLoading && !hasCheckedAccounts) {
-            hasCheckedAccounts = true
-            if (accounts.isNotEmpty()) {
-                // Try auto-unlock from saved session passkey first
-                val savedPasskey = viewModel.getSavedPasskey()
-                if (savedPasskey != null) {
-                    viewModel.loadAccountsWithOtps(savedPasskey)
-                    autoUnlockAttempted = true
-                } else {
-                    showPasskeyDialog = true
-                }
+    LaunchedEffect(isLoading, hasTriggeredUnlockFlow, isUnlocked) {
+        if (!isLoading && !hasTriggeredUnlockFlow && !isUnlocked) {
+            hasTriggeredUnlockFlow = true
+            // Try auto-unlock from saved session passkey first
+            val savedPasskey = viewModel.getSavedPasskey()
+            if (savedPasskey != null) {
+                viewModel.loadAccountsWithOtps(savedPasskey)
+                autoUnlockAttempted = true
+            } else {
+                showPasskeyDialog = true
             }
         }
     }
@@ -74,33 +72,30 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(accountOtps) {
-        if (accountOtps.isNotEmpty()) {
-            isUnlocked = true
+    LaunchedEffect(isUnlocked) {
+        if (isUnlocked) {
             showPasskeyDialog = false
         }
     }
 
     Scaffold(
         bottomBar = {
-            if (isUnlocked || accounts.isEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
+            ) {
+                Button(
+                    onClick = onNavigateToAccounts
                 ) {
-                    Button(
-                        onClick = onNavigateToAccounts
-                    ) {
-                        Text("Manage Accounts")
-                    }
+                    Text("Manage Accounts")
+                }
 
-                    Button(
-                        onClick = onNavigateToSettings
-                    ) {
-                        Text("Settings")
-                    }
+                Button(
+                    onClick = onNavigateToSettings
+                ) {
+                    Text("Settings")
                 }
             }
         }
