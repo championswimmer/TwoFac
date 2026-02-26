@@ -23,8 +23,10 @@ kotlin {
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
+        iosX64(),
         watchosArm64(),
         watchosSimulatorArm64(),
+        watchosX64(),
         macosX64(),
         macosArm64(),
     ).forEach { iosTarget ->

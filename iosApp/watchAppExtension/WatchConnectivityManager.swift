@@ -1,6 +1,6 @@
 import Foundation
 import WatchConnectivity
-import sharedLib
+import TwoFacKit
 import SwiftUI
 
 class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
@@ -42,8 +42,8 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         print("WCSession activated on watch.")
         
         // Check if there's an existing context we should process
-        if let context = session.receivedApplicationContext,
-           let payloadString = context["payloadString"] as? String {
+        let context = session.receivedApplicationContext
+        if let payloadString = context["payloadString"] as? String {
             processPayloadData(payloadString)
         }
     }

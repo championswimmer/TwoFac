@@ -1,6 +1,6 @@
 import Foundation
 import WatchConnectivity
-import sharedLib
+import TwoFacKit
 
 class WatchSyncCoordinator: NSObject, ObservableObject, WCSessionDelegate {
     static let shared = WatchSyncCoordinator()
