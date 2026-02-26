@@ -43,7 +43,7 @@ class AccountsViewModel(
     val twoFacLibUnlocked: Boolean get() = twoFacLib.isUnlocked()
 
     /** Return a passkey previously persisted by the session manager, or null. */
-    fun getSavedPasskey(): String? = sessionManager?.getSavedPasskey()
+    suspend fun getSavedPasskey(): String? = sessionManager?.getSavedPasskey()
 
     /** Clear any saved passkey from the session manager. */
     fun clearSavedPasskey() { sessionManager?.clearPasskey() }

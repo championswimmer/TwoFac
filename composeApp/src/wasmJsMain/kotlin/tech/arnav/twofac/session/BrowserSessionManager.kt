@@ -73,7 +73,7 @@ class BrowserSessionManager : SessionManager {
         }
     }
 
-    override fun getSavedPasskey(): String? {
+    override suspend fun getSavedPasskey(): String? {
         return try {
             if (!isRememberPasskeyEnabled()) null
             else localStorageGetItem(SESSION_PASSKEY_KEY)
