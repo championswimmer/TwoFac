@@ -49,7 +49,7 @@ fun HomeScreen(
         viewModel.loadAccounts()
     }
 
-    LaunchedEffect(isLoading) {
+    LaunchedEffect(isLoading, hasTriggeredUnlockFlow, isUnlocked) {
         if (!isLoading && !hasTriggeredUnlockFlow && !isUnlocked) {
             hasTriggeredUnlockFlow = true
             // Try auto-unlock from saved session passkey first
