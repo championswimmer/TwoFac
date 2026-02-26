@@ -164,4 +164,7 @@ internal fun hasTotpIntervalChanged(
     previousEpochSeconds: Long,
     currentEpochSeconds: Long,
     intervalSeconds: Long
-): Boolean = previousEpochSeconds / intervalSeconds != currentEpochSeconds / intervalSeconds
+): Boolean {
+    require(intervalSeconds > 0) { "intervalSeconds must be positive" }
+    return previousEpochSeconds / intervalSeconds != currentEpochSeconds / intervalSeconds
+}
