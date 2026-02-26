@@ -73,10 +73,9 @@ fun OTPCard(
     LaunchedEffect(Unit) {
         while (true) {
             val newTime = Clock.System.now().epochSeconds
-            val timeInInterval = newTime % timeInterval
 
-            // Check if we need to refresh OTP (when interval resets)
-            if (timeInInterval == 0L && newTime != currentTime) {
+            // Check if we crossed into a new TOTP interval
+            if (hasTotpIntervalChanged(currentTime, newTime, timeInterval)) {
                 onRefreshOTP()
             }
 
@@ -159,4 +158,13 @@ private fun formatOTPCode(code: String): String {
     } else {
         code
     }
+}
+
+internal fun hasTotpIntervalChanged(
+    previousEpochSeconds: Long,
+    currentEpochSeconds: Long,
+    intervalSeconds: Long
+): Boolean {
+    require(intervalSeconds > 0) { "intervalSeconds must be positive" }
+    return previousEpochSeconds / intervalSeconds != currentEpochSeconds / intervalSeconds
 }
