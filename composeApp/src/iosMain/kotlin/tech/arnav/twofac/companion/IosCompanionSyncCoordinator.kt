@@ -58,6 +58,7 @@ class IosCompanionSyncCoordinator(
 
     override suspend fun syncNow(manual: Boolean): Boolean {
         val activeSession = session ?: return false
+        activeSession.activateSession()
         if (!twoFacLib.isUnlocked()) {
             NSLog("Companion sync aborted: vault is locked.")
             return false
@@ -87,14 +88,22 @@ class IosCompanionSyncCoordinator(
             generatedAtEpochSec = Clock.System.now().epochSeconds,
         )
         val payloadString = Json.encodeToString(WatchSyncSnapshot.serializer(), snapshot)
+        // Keep values as strings so payload is always valid property-list data for WCSession.
         val payload: Map<Any?, Any?> = mapOf(
             IOS_PAYLOAD_STRING_KEY to payloadString,
-            IOS_GENERATED_AT_EPOCH_SEC_KEY to snapshot.generatedAtEpochSec,
-            IOS_MANUAL_SYNC_KEY to manual,
+            IOS_GENERATED_AT_EPOCH_SEC_KEY to snapshot.generatedAtEpochSec.toString(),
+            IOS_MANUAL_SYNC_KEY to manual.toString(),
         )
 
+        NSLog(
+            "Companion sync: sending payload. activationState=%ld accounts=%ld payloadLength=%ld",
+            activeSession.activationState,
+            sourceAccounts.size.toLong(),
+            payloadString.length.toLong(),
+        )
         activeSession.transferUserInfo(payload)
         updateApplicationContext(activeSession, payload)
+        sendImmediateMessageIfReachable(activeSession, payload)
         return true
     }
 
@@ -113,7 +122,31 @@ class IosCompanionSyncCoordinator(
         val success = activeSession.updateApplicationContext(payload, null)
         if (!success) {
             NSLog("Companion sync application context update failed.")
+        } else {
+            NSLog("Companion sync application context updated successfully.")
         }
+    }
+
+    private fun sendImmediateMessageIfReachable(
+        activeSession: WCSession,
+        payload: Map<Any?, Any?>,
+    ) {
+        if (!activeSession.isReachable()) {
+            NSLog("Companion sync immediate message skipped: watch is not reachable.")
+            return
+        }
+
+        activeSession.sendMessage(
+            message = payload,
+            replyHandler = null,
+            errorHandler = { error ->
+                NSLog(
+                    "Companion sync immediate message failed: %@",
+                    error?.localizedDescription ?: "unknown error",
+                )
+            },
+        )
+        NSLog("Companion sync immediate message sent.")
     }
 }
 

@@ -6,6 +6,7 @@ progress:
 - "[x] iOS <> watchOS connectivity layer (iOS side)"
 - "[x] Define a shared companion discovery/sync interface for phone apps"
 - "[x] Implement iPhone-side companion discover + sync controls"
+- "[x] Basic watchOS account pager UI (one account per page with OTP + 30s countdown bar)"
 - "[ ] watchOS app UI"
 ---
 # TwoFac watchOS Companion App Plan (SwiftUI + TwoFacKit)
@@ -72,7 +73,7 @@ From Apple WatchConnectivity docs and sample docs:
 ## Current repository baseline (relevant)
 
 - `sharedLib` already defines iOS framework base name as **`TwoFacKit`**.
-- `iosApp` currently embeds and renders `ComposeApp` UI (`ContentView.swift` uses `MainViewControllerKt.MainViewController()`).
+- `iosApp` currently embeds and renders `TwoFacKit` (from `composeApp`) UI (`ContentView.swift` uses `MainViewControllerKt.MainViewController()`).
 - `iosApp` now includes watch app + watch extension targets and basic `WCSession` coordinator wiring.
 - `composeApp` shared settings already has watch sync controls (`Sync to Watch`, `Force Discover Watch App`) when a coordinator is provided.
 - Android provides `WatchSyncCoordinator` implementation; iOS currently does not bind one into Compose/Koin yet.

@@ -144,11 +144,11 @@ jobs:
         run: |
           mkdir -p composeApp/build/XCFrameworks/release
           xcodebuild -create-xcframework \
-            -framework composeApp/build/bin/iosArm64/releaseFramework/ComposeApp.framework \
-            -framework composeApp/build/bin/iosSimulatorArm64/releaseFramework/ComposeApp.framework \
-            -output composeApp/build/XCFrameworks/release/ComposeApp.xcframework
+            -framework composeApp/build/bin/iosArm64/releaseFramework/TwoFacKit.framework \
+            -framework composeApp/build/bin/iosSimulatorArm64/releaseFramework/TwoFacKit.framework \
+            -output composeApp/build/XCFrameworks/release/TwoFacKit.xcframework
           cd composeApp/build/XCFrameworks/release
-          zip -r ComposeApp.xcframework.zip ComposeApp.xcframework
+          zip -r TwoFacKit.xcframework.zip TwoFacKit.xcframework
 
       - name: Import signing certificate
         if: ${{ env.IOS_SIGNING_CERTIFICATE_P12_BASE64 != '' }}
@@ -228,7 +228,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-xcframework
-          path: composeApp/build/XCFrameworks/release/ComposeApp.xcframework.zip
+          path: composeApp/build/XCFrameworks/release/TwoFacKit.xcframework.zip
 
       - name: Upload iOS IPA
         if: ${{ env.IOS_TEAM_ID != '' }}
@@ -303,7 +303,7 @@ jobs:
             artifacts/windows-desktop-msi/*.msi
             artifacts/2fac-windows-x64.exe
             artifacts/macos-desktop-dmg/*.dmg
-            artifacts/ios-xcframework/ComposeApp.xcframework.zip
+            artifacts/ios-xcframework/TwoFacKit.xcframework.zip
             artifacts/ios-ipa/*.ipa
             artifacts/2fac-macos-arm64.tar.gz
             artifacts/2fac-macos-x64.tar.gz
