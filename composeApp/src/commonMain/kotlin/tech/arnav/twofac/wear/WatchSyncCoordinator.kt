@@ -1,42 +1,42 @@
 package tech.arnav.twofac.wear
 
-import tech.arnav.twofac.lib.uri.OtpAuthURI
-import tech.arnav.twofac.lib.watchsync.WatchSyncAccount
-import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
+import tech.arnav.twofac.companion.CompanionSyncCoordinator
+import tech.arnav.twofac.companion.CompanionSyncSourceAccount
+import tech.arnav.twofac.companion.buildCompanionSyncSnapshot
+import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 
-interface WatchSyncCoordinator {
-    suspend fun isCompanionActive(): Boolean
-    suspend fun forceDiscoverCompanion(): Boolean = isCompanionActive()
-    suspend fun syncNow(manual: Boolean): Boolean
-    suspend fun onAccountsUnlocked()
-    suspend fun onAccountsChanged()
-}
+@Deprecated(
+    message = "Use CompanionSyncCoordinator from tech.arnav.twofac.companion",
+    replaceWith = ReplaceWith("CompanionSyncCoordinator"),
+)
+typealias WatchSyncCoordinator = CompanionSyncCoordinator
 
-data class WatchSyncSourceAccount(
-    val accountId: String,
-    val accountLabel: String,
-    val otpAuthUri: String,
+@Deprecated(
+    message = "Use CompanionSyncSourceAccount from tech.arnav.twofac.companion",
+    replaceWith = ReplaceWith("CompanionSyncSourceAccount"),
+)
+typealias WatchSyncSourceAccount = CompanionSyncSourceAccount
+
+@Deprecated(
+    message = "Use buildCompanionSyncSnapshot from tech.arnav.twofac.companion",
+    replaceWith = ReplaceWith("buildCompanionSyncSnapshot(sourceAccounts, generatedAtEpochSec)"),
+)
+fun buildWatchSyncSnapshot(
+    sourceAccounts: List<CompanionSyncSourceAccount>,
+    generatedAtEpochSec: Long,
+) = buildCompanionSyncSnapshot(
+    sourceAccounts = sourceAccounts,
+    generatedAtEpochSec = generatedAtEpochSec,
 )
 
-fun buildWatchSyncSnapshot(
-    sourceAccounts: List<WatchSyncSourceAccount>,
-    generatedAtEpochSec: Long,
-): WatchSyncSnapshot {
-    val watchAccounts = sourceAccounts.map { source ->
-        WatchSyncAccount(
-            accountId = source.accountId,
-            issuer = runCatching { OtpAuthURI.parse(source.otpAuthUri).issuer }.getOrNull(),
-            accountLabel = source.accountLabel,
-            otpAuthUri = source.otpAuthUri,
-        )
-    }
-    return WatchSyncSnapshot(
-        generatedAtEpochSec = generatedAtEpochSec,
-        accounts = watchAccounts,
-    )
-}
-
+@Deprecated(
+    message = "Use isSyncToCompanionEnabled from tech.arnav.twofac.companion",
+    replaceWith = ReplaceWith("isSyncToCompanionEnabled(isCompanionActive, isSyncInProgress)"),
+)
 fun isSyncToWatchEnabled(
     isCompanionActive: Boolean,
     isSyncInProgress: Boolean,
-): Boolean = isCompanionActive && !isSyncInProgress
+): Boolean = isSyncToCompanionEnabled(
+    isCompanionActive = isCompanionActive,
+    isSyncInProgress = isSyncInProgress,
+)

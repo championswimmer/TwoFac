@@ -2,9 +2,11 @@
 task: Create watchOS companion app
 status: In Progress
 progress:
-- [x] Add watchOS app target in `iosApp` Xcode project
-- [x] iOS <> watchOS connectivity layer (iOS side)
-- [ ] watchOS app UI
+- "[x] Add watchOS app target in `iosApp` Xcode project"
+- "[x] iOS <> watchOS connectivity layer (iOS side)"
+- "[x] Define a shared companion discovery/sync interface for phone apps"
+- "[x] Implement iPhone-side companion discover + sync controls"
+- "[ ] watchOS app UI"
 ---
 # TwoFac watchOS Companion App Plan (SwiftUI + TwoFacKit)
 
@@ -13,6 +15,7 @@ Build a **watchOS companion app** for TwoFac where:
 - UI is native SwiftUI on watchOS (no Compose on watchOS).
 - business logic/OTP generation comes from `TwoFacKit` (framework built from `sharedLib`).
 - watch syncs secrets from paired iPhone app periodically and on-demand.
+- iPhone and Android phone apps both use the same companion-discovery + manual-sync interface pattern.
 - after sync, watch can show OTP entries offline on watch.
 - UX is **one code per vertical swipe screen** to keep the interface uncluttered.
 
@@ -28,6 +31,9 @@ Build a **watchOS companion app** for TwoFac where:
    - keeps parity with Android/Desktop/CLI behavior.
 3. **SwiftUI watch-first UI is now preferred**
    - watchOS provides vertical page tab style (`.tabViewStyle(.verticalPage)`) suitable for one-code-per-screen swipe UI.
+4. **Companion controls should be platform-adapted behind one contract**
+   - shared UI logic should call one companion coordinator contract.
+   - Android implementation discovers Wear OS app via capabilities; iOS implementation discovers Apple Watch companion via `WCSession` state and optional ping.
 
 ---
 
@@ -67,7 +73,9 @@ From Apple WatchConnectivity docs and sample docs:
 
 - `sharedLib` already defines iOS framework base name as **`TwoFacKit`**.
 - `iosApp` currently embeds and renders `ComposeApp` UI (`ContentView.swift` uses `MainViewControllerKt.MainViewController()`).
-- iOS app Xcode project currently has only iOS target; no watch app target yet.
+- `iosApp` now includes watch app + watch extension targets and basic `WCSession` coordinator wiring.
+- `composeApp` shared settings already has watch sync controls (`Sync to Watch`, `Force Discover Watch App`) when a coordinator is provided.
+- Android provides `WatchSyncCoordinator` implementation; iOS currently does not bind one into Compose/Koin yet.
 
 ---
 
@@ -100,6 +108,20 @@ From Apple WatchConnectivity docs and sample docs:
    - `WatchSyncAccount(accountId, issuer, accountLabel, otpAuthUri)`
 4. Add deterministic serialization + version validation tests in `sharedLib` (common tests), and only add Swift-facing facades on top where needed.
 
+## Phase 1.5 — Common companion-discovery interface on phone apps
+1. Introduce/rename a shared coordinator contract in `composeApp/commonMain` so companion controls are platform-neutral:
+   - recommended name: `CompanionSyncCoordinator` (or keep `WatchSyncCoordinator` but make it explicitly platform-neutral in docs/comments).
+2. Ensure the shared contract includes these operations:
+   - `isCompanionActive()`,
+   - `forceDiscoverCompanion()`,
+   - `syncNow(manual: Boolean)`,
+   - lifecycle hooks (`onAccountsUnlocked`, `onAccountsChanged`),
+   - optional `companionDisplayName` for UI copy.
+3. Update shared settings UI copy/buttons to be generic:
+   - section title: `Companion Sync`,
+   - action labels can include platform display name (`Sync to Apple Watch`, `Sync to Wear OS`).
+4. Preserve Android behavior by adapting existing implementation to this shared contract without transport regressions.
+
 ## Phase 2 — Add watchOS app target in `iosApp` Xcode project
 1. Add new targets:
    - Watch App target
@@ -112,8 +134,9 @@ From Apple WatchConnectivity docs and sample docs:
 4. Wire `TwoFacKit.framework` to watch extension build settings (framework search paths/link/embed).
 
 ## Phase 3 — Introduce iOS↔watch connectivity layer (iOS side)
-1. Create `WatchSyncCoordinator` in iOS app:
+1. Create/extend `WatchSyncCoordinator` in iOS app:
    - owns `WCSession.default`, delegate, activation, retries.
+   - provides discover semantics (`isPaired`, `isWatchAppInstalled`, optional reachability ping).
 2. Implement outbound sync channels with clear intent:
    - `updateApplicationContext` for latest snapshot metadata (quick state signal)
    - `transferUserInfo` for guaranteed snapshot deliveries
@@ -164,16 +187,21 @@ From Apple WatchConnectivity docs and sample docs:
    - explicit connectivity last error message.
 
 ## Phase 7 — iOS app integration updates needed
-1. Add settings screen section in iOS app (can be SwiftUI alongside Compose host):
-   - watch sync enabled toggle,
-   - last sync timestamp/status,
-   - “Sync now” action.
-2. Trigger sync events from iOS app lifecycle:
+1. Add iPhone settings controls with parity to Android companion UX:
+   - companion discovered/active status,
+   - `Force Discover Companion` action,
+   - `Sync now` action.
+2. Wire iOS implementation into the shared coordinator contract used by Compose settings:
+   - either bind an iOS-side implementation in `composeApp/iosMain`,
+   - or bridge from Swift `WatchSyncCoordinator` into Compose DI so shared UI calls the same contract as Android.
+3. Keep iOS-native fallback option:
+   - if Compose-side binding is not feasible immediately, expose a Swift settings section with the same two actions and keep contract parity documented.
+4. Trigger sync events from iOS app lifecycle:
    - on iOS app foreground and opportunistic background windows,
    - no dedicated secret CRUD-triggered sync requirement.
-3. Respect privacy/security settings:
+5. Respect privacy/security settings:
    - if user disables watch sync, send wipe signal to watch + clear watch store.
-4. Add migration behavior:
+6. Add migration behavior:
    - first launch after feature flag on => full snapshot transfer.
 
 ## Phase 8 — Security hardening
@@ -216,13 +244,18 @@ From Apple WatchConnectivity docs and sample docs:
 1. **`sharedLib`**
    - keep a single companion sync contract shared with plan 01 (`watchsync` models + codec), not a separate watchOS-only DTO hierarchy.
    - add/adjust Swift-friendly public APIs for secret import/list/code generation as thin facades over shared models.
-2. **`iosApp`**
+2. **`composeApp`**
+   - define one shared companion sync interface in `commonMain` (or formalize existing one as platform-neutral).
+   - keep shared settings UI using that interface for discovery + sync actions.
+   - provide Android and iOS bindings to the same interface (Android data-layer, iOS watch connectivity adapter/bridge).
+3. **`iosApp`**
    - update `iosApp.xcodeproj` with watch targets/capabilities.
    - add Swift files for `WatchSyncCoordinator` and delegate handlers.
-   - add iOS settings UI hooks for watch sync control/status.
-3. **new watch extension/watch app sources (under `iosApp`)**
+   - expose `discoverCompanion` + `syncNow` operations suitable for Compose/UI integration.
+   - add iOS settings UI hooks for companion control/status where needed.
+4. **new watch extension/watch app sources (under `iosApp`)**
    - `WatchConnectivityManager`, `WatchOtpStore`, `OtpTicker`, SwiftUI vertical page screens.
-4. **build integration**
+5. **build integration**
    - ensure `TwoFacKit` framework available to watch extension build path and signed correctly.
 
 ---

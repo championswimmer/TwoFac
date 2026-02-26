@@ -2,10 +2,10 @@
 task: Create Browser Extensions for Chrome and Firefox
 status: In Progress
 progress:
-  - [x] PWA foundation
-  - [x] Chrome extension
-  - [x] Firefox extension
-  - [x] Build pipeline and packaging
+  - "[x] PWA foundation"
+  - "[x] Chrome extension"
+  - "[x] Firefox extension"
+  - "[x] Build pipeline and packaging"
 ---
 # Browser Extension Packaging Plan (Chrome + Firefox)
 

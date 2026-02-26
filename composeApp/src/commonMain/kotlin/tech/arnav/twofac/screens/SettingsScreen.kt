@@ -43,10 +43,10 @@ import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.BackupTransport
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.storage.getStoragePath
-import tech.arnav.twofac.wear.WatchSyncCoordinator
-import tech.arnav.twofac.wear.isSyncToWatchEnabled
+import tech.arnav.twofac.companion.CompanionSyncCoordinator
+import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 
-private enum class BackupAction { EXPORT, IMPORT, SYNC_WATCH }
+private enum class BackupAction { EXPORT, IMPORT, SYNC_COMPANION }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,22 +61,26 @@ fun SettingsScreen(
     val backupService = remember { koin.getOrNull<BackupService>() }
     val backupTransport = remember { koin.getOrNull<BackupTransport>() }
     val twoFacLib = remember { koin.getOrNull<TwoFacLib>() }
-    val watchSyncCoordinator = remember { koin.getOrNull<WatchSyncCoordinator>() }
+    val companionSyncCoordinator = remember { koin.getOrNull<CompanionSyncCoordinator>() }
     val sessionManager = remember { koin.getOrNull<SessionManager>() }
 
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
-    var isWatchCompanionActive by remember { mutableStateOf(false) }
-    var isWatchSyncInProgress by remember { mutableStateOf(false) }
-    var isWatchDiscoveryInProgress by remember { mutableStateOf(false) }
+    var isCompanionActive by remember { mutableStateOf(false) }
+    var isCompanionSyncInProgress by remember { mutableStateOf(false) }
+    var isCompanionDiscoveryInProgress by remember { mutableStateOf(false) }
+    var companionDisplayName by remember {
+        mutableStateOf(companionSyncCoordinator?.companionDisplayName ?: "Watch")
+    }
     var isRememberPasskeyEnabled by remember {
         mutableStateOf(sessionManager?.isRememberPasskeyEnabled() ?: false)
     }
 
-    LaunchedEffect(watchSyncCoordinator) {
-        if (watchSyncCoordinator != null) {
-            isWatchCompanionActive = watchSyncCoordinator.isCompanionActive()
+    LaunchedEffect(companionSyncCoordinator) {
+        companionDisplayName = companionSyncCoordinator?.companionDisplayName ?: "Watch"
+        if (companionSyncCoordinator != null) {
+            isCompanionActive = companionSyncCoordinator.isCompanionActive()
         }
     }
 
@@ -205,7 +209,7 @@ fun SettingsScreen(
                 }
             }
 
-            if (watchSyncCoordinator != null) {
+            if (companionSyncCoordinator != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -214,15 +218,15 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Watch Sync",
+                            text = "Companion Sync",
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            text = if (isWatchCompanionActive) {
-                                "Watch companion is active."
+                            text = if (isCompanionActive) {
+                                "$companionDisplayName companion is active."
                             } else {
-                                "Watch companion is not active."
+                                "$companionDisplayName companion is not active."
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -231,56 +235,56 @@ fun SettingsScreen(
                         Button(
                             onClick = {
                                 if (twoFacLib != null && !twoFacLib.isUnlocked()) {
-                                    pendingAction = BackupAction.SYNC_WATCH
+                                    pendingAction = BackupAction.SYNC_COMPANION
                                     return@Button
                                 }
                                 coroutineScope.launch {
                                     try {
-                                        isWatchSyncInProgress = true
-                                        val synced = watchSyncCoordinator.syncNow(manual = true)
+                                        isCompanionSyncInProgress = true
+                                        val synced = companionSyncCoordinator.syncNow(manual = true)
                                         if (synced) {
-                                            snackbarHostState.showSnackbar("Sync sent to watch")
+                                            snackbarHostState.showSnackbar("Sync sent to $companionDisplayName")
                                         } else {
-                                            snackbarHostState.showSnackbar("Unable to sync to watch right now")
+                                            snackbarHostState.showSnackbar("Unable to sync to $companionDisplayName right now")
                                         }
-                                        isWatchCompanionActive = watchSyncCoordinator.isCompanionActive()
+                                        isCompanionActive = companionSyncCoordinator.isCompanionActive()
                                     } finally {
-                                        isWatchSyncInProgress = false
+                                        isCompanionSyncInProgress = false
                                     }
                                 }
                             },
-                            enabled = isSyncToWatchEnabled(
-                                isCompanionActive = isWatchCompanionActive,
-                                isSyncInProgress = isWatchSyncInProgress,
+                            enabled = isSyncToCompanionEnabled(
+                                isCompanionActive = isCompanionActive,
+                                isSyncInProgress = isCompanionSyncInProgress,
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Sync to Watch")
+                            Text("Sync to $companionDisplayName")
                         }
                         OutlinedButton(
                             onClick = {
                                 coroutineScope.launch {
                                     try {
-                                        isWatchDiscoveryInProgress = true
-                                        isWatchCompanionActive =
-                                            watchSyncCoordinator.forceDiscoverCompanion()
-                                        val message = if (isWatchCompanionActive) {
-                                            "Watch app discovered"
+                                        isCompanionDiscoveryInProgress = true
+                                        isCompanionActive =
+                                            companionSyncCoordinator.forceDiscoverCompanion()
+                                        val message = if (isCompanionActive) {
+                                            "$companionDisplayName companion discovered"
                                         } else {
-                                            "Unable to discover watch app"
+                                            "Unable to discover $companionDisplayName companion"
                                         }
                                         snackbarHostState.showSnackbar(message)
                                     } finally {
-                                        isWatchDiscoveryInProgress = false
+                                        isCompanionDiscoveryInProgress = false
                                     }
                                 }
                             },
-                            enabled = !isWatchSyncInProgress && !isWatchDiscoveryInProgress,
+                            enabled = !isCompanionSyncInProgress && !isCompanionDiscoveryInProgress,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 8.dp)
                         ) {
-                            Text("Force Discover Watch App")
+                            Text("Force Discover Companion")
                         }
                     }
                 }
@@ -336,36 +340,36 @@ fun SettingsScreen(
                                 }
                                 snackbarHostState.showSnackbar(message)
                                 if (result is BackupResult.Success) {
-                                    watchSyncCoordinator?.onAccountsChanged()
+                                    companionSyncCoordinator?.onAccountsChanged()
                                 }
                                 pendingAction = null
                             }
 
-                            BackupAction.SYNC_WATCH -> {
-                                if (watchSyncCoordinator == null || twoFacLib == null) {
-                                    snackbarHostState.showSnackbar("Watch sync is unavailable")
+                            BackupAction.SYNC_COMPANION -> {
+                                if (companionSyncCoordinator == null || twoFacLib == null) {
+                                    snackbarHostState.showSnackbar("Companion sync is unavailable")
                                     pendingAction = null
                                     return@launch
                                 }
                                 val hasAccounts = twoFacLib.getAllAccounts().isNotEmpty()
                                 if (!hasAccounts) {
-                                    snackbarHostState.showSnackbar("No accounts to sync to watch")
+                                    snackbarHostState.showSnackbar("No accounts to sync to $companionDisplayName")
                                     pendingAction = null
                                     return@launch
                                 }
                                 try {
-                                    isWatchSyncInProgress = true
-                                    val synced = watchSyncCoordinator.syncNow(manual = true)
+                                    isCompanionSyncInProgress = true
+                                    val synced = companionSyncCoordinator.syncNow(manual = true)
                                     val message = if (synced) {
-                                        "Sync sent to watch"
+                                        "Sync sent to $companionDisplayName"
                                     } else {
-                                        "Unable to sync to watch right now"
+                                        "Unable to sync to $companionDisplayName right now"
                                     }
                                     snackbarHostState.showSnackbar(message)
-                                    isWatchCompanionActive =
-                                        watchSyncCoordinator.isCompanionActive()
+                                    isCompanionActive =
+                                        companionSyncCoordinator.isCompanionActive()
                                 } finally {
-                                    isWatchSyncInProgress = false
+                                    isCompanionSyncInProgress = false
                                 }
                                 pendingAction = null
                             }

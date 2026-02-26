@@ -14,13 +14,13 @@ import kotlinx.coroutines.launch
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.session.SessionManager
-import tech.arnav.twofac.wear.WatchSyncCoordinator
+import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class AccountsViewModel(
     private val twoFacLib: TwoFacLib,
-    private val watchSyncCoordinator: WatchSyncCoordinator? = null,
+    private val companionSyncCoordinator: CompanionSyncCoordinator? = null,
     private val sessionManager: SessionManager? = null,
 ) : ViewModel() {
 
@@ -104,7 +104,7 @@ class AccountsViewModel(
                 val accountOtpList = twoFacLib.getAllAccountOTPs()
                 _accountOtps.value = accountOtpList
                 _accounts.value = accountOtpList.map { it.first }
-                watchSyncCoordinator?.onAccountsUnlocked()
+                companionSyncCoordinator?.onAccountsUnlocked()
 
                 // Persist the passkey for session auto-unlock (if the user opted in)
                 if (passkey != null) {
@@ -133,7 +133,7 @@ class AccountsViewModel(
                 }
                 val success = twoFacLib.addAccount(uri)
                 if (success) {
-                    watchSyncCoordinator?.onAccountsChanged()
+                    companionSyncCoordinator?.onAccountsChanged()
                     loadAccounts()
                 } else {
                     _error.value = "Failed to add account"

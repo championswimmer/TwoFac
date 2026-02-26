@@ -7,6 +7,9 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import tech.arnav.twofac.companion.CompanionSyncCoordinator
+import tech.arnav.twofac.companion.CompanionSyncSourceAccount
+import tech.arnav.twofac.companion.buildCompanionSyncSnapshot
 import tech.arnav.twofac.lib.TwoFacLib
 import java.util.concurrent.TimeUnit
 import kotlin.time.Clock
@@ -16,7 +19,9 @@ class AndroidWatchSyncCoordinator(
     private val appContext: Context,
     private val twoFacLib: TwoFacLib,
     private val dataLayerClient: WearSyncDataLayerClient,
-) : WatchSyncCoordinator {
+) : CompanionSyncCoordinator {
+
+    override val companionDisplayName: String = "Wear OS Watch"
 
     override suspend fun isCompanionActive(): Boolean {
         return runCatching { dataLayerClient.hasReachableWatchCompanion() }.getOrDefault(false)
@@ -43,13 +48,13 @@ class AndroidWatchSyncCoordinator(
         }
         val uris = twoFacLib.exportAccountURIs()
         val sourceAccounts = accounts.zip(uris).map { (account, uri) ->
-            WatchSyncSourceAccount(
+            CompanionSyncSourceAccount(
                 accountId = account.accountID,
                 accountLabel = account.accountLabel,
                 otpAuthUri = uri,
             )
         }
-        val snapshot = buildWatchSyncSnapshot(
+        val snapshot = buildCompanionSyncSnapshot(
             sourceAccounts = sourceAccounts,
             generatedAtEpochSec = Clock.System.now().epochSeconds,
         )

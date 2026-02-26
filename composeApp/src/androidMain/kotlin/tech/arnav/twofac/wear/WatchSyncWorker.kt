@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import org.koin.core.context.GlobalContext
+import tech.arnav.twofac.companion.CompanionSyncCoordinator
 
 class WatchSyncWorker(
     appContext: Context,
@@ -11,7 +12,7 @@ class WatchSyncWorker(
 ) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         val coordinator =
-            runCatching { GlobalContext.get().get<WatchSyncCoordinator>() }.getOrNull()
+            runCatching { GlobalContext.get().get<CompanionSyncCoordinator>() }.getOrNull()
             ?: return Result.success()
         return runCatching {
             coordinator.syncNow(manual = false)

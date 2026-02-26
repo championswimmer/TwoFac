@@ -21,9 +21,9 @@ Plans are stored in markdown files with the following format:
 name: Plan Name
 status: Planned # Planned, In Progress, Completed
 progress:
-  - [ ] Task 1 # mark with [x] when done
-  - [ ] Task 2
-  - [ ] Task 3
+  - "[ ] Task 1" # mark with [x] when done
+  - "[ ] Task 2"
+  - "[ ] Task 3"
 ---
 
 # Plan Name

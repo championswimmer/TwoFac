@@ -6,6 +6,7 @@ import tech.arnav.twofac.lib.storage.Storage
 import tech.arnav.twofac.storage.FileStorage
 import tech.arnav.twofac.storage.createAccountsStore
 import tech.arnav.twofac.viewmodels.AccountsViewModel
+import tech.arnav.twofac.companion.CompanionSyncCoordinator
 
 val storageModule = module {
     single<Storage> {
@@ -23,7 +24,7 @@ val viewModelModule = module {
     single<AccountsViewModel> {
         AccountsViewModel(
             twoFacLib = get(),
-            watchSyncCoordinator = getOrNull(),
+            companionSyncCoordinator = getOrNull<CompanionSyncCoordinator>(),
             sessionManager = getOrNull(),
         )
     }

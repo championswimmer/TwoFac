@@ -1,5 +1,8 @@
 package tech.arnav.twofac.wear
 
+import tech.arnav.twofac.companion.CompanionSyncSourceAccount
+import tech.arnav.twofac.companion.buildCompanionSyncSnapshot
+import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -9,9 +12,9 @@ import kotlin.test.assertTrue
 class WatchSyncCoordinatorTest {
     @Test
     fun testBuildWatchSyncSnapshotMapsIssuerWhenUriValid() {
-        val snapshot = buildWatchSyncSnapshot(
+        val snapshot = buildCompanionSyncSnapshot(
             sourceAccounts = listOf(
-                WatchSyncSourceAccount(
+                CompanionSyncSourceAccount(
                     accountId = "acc-1",
                     accountLabel = "user@example.com",
                     otpAuthUri = "otpauth://totp/GitHub:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub",
@@ -26,9 +29,9 @@ class WatchSyncCoordinatorTest {
 
     @Test
     fun testBuildWatchSyncSnapshotKeepsNullIssuerWhenUriInvalid() {
-        val snapshot = buildWatchSyncSnapshot(
+        val snapshot = buildCompanionSyncSnapshot(
             sourceAccounts = listOf(
-                WatchSyncSourceAccount(
+                CompanionSyncSourceAccount(
                     accountId = "acc-1",
                     accountLabel = "user@example.com",
                     otpAuthUri = "invalid-uri",
@@ -42,8 +45,8 @@ class WatchSyncCoordinatorTest {
 
     @Test
     fun testIsSyncToWatchEnabledRequiresActiveCompanionAndIdleState() {
-        assertTrue(isSyncToWatchEnabled(isCompanionActive = true, isSyncInProgress = false))
-        assertFalse(isSyncToWatchEnabled(isCompanionActive = false, isSyncInProgress = false))
-        assertFalse(isSyncToWatchEnabled(isCompanionActive = true, isSyncInProgress = true))
+        assertTrue(isSyncToCompanionEnabled(isCompanionActive = true, isSyncInProgress = false))
+        assertFalse(isSyncToCompanionEnabled(isCompanionActive = false, isSyncInProgress = false))
+        assertFalse(isSyncToCompanionEnabled(isCompanionActive = true, isSyncInProgress = true))
     }
 }
