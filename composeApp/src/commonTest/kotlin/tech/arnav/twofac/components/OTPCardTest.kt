@@ -7,12 +7,12 @@ import kotlin.test.assertTrue
 class OTPCardTest {
     @Test
     fun testHasTotpIntervalChangedReturnsFalseWithinSameWindow() {
-        assertFalse(hasTotpIntervalChanged(previousEpochSeconds = 100L, currentEpochSeconds = 129L, intervalSeconds = 30L))
+        assertFalse(hasTotpIntervalChanged(previousEpochSeconds = 100L, currentEpochSeconds = 119L, intervalSeconds = 30L))
     }
 
     @Test
     fun testHasTotpIntervalChangedReturnsTrueAcrossWindowBoundary() {
-        assertTrue(hasTotpIntervalChanged(previousEpochSeconds = 129L, currentEpochSeconds = 130L, intervalSeconds = 30L))
+        assertTrue(hasTotpIntervalChanged(previousEpochSeconds = 119L, currentEpochSeconds = 120L, intervalSeconds = 30L))
     }
 
     @Test
