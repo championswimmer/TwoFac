@@ -9,7 +9,7 @@ This is what each module is for:
 
 ## Environment Setup
 
-The project uses a `.copilot/setup.sh` script to pre-configure the Copilot environment with:
+The project uses `.github/workflows/copilot-setup-steps.yml` to pre-configure the Copilot environment with:
 
 - **JDK 21** (Temurin distribution) - matches the version used in GitHub Actions
 - **Node.js 22** - required for Web/Wasm builds
