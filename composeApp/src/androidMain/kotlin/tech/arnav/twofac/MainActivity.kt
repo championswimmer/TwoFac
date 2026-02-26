@@ -14,7 +14,8 @@ class MainActivity : FragmentActivity() {
         private var currentActivity: WeakReference<FragmentActivity>? = null
 
         fun currentActivityOrThrow(): FragmentActivity {
-            return requireNotNull(currentActivity?.get()) { "MainActivity is not available" }
+            val activityRef = currentActivity
+            return requireNotNull(activityRef?.get()) { "No active FragmentActivity available for biometric prompt" }
         }
     }
 

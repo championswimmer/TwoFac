@@ -30,6 +30,7 @@ class AndroidBiometricSessionManager(
         private const val KEY_ENCRYPTED_PASSKEY = "encrypted_passkey"
         private const val KEY_PASSKEY_IV = "passkey_iv"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+        // After a successful biometric prompt, the key remains usable for this duration.
         private const val AUTH_VALIDITY_SECONDS = 15 * 60
     }
 
@@ -74,8 +75,8 @@ class AndroidBiometricSessionManager(
                 .putString(KEY_ENCRYPTED_PASSKEY, Base64.encodeToString(encrypted, Base64.NO_WRAP))
                 .putString(KEY_PASSKEY_IV, Base64.encodeToString(iv, Base64.NO_WRAP))
                 .apply()
-        } catch (_: Exception) {
-            Log.w(TAG, "Failed to save passkey in biometric session storage")
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to save passkey in biometric session storage", e)
             clearPasskey()
         }
     }
@@ -111,8 +112,8 @@ class AndroidBiometricSessionManager(
                         val encrypted = Base64.decode(encryptedBase64, Base64.NO_WRAP)
                         val decrypted = resultCipher.doFinal(encrypted)
                         continuation.resume(String(decrypted))
-                    } catch (_: Exception) {
-                        Log.w(TAG, "Failed to decrypt passkey after biometric auth")
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed to decrypt passkey after biometric auth", e)
                         clearPasskey()
                         continuation.resume(null)
                     }
@@ -136,8 +137,8 @@ class AndroidBiometricSessionManager(
                 callback,
             )
             biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
-        } catch (_: Exception) {
-            Log.w(TAG, "Biometric prompt/decrypt setup failed")
+        } catch (e: Exception) {
+            Log.w(TAG, "Biometric prompt/decrypt setup failed", e)
             clearPasskey()
             continuation.resume(null)
         }
@@ -175,7 +176,8 @@ class AndroidBiometricSessionManager(
             val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
             keyStore.load(null)
             keyStore.deleteEntry(KEYSTORE_ALIAS)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to delete biometric key", e)
         }
     }
 }
