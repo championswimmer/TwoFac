@@ -57,8 +57,8 @@
 
 ```
 TwoFac/
-├── sharedLib/    # Core 2FA library (Kotlin Multiplatform)
-├── cliApp/       # Command-line application (Native targets)
+├── sharedLib/    # Shared 2FA library (TOTP/HOTP, crypto, storage)
+├── cliApp/       # CLI application (Clikt-based, native binaries)
 ├── composeApp/   # Compose Multiplatform UI application
 ├── watchApp/     # Wear OS app
 └── iosApp/       # iOS application wrapper
