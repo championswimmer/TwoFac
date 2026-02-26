@@ -12,6 +12,8 @@
 [![Windows](https://img.shields.io/badge/Windows-10%2B-0078D4.svg?logo=windows)](https://www.microsoft.com/windows/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%2B-E95420.svg?logo=ubuntu)](https://ubuntu.com/)
 [![Web](https://img.shields.io/badge/platform-web-F7DF1E.svg?logo=webassembly)](https://webassembly.org/)
+[![Chrome Extension](https://img.shields.io/badge/Chrome%20Extension-119%2B-4285F4.svg?logo=googlechrome)](https://developer.chrome.com/docs/extensions/)
+[![Firefox Extension](https://img.shields.io/badge/Firefox%20Extension-120%2B-FF7139.svg?logo=firefoxbrowser)](https://extensionworkshop.com/)
 [![CLI macOS](https://img.shields.io/badge/CLI-macOS-000000.svg?logo=apple)](https://www.apple.com/macos/)
 [![CLI Windows](https://img.shields.io/badge/CLI-Windows-0078D4.svg?logo=windows)](https://www.microsoft.com/windows/)
 [![CLI Linux](https://img.shields.io/badge/CLI-Linux-4EAA25.svg?logo=gnubash)](https://en.wikipedia.org/wiki/Command-line_interface)
@@ -42,5 +44,4 @@
 
 - **[Importing from Other Apps](docs/IMPORTING.md)** - Guide to importing 2FA secrets from Authy, 2FAS, Ente Auth, and other authenticator apps
 - **[Development Guide](DEVELOPMENT.md)** - Setup, building, and contributing to the project
-
 
