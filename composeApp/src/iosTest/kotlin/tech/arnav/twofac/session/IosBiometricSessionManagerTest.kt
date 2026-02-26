@@ -5,6 +5,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -18,6 +19,8 @@ class IosBiometricSessionManagerTest {
     }
 
     private fun <T> runSuspend(block: suspend () -> T): T {
+        // This helper is used only for tests where the suspend function returns immediately
+        // (without asynchronous callbacks). It intentionally avoids adding coroutine test deps.
         var result: Result<T>? = null
         block.startCoroutine(
             object : Continuation<T> {
@@ -27,7 +30,9 @@ class IosBiometricSessionManagerTest {
                 }
             }
         )
-        return result!!.getOrThrow()
+        return requireNotNull(result) {
+            "Suspend block did not complete synchronously in this test helper"
+        }.getOrThrow()
     }
 
     @Test
@@ -56,16 +61,28 @@ class IosBiometricSessionManagerTest {
     }
 
     @Test
-    fun biometricDisableKeepsBiometricFlagOff() {
+    fun rememberEnabledWithoutBiometricCanRoundTripPasskey() {
+        val manager = createManager()
+        manager.setBiometricEnabled(false)
+        manager.setRememberPasskey(true)
+
+        manager.savePasskey("test-passkey")
+
+        assertEquals("test-passkey", runSuspend { manager.getSavedPasskey() })
+    }
+
+    @Test
+    fun setBiometricEnabledWithFalseKeepsBiometricDisabled() {
         val manager = createManager()
         manager.setBiometricEnabled(false)
         assertFalse(manager.isBiometricEnabled())
     }
 
     @Test
-    fun biometricAvailabilityMethodIsCallable() {
+    fun biometricEnablementRespectsAvailability() {
         val manager = createManager()
         val availability = manager.isBiometricAvailable()
-        assertTrue(availability || !availability)
+        manager.setBiometricEnabled(true)
+        assertEquals(availability, manager.isBiometricEnabled())
     }
 }

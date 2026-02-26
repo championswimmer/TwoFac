@@ -21,6 +21,7 @@ import platform.Security.errSecSuccess
 import platform.Security.kSecAccessControlBiometryCurrentSet
 import platform.Security.kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 import platform.Security.kSecAttrAccessControl
+import platform.Security.kSecAttrAccessible
 import platform.Security.kSecAttrAccount
 import platform.Security.kSecAttrService
 import platform.Security.kSecClass
@@ -78,40 +79,53 @@ class IosBiometricSessionManager(
     }
 
     override suspend fun getSavedPasskey(): String? {
-        if (!isRememberPasskeyEnabled() || !isBiometricEnabled()) return null
-        return authenticateAndRetrieve()
+        if (!isRememberPasskeyEnabled()) return null
+        return if (isBiometricEnabled()) {
+            authenticateAndRetrieve()
+        } else {
+            readFromKeychain()
+        }
     }
 
     override fun savePasskey(passkey: String) {
         if (!isRememberPasskeyEnabled()) return
-        saveToKeychain(passkey)
+        saveToKeychain(passkey, requireBiometric = isBiometricEnabled())
     }
 
     override fun clearPasskey() {
         deleteFromKeychain()
     }
 
-    private fun saveToKeychain(passkey: String) {
+    private fun saveToKeychain(passkey: String, requireBiometric: Boolean) {
         deleteFromKeychain()
 
-        val passkeyData = (passkey as NSString).dataUsingEncoding(NSUTF8StringEncoding) ?: return
+        val passkeyData = NSString.create(string = passkey).dataUsingEncoding(NSUTF8StringEncoding) ?: return
+        val query = if (requireBiometric) {
+            val accessControl = SecAccessControlCreateWithFlags(
+                allocator = kCFAllocatorDefault,
+                protection = kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+                flags = kSecAccessControlBiometryCurrentSet,
+                error = null,
+            ) ?: return
+            mapOf<Any?, Any?>(
+                kSecClass to kSecClassGenericPassword,
+                kSecAttrService to SERVICE_NAME,
+                kSecAttrAccount to PASSKEY_ACCOUNT,
+                kSecValueData to passkeyData,
+                kSecAttrAccessControl to accessControl,
+            )
+        } else {
+            mapOf<Any?, Any?>(
+                kSecClass to kSecClassGenericPassword,
+                kSecAttrService to SERVICE_NAME,
+                kSecAttrAccount to PASSKEY_ACCOUNT,
+                kSecValueData to passkeyData,
+                kSecAttrAccessible to kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+            )
+        }
 
-        val accessControl = SecAccessControlCreateWithFlags(
-            allocator = kCFAllocatorDefault,
-            protection = kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-            flags = kSecAccessControlBiometryCurrentSet,
-            error = null,
-        ) ?: return
-
-        val query = mapOf<Any?, Any?>(
-            kSecClass to kSecClassGenericPassword,
-            kSecAttrService to SERVICE_NAME,
-            kSecAttrAccount to PASSKEY_ACCOUNT,
-            kSecValueData to passkeyData,
-            kSecAttrAccessControl to accessControl,
-        )
-
-        SecItemAdd(query as CFDictionaryRef, null)
+        val status = SecItemAdd(query as CFDictionaryRef, null)
+        if (status != errSecSuccess) return
     }
 
     private fun deleteFromKeychain() {
@@ -144,15 +158,16 @@ class IosBiometricSessionManager(
         }
     }
 
-    private fun readFromKeychain(context: LAContext): String? {
+    private fun readFromKeychain(context: LAContext? = null): String? {
         val query = mapOf<Any?, Any?>(
             kSecClass to kSecClassGenericPassword,
             kSecAttrService to SERVICE_NAME,
             kSecAttrAccount to PASSKEY_ACCOUNT,
             kSecReturnData to kCFBooleanTrue,
             kSecMatchLimit to kSecMatchLimitOne,
-            kSecUseAuthenticationContext to context,
-        )
+        ) + listOfNotNull(
+            context?.let { kSecUseAuthenticationContext to it }
+        ).toMap()
 
         memScoped {
             val result = alloc<CFTypeRefVar>()
