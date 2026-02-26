@@ -1,3 +1,11 @@
+---
+task: Create watchOS companion app
+status: In Progress
+progress:
+- [x] Add watchOS app target in `iosApp` Xcode project
+- [ ] iOS <> watchOS connectivity layer (iOS side)
+- [ ] watchOS app UI
+---
 # TwoFac watchOS Companion App Plan (SwiftUI + TwoFacKit)
 
 ## Goal

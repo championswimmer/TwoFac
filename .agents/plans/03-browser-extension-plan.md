@@ -1,3 +1,7 @@
+---
+task: Create Browser Extensions for Chrome and Firefox
+status: In Progress
+---
 # Browser Extension Packaging Plan (Chrome + Firefox)
 
 ## Goal
