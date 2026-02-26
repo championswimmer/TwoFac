@@ -43,5 +43,42 @@
 ## Documentation
 
 - **[Importing from Other Apps](docs/IMPORTING.md)** - Guide to importing 2FA secrets from Authy, 2FAS, Ente Auth, and other authenticator apps
-- **[Development Guide](DEVELOPMENT.md)** - Setup, building, and contributing to the project
+- **[Development Guide](#development)** - Setup, building, and running the project
 
+## Development
+
+### Prerequisites
+
+- **JDK 17+** (recommended: JDK 21)
+- **Android SDK** (if building Android targets)
+- **Xcode** (if building iOS targets on macOS)
+- **Native toolchains** for your platform (GCC/Clang for Linux, MSVC for Windows)
+
+### Project structure
+
+```
+TwoFac/
+├── sharedLib/    # Shared 2FA library (TOTP/HOTP, crypto, storage)
+├── cliApp/       # CLI application (Clikt-based, native binaries)
+├── composeApp/   # Compose Multiplatform UI application
+├── watchApp/     # Wear OS app
+└── iosApp/       # iOS application wrapper
+```
+
+### Common commands
+
+```bash
+# Baseline checks
+./gradlew check
+
+# Module tests
+./gradlew :sharedLib:test
+./gradlew :cliApp:test
+./gradlew :composeApp:test
+
+# Run desktop app
+./gradlew :composeApp:run
+
+# Run web app
+./gradlew :composeApp:wasmJsBrowserDevelopmentRun
+```
