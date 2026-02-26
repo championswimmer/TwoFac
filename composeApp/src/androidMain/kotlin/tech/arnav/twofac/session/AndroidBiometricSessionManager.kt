@@ -4,6 +4,7 @@ import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import android.util.Log
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -22,6 +23,7 @@ class AndroidBiometricSessionManager(
 ) : SessionManager {
 
     companion object {
+        private const val TAG = "AndroidBiometricSession"
         private const val KEYSTORE_ALIAS = "twofac_biometric_key"
         private const val PREFS_NAME = "twofac_session_prefs"
         private const val KEY_REMEMBER_ENABLED = "remember_passkey_enabled"
@@ -73,6 +75,7 @@ class AndroidBiometricSessionManager(
                 .putString(KEY_PASSKEY_IV, Base64.encodeToString(iv, Base64.NO_WRAP))
                 .apply()
         } catch (_: Exception) {
+            Log.w(TAG, "Failed to save passkey in biometric session storage")
             clearPasskey()
         }
     }
@@ -109,6 +112,7 @@ class AndroidBiometricSessionManager(
                         val decrypted = resultCipher.doFinal(encrypted)
                         continuation.resume(String(decrypted))
                     } catch (_: Exception) {
+                        Log.w(TAG, "Failed to decrypt passkey after biometric auth")
                         clearPasskey()
                         continuation.resume(null)
                     }
@@ -133,6 +137,7 @@ class AndroidBiometricSessionManager(
             )
             biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
         } catch (_: Exception) {
+            Log.w(TAG, "Biometric prompt/decrypt setup failed")
             clearPasskey()
             continuation.resume(null)
         }
