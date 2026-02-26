@@ -140,6 +140,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation("androidx.biometric:biometric:1.4.0-alpha05")
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.play.services.wearable)
             implementation(libs.kstore.file)
@@ -171,6 +172,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = rootProject.extra["appVersionCode"] as Int
         versionName = rootProject.extra["appVersionName"] as String
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
@@ -190,6 +192,8 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    androidTestImplementation(libs.androidx.testExt.junit)
+    androidTestImplementation(libs.androidx.core)
 }
 
 val appVersionName = rootProject.extra["appVersionName"] as String

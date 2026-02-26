@@ -1,8 +1,11 @@
 package tech.arnav.twofac.di
 
 import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import org.koin.dsl.module
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
+import tech.arnav.twofac.session.AndroidBiometricSessionManager
+import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.wear.AndroidWatchSyncCoordinator
 import tech.arnav.twofac.wear.WearSyncDataLayerClient
 
@@ -14,6 +17,18 @@ fun androidWearSyncModule(appContext: Context) = module {
             appContext = get(),
             twoFacLib = get(),
             dataLayerClient = get(),
+        )
+    }
+}
+
+fun androidBiometricModule(
+    appContext: Context,
+    activityProvider: () -> FragmentActivity,
+) = module {
+    single<SessionManager> {
+        AndroidBiometricSessionManager(
+            context = appContext,
+            activityProvider = activityProvider,
         )
     }
 }
