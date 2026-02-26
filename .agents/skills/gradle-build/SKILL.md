@@ -1,10 +1,10 @@
 ---
-name: Gradle Verify Commands
-description: Use Gradle commands to quickly validate the impact of changes in the codebase.
+name: Gradle Build Commands
+description: Use Gradle commands to build and run the app by platform.
 ---
-# Skill: Gradle Verify Commands
+# Skill: Gradle Build Commands
 
-Use these commands to validate likely impact quickly.
+Use these commands to build and run the app by platform.
 
 ## Common checks
 
