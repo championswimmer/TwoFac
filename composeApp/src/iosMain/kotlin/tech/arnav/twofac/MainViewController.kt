@@ -1,11 +1,15 @@
 package tech.arnav.twofac
 
 import androidx.compose.ui.window.ComposeUIViewController
+import tech.arnav.twofac.di.iosBiometricModule
 import tech.arnav.twofac.di.iosCompanionSyncModule
 
 fun MainViewController() = ComposeUIViewController {
     initKoin {
-        modules(iosCompanionSyncModule())
+        modules(
+            iosCompanionSyncModule(),
+            iosBiometricModule,
+        )
     }
     App()
 }

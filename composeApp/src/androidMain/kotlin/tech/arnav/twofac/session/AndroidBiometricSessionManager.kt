@@ -20,7 +20,7 @@ import kotlin.coroutines.suspendCoroutine
 class AndroidBiometricSessionManager(
     private val context: Context,
     private val activityProvider: () -> FragmentActivity,
-) : SessionManager {
+) : BiometricSessionManager {
 
     companion object {
         private const val TAG = "AndroidBiometricSession"
@@ -45,6 +45,18 @@ class AndroidBiometricSessionManager(
     }
 
     override fun setRememberPasskey(enabled: Boolean) {
+        setRememberEnabled(enabled)
+    }
+
+    override fun isBiometricEnabled(): Boolean {
+        return prefs.getBoolean(KEY_REMEMBER_ENABLED, false) && isBiometricAvailable()
+    }
+
+    override fun setBiometricEnabled(enabled: Boolean) {
+        setRememberEnabled(enabled && isBiometricAvailable())
+    }
+
+    private fun setRememberEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_REMEMBER_ENABLED, enabled).apply()
         if (!enabled) {
             clearPasskey()
@@ -88,7 +100,7 @@ class AndroidBiometricSessionManager(
             .apply()
     }
 
-    private fun isBiometricAvailable(): Boolean {
+    override fun isBiometricAvailable(): Boolean {
         val biometricManager = BiometricManager.from(context)
         return biometricManager.canAuthenticate(
             BiometricManager.Authenticators.BIOMETRIC_STRONG

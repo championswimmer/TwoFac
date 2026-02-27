@@ -4,5 +4,7 @@
     <dict>
         <key>CADisableMinimumFrameDurationOnPhone</key>
         <true/>
+        <key>NSFaceIDUsageDescription</key>
+        <string>TwoFac uses Face ID to securely unlock your 2FA codes without entering a passkey.</string>
     </dict>
 </plist>
