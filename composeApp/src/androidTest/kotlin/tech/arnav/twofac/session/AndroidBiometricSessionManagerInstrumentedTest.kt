@@ -26,6 +26,9 @@ class AndroidBiometricSessionManagerInstrumentedTest {
             }
 
             assertTrue(manager.isAvailable())
+            manager.isBiometricAvailable()
+            manager.setBiometricEnabled(false)
+            assertFalse(manager.isBiometricEnabled())
             manager.setRememberPasskey(false)
             assertFalse(manager.isRememberPasskeyEnabled())
 
