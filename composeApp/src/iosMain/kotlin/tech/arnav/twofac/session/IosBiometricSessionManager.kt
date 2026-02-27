@@ -96,6 +96,12 @@ class IosBiometricSessionManager(
         deleteFromKeychain()
     }
 
+    override suspend fun enrollPasskey(passkey: String): Boolean {
+        if (!isBiometricAvailable()) return false
+        saveToKeychain(passkey, requireBiometric = true)
+        return true
+    }
+
     private fun saveToKeychain(passkey: String, requireBiometric: Boolean) {
         deleteFromKeychain()
 

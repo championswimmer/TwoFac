@@ -2,6 +2,8 @@ package tech.arnav.twofac.wear
 
 import android.content.Context
 import android.util.Log
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.CapabilityClient
@@ -19,10 +21,24 @@ import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshotCodec
 class WearSyncDataLayerClient(context: Context) {
     private val appContext = context.applicationContext
 
-    val dataClient: DataClient = Wearable.getDataClient(appContext)
-    val messageClient: MessageClient = Wearable.getMessageClient(appContext)
-    val capabilityClient: CapabilityClient = Wearable.getCapabilityClient(appContext)
-    val nodeClient = Wearable.getNodeClient(appContext)
+    /** Whether the Wearable API is available on this device. */
+    val isAvailable: Boolean by lazy {
+        val result = GoogleApiAvailability.getInstance()
+            .isGooglePlayServicesAvailable(appContext, /* minApkVersion = */ 0)
+        if (result != ConnectionResult.SUCCESS) {
+            Log.d(TAG, "Google Play Services not available (code=$result), Wearable API disabled.")
+            return@lazy false
+        }
+        // Try to touch the Wearable API — if it throws, the device lacks Wear support
+        runCatching { Wearable.getNodeClient(appContext) }
+            .onFailure { Log.d(TAG, "Wearable API not available on this device.", it) }
+            .isSuccess
+    }
+
+    val dataClient: DataClient by lazy { Wearable.getDataClient(appContext) }
+    val messageClient: MessageClient by lazy { Wearable.getMessageClient(appContext) }
+    val capabilityClient: CapabilityClient by lazy { Wearable.getCapabilityClient(appContext) }
+    val nodeClient by lazy { Wearable.getNodeClient(appContext) }
 
     fun getReachableWatchNodes(): Task<Set<Node>> {
         return capabilityClient
@@ -36,6 +52,7 @@ class WearSyncDataLayerClient(context: Context) {
     }
 
     suspend fun hasReachableWatchCompanion(): Boolean = withContext(Dispatchers.IO) {
+        if (!isAvailable) return@withContext false
         val hasReachable = Tasks.await(getReachableWatchNodes()).isNotEmpty()
         if (!hasReachable) {
             logWatchAvailabilityIssue("sync")
@@ -44,6 +61,7 @@ class WearSyncDataLayerClient(context: Context) {
     }
 
     suspend fun forceDiscoverWatchCompanion(): Boolean = withContext(Dispatchers.IO) {
+        if (!isAvailable) return@withContext false
         val nodes = Tasks.await(
             capabilityClient.getCapability(
                 WatchSyncContract.WATCH_CAPABILITY,
@@ -72,6 +90,7 @@ class WearSyncDataLayerClient(context: Context) {
     }
 
     suspend fun publishSnapshot(snapshot: WatchSyncSnapshot, manual: Boolean): Boolean = withContext(Dispatchers.IO) {
+        if (!isAvailable) return@withContext false
         val dataRequest = PutDataMapRequest.create(WatchSyncContract.SNAPSHOT_DATA_PATH).run {
             dataMap.putByteArray(WatchSyncContract.SNAPSHOT_PAYLOAD_KEY, WatchSyncSnapshotCodec.encode(snapshot))
             dataMap.putLong(WatchSyncContract.SNAPSHOT_GENERATED_AT_KEY, snapshot.generatedAtEpochSec)

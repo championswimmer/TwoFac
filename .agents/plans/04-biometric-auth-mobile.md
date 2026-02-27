@@ -2,10 +2,10 @@
 task: Implement Biometric Authentication for Mobile Apps (Android & iOS)
 status: Not Started
 progress:
-  - "[ ] Phase 0 — Common SessionManager groundwork"
-  - "[ ] Phase 1 — Android BiometricSessionManager"
-  - "[ ] Phase 2 — iOS BiometricSessionManager"
-  - "[ ] Phase 3 — Shared UI for biometric opt-in"
+  - "[x] Phase 0 — Common SessionManager groundwork"
+  - "[x] Phase 1 — Android BiometricSessionManager"
+  - "[x] Phase 2 — iOS BiometricSessionManager"
+  - "[x] Phase 3 — Shared UI for biometric opt-in"
   - "[ ] Phase 4 — Testing and validation"
 ---
 # Biometric Authentication Plan (Android & iOS)
@@ -103,7 +103,7 @@ val wasmSessionModule = module {
 └──────────────────────────────────────────────────────────────┘
          ▲                              ▲
          │                              │
-┌────────┴────────────┐    ┌────────────┴──────────────┐
+┌────────┴────────────┐    ┌────────────┴───────────────┐
 │  androidMain        │    │  iosMain                   │
 │                     │    │                            │
 │  BiometricSession   │    │  BiometricSession          │
@@ -111,7 +111,7 @@ val wasmSessionModule = module {
 │                     │    │                            │
 │  Uses:              │    │  Uses:                     │
 │  • AndroidKeystore  │    │  • iOS Keychain            │
-│  • BiometricPrompt  │    │    (kSecAttrAccessControl   │
+│  • BiometricPrompt  │    │    (kSecAttrAccessControl  │
 │  • EncryptedShared  │    │     biometryCurrentSet)    │
 │    Preferences      │    │  • LAContext               │
 │                     │    │    (LocalAuthentication)   │
