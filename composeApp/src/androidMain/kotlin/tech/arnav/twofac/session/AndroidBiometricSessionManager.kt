@@ -41,15 +41,11 @@ class AndroidBiometricSessionManager(
     override fun isAvailable(): Boolean = true
 
     override fun isRememberPasskeyEnabled(): Boolean {
-        return isBiometricEnabled()
+        return prefs.getBoolean(KEY_REMEMBER_ENABLED, false) && isBiometricAvailable()
     }
 
     override fun setRememberPasskey(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_REMEMBER_ENABLED, enabled).apply()
-        if (!enabled) {
-            clearPasskey()
-            deleteKey()
-        }
+        setRememberEnabled(enabled)
     }
 
     override fun isBiometricEnabled(): Boolean {
@@ -57,7 +53,15 @@ class AndroidBiometricSessionManager(
     }
 
     override fun setBiometricEnabled(enabled: Boolean) {
-        setRememberPasskey(enabled)
+        setRememberEnabled(enabled && isBiometricAvailable())
+    }
+
+    private fun setRememberEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_REMEMBER_ENABLED, enabled).apply()
+        if (!enabled) {
+            clearPasskey()
+            deleteKey()
+        }
     }
 
     override suspend fun getSavedPasskey(): String? {
