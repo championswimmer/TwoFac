@@ -44,6 +44,7 @@
 
 - **[Importing from Other Apps](docs/IMPORTING.md)** - Guide to importing 2FA secrets from Authy, 2FAS, Ente Auth, and other authenticator apps
 - **[Development Guide](#development)** - Setup, building, and running the project
+- **[GitHub Copilot Setup](.github/workflows/copilot-setup-steps.yml)** - Pre-configured environment with Java 21, Node.js 22, and Gradle caching
 
 ## Development
 
