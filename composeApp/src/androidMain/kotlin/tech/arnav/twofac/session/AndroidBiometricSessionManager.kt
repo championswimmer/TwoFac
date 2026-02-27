@@ -89,7 +89,7 @@ class AndroidBiometricSessionManager(
                 .apply()
         } catch (e: Exception) {
             Log.w(TAG, "Failed to save passkey in biometric session storage", e)
-            clearPasskey()
+            // Don't clearPasskey() here in case enrollment data is still valid
         }
     }
 
@@ -105,6 +105,76 @@ class AndroidBiometricSessionManager(
         return biometricManager.canAuthenticate(
             BiometricManager.Authenticators.BIOMETRIC_STRONG
         ) == BiometricManager.BIOMETRIC_SUCCESS
+    }
+
+    override suspend fun enrollPasskey(passkey: String): Boolean {
+        if (!isBiometricAvailable()) return false
+
+        return try {
+            // Start fresh: delete old key and data
+            deleteKey()
+            clearPasskey()
+
+            // Create a new key
+            val key = getOrCreateKey()
+
+            // Prompt biometric to authenticate the time-based key
+            val authenticated = promptBiometric(
+                title = "Enable Biometric Unlock",
+                subtitle = "Authenticate to securely save your passkey",
+            )
+            if (!authenticated) return false
+
+            // Key is now authenticated for AUTH_VALIDITY_SECONDS — encrypt and save
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val encrypted = cipher.doFinal(passkey.toByteArray())
+            val iv = cipher.iv
+
+            prefs.edit()
+                .putString(KEY_ENCRYPTED_PASSKEY, Base64.encodeToString(encrypted, Base64.NO_WRAP))
+                .putString(KEY_PASSKEY_IV, Base64.encodeToString(iv, Base64.NO_WRAP))
+                .apply()
+
+            true
+        } catch (e: Exception) {
+            Log.w(TAG, "Biometric enrollment failed", e)
+            clearPasskey()
+            false
+        }
+    }
+
+    // ── Private helpers ──
+
+    private suspend fun promptBiometric(
+        title: String,
+        subtitle: String,
+    ): Boolean = suspendCoroutine { continuation ->
+        try {
+            val activity = activityProvider()
+            val executor = ContextCompat.getMainExecutor(context)
+
+            val callback = object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    continuation.resume(true)
+                }
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    continuation.resume(false)
+                }
+            }
+
+            val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle(title)
+                .setSubtitle(subtitle)
+                .setNegativeButtonText("Cancel")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                .build()
+
+            BiometricPrompt(activity, executor, callback).authenticate(promptInfo)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to show biometric prompt", e)
+            continuation.resume(false)
+        }
     }
 
     private suspend fun authenticateAndDecrypt(

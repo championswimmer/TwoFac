@@ -41,6 +41,7 @@ import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.BackupTransport
+import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.storage.getStoragePath
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
@@ -76,6 +77,12 @@ fun SettingsScreen(
     var isRememberPasskeyEnabled by remember {
         mutableStateOf(sessionManager?.isRememberPasskeyEnabled() ?: false)
     }
+    val biometricSessionManager = sessionManager as? BiometricSessionManager
+    var isBiometricEnabled by remember {
+        mutableStateOf(biometricSessionManager?.isBiometricEnabled() ?: false)
+    }
+    var showBiometricEnrollmentDialog by remember { mutableStateOf(false) }
+    var biometricEnrollmentError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(companionSyncCoordinator) {
         companionDisplayName = companionSyncCoordinator?.companionDisplayName ?: "Watch"
@@ -155,6 +162,10 @@ fun SettingsScreen(
                                 onCheckedChange = { enabled ->
                                     sessionManager.setRememberPasskey(enabled)
                                     isRememberPasskeyEnabled = enabled
+                                    if (!enabled) {
+                                        biometricSessionManager?.setBiometricEnabled(false)
+                                        isBiometricEnabled = false
+                                    }
                                 }
                             )
                         }
@@ -164,6 +175,41 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp)
                         )
+
+                        // Biometric unlock toggle — only shown when biometric hardware is available
+                        if (biometricSessionManager != null && biometricSessionManager.isBiometricAvailable()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Biometric Unlock",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Text(
+                                        text = "Use fingerprint or face recognition to unlock your vault",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                Switch(
+                                    checked = isBiometricEnabled,
+                                    onCheckedChange = { enabled ->
+                                        if (enabled) {
+                                            // Start enrollment flow: prompt for passkey first
+                                            showBiometricEnrollmentDialog = true
+                                        } else {
+                                            biometricSessionManager.setBiometricEnabled(false)
+                                            isBiometricEnabled = false
+                                        }
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -384,6 +430,46 @@ fun SettingsScreen(
             onDismiss = {
                 pendingAction = null
                 passkeyError = null
+            }
+        )
+    }
+
+    // Passkey dialog for biometric enrollment
+    if (showBiometricEnrollmentDialog && biometricSessionManager != null) {
+        PasskeyDialog(
+            isVisible = true,
+            isLoading = isLoading,
+            error = biometricEnrollmentError,
+            onPasskeySubmit = { passkey ->
+                biometricEnrollmentError = null
+                isLoading = true
+                coroutineScope.launch {
+                    try {
+                        // Verify passkey is correct
+                        twoFacLib?.unlock(passkey)
+                        // Enable biometric and enroll the passkey
+                        biometricSessionManager.setBiometricEnabled(true)
+                        sessionManager.setRememberPasskey(true)
+                        val enrolled = biometricSessionManager.enrollPasskey(passkey)
+                        if (enrolled) {
+                            isBiometricEnabled = true
+                            isRememberPasskeyEnabled = true
+                            showBiometricEnrollmentDialog = false
+                            snackbarHostState.showSnackbar("Biometric unlock enabled")
+                        } else {
+                            biometricSessionManager.setBiometricEnabled(false)
+                            biometricEnrollmentError = "Biometric enrollment cancelled"
+                        }
+                    } catch (e: Exception) {
+                        biometricEnrollmentError = e.message ?: "Failed to verify passkey"
+                    } finally {
+                        isLoading = false
+                    }
+                }
+            },
+            onDismiss = {
+                showBiometricEnrollmentDialog = false
+                biometricEnrollmentError = null
             }
         )
     }
