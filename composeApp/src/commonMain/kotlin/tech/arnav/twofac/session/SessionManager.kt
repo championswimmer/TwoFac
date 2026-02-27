@@ -52,15 +52,6 @@ interface SessionManager {
     /** Toggle the "remember passkey" preference. Disabling also clears any saved passkey. */
     fun setRememberPasskey(enabled: Boolean)
 
-    /** Whether biometric authentication is available on this platform/device. */
-    fun isBiometricAvailable(): Boolean = false
-
-    /** Whether biometric authentication is enabled by user preference. */
-    fun isBiometricEnabled(): Boolean = false
-
-    /** Toggle biometric authentication. */
-    fun setBiometricEnabled(enabled: Boolean) = Unit
-
     /** Return the previously saved passkey, or null if none is stored or the feature is disabled. */
     suspend fun getSavedPasskey(): String?
 

@@ -37,7 +37,7 @@ import kotlin.coroutines.suspendCoroutine
 @OptIn(ExperimentalForeignApi::class)
 class IosBiometricSessionManager(
     private val userDefaults: NSUserDefaults = NSUserDefaults.standardUserDefaults
-) : SessionManager {
+) : BiometricSessionManager {
 
     companion object {
         private const val SERVICE_NAME = "tech.arnav.twofac"
