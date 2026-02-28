@@ -17,8 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -33,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.ocnyang.compose_toast.Toast
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.getKoin
@@ -54,7 +53,6 @@ private enum class BackupAction { EXPORT, IMPORT, SYNC_COMPANION }
 fun SettingsScreen(
     onNavigateBack: () -> Unit
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     // Optional backup dependencies – only registered on platforms that support local file backup
@@ -102,7 +100,6 @@ fun SettingsScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -289,9 +286,9 @@ fun SettingsScreen(
                                         isCompanionSyncInProgress = true
                                         val synced = companionSyncCoordinator.syncNow(manual = true)
                                         if (synced) {
-                                            snackbarHostState.showSnackbar("Sync sent to $companionDisplayName")
+                                            Toast.showSuccess("Sync sent to $companionDisplayName")
                                         } else {
-                                            snackbarHostState.showSnackbar("Unable to sync to $companionDisplayName right now")
+                                            Toast.showWarning("Unable to sync to $companionDisplayName right now")
                                         }
                                         isCompanionActive = companionSyncCoordinator.isCompanionActive()
                                     } finally {
@@ -319,7 +316,7 @@ fun SettingsScreen(
                                         } else {
                                             "Unable to discover $companionDisplayName companion"
                                         }
-                                        snackbarHostState.showSnackbar(message)
+                                        if (isCompanionActive) Toast.showSuccess(message) else Toast.showWarning(message)
                                     } finally {
                                         isCompanionDiscoveryInProgress = false
                                     }
@@ -354,37 +351,35 @@ fun SettingsScreen(
                         when (action) {
                             BackupAction.EXPORT -> {
                                 val result = backupService!!.createBackup(backupTransport!!)
-                                val message = when (result) {
+                                when (result) {
                                     is BackupResult.Success ->
-                                        "Backup exported: ${result.value.id}"
+                                        Toast.showSuccess("Backup exported: ${result.value.id}")
                                     is BackupResult.Failure ->
-                                        "Export failed: ${result.message}"
+                                        Toast.showError("Export failed: ${result.message}")
                                 }
-                                snackbarHostState.showSnackbar(message)
                                 pendingAction = null
                             }
                             BackupAction.IMPORT -> {
                                 val listResult = backupTransport!!.listBackups()
                                 if (listResult is BackupResult.Failure) {
-                                    snackbarHostState.showSnackbar("No backups found: ${listResult.message}")
+                                    Toast.showError("No backups found: ${listResult.message}")
                                     pendingAction = null
                                     return@launch
                                 }
                                 val backups = (listResult as BackupResult.Success).value
                                 if (backups.isEmpty()) {
-                                    snackbarHostState.showSnackbar("No backup files found")
+                                    Toast.showWarning("No backup files found")
                                     pendingAction = null
                                     return@launch
                                 }
                                 val latest = backups.maxBy { it.createdAt }
                                 val result = backupService!!.restoreBackup(backupTransport, latest.id)
-                                val message = when (result) {
+                                when (result) {
                                     is BackupResult.Success ->
-                                        "Imported ${result.value} account(s) from ${latest.id}"
+                                        Toast.showSuccess("Imported ${result.value} account(s) from ${latest.id}")
                                     is BackupResult.Failure ->
-                                        "Import failed: ${result.message}"
+                                        Toast.showError("Import failed: ${result.message}")
                                 }
-                                snackbarHostState.showSnackbar(message)
                                 if (result is BackupResult.Success) {
                                     companionSyncCoordinator?.onAccountsChanged()
                                 }
@@ -393,25 +388,24 @@ fun SettingsScreen(
 
                             BackupAction.SYNC_COMPANION -> {
                                 if (companionSyncCoordinator == null || twoFacLib == null) {
-                                    snackbarHostState.showSnackbar("Companion sync is unavailable")
+                                    Toast.showError("Companion sync is unavailable")
                                     pendingAction = null
                                     return@launch
                                 }
                                 val hasAccounts = twoFacLib.getAllAccounts().isNotEmpty()
                                 if (!hasAccounts) {
-                                    snackbarHostState.showSnackbar("No accounts to sync to $companionDisplayName")
+                                    Toast.showWarning("No accounts to sync to $companionDisplayName")
                                     pendingAction = null
                                     return@launch
                                 }
                                 try {
                                     isCompanionSyncInProgress = true
                                     val synced = companionSyncCoordinator.syncNow(manual = true)
-                                    val message = if (synced) {
-                                        "Sync sent to $companionDisplayName"
+                                    if (synced) {
+                                        Toast.showSuccess("Sync sent to $companionDisplayName")
                                     } else {
-                                        "Unable to sync to $companionDisplayName right now"
+                                        Toast.showWarning("Unable to sync to $companionDisplayName right now")
                                     }
-                                    snackbarHostState.showSnackbar(message)
                                     isCompanionActive =
                                         companionSyncCoordinator.isCompanionActive()
                                 } finally {
@@ -455,7 +449,7 @@ fun SettingsScreen(
                             isBiometricEnabled = true
                             isRememberPasskeyEnabled = true
                             showBiometricEnrollmentDialog = false
-                            snackbarHostState.showSnackbar("Biometric unlock enabled")
+                            Toast.showSuccess("Biometric unlock enabled")
                         } else {
                             biometricSessionManager.setBiometricEnabled(false)
                             biometricEnrollmentError = "Biometric enrollment cancelled"

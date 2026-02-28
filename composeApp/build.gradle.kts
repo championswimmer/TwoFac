@@ -132,6 +132,7 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
 
             implementation(libs.kstore)
+            implementation(libs.compose.toast)
             api(project(":sharedLib"))
         }
         commonTest.dependencies {

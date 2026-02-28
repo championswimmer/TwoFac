@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.ocnyang.compose_toast.ProvideToastManager
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import tech.arnav.twofac.navigation.AccountDetail
 import tech.arnav.twofac.navigation.Accounts
@@ -22,47 +23,49 @@ import tech.arnav.twofac.screens.SettingsScreen
 @Preview
 fun App() {
     MaterialTheme {
-        val navController = rememberNavController()
+        ProvideToastManager {
+            val navController = rememberNavController()
 
-        NavHost(
-            navController = navController,
-            startDestination = Home
-        ) {
-            composable<Home> {
-                HomeScreen(
-                    onNavigateToAccounts = { navController.navigate(Accounts) },
-                    onNavigateToSettings = { navController.navigate(Settings) }
-                )
-            }
+            NavHost(
+                navController = navController,
+                startDestination = Home
+            ) {
+                composable<Home> {
+                    HomeScreen(
+                        onNavigateToAccounts = { navController.navigate(Accounts) },
+                        onNavigateToSettings = { navController.navigate(Settings) }
+                    )
+                }
 
-            composable<Accounts> {
-                AccountsScreen(
-                    onNavigateToAddAccount = { navController.navigate(AddAccount) },
-                    onNavigateToAccountDetail = { accountId ->
-                        navController.navigate(AccountDetail(accountId))
-                    },
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
+                composable<Accounts> {
+                    AccountsScreen(
+                        onNavigateToAddAccount = { navController.navigate(AddAccount) },
+                        onNavigateToAccountDetail = { accountId ->
+                            navController.navigate(AccountDetail(accountId))
+                        },
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
 
-            composable<AccountDetail> { backStackEntry ->
-                val accountDetail = backStackEntry.toRoute<AccountDetail>()
-                AccountDetailScreen(
-                    accountId = accountDetail.accountId,
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
+                composable<AccountDetail> { backStackEntry ->
+                    val accountDetail = backStackEntry.toRoute<AccountDetail>()
+                    AccountDetailScreen(
+                        accountId = accountDetail.accountId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
 
-            composable<Settings> {
-                SettingsScreen(
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
+                composable<Settings> {
+                    SettingsScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
 
-            composable<AddAccount> {
-                AddAccountScreen(
-                    onNavigateBack = { navController.popBackStack() }
-                )
+                composable<AddAccount> {
+                    AddAccountScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }
