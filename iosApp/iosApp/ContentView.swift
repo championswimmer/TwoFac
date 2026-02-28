@@ -1,6 +1,6 @@
 import UIKit
 import SwiftUI
-import TwoFacKit
+import TwoFacUIKit
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {

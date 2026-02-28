@@ -1,5 +1,6 @@
 package tech.arnav.twofac.lib.watchsync
 
+import kotlinx.serialization.json.Json
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.TwoFacLib
 import kotlin.time.Clock
@@ -7,6 +8,7 @@ import kotlin.time.Clock
 @OptIn(kotlin.time.ExperimentalTime::class)
 @PublicApi
 object IosWatchSyncHelper {
+    private val watchSyncJson = Json { ignoreUnknownKeys = true }
 
     /**
      * Generates a JSON payload string of all current accounts suitable for syncing to watchOS.
@@ -34,8 +36,8 @@ object IosWatchSyncHelper {
             generatedAtEpochSec = Clock.System.now().epochSeconds,
             accounts = watchAccounts
         )
-        
-        return kotlinx.serialization.json.Json.encodeToString(WatchSyncSnapshot.serializer(), snapshot)
+
+        return watchSyncJson.encodeToString(WatchSyncSnapshot.serializer(), snapshot)
     }
 
     /**
@@ -43,7 +45,7 @@ object IosWatchSyncHelper {
      */
     @Throws(Exception::class)
     fun decodeWatchSyncPayloadString(payload: String): WatchSyncSnapshot {
-        val decoded = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }.decodeFromString(WatchSyncSnapshot.serializer(), payload)
+        val decoded = watchSyncJson.decodeFromString(WatchSyncSnapshot.serializer(), payload)
         require(decoded.version == WatchSyncContract.SCHEMA_VERSION) {
             "Unsupported watch sync schema version: ${decoded.version}"
         }

@@ -24,12 +24,16 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64(),
         watchosArm64(),
+        watchosDeviceArm64(),
         watchosSimulatorArm64(),
         macosX64(),
         macosArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = frameworkName
+            freeCompilerArgs += listOf(
+                "-Xbinary=bundleId=tech.arnav.twofac.lib"
+            )
             isStatic = true // Set to false if you want a dynamic framework
         }
     }

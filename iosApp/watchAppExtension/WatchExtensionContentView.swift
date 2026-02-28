@@ -5,7 +5,7 @@ struct WatchExtensionContentView: View {
     @EnvironmentObject private var connectivityManager: WatchConnectivityManager
     @Environment(\.scenePhase) private var scenePhase
     @State private var now = Date()
-    private let ticker = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
+    private let ticker = Timer.publish(every: 1.0 / 30.0, on: .main, in: .common).autoconnect()
 
     private var remainingSeconds: Int {
         let seconds = Int(now.timeIntervalSince1970)
@@ -13,8 +13,9 @@ struct WatchExtensionContentView: View {
         return mod == 0 ? 30 : 30 - mod
     }
 
-    private var remainingProgress: Double {
-        Double(remainingSeconds) / 30.0
+    private var elapsedProgress: Double {
+        let elapsedInWindow = now.timeIntervalSince1970.truncatingRemainder(dividingBy: 30.0)
+        return min(max(elapsedInWindow / 30.0, 0), 1)
     }
 
     var body: some View {
@@ -82,7 +83,7 @@ struct WatchExtensionContentView: View {
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
 
-                            CountdownBar(progress: remainingProgress)
+                            CountdownBar(progress: elapsedProgress)
                                 .frame(height: 8)
                         }
                         .padding(.horizontal, 10)
