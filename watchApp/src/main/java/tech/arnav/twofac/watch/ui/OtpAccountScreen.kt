@@ -15,13 +15,17 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import androidx.wear.tooling.preview.devices.WearDevices
 import tech.arnav.twofac.watch.otp.WatchOtpEntry
+import tech.arnav.twofac.watch.presentation.theme.TwofacTheme
 
 @Composable
 fun OtpAccountScreen(
@@ -82,6 +86,7 @@ fun OtpAccountScreen(
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colors.primary,
+                        fontFamily = FontFamily.Monospace,
                         textAlign = TextAlign.Center,
                         letterSpacing = 2.sp,
                         modifier = Modifier.padding(top = 4.dp),
@@ -148,5 +153,23 @@ private fun CountdownArc(
                 size = arcSize,
             )
         }
+    }
+}
+
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
+@Composable
+private fun OtpAccountScreenPreview() {
+    TwofacTheme {
+        OtpAccountScreen(
+            entry = WatchOtpEntry.Valid(
+                accountId = "preview-account",
+                issuer = "GitHub",
+                accountLabel = "arnav@example.com",
+                otpCode = "123456",
+                nextRefreshAtEpochSec = 1_762_304_840L,
+                periodSec = 30L,
+            ),
+            currentEpochMillis = 1_762_304_820_000L,
+        )
     }
 }
