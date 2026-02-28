@@ -141,7 +141,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation("androidx.biometric:biometric:1.1.0")
+            implementation(libs.androidx.biometric)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.play.services.wearable)
             implementation(libs.kstore.file)
