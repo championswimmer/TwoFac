@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
+import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.watch.otp.WatchOtpEntry
 import tech.arnav.twofac.watch.presentation.theme.TwofacTheme
 
@@ -54,7 +55,7 @@ fun OtpAccountScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             val issuer = entry.issuer
-            val issuerOrLabel = issuer?.takeIf { it.isNotBlank() } ?: entry.accountLabel
+            val issuerOrLabel = issuer?.takeIf { it.isNotBlank() } ?: entry.account.accountLabel
             Text(
                 text = issuerOrLabel,
                 style = MaterialTheme.typography.caption1,
@@ -64,7 +65,7 @@ fun OtpAccountScreen(
             )
             if (!issuer.isNullOrBlank()) {
                 Text(
-                    text = entry.accountLabel,
+                    text = entry.account.accountLabel,
                     style = MaterialTheme.typography.caption2,
                     color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
                     textAlign = TextAlign.Center,
@@ -162,9 +163,11 @@ private fun OtpAccountScreenPreview() {
     TwofacTheme {
         OtpAccountScreen(
             entry = WatchOtpEntry.Valid(
-                accountId = "preview-account",
+                account = StoredAccount.DisplayAccount(
+                    accountID = "preview-account",
+                    accountLabel = "arnav@example.com",
+                ),
                 issuer = "GitHub",
-                accountLabel = "arnav@example.com",
                 otpCode = "123456",
                 nextRefreshAtEpochSec = 1_762_304_840L,
                 periodSec = 30L,

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.isActive
 import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.TOTP
+import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
 import kotlin.time.Clock
@@ -29,35 +30,44 @@ class WatchOtpProvider(
                 val otp = OtpAuthURI.parse(account.otpAuthUri)
                 when (otp) {
                     is TOTP -> WatchOtpEntry.Valid(
-                        accountId = account.accountId,
+                        account = StoredAccount.DisplayAccount(
+                            accountID = account.accountId,
+                            accountLabel = account.accountLabel,
+                            nextCodeAt = otp.nextCodeAt(nowEpochSec),
+                        ),
                         issuer = account.issuer,
-                        accountLabel = account.accountLabel,
                         otpCode = otp.generateOTP(nowEpochSec),
                         nextRefreshAtEpochSec = otp.nextCodeAt(nowEpochSec),
                         periodSec = otp.timeInterval,
                     )
 
                     is HOTP -> WatchOtpEntry.Valid(
-                        accountId = account.accountId,
+                        account = StoredAccount.DisplayAccount(
+                            accountID = account.accountId,
+                            accountLabel = account.accountLabel,
+                        ),
                         issuer = account.issuer,
-                        accountLabel = account.accountLabel,
                         otpCode = otp.generateOTP(0),
                         nextRefreshAtEpochSec = null,
                         periodSec = null,
                     )
 
                     else -> WatchOtpEntry.Invalid(
-                        accountId = account.accountId,
+                        account = StoredAccount.DisplayAccount(
+                            accountID = account.accountId,
+                            accountLabel = account.accountLabel,
+                        ),
                         issuer = account.issuer,
-                        accountLabel = account.accountLabel,
                         reason = "Unsupported OTP type",
                     )
                 }
             } catch (error: IllegalArgumentException) {
                 WatchOtpEntry.Invalid(
-                    accountId = account.accountId,
+                    account = StoredAccount.DisplayAccount(
+                        accountID = account.accountId,
+                        accountLabel = account.accountLabel,
+                    ),
                     issuer = account.issuer,
-                    accountLabel = account.accountLabel,
                     reason = error.message ?: "Invalid otpauth URI",
                 )
             }
@@ -81,23 +91,20 @@ class WatchOtpProvider(
 }
 
 sealed interface WatchOtpEntry {
-    val accountId: String
+    val account: StoredAccount.DisplayAccount
     val issuer: String?
-    val accountLabel: String
 
     data class Valid(
-        override val accountId: String,
+        override val account: StoredAccount.DisplayAccount,
         override val issuer: String?,
-        override val accountLabel: String,
         val otpCode: String,
         val nextRefreshAtEpochSec: Long?,
         val periodSec: Long?,
     ) : WatchOtpEntry
 
     data class Invalid(
-        override val accountId: String,
+        override val account: StoredAccount.DisplayAccount,
         override val issuer: String?,
-        override val accountLabel: String,
         val reason: String,
     ) : WatchOtpEntry
 }
