@@ -62,17 +62,17 @@ Uber JAR (cross-platform):
 
 Output: `composeApp/build/compose/binaries/main/`
 
-### Android Mobile App (`composeApp` - Android)
+### Android Mobile App (`androidApp`)
 
 | Action | Command |
 |--------|---------|
-| Build debug APK | `./gradlew :composeApp:assembleDebug` |
-| Build release APK | `./gradlew :composeApp:assembleRelease` |
-| Install debug | `./gradlew :composeApp:installDebug` |
-| Uninstall | `./gradlew :composeApp:uninstallDebug` |
-| Build bundle (AAB) | `./gradlew :composeApp:bundle` |
+| Build debug APK | `./gradlew :androidApp:assembleDebug` |
+| Build release APK | `./gradlew :androidApp:assembleRelease` |
+| Install debug | `./gradlew :androidApp:installDebug` |
+| Uninstall | `./gradlew :androidApp:uninstallDebug` |
+| Build bundle (AAB) | `./gradlew :androidApp:bundle` |
 
-Output: `composeApp/build/outputs/apk/` or `composeApp/build/outputs/bundle/`
+Output: `androidApp/build/outputs/apk/` or `androidApp/build/outputs/bundle/`
 
 ### Wear OS Watch App (`watchApp`)
 

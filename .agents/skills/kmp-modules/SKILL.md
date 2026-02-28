@@ -20,16 +20,27 @@ This is the core module containing all business logic, data models, state manage
   - Core domain models and use cases/interactors.
   - Platform-specific implementations for storage or cryptography via `expect`/`actual` declarations.
 
-### 2. `composeApp` (GUI Application)
+### 2. `composeApp` (GUI Library)
 This module contains most of the common Graphical User Interface (GUI) application code, built using Compose Multiplatform.
-- **Purpose**: Provides the visual interface for the application (e.g., Desktop, Android, iOS).
+- **Purpose**: Provides the visual interface for the application (Desktop, Android library, iOS, Web/Wasm).
 - **Dependencies**: Depends heavily on `sharedLib` to fetch data, observe state, and trigger actions.
 - **What goes here**:
   - UI components, screens, and visual layouts written in Jetpack/Compose Multiplatform.
   - ViewModels or UI state holders that bridge the UI with the `sharedLib`.
-  - Platform-specific GUI bootstrapping (e.g., setting up the `main` window for desktop or `MainActivity` for Android) within respective `<platform>Main` source sets.
+  - Platform-specific shared code (e.g., Android DI modules, biometric session, wear sync) within respective `<platform>Main` source sets.
+  - Platform-specific GUI bootstrapping for desktop (`main` window) and iOS (framework) within their source sets.
 
-### 3. `cliApp` (Command Line Interface)
+### 3. `androidApp` (Android App Entry Point)
+This is a thin wrapper module that hosts the Android application entry point.
+- **Purpose**: Contains only the Android `Application` class, `Activity`, manifest, and app-level resources (icons, strings).
+- **Dependencies**: Depends on `composeApp` which provides all the shared UI and business logic.
+- **What goes here**:
+  - `TwoFacApplication` (Application class) and `MainActivity` (Activity).
+  - `AndroidManifest.xml` with application/activity declarations.
+  - App-level resources (launcher icons, app name string).
+  - **Do not** put shared Android code here — that belongs in `composeApp/androidMain`.
+
+### 4. `cliApp` (Command Line Interface)
 This module contains code specifically related to the Command Line Interface application.
 - **Purpose**: Provides a terminal-based interface for interacting with the application.
 - **Dependencies**: Depends on `sharedLib` to perform corresponding operations without needing a graphical interface.

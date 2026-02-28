@@ -57,7 +57,7 @@ abstract class GenerateBrowserExtensionManifestsTask : DefaultTask() {
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
@@ -66,9 +66,16 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
+    androidLibrary {
+        namespace = "tech.arnav.twofac.composeapp"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            jvmTarget = JvmTarget.JVM_21
+        }
+        androidResources {
+            enable = true
         }
     }
 
@@ -135,7 +142,6 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.biometric)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.play.services.wearable)
@@ -158,38 +164,8 @@ kotlin {
     }
 }
 
-android {
-    namespace = "tech.arnav.twofac"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        applicationId = "tech.arnav.twofac"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = rootProject.extra["appVersionCode"] as Int
-        versionName = rootProject.extra["appVersionName"] as String
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-}
-
 dependencies {
-    debugImplementation(compose.uiTooling)
-    androidTestImplementation(libs.androidx.testExt.junit)
-    androidTestImplementation(libs.androidx.core)
+    androidRuntimeClasspath(compose.uiTooling)
 }
 
 val appVersionName = rootProject.extra["appVersionName"] as String
