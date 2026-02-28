@@ -13,10 +13,23 @@ expect fun createAccountsStore(): KStore<List<StoredAccount>>
 
 expect fun getStoragePath(): String
 
+expect suspend fun deleteAccountsStorage(): Boolean
+
 internal fun ensureStorageFileExists(filePath: Path) {
     if (SystemFileSystem.exists(filePath)) return
     SystemFileSystem.sink(filePath).buffered().use { sink ->
         sink.write("[]".encodeToByteArray())
         sink.flush()
+    }
+}
+
+internal fun deleteStorageFile(filePath: Path): Boolean {
+    return try {
+        if (SystemFileSystem.exists(filePath)) {
+            SystemFileSystem.delete(filePath)
+        }
+        true
+    } catch (_: Exception) {
+        false
     }
 }

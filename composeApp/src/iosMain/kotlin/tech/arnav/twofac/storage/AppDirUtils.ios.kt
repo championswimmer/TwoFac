@@ -34,3 +34,8 @@ actual fun getStoragePath(): String {
     val dir = getDocumentDirectory()
     return Path(dir, ACCOUNTS_STORAGE_FILE).toString()
 }
+
+actual suspend fun deleteAccountsStorage(): Boolean {
+    val dir = getDocumentDirectory()
+    return deleteStorageFile(Path(dir, ACCOUNTS_STORAGE_FILE))
+}

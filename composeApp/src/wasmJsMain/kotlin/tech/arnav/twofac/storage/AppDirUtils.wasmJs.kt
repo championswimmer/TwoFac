@@ -14,3 +14,15 @@ actual fun createAccountsStore(): KStore<List<StoredAccount>> {
 actual fun getStoragePath(): String {
     return "Browser LocalStorage (key: $ACCOUNTS_STORAGE_KEY)"
 }
+
+actual suspend fun deleteAccountsStorage(): Boolean {
+    return try {
+        localStorageRemoveItem(ACCOUNTS_STORAGE_KEY)
+        true
+    } catch (_: Throwable) {
+        false
+    }
+}
+
+@JsFun("(key) => { window.localStorage.removeItem(key); }")
+private external fun localStorageRemoveItem(key: String)

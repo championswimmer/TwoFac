@@ -149,6 +149,20 @@ class MemoryStorageTest {
     }
 
     @Test
+    fun testDeleteAllAccountsClearsStorage() = runTest {
+        val storage = MemoryStorage()
+        val account1 = createTestStoredAccount(accountLabel = "GitHub:user1@example.com")
+        val account2 = createTestStoredAccount(accountLabel = "Google:user2@example.com")
+
+        assertTrue(storage.saveAccount(account1))
+        assertTrue(storage.saveAccount(account2))
+        assertEquals(2, storage.getAccountList().size)
+
+        assertTrue(storage.deleteAllAccounts())
+        assertTrue(storage.getAccountList().isEmpty())
+    }
+
+    @Test
     fun testSaveAccountsWithSameLabelButDifferentID() = runTest {
         val storage = MemoryStorage()
         val accountID1 = Uuid.random()

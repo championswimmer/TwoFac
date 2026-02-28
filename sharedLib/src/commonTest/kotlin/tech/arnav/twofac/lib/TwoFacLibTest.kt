@@ -1,6 +1,7 @@
 package tech.arnav.twofac.lib
 
 import kotlinx.coroutines.test.runTest
+import tech.arnav.twofac.lib.storage.MemoryStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -81,5 +82,22 @@ class TwoFacLibTest {
 
         lib.unlock("passkey2")
         assertTrue(lib.isUnlocked())
+    }
+
+    @Test
+    fun testDeleteAllAccountsFromStorageClearsCachedAccounts() = runTest {
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        assertTrue(
+            lib.addAccount(
+                "otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example"
+            )
+        )
+        assertEquals(1, lib.getAllAccounts().size)
+
+        val deleted = lib.deleteAllAccountsFromStorage()
+
+        assertTrue(deleted)
+        assertTrue(lib.isUnlocked())
+        assertTrue(lib.getAllAccounts().isEmpty())
     }
 }
