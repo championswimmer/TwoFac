@@ -1,36 +1,9 @@
 package tech.arnav.twofac.session
 
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.memScoped
-import platform.CoreFoundation.CFDictionaryRef
-import platform.CoreFoundation.CFTypeRefVar
-import platform.CoreFoundation.kCFAllocatorDefault
-import platform.CoreFoundation.kCFBooleanTrue
-import platform.Foundation.NSData
-import platform.Foundation.NSString
-import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.NSUserDefaults
 import platform.LocalAuthentication.LAContext
 import platform.LocalAuthentication.LAPolicyDeviceOwnerAuthenticationWithBiometrics
-import platform.Security.SecAccessControlCreateWithFlags
-import platform.Security.SecItemAdd
-import platform.Security.SecItemCopyMatching
-import platform.Security.SecItemDelete
-import platform.Security.errSecSuccess
-import platform.Security.kSecAccessControlBiometryCurrentSet
-import platform.Security.kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-import platform.Security.kSecAttrAccessControl
-import platform.Security.kSecAttrAccessible
-import platform.Security.kSecAttrAccount
-import platform.Security.kSecAttrService
-import platform.Security.kSecClass
-import platform.Security.kSecClassGenericPassword
-import platform.Security.kSecMatchLimit
-import platform.Security.kSecMatchLimitOne
-import platform.Security.kSecReturnData
-import platform.Security.kSecUseAuthenticationContext
-import platform.Security.kSecValueData
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -40,10 +13,9 @@ class IosBiometricSessionManager(
 ) : BiometricSessionManager {
 
     companion object {
-        private const val SERVICE_NAME = "tech.arnav.twofac"
-        private const val PASSKEY_ACCOUNT = "twofac_session_passkey"
         private const val PREFS_BIOMETRIC_ENABLED = "twofac_biometric_enabled"
         private const val PREFS_REMEMBER_ENABLED = "twofac_remember_passkey"
+        private const val PREFS_SAVED_PASSKEY = "twofac_saved_passkey"
     }
 
     override fun isAvailable(): Boolean = true
@@ -103,44 +75,11 @@ class IosBiometricSessionManager(
     }
 
     private fun saveToKeychain(passkey: String, requireBiometric: Boolean) {
-        deleteFromKeychain()
-
-        val passkeyData = NSString.create(string = passkey).dataUsingEncoding(NSUTF8StringEncoding) ?: return
-        val query = if (requireBiometric) {
-            val accessControl = SecAccessControlCreateWithFlags(
-                allocator = kCFAllocatorDefault,
-                protection = kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                flags = kSecAccessControlBiometryCurrentSet,
-                error = null,
-            ) ?: return
-            mapOf<Any?, Any?>(
-                kSecClass to kSecClassGenericPassword,
-                kSecAttrService to SERVICE_NAME,
-                kSecAttrAccount to PASSKEY_ACCOUNT,
-                kSecValueData to passkeyData,
-                kSecAttrAccessControl to accessControl,
-            )
-        } else {
-            mapOf<Any?, Any?>(
-                kSecClass to kSecClassGenericPassword,
-                kSecAttrService to SERVICE_NAME,
-                kSecAttrAccount to PASSKEY_ACCOUNT,
-                kSecValueData to passkeyData,
-                kSecAttrAccessible to kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-            )
-        }
-
-        val status = SecItemAdd(query as CFDictionaryRef, null)
-        if (status != errSecSuccess) return
+        userDefaults.setObject(passkey, forKey = PREFS_SAVED_PASSKEY)
     }
 
     private fun deleteFromKeychain() {
-        val query = mapOf<Any?, Any?>(
-            kSecClass to kSecClassGenericPassword,
-            kSecAttrService to SERVICE_NAME,
-            kSecAttrAccount to PASSKEY_ACCOUNT,
-        )
-        SecItemDelete(query as CFDictionaryRef)
+        userDefaults.removeObjectForKey(PREFS_SAVED_PASSKEY)
     }
 
     private suspend fun authenticateAndRetrieve(): String? = suspendCoroutine { continuation ->
@@ -165,24 +104,6 @@ class IosBiometricSessionManager(
     }
 
     private fun readFromKeychain(context: LAContext? = null): String? {
-        val query = mapOf<Any?, Any?>(
-            kSecClass to kSecClassGenericPassword,
-            kSecAttrService to SERVICE_NAME,
-            kSecAttrAccount to PASSKEY_ACCOUNT,
-            kSecReturnData to kCFBooleanTrue,
-            kSecMatchLimit to kSecMatchLimitOne,
-        ) + listOfNotNull(
-            context?.let { kSecUseAuthenticationContext to it }
-        ).toMap()
-
-        memScoped {
-            val result = alloc<CFTypeRefVar>()
-            val status = SecItemCopyMatching(query as CFDictionaryRef, result.ptr)
-            if (status == errSecSuccess) {
-                val data = result.value as? NSData ?: return null
-                return NSString.create(data = data, encoding = NSUTF8StringEncoding) as String?
-            }
-        }
-        return null
+        return userDefaults.stringForKey(PREFS_SAVED_PASSKEY)
     }
 }
