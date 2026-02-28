@@ -26,7 +26,7 @@ import tech.arnav.twofac.watch.otp.WatchOtpEntry
 @Composable
 fun OtpAccountScreen(
     entry: WatchOtpEntry,
-    currentEpochSec: Long,
+    currentEpochMillis: Long,
 ) {
     Box(
         modifier = Modifier
@@ -36,7 +36,7 @@ fun OtpAccountScreen(
     ) {
         if (entry is WatchOtpEntry.Valid && entry.nextRefreshAtEpochSec != null && entry.periodSec != null) {
             CountdownArc(
-                currentEpochSec = currentEpochSec,
+                currentEpochMillis = currentEpochMillis,
                 nextRefreshAtEpochSec = entry.nextRefreshAtEpochSec,
                 periodSec = entry.periodSec,
             )
@@ -104,12 +104,14 @@ fun OtpAccountScreen(
 
 @Composable
 private fun CountdownArc(
-    currentEpochSec: Long,
+    currentEpochMillis: Long,
     nextRefreshAtEpochSec: Long,
     periodSec: Long,
 ) {
-    val remaining = (nextRefreshAtEpochSec - currentEpochSec).coerceIn(0L, periodSec)
-    val progress = remaining.toFloat() / periodSec.toFloat()
+    val periodMillis = periodSec * 1000L
+    val nextRefreshAtMillis = nextRefreshAtEpochSec * 1000L
+    val remainingMillis = (nextRefreshAtMillis - currentEpochMillis).coerceIn(0L, periodMillis)
+    val progress = remainingMillis.toFloat() / periodMillis.toFloat()
 
     // Color transitions: green (full) → amber (half) → red (nearly expired)
     val arcColor = when {

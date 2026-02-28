@@ -82,12 +82,12 @@ fun WearApp() {
         val snapshotFlow = remember(repository) { repository.state.map { it.snapshot } }
         val otpEntries by otpProvider.ticker(snapshotFlow).collectAsState(initial = emptyList())
 
-        // Wall clock ticking every second for countdown arc
-        var currentEpochSec by remember { mutableLongStateOf(Clock.System.now().epochSeconds) }
+        // Wall clock ticking frequently for smooth countdown arc animation
+        var currentEpochMillis by remember { mutableLongStateOf(Clock.System.now().toEpochMilliseconds()) }
         LaunchedEffect(Unit) {
             while (isActive) {
-                currentEpochSec = Clock.System.now().epochSeconds
-                delay(1000)
+                currentEpochMillis = Clock.System.now().toEpochMilliseconds()
+                delay(33)
             }
         }
 
@@ -98,7 +98,7 @@ fun WearApp() {
         } else {
             OtpPagerScreen(
                 entries = otpEntries,
-                currentEpochSec = currentEpochSec,
+                currentEpochMillis = currentEpochMillis,
             )
         }
     }
@@ -107,7 +107,7 @@ fun WearApp() {
 @Composable
 private fun OtpPagerScreen(
     entries: List<WatchOtpEntry>,
-    currentEpochSec: Long,
+    currentEpochMillis: Long,
 ) {
     val pagerState = rememberPagerState(pageCount = { entries.size })
 
@@ -118,7 +118,7 @@ private fun OtpPagerScreen(
         ) { page ->
             OtpAccountScreen(
                 entry = entries[page],
-                currentEpochSec = currentEpochSec,
+                currentEpochMillis = currentEpochMillis,
             )
         }
 
