@@ -49,7 +49,8 @@ fun OtpAccountScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            val issuerOrLabel = entry.issuer?.takeIf { it.isNotBlank() } ?: entry.accountLabel
+            val issuer = entry.issuer
+            val issuerOrLabel = issuer?.takeIf { it.isNotBlank() } ?: entry.accountLabel
             Text(
                 text = issuerOrLabel,
                 style = MaterialTheme.typography.caption1,
@@ -57,7 +58,7 @@ fun OtpAccountScreen(
                 textAlign = TextAlign.Center,
                 maxLines = 1,
             )
-            if (entry.issuer != null && entry.issuer.isNotBlank()) {
+            if (!issuer.isNullOrBlank()) {
                 Text(
                     text = entry.accountLabel,
                     style = MaterialTheme.typography.caption2,
