@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.TimeText
 import tech.arnav.twofac.watch.otp.WatchOtpEntry
-import tech.arnav.twofac.watch.presentation.OtpAccountScreen
 
 @Composable
 fun OtpPagerScreen(
