@@ -9,4 +9,15 @@ interface BiometricSessionManager : SessionManager {
 
     /** Toggle biometric authentication. */
     fun setBiometricEnabled(enabled: Boolean)
+
+    /**
+     * Enroll the passkey for biometric-based auto-unlock.
+     *
+     * On Android: triggers BiometricPrompt to authenticate the KeyStore key,
+     * then encrypts and saves the passkey.
+     * On iOS: saves the passkey to the Keychain with biometric access control.
+     *
+     * @return true if enrollment succeeded, false if cancelled or failed.
+     */
+    suspend fun enrollPasskey(passkey: String): Boolean
 }
