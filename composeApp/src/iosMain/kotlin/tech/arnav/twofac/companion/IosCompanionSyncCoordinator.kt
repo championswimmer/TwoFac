@@ -64,25 +64,15 @@ class IosCompanionSyncCoordinator(
             return false
         }
 
-        val accounts = twoFacLib.getAllAccounts()
-        if (accounts.isEmpty()) {
+        val sourceAccounts = loadCompanionSyncSourceAccounts(twoFacLib) {
             NSLog("Companion sync aborted: no accounts available.")
-            return false
-        }
+        } ?: return false
 
         if (!isCompanionActive()) {
             NSLog("Companion sync aborted: Apple Watch companion is unavailable.")
             return false
         }
 
-        val uris = twoFacLib.exportAccountURIs()
-        val sourceAccounts = accounts.zip(uris).map { (account, uri) ->
-            CompanionSyncSourceAccount(
-                accountId = account.accountID,
-                accountLabel = account.accountLabel,
-                otpAuthUri = uri,
-            )
-        }
         val snapshot = buildCompanionSyncSnapshot(
             sourceAccounts = sourceAccounts,
             generatedAtEpochSec = Clock.System.now().epochSeconds,

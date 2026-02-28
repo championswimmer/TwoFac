@@ -1,6 +1,7 @@
 package tech.arnav.twofac.wear
 
 import android.content.Context
+import android.widget.Toast
 import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -8,8 +9,8 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
-import tech.arnav.twofac.companion.CompanionSyncSourceAccount
 import tech.arnav.twofac.companion.buildCompanionSyncSnapshot
+import tech.arnav.twofac.companion.loadCompanionSyncSourceAccounts
 import tech.arnav.twofac.lib.TwoFacLib
 import java.util.concurrent.TimeUnit
 import kotlin.time.Clock
@@ -41,19 +42,18 @@ class AndroidWatchSyncCoordinator(
             Log.w(TAG, "Sync aborted: no reachable watch companion.")
             return@withContext false
         }
-        val accounts = twoFacLib.getAllAccounts()
-        if (accounts.isEmpty()) {
+        val sourceAccounts = loadCompanionSyncSourceAccounts(twoFacLib) {
             Log.w(TAG, "Sync aborted: no accounts available to sync.")
-            return@withContext false
-        }
-        val uris = twoFacLib.exportAccountURIs()
-        val sourceAccounts = accounts.zip(uris).map { (account, uri) ->
-            CompanionSyncSourceAccount(
-                accountId = account.accountID,
-                accountLabel = account.accountLabel,
-                otpAuthUri = uri,
-            )
-        }
+            if (manual) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        appContext,
+                        "No accounts added yet, so nothing can be synced to watch.",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+        } ?: return@withContext false
         val snapshot = buildCompanionSyncSnapshot(
             sourceAccounts = sourceAccounts,
             generatedAtEpochSec = Clock.System.now().epochSeconds,

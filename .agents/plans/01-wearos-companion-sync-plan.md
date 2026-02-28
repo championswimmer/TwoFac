@@ -1,11 +1,11 @@
 ---
 task: Create Android WearOS companion app
-status: In Progress
+status: Completed
 progress:
 - "[x] Add watchApp module for Android WearOS"
 - "[x] Sync snapshot of accounts from phone to watch"
 - "[x] WearUI vertical screen of OTP accounts" 
-- "[ ] Pairing flow on mobile app side settings"
+- "[x] Pairing flow on mobile app side settings"
 
 ---
 # Wear OS Companion App Plan (Phone-Paired, Secret Sync, OTP Display)

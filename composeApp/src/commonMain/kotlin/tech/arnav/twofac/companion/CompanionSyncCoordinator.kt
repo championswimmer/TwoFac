@@ -3,6 +3,7 @@ package tech.arnav.twofac.companion
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import tech.arnav.twofac.lib.watchsync.WatchSyncAccount
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
+import tech.arnav.twofac.lib.TwoFacLib
 
 interface CompanionSyncCoordinator {
     val companionDisplayName: String
@@ -20,6 +21,25 @@ data class CompanionSyncSourceAccount(
     val accountLabel: String,
     val otpAuthUri: String,
 )
+
+suspend fun loadCompanionSyncSourceAccounts(
+    twoFacLib: TwoFacLib,
+    onEmpty: (suspend () -> Unit)? = null,
+): List<CompanionSyncSourceAccount>? {
+    val accounts = twoFacLib.getAllAccounts()
+    if (accounts.isEmpty()) {
+        onEmpty?.invoke()
+        return null
+    }
+    val uris = twoFacLib.exportAccountURIs()
+    return accounts.zip(uris).map { (account, uri) ->
+        CompanionSyncSourceAccount(
+            accountId = account.accountID,
+            accountLabel = account.accountLabel,
+            otpAuthUri = uri,
+        )
+    }
+}
 
 fun buildCompanionSyncSnapshot(
     sourceAccounts: List<CompanionSyncSourceAccount>,

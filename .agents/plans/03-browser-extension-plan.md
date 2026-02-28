@@ -1,6 +1,6 @@
 ---
 task: Create Browser Extensions for Chrome and Firefox
-status: In Progress
+status: Completed
 progress:
   - "[x] PWA foundation"
   - "[x] Chrome extension"
