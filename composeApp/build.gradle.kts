@@ -224,6 +224,13 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "tech.arnav.twofac"
             packageVersion = rootProject.extra["appVersionName"] as String
+
+            linux {
+                iconFile.set(project.file("src/desktopMain/resources/icons/linux.png"))
+            }
+            windows {
+                iconFile.set(project.file("src/desktopMain/resources/icons/windows.ico"))
+            }
         }
     }
 }
