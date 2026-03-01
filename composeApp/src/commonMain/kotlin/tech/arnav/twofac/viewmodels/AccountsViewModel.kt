@@ -114,10 +114,10 @@ class AccountsViewModel(
                 // Persist the passkey for session auto-unlock (if the user opted in)
                 if (passkey != null) {
                     sessionManager?.savePasskey(passkey)
-                    val secureSessionManager =
+                    val enrollmentSessionManager =
                         sessionManagerForPostUnlockEnrollment(sessionManager, fromAutoUnlock)
-                    if (secureSessionManager is WebAuthnSessionManager) {
-                        secureSessionManager.enrollPasskey(passkey)
+                    if (enrollmentSessionManager is WebAuthnSessionManager) {
+                        enrollmentSessionManager.enrollPasskey(passkey)
                     }
                 }
             } catch (e: Exception) {

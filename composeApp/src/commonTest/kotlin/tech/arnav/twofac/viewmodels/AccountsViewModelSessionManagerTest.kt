@@ -36,7 +36,7 @@ class AccountsViewModelSessionManagerTest {
     }
 }
 
-private class FakeSessionManager : SessionManager {
+private open class BaseFakeSessionManager : SessionManager {
     override fun isAvailable(): Boolean = true
     override fun isRememberPasskeyEnabled(): Boolean = false
     override fun setRememberPasskey(enabled: Boolean) = Unit
@@ -45,15 +45,12 @@ private class FakeSessionManager : SessionManager {
     override fun clearPasskey() = Unit
 }
 
+private class FakeSessionManager : BaseFakeSessionManager()
+
 private class FakeSecureSessionManager(
     private val secureEnabled: Boolean,
-) : SecureSessionManager {
-    override fun isAvailable(): Boolean = true
+) : BaseFakeSessionManager(), SecureSessionManager {
     override fun isRememberPasskeyEnabled(): Boolean = secureEnabled
-    override fun setRememberPasskey(enabled: Boolean) = Unit
-    override suspend fun getSavedPasskey(): String? = null
-    override fun savePasskey(passkey: String) = Unit
-    override fun clearPasskey() = Unit
     override fun isSecureUnlockAvailable(): Boolean = true
     override fun isSecureUnlockEnabled(): Boolean = secureEnabled
     override fun setSecureUnlockEnabled(enabled: Boolean) = Unit
