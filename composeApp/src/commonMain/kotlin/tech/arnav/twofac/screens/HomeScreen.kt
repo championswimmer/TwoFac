@@ -55,7 +55,7 @@ fun HomeScreen(
             // Try auto-unlock from saved session passkey first
             val savedPasskey = viewModel.getSavedPasskey()
             if (savedPasskey != null) {
-                viewModel.loadAccountsWithOtps(savedPasskey)
+                viewModel.loadAccountsWithOtps(savedPasskey, fromAutoUnlock = true)
                 autoUnlockAttempted = true
             } else {
                 showPasskeyDialog = true
