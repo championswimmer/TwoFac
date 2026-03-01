@@ -17,12 +17,10 @@ actual fun getStoragePath(): String {
 
 actual suspend fun deleteAccountsStorage(): Boolean {
     return try {
-        localStorageRemoveItem(ACCOUNTS_STORAGE_KEY)
+        // Use the kstore's own delete function for platform-agnostic deletion
+        createAccountsStore().delete()
         true
     } catch (_: Throwable) {
         false
     }
 }
-
-@JsFun("(key) => { window.localStorage.removeItem(key); }")
-private external fun localStorageRemoveItem(key: String)
