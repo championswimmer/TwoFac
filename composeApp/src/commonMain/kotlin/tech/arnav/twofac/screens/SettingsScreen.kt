@@ -287,6 +287,10 @@ fun SettingsScreen(
                                 coroutineScope.launch {
                                     try {
                                         isCompanionSyncInProgress = true
+                                        if (twoFacLib != null && twoFacLib.getAllAccounts().isEmpty()) {
+                                            snackbarHostState.showSnackbar("No accounts to sync to $companionDisplayName")
+                                            return@launch
+                                        }
                                         val synced = companionSyncCoordinator.syncNow(manual = true)
                                         if (synced) {
                                             snackbarHostState.showSnackbar("Sync sent to $companionDisplayName")

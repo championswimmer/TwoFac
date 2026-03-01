@@ -1,7 +1,6 @@
 package tech.arnav.twofac.wear
 
 import android.content.Context
-import android.widget.Toast
 import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -44,15 +43,6 @@ class AndroidWatchSyncCoordinator(
         }
         val sourceAccounts = loadCompanionSyncSourceAccounts(twoFacLib) {
             Log.w(TAG, "Sync aborted: no accounts available to sync.")
-            if (manual) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        appContext,
-                        "No accounts added yet, so nothing can be synced to watch.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-            }
         } ?: return@withContext false
         val snapshot = buildCompanionSyncSnapshot(
             sourceAccounts = sourceAccounts,
