@@ -222,6 +222,16 @@ tasks.register("packageBrowserExtensions") {
     dependsOn(packageChromeExtension, packageFirefoxExtension)
 }
 
+// The CMP plugin creates COMPOSE_SKIKO_JS_WASM_RUNTIME as a resolvable configuration for
+// unpacking Skiko runtime for wasm. It should not be consumable (i.e. exposed as a variant
+// of this project), otherwise Gradle will visit it when resolving composeApp from androidApp
+// and prematurely evaluate skikoVersionProvider in a JVM context where Skiko is not found.
+configurations.configureEach {
+    if (name == "COMPOSE_SKIKO_JS_WASM_RUNTIME") {
+        isCanBeConsumed = false
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "tech.arnav.twofac.MainKt"
