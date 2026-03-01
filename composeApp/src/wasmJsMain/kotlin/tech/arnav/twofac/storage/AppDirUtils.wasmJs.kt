@@ -14,3 +14,13 @@ actual fun createAccountsStore(): KStore<List<StoredAccount>> {
 actual fun getStoragePath(): String {
     return "Browser LocalStorage (key: $ACCOUNTS_STORAGE_KEY)"
 }
+
+actual suspend fun deleteAccountsStorage(): Boolean {
+    return try {
+        // Use the kstore's own delete function for platform-agnostic deletion
+        createAccountsStore().delete()
+        true
+    } catch (_: Throwable) {
+        false
+    }
+}

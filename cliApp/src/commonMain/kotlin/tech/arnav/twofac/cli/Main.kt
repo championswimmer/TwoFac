@@ -8,6 +8,7 @@ import tech.arnav.twofac.cli.commands.AddCommand
 import tech.arnav.twofac.cli.commands.BackupCommand
 import tech.arnav.twofac.cli.commands.DisplayCommand
 import tech.arnav.twofac.cli.commands.InfoCommand
+import tech.arnav.twofac.cli.commands.StorageCommand
 import tech.arnav.twofac.cli.di.appModule
 import tech.arnav.twofac.cli.di.storageModule
 
@@ -33,5 +34,6 @@ fun main(args: Array<String>) {
         InfoCommand(),
         AddCommand(),
         BackupCommand(),
+        StorageCommand(),
     ).main(args)
 }

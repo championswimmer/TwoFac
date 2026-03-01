@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.async
 import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import tech.arnav.twofac.lib.storage.Storage
 import tech.arnav.twofac.lib.storage.StoredAccount
 import kotlin.uuid.ExperimentalUuidApi
@@ -38,5 +39,16 @@ class FileStorage(
         // TODO: handle duplicates and/or update existing accounts
         kstore.plus(account)
         true
+    }.await()
+
+    override suspend fun deleteAllAccounts(): Boolean = coroutineScope.async {
+        return@async try {
+            if (SystemFileSystem.exists(storageFilePath)) {
+                SystemFileSystem.delete(storageFilePath)
+            }
+            true
+        } catch (_: Exception) {
+            false
+        }
     }.await()
 }
