@@ -1,6 +1,6 @@
 package tech.arnav.twofac.session
 
-interface BiometricSessionManager : SessionManager {
+interface BiometricSessionManager : SecureSessionManager {
     /** Whether biometric authentication is available on this platform/device. */
     fun isBiometricAvailable(): Boolean
 
@@ -9,6 +9,12 @@ interface BiometricSessionManager : SessionManager {
 
     /** Toggle biometric authentication. */
     fun setBiometricEnabled(enabled: Boolean)
+
+    override fun isSecureUnlockAvailable(): Boolean = isBiometricAvailable()
+
+    override fun isSecureUnlockEnabled(): Boolean = isBiometricEnabled()
+
+    override fun setSecureUnlockEnabled(enabled: Boolean) = setBiometricEnabled(enabled)
 
     /**
      * Enroll the passkey for biometric-based auto-unlock.
@@ -19,5 +25,5 @@ interface BiometricSessionManager : SessionManager {
      *
      * @return true if enrollment succeeded, false if cancelled or failed.
      */
-    suspend fun enrollPasskey(passkey: String): Boolean
+    override suspend fun enrollPasskey(passkey: String): Boolean
 }
