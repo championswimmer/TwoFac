@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package tech.arnav.twofac.session
 
 /**
