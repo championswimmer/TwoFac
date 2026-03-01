@@ -23,6 +23,7 @@ internal data class WebAuthnOperationResult(
     val status: WebAuthnOperationStatus,
     val credentialId: String? = null,
     val extensionResults: String? = null,
+    val prfFirstOutputBase64Url: String? = null,
     val message: String? = null,
 )
 
@@ -64,12 +65,13 @@ internal class BrowserWebAuthnClient : WebAuthnClient {
     override suspend fun createCredential(): WebAuthnOperationResult =
         suspendCoroutine { continuation ->
             runCatching {
-                createWebAuthnCredential { status, credentialId, extensionResults, message ->
+                createWebAuthnCredential { status, credentialId, extensionResults, prfFirstOutputBase64Url, message ->
                     continuation.resume(
                         WebAuthnOperationResult(
                             status = status.toWebAuthnOperationStatus(),
                             credentialId = credentialId,
                             extensionResults = extensionResults,
+                            prfFirstOutputBase64Url = prfFirstOutputBase64Url,
                             message = message,
                         )
                     )
@@ -87,12 +89,13 @@ internal class BrowserWebAuthnClient : WebAuthnClient {
     override suspend fun authenticate(credentialId: String?): WebAuthnOperationResult =
         suspendCoroutine { continuation ->
             runCatching {
-                authenticateWebAuthnCredential(credentialId) { status, returnedCredentialId, extensionResults, message ->
+                authenticateWebAuthnCredential(credentialId) { status, returnedCredentialId, extensionResults, prfFirstOutputBase64Url, message ->
                     continuation.resume(
                         WebAuthnOperationResult(
                             status = status.toWebAuthnOperationStatus(),
                             credentialId = returnedCredentialId ?: credentialId,
                             extensionResults = extensionResults,
+                            prfFirstOutputBase64Url = prfFirstOutputBase64Url,
                             message = message,
                         )
                     )
@@ -190,14 +193,14 @@ private external fun queryWebAuthnCapabilities(onResult: (Boolean, Boolean, Bool
       const handleError = (error) => {
         const name = (error && error.name) || "UnknownError";
         if (name === "AbortError" || name === "NotAllowedError") {
-          onResult("CANCELLED", null, null, name);
+          onResult("CANCELLED", null, null, null, name);
           return;
         }
         if (name === "NotSupportedError" || name === "SecurityError" || name === "InvalidStateError") {
-          onResult("UNAVAILABLE", null, null, name);
+          onResult("UNAVAILABLE", null, null, null, name);
           return;
         }
-        onResult("FAILED", null, null, name);
+        onResult("FAILED", null, null, null, name);
       };
 
       if (
@@ -207,7 +210,7 @@ private external fun queryWebAuthnCapabilities(onResult: (Boolean, Boolean, Bool
         typeof window.PublicKeyCredential === "undefined" ||
         !window.isSecureContext
       ) {
-        onResult("UNAVAILABLE", null, null, "WebAuthnUnavailable");
+        onResult("UNAVAILABLE", null, null, null, "WebAuthnUnavailable");
         return;
       }
 
@@ -258,13 +261,13 @@ private external fun queryWebAuthnCapabilities(onResult: (Boolean, Boolean, Bool
             credential && typeof credential.getClientExtensionResults === "function"
               ? JSON.stringify(credential.getClientExtensionResults())
               : null;
-          onResult("SUCCESS", credentialId, extensionResults, null);
+          onResult("SUCCESS", credentialId, extensionResults, null, null);
         })
         .catch(handleError);
     }
     """
 )
-private external fun createWebAuthnCredential(onResult: (String, String?, String?, String?) -> Unit)
+private external fun createWebAuthnCredential(onResult: (String, String?, String?, String?, String?) -> Unit)
 
 @JsFun(
     """
@@ -272,14 +275,14 @@ private external fun createWebAuthnCredential(onResult: (String, String?, String
       const handleError = (error) => {
         const name = (error && error.name) || "UnknownError";
         if (name === "AbortError" || name === "NotAllowedError") {
-          onResult("CANCELLED", credentialId || null, null, name);
+          onResult("CANCELLED", credentialId || null, null, null, name);
           return;
         }
         if (name === "NotSupportedError" || name === "SecurityError") {
-          onResult("UNAVAILABLE", credentialId || null, null, name);
+          onResult("UNAVAILABLE", credentialId || null, null, null, name);
           return;
         }
-        onResult("FAILED", credentialId || null, null, name);
+        onResult("FAILED", credentialId || null, null, null, name);
       };
 
       if (
@@ -289,7 +292,7 @@ private external fun createWebAuthnCredential(onResult: (String, String?, String
         typeof window.PublicKeyCredential === "undefined" ||
         !window.isSecureContext
       ) {
-        onResult("UNAVAILABLE", credentialId || null, null, "WebAuthnUnavailable");
+        onResult("UNAVAILABLE", credentialId || null, null, null, "WebAuthnUnavailable");
         return;
       }
 
@@ -326,11 +329,45 @@ private external fun createWebAuthnCredential(onResult: (String, String?, String
 
       navigator.credentials.get({ publicKey })
         .then((assertion) => {
-          const extensionResults =
+          const extensionResultObject =
             assertion && typeof assertion.getClientExtensionResults === "function"
-              ? JSON.stringify(assertion.getClientExtensionResults())
+              ? assertion.getClientExtensionResults()
               : null;
-          onResult("SUCCESS", credentialId || null, extensionResults, null);
+          const extensionResults = extensionResultObject ? JSON.stringify(extensionResultObject) : null;
+          let prfFirstOutputBase64Url = null;
+          try {
+            const prfFirstOutput =
+              extensionResultObject &&
+              extensionResultObject.prf &&
+              extensionResultObject.prf.results
+                ? extensionResultObject.prf.results.first
+                : null;
+            if (prfFirstOutput instanceof ArrayBuffer) {
+              const prfBytes = new Uint8Array(prfFirstOutput);
+              let binary = "";
+              for (let index = 0; index < prfBytes.length; index++) {
+                binary += String.fromCharCode(prfBytes[index]);
+              }
+              prfFirstOutputBase64Url = btoa(binary)
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=+$/g, "");
+            } else if (typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView(prfFirstOutput)) {
+              const view = prfFirstOutput;
+              const prfBytes = new Uint8Array(view.buffer, view.byteOffset, view.byteLength);
+              let binary = "";
+              for (let index = 0; index < prfBytes.length; index++) {
+                binary += String.fromCharCode(prfBytes[index]);
+              }
+              prfFirstOutputBase64Url = btoa(binary)
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=+$/g, "");
+            }
+          } catch (_) {
+            prfFirstOutputBase64Url = null;
+          }
+          onResult("SUCCESS", credentialId || null, extensionResults, prfFirstOutputBase64Url, null);
         })
         .catch(handleError);
     }
@@ -338,5 +375,5 @@ private external fun createWebAuthnCredential(onResult: (String, String?, String
 )
 private external fun authenticateWebAuthnCredential(
     credentialId: String?,
-    onResult: (String, String?, String?, String?) -> Unit,
+    onResult: (String, String?, String?, String?, String?) -> Unit,
 )
