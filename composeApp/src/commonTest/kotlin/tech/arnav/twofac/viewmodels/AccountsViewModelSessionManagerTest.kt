@@ -16,21 +16,28 @@ class AccountsViewModelSessionManagerTest {
 
     @Test
     fun sessionManagerForPostUnlockEnrollmentReturnsNullForAutoUnlock() {
-        val manager = FakeSecureSessionManager(secureEnabled = true)
+        val manager = FakeSecureSessionManager(secureEnabled = true, secureAvailable = true)
         val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = true)
         assertNull(result)
     }
 
     @Test
     fun sessionManagerForPostUnlockEnrollmentReturnsNullWhenSecureUnlockDisabled() {
-        val manager = FakeSecureSessionManager(secureEnabled = false)
+        val manager = FakeSecureSessionManager(secureEnabled = false, secureAvailable = true)
+        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
+        assertNull(result)
+    }
+
+    @Test
+    fun sessionManagerForPostUnlockEnrollmentReturnsNullWhenSecureUnlockUnavailable() {
+        val manager = FakeSecureSessionManager(secureEnabled = true, secureAvailable = false)
         val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
         assertNull(result)
     }
 
     @Test
     fun sessionManagerForPostUnlockEnrollmentReturnsSecureManagerWhenManualUnlockAndEnabled() {
-        val manager = FakeSecureSessionManager(secureEnabled = true)
+        val manager = FakeSecureSessionManager(secureEnabled = true, secureAvailable = true)
         val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
         assertNotNull(result)
     }
@@ -49,9 +56,10 @@ private class FakeSessionManager : BaseFakeSessionManager()
 
 private class FakeSecureSessionManager(
     private val secureEnabled: Boolean,
+    private val secureAvailable: Boolean,
 ) : BaseFakeSessionManager(), SecureSessionManager {
     override fun isRememberPasskeyEnabled(): Boolean = secureEnabled
-    override fun isSecureUnlockAvailable(): Boolean = true
+    override fun isSecureUnlockAvailable(): Boolean = secureAvailable
     override fun isSecureUnlockEnabled(): Boolean = secureEnabled
     override fun setSecureUnlockEnabled(enabled: Boolean) = Unit
     override suspend fun enrollPasskey(passkey: String): Boolean = true

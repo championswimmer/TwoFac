@@ -193,5 +193,7 @@ internal fun sessionManagerForPostUnlockEnrollment(
 ): SecureSessionManager? {
     if (fromAutoUnlock) return null
     val secureSessionManager = sessionManager as? SecureSessionManager ?: return null
-    return secureSessionManager.takeIf { it.isSecureUnlockEnabled() }
+    return secureSessionManager.takeIf {
+        it.isSecureUnlockEnabled() && it.isSecureUnlockAvailable()
+    }
 }
