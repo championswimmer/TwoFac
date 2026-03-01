@@ -88,7 +88,6 @@ kotlin {
                 "-Xbinary=bundleId=tech.arnav.twofac.app"
             )
             isStatic = true
-            transitiveExport = true
             export(projects.sharedLib)
         }
     }
