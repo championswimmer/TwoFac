@@ -2,11 +2,11 @@ package tech.arnav.twofac
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import tech.arnav.twofac.navigation.AccountDetail
 import tech.arnav.twofac.navigation.Accounts
 import tech.arnav.twofac.navigation.AddAccount

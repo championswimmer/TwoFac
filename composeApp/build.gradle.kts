@@ -60,7 +60,6 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.composePwa)
     alias(libs.plugins.kotlinxSerialization)
 }
@@ -89,7 +88,6 @@ kotlin {
                 "-Xbinary=bundleId=tech.arnav.twofac.app"
             )
             isStatic = true
-            transitiveExport = true
             export(projects.sharedLib)
         }
     }
@@ -117,12 +115,12 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.uiToolingPreview)
+            implementation(libs.compose.components.resources)
             implementation(libs.kotlinx.io.core)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
@@ -141,7 +139,6 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
         androidMain.dependencies {
-            implementation(compose.preview)
             implementation(libs.androidx.biometric)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.play.services.wearable)
@@ -165,7 +162,7 @@ kotlin {
 }
 
 dependencies {
-    androidRuntimeClasspath(compose.uiTooling)
+    androidRuntimeClasspath(libs.compose.uiTooling)
 }
 
 val appVersionName = rootProject.extra["appVersionName"] as String

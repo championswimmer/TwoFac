@@ -36,5 +36,5 @@ dependencies {
     implementation(project(":composeApp"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.kotlin.multiplatform.appdirs)
-    debugImplementation(compose.uiTooling)
+    debugImplementation(libs.compose.uiToolingPreview)
 }
