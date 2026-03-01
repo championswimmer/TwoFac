@@ -40,21 +40,25 @@ class DisplayCommand : CliktCommand(), KoinComponent {
             return
         }
 
-        // Fetch and display all account OTPs
-        val animation = terminal.animation<DisplayAccountsStatic> { displayAccounts ->
-            createTable(displayAccounts)
-        }
-        echo("\n")
-        runBlocking {
-            // Unlock the library with the provided passkey
-            accountsViewModel.unlock(passkey)
+        val isInteractive = terminal.terminalInfo.inputInteractive && terminal.terminalInfo.outputInteractive
 
-            repeat(2.minutes.inWholeSeconds.toInt()) {
-                animation.update(accountsViewModel.showAllAccountOTPs())
-                delay(1.seconds.inWholeMilliseconds)
+        runBlocking {
+            accountsViewModel.unlock(passkey)
+            val displayAccounts = accountsViewModel.showAllAccountOTPs()
+
+            if (isInteractive) {
+                val animation = terminal.animation<DisplayAccountsStatic> { displayAccounts ->
+                    createTable(displayAccounts)
+                }
+                echo("\n")
+                repeat(2.minutes.inWholeSeconds.toInt()) {
+                    animation.update(accountsViewModel.showAllAccountOTPs())
+                    delay(1.seconds.inWholeMilliseconds)
+                }
+                terminal.warning("Exiting display command after 2 minutes of inactivity.")
+            } else {
+                echo(createTable(displayAccounts))
             }
-            terminal.warning("Exiting display command after 2 minutes of inactivity.")
-            return@runBlocking
         }
     }
 
