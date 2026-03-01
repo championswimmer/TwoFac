@@ -1,14 +1,14 @@
 ---
 name: Delete Account Storage Option
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0 - Confirm deletion contract and UX copy"
-  - "[ ] Phase 1 - Add sharedLib storage deletion API"
-  - "[ ] Phase 2 - Implement deletion in composeApp storage backends"
-  - "[ ] Phase 3 - Add Settings delete action and confirmation dialog"
-  - "[ ] Phase 4 - Add CLI storage deletion command"
-  - "[ ] Phase 5 - Add tests and API snapshots"
-  - "[ ] Phase 6 - Validate behavior and update docs"
+  - "[x] Phase 0 - Confirm deletion contract and UX copy"
+  - "[x] Phase 1 - Add sharedLib storage deletion API"
+  - "[x] Phase 2 - Implement deletion in composeApp storage backends"
+  - "[x] Phase 3 - Add Settings delete action and confirmation dialog"
+  - "[x] Phase 4 - Add CLI storage deletion command"
+  - "[x] Phase 5 - Add tests and API snapshots"
+  - "[x] Phase 6 - Validate behavior and update docs"
 ---
 
 # Delete Account Storage Option
