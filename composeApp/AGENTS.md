@@ -1,14 +1,17 @@
 # composeApp AGENTS.md
 
-`composeApp` is the Compose Multiplatform UI layer for Android, iOS, Desktop, and Web.
+`composeApp` is the Compose Multiplatform UI library for Android, iOS, Desktop, and Web.
+With AGP 9, this module uses the `com.android.kotlin.multiplatform.library` plugin for Android.
 
 ## Source-set layout
 
 - `src/commonMain`: shared UI, navigation, DI wiring, view models, storage adapter layer
-- `src/androidMain`: Android entry points (`MainActivity`, `TwoFacApplication`)
+- `src/androidMain`: Android-specific shared code (DI modules, biometrics, wear sync, storage)
 - `src/iosMain`: iOS bridge (`MainViewController`)
 - `src/desktopMain`: Desktop entry point (`main.kt`)
 - `src/wasmJsMain`: Web entry point (`main.kt`)
+
+Note: Android app entry points (`MainActivity`, `TwoFacApplication`, manifest, icons) are in the `androidApp` module.
 
 ## Platform Specifics
 

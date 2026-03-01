@@ -5,12 +5,13 @@ This repository is a Kotlin Multiplatform 2FA project with multiple app frontend
 ## Module map
 
 - `sharedLib/`: core domain library (OTP generation, storage models, import adapters, crypto helpers)
-- `composeApp/`: Compose Multiplatform UI app (Android, iOS framework, Desktop JVM, Web/Wasm)
+- `composeApp/`: Compose Multiplatform UI library (Android library, iOS framework, Desktop JVM, Web/Wasm)
   - `commonMain`: code shared across all Compose targets
-  - `androidMain`: Android-specific code
+  - `androidMain`: Android-specific shared code (DI, biometrics, wear sync, storage)
   - `iosMain`: iOS-specific code (compiled into framework consumed by `iosApp`)
   - `desktopMain`: JVM desktop-specific code
   - `wasmJsMain`: Web/Wasm-specific code
+- `androidApp/`: thin Android app wrapper that hosts `composeApp` (Application, Activity, resources)
 - `cliApp/`: native CLI app built with Clikt, uses `sharedLib`
   - Provides 2FA codes with auto-refresh, account management, and platform info commands
 - `watchApp/`: Android Wear OS app, currently minimal UI scaffold with `sharedLib` dependency
@@ -19,18 +20,19 @@ This repository is a Kotlin Multiplatform 2FA project with multiple app frontend
 ## Dependency direction
 
 - `sharedLib` is the central dependency used by `composeApp`, `cliApp`, and `watchApp`.
+- `androidApp` depends on `composeApp` (thin wrapper for Android entry point).
 - `iosApp` consumes the framework generated from `composeApp`.
 
 ## Platform-to-module mapping
 
-| Platform          | Codebase                       | sharedLib variant        |
-|-------------------|--------------------------------|--------------------------|
-| Android           | `composeApp/androidMain`       | `jvm`                    |
-| iOS (+ Simulator) | `iosApp → composeApp/iosMain`  | `native` (as framework)  |
-| Desktop           | `composeApp/desktopMain`       | `jvm`                    |
-| Web               | `composeApp/wasmJsMain`        | `wasmJs`                 |
-| CLI               | `cliApp`                       | `native` (as static lib) |
-| Wear OS           | `watchApp`                     | `jvm`                    |
+| Platform          | Codebase                                | sharedLib variant        |
+|-------------------|-----------------------------------------|--------------------------|
+| Android           | `androidApp → composeApp/androidMain`   | `jvm`                    |
+| iOS (+ Simulator) | `iosApp → composeApp/iosMain`           | `native` (as framework)  |
+| Desktop           | `composeApp/desktopMain`                | `jvm`                    |
+| Web               | `composeApp/wasmJsMain`                 | `wasmJs`                 |
+| CLI               | `cliApp`                                | `native` (as static lib) |
+| Wear OS           | `watchApp`                              | `jvm`                    |
 
 ## Agent skills
 
