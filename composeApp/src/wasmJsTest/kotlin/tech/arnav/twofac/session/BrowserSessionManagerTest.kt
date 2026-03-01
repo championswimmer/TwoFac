@@ -5,10 +5,13 @@ import tech.arnav.twofac.session.interop.WebAuthnCapabilities
 import tech.arnav.twofac.session.interop.WebAuthnClient
 import tech.arnav.twofac.session.interop.WebAuthnOperationResult
 import tech.arnav.twofac.session.interop.WebAuthnOperationStatus
+import tech.arnav.twofac.session.interop.WebCryptoClient
+import tech.arnav.twofac.session.interop.WebCryptoEncryptResult
 import tech.arnav.twofac.session.interop.WebStorageClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -36,9 +39,14 @@ class BrowserSessionManagerTest {
                 status = WebAuthnOperationStatus.SUCCESS,
                 credentialId = "cred-1"
             ),
-            authenticateResult = WebAuthnOperationResult(status = WebAuthnOperationStatus.SUCCESS),
+            authenticateResult = successfulAuthResult(),
         )
-        val manager = BrowserSessionManager(storage, client)
+        val manager = BrowserSessionManager(
+            storageClient = storage,
+            webAuthnClient = client,
+            webCryptoClient = FakeWebCryptoClient(),
+            encryptedPasskeyStore = FakeEncryptedPasskeyStore(),
+        )
 
         assertFalse(manager.isAvailable())
         manager.setRememberPasskey(true)
@@ -46,8 +54,10 @@ class BrowserSessionManagerTest {
     }
 
     @Test
-    fun enrollAndUnlockWithWebAuthnSuccess() = runTest {
+    fun enrollPersistsEncryptedBlobAndUnlockDecryptsPasskey() = runTest {
         val storage = FakeStorageClient()
+        val encryptedStore = FakeEncryptedPasskeyStore()
+        val cryptoClient = FakeWebCryptoClient(decryptResult = "pass-123")
         val client = FakeWebAuthnClient(
             supported = true,
             capabilities = supportedCapabilities(),
@@ -55,23 +65,34 @@ class BrowserSessionManagerTest {
                 status = WebAuthnOperationStatus.SUCCESS,
                 credentialId = "cred-1"
             ),
-            authenticateResult = WebAuthnOperationResult(status = WebAuthnOperationStatus.SUCCESS),
+            authenticateResult = successfulAuthResult(),
         )
-        val manager = BrowserSessionManager(storage, client)
+        val manager = BrowserSessionManager(
+            storageClient = storage,
+            webAuthnClient = client,
+            webCryptoClient = cryptoClient,
+            encryptedPasskeyStore = encryptedStore,
+        )
 
         manager.setRememberPasskey(true)
         assertTrue(manager.enrollPasskey("pass-123"))
         assertEquals(SecureUnlockOutcome.SUCCESS, manager.lastEnrollOutcome)
+        val storedPayload = encryptedStore.value
+        assertNotNull(storedPayload)
+        assertFalse(storedPayload.contains("pass-123"))
 
         val unlockedPasskey = manager.getSavedPasskey()
         assertEquals("pass-123", unlockedPasskey)
         assertEquals("cred-1", client.lastAuthenticateCredentialId)
         assertFalse(storage.snapshot.values.contains("pass-123"))
+        assertTrue((cryptoClient.lastEncryptContext ?: "").contains("cred-1"))
+        assertTrue((cryptoClient.lastDecryptContext ?: "").contains("cred-1"))
     }
 
     @Test
     fun unlockCancelledMapsToExplicitOutcome() = runTest {
         val storage = FakeStorageClient()
+        val encryptedStore = FakeEncryptedPasskeyStore()
         val client = FakeWebAuthnClient(
             supported = true,
             capabilities = supportedCapabilities(),
@@ -79,9 +100,14 @@ class BrowserSessionManagerTest {
                 status = WebAuthnOperationStatus.SUCCESS,
                 credentialId = "cred-1"
             ),
-            authenticateResult = WebAuthnOperationResult(status = WebAuthnOperationStatus.SUCCESS),
+            authenticateResult = successfulAuthResult(),
         )
-        val manager = BrowserSessionManager(storage, client)
+        val manager = BrowserSessionManager(
+            storageClient = storage,
+            webAuthnClient = client,
+            webCryptoClient = FakeWebCryptoClient(),
+            encryptedPasskeyStore = encryptedStore,
+        )
 
         manager.setRememberPasskey(true)
         assertTrue(manager.enrollPasskey("pass-123"))
@@ -95,12 +121,70 @@ class BrowserSessionManagerTest {
         assertNull(attempt.passkey)
     }
 
+    @Test
+    fun clearPasskeyRemovesEncryptedBlob() = runTest {
+        val encryptedStore = FakeEncryptedPasskeyStore()
+        val manager = BrowserSessionManager(
+            storageClient = FakeStorageClient(),
+            webAuthnClient = FakeWebAuthnClient(
+                supported = true,
+                capabilities = supportedCapabilities(),
+                createResult = WebAuthnOperationResult(
+                    status = WebAuthnOperationStatus.SUCCESS,
+                    credentialId = "cred-1",
+                ),
+                authenticateResult = successfulAuthResult(),
+            ),
+            webCryptoClient = FakeWebCryptoClient(),
+            encryptedPasskeyStore = encryptedStore,
+        )
+
+        manager.setRememberPasskey(true)
+        assertTrue(manager.enrollPasskey("pass-123"))
+        assertNotNull(encryptedStore.value)
+
+        manager.clearPasskey()
+        assertNull(encryptedStore.value)
+        assertNull(manager.getSavedPasskey())
+    }
+
+    @Test
+    fun enrollFailsWhenPrfOutputMissing() = runTest {
+        val encryptedStore = FakeEncryptedPasskeyStore()
+        val manager = BrowserSessionManager(
+            storageClient = FakeStorageClient(),
+            webAuthnClient = FakeWebAuthnClient(
+                supported = true,
+                capabilities = supportedCapabilities(),
+                createResult = WebAuthnOperationResult(
+                    status = WebAuthnOperationStatus.SUCCESS,
+                    credentialId = "cred-1",
+                ),
+                authenticateResult = WebAuthnOperationResult(status = WebAuthnOperationStatus.SUCCESS),
+            ),
+            webCryptoClient = FakeWebCryptoClient(),
+            encryptedPasskeyStore = encryptedStore,
+        )
+
+        manager.setRememberPasskey(true)
+        assertFalse(manager.enrollPasskey("pass-123"))
+        assertEquals(SecureUnlockOutcome.UNAVAILABLE, manager.lastEnrollOutcome)
+        assertNull(encryptedStore.value)
+    }
+
     private fun supportedCapabilities(): WebAuthnCapabilities {
         return WebAuthnCapabilities(
             publicKeyCredentialAvailable = true,
             userVerifyingAuthenticatorAvailable = true,
             clientCapabilitiesAvailable = true,
             prfSupported = true,
+        )
+    }
+
+    private fun successfulAuthResult(): WebAuthnOperationResult {
+        return WebAuthnOperationResult(
+            status = WebAuthnOperationStatus.SUCCESS,
+            prfFirstOutputBase64Url = "cHJmLWtleS1ieXRlcw",
         )
     }
 }
@@ -119,6 +203,51 @@ private class FakeStorageClient : WebStorageClient {
 
     override fun removeItem(key: String) {
         values.remove(key)
+    }
+}
+
+private class FakeEncryptedPasskeyStore : EncryptedPasskeyStore {
+    var value: String? = null
+
+    override suspend fun read(): String? = value
+
+    override suspend fun write(value: String): Boolean {
+        this.value = value
+        return true
+    }
+
+    override fun clear() {
+        value = null
+    }
+}
+
+private class FakeWebCryptoClient(
+    var encryptResult: WebCryptoEncryptResult? = WebCryptoEncryptResult(
+        saltBase64Url = "c2FsdA",
+        nonceBase64Url = "bm9uY2U",
+        ciphertextBase64Url = "Y2lwaGVydGV4dA",
+    ),
+    var decryptResult: String? = "pass-123",
+) : WebCryptoClient {
+    var lastEncryptContext: String? = null
+    var lastDecryptContext: String? = null
+
+    override suspend fun encrypt(
+        plaintext: String,
+        prfFirstOutputBase64Url: String,
+        context: String,
+    ): WebCryptoEncryptResult? {
+        lastEncryptContext = context
+        return encryptResult
+    }
+
+    override suspend fun decrypt(
+        encryptedResult: WebCryptoEncryptResult,
+        prfFirstOutputBase64Url: String,
+        context: String,
+    ): String? {
+        lastDecryptContext = context
+        return decryptResult
     }
 }
 
