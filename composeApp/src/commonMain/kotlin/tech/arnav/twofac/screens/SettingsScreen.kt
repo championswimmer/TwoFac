@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,6 +23,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,6 +71,8 @@ fun SettingsScreen(
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var showDeleteStorageDialog by remember { mutableStateOf(false) }
+    var isDeleteStorageInProgress by remember { mutableStateOf(false) }
     var isCompanionActive by remember { mutableStateOf(false) }
     var isCompanionSyncInProgress by remember { mutableStateOf(false) }
     var isCompanionDiscoveryInProgress by remember { mutableStateOf(false) }
@@ -120,11 +125,27 @@ fun SettingsScreen(
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Storage Location",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Storage Location",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = { showDeleteStorageDialog = true },
+                            enabled = twoFacLib != null && !isDeleteStorageInProgress && !isLoading
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete all accounts",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                     Text(
                         text = "Accounts are saved at:",
                         style = MaterialTheme.typography.bodyMedium,
@@ -340,6 +361,72 @@ fun SettingsScreen(
                 }
             }
         }
+    }
+
+    if (showDeleteStorageDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!isDeleteStorageInProgress) {
+                    showDeleteStorageDialog = false
+                }
+            },
+            title = { Text("Delete all accounts?") },
+            text = {
+                Text(
+                    "This deletes all existing accounts and cannot be undone unless you have a backup.\n\n" +
+                        "A fresh storage file will be created on next run/use."
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (twoFacLib == null) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Account deletion is unavailable")
+                            }
+                            showDeleteStorageDialog = false
+                            return@Button
+                        }
+                        coroutineScope.launch {
+                            isDeleteStorageInProgress = true
+                            try {
+                                val deleted = twoFacLib.deleteAllAccountsFromStorage()
+                                if (!deleted) {
+                                    snackbarHostState.showSnackbar("Failed to delete accounts from storage")
+                                    return@launch
+                                }
+                                try {
+                                    companionSyncCoordinator?.onAccountsChanged()
+                                    snackbarHostState.showSnackbar("All accounts deleted from storage")
+                                } catch (e: Exception) {
+                                    snackbarHostState.showSnackbar(
+                                        "Accounts deleted, but companion sync failed: ${e.message ?: "unknown error"}"
+                                    )
+                                }
+                                showDeleteStorageDialog = false
+                            } catch (e: Exception) {
+                                snackbarHostState.showSnackbar(
+                                    "Delete failed: ${e.message ?: "unknown error"}"
+                                )
+                            } finally {
+                                isDeleteStorageInProgress = false
+                            }
+                        }
+                    },
+                    enabled = !isDeleteStorageInProgress
+                ) {
+                    Text(if (isDeleteStorageInProgress) "Deleting..." else "Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteStorageDialog = false },
+                    enabled = !isDeleteStorageInProgress
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     // Passkey dialog for backup operations

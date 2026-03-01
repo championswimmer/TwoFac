@@ -41,4 +41,8 @@ class FileStorage(
             false
         }
     }
+
+    override suspend fun deleteAllAccounts(): Boolean {
+        return deleteAccountsStorage()
+    }
 }

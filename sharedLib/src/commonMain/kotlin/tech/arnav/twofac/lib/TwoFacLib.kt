@@ -112,6 +112,14 @@ class TwoFacLib private constructor(
         return success
     }
 
+    suspend fun deleteAllAccountsFromStorage(): Boolean {
+        val success = storage.deleteAllAccounts()
+        if (success) {
+            accountList = emptyList()
+        }
+        return success
+    }
+
     /**
      * Import accounts from an external authenticator app using an ImportAdapter
      *

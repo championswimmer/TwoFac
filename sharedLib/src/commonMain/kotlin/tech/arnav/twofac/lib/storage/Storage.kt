@@ -16,4 +16,6 @@ interface Storage {
 
     suspend fun saveAccount(account: StoredAccount): Boolean
 
+    suspend fun deleteAllAccounts(): Boolean
+
 }

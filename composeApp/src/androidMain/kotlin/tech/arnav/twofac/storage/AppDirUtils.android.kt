@@ -28,3 +28,8 @@ actual fun getStoragePath(): String {
     val dir = appDirs.getUserDataDir()
     return Path(dir, ACCOUNTS_STORAGE_FILE).toString()
 }
+
+actual suspend fun deleteAccountsStorage(): Boolean {
+    val dir = appDirs.getUserDataDir()
+    return deleteStorageFile(Path(dir, ACCOUNTS_STORAGE_FILE))
+}

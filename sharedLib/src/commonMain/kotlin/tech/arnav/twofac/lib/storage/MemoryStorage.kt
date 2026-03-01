@@ -40,4 +40,9 @@ class MemoryStorage : Storage {
             true
         }
     }
+
+    override suspend fun deleteAllAccounts(): Boolean {
+        accounts.clear()
+        return true
+    }
 }
