@@ -231,6 +231,9 @@ compose.desktop {
             windows {
                 iconFile.set(project.file("src/desktopMain/resources/icons/windows.ico"))
             }
+            macOS {
+                iconFile.set(project.file("src/desktopMain/resources/icons/macos.icns"))
+            }
         }
     }
 }
