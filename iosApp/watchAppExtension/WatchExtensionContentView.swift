@@ -110,6 +110,18 @@ struct WatchExtensionContentView: View {
 private struct CountdownBar: View {
     let progress: Double
 
+    // Color transitions: green → amber → red (matches Android Wear app thresholds)
+    private var barColor: Color {
+        let remaining = 1.0 - min(max(progress, 0), 1)
+        if remaining > 0.5 {
+            return .green
+        } else if remaining > 0.25 {
+            return .yellow
+        } else {
+            return .red
+        }
+    }
+
     var body: some View {
         GeometryReader { proxy in
             let clampedProgress = min(max(progress, 0), 1)
@@ -118,7 +130,7 @@ private struct CountdownBar: View {
                 Capsule()
                     .fill(Color.gray.opacity(0.25))
                 Capsule()
-                    .fill(Color.green)
+                    .fill(barColor)
                     .frame(width: proxy.size.width * clampedProgress)
             }
         }

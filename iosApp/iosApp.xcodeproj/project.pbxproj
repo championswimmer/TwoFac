@@ -40,7 +40,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		950547452F53EE3A00A5ABB0 /* Exceptions for "watchAppExtension" folder in "watchApp" target */ = {
+		950547452F53EE3A00A5ABB0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				TwoFacWatchApp.swift,
@@ -49,14 +49,14 @@
 			);
 			target = C1A0000D2EC1000000A4DA20 /* watchApp */;
 		};
-		B99700CA2DC9B8D800C7335B /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+		B99700CA2DC9B8D800C7335B /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = B9DA97B02DC1472C00A4DA20 /* iosApp */;
 		};
-		C1A000052EC1000000A4DA20 /* Exceptions for "watchApp" folder in "watchApp" target */ = {
+		C1A000052EC1000000A4DA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -69,7 +69,7 @@
 		B9DA97B32DC1472C00A4DA20 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				B99700CA2DC9B8D800C7335B /* Exceptions for "iosApp" folder in "iosApp" target */,
+				B99700CA2DC9B8D800C7335B /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -82,7 +82,7 @@
 		C1A000072EC1000000A4DA20 /* watchApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				C1A000052EC1000000A4DA20 /* Exceptions for "watchApp" folder in "watchApp" target */,
+				C1A000052EC1000000A4DA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
 			path = watchApp;
 			sourceTree = "<group>";
@@ -90,7 +90,7 @@
 		C1A000082EC1000000A4DA20 /* watchAppExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				950547452F53EE3A00A5ABB0 /* Exceptions for "watchAppExtension" folder in "watchApp" target */,
+				950547452F53EE3A00A5ABB0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
 			path = watchAppExtension;
 			sourceTree = "<group>";
@@ -449,6 +449,8 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TwoFac;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "TwoFac uses Face ID to securely unlock your 2FA codes without entering a passkey.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -476,7 +478,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				DEVELOPMENT_TEAM = 9UV5DX2Q64;
 				ENABLE_PREVIEWS = YES;
 				EXCLUDED_ARCHS = x86_64;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -485,6 +487,8 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TwoFac;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "TwoFac uses Face ID to securely unlock your 2FA codes without entering a passkey.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -532,7 +536,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				DEVELOPMENT_TEAM = 9UV5DX2Q64;
 				EXCLUDED_ARCHS = x86_64;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watchApp/Info.plist;
