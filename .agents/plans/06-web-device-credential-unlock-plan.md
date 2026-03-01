@@ -6,7 +6,7 @@ progress:
    - "[x] Phase 1 - Add secure session abstractions in commonMain"
    - "[x] Phase 2 - Implement wasmJs WebAuthnSessionManager secure unlock path with library-backed interop"
    - "[x] Phase 3 - Persist encrypted passkey and keep decrypted key session-only"
-  - "[ ] Phase 4 - Wire Settings/Home unlock flows (secure-only, no legacy plaintext)"
+   - "[x] Phase 4 - Wire Settings/Home unlock flows (secure-only, no legacy plaintext)"
   - "[ ] Phase 5 - Add tests and hardening"
 ---
 

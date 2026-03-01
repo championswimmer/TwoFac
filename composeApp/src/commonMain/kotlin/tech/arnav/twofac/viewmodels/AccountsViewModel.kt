@@ -11,10 +11,11 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.session.SessionManager
-import tech.arnav.twofac.companion.CompanionSyncCoordinator
+import tech.arnav.twofac.session.WebAuthnSessionManager
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -79,7 +80,10 @@ class AccountsViewModel(
         }
     }
 
-    fun loadAccountsWithOtps(passkey: String?) {
+    fun loadAccountsWithOtps(
+        passkey: String?,
+        fromAutoUnlock: Boolean = false,
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
@@ -109,6 +113,10 @@ class AccountsViewModel(
                 // Persist the passkey for session auto-unlock (if the user opted in)
                 if (passkey != null) {
                     sessionManager?.savePasskey(passkey)
+                    val webAuthnSessionManager = sessionManager as? WebAuthnSessionManager
+                    if (!fromAutoUnlock && webAuthnSessionManager?.isSecureUnlockEnabled() == true) {
+                        webAuthnSessionManager.enrollPasskey(passkey)
+                    }
                 }
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to load accounts with OTPs"

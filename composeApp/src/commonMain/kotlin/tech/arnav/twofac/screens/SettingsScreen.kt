@@ -48,6 +48,7 @@ import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.BackupTransport
 import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SessionManager
+import tech.arnav.twofac.session.WebAuthnSessionManager
 import tech.arnav.twofac.storage.getStoragePath
 
 private enum class BackupAction { EXPORT, IMPORT, SYNC_COMPANION }
@@ -83,11 +84,21 @@ fun SettingsScreen(
         mutableStateOf(sessionManager?.isRememberPasskeyEnabled() ?: false)
     }
     val biometricSessionManager = sessionManager as? BiometricSessionManager
+    val webAuthnSessionManager = sessionManager as? WebAuthnSessionManager
+    val rememberPasskeyTitle =
+        if (webAuthnSessionManager != null) "Secure Unlock" else "Remember Passkey"
+    val rememberPasskeyDescription = if (webAuthnSessionManager != null) {
+        "Require device credential verification before unlock and keep only encrypted passkey data in browser storage."
+    } else {
+        "Keep the passkey saved so you don't have to enter it every time the extension is opened. Only enable this on devices you trust."
+    }
     var isBiometricEnabled by remember {
         mutableStateOf(biometricSessionManager?.isBiometricEnabled() ?: false)
     }
     var showBiometricEnrollmentDialog by remember { mutableStateOf(false) }
     var biometricEnrollmentError by remember { mutableStateOf<String?>(null) }
+    var showSecureEnrollmentDialog by remember { mutableStateOf(false) }
+    var secureEnrollmentError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(companionSyncCoordinator) {
         companionDisplayName = companionSyncCoordinator?.companionDisplayName ?: "Watch"
@@ -175,23 +186,33 @@ fun SettingsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Remember Passkey",
+                                text = rememberPasskeyTitle,
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Switch(
                                 checked = isRememberPasskeyEnabled,
                                 onCheckedChange = { enabled ->
-                                    sessionManager.setRememberPasskey(enabled)
-                                    isRememberPasskeyEnabled = enabled
                                     if (!enabled) {
+                                        sessionManager.setRememberPasskey(false)
+                                        isRememberPasskeyEnabled = false
+                                        showSecureEnrollmentDialog = false
+                                        secureEnrollmentError = null
                                         biometricSessionManager?.setBiometricEnabled(false)
                                         isBiometricEnabled = false
+                                        return@Switch
                                     }
+                                    if (webAuthnSessionManager != null) {
+                                        secureEnrollmentError = null
+                                        showSecureEnrollmentDialog = true
+                                        return@Switch
+                                    }
+                                    sessionManager.setRememberPasskey(true)
+                                    isRememberPasskeyEnabled = true
                                 }
                             )
                         }
                         Text(
-                            text = "Keep the passkey saved so you don't have to enter it every time the extension is opened. Only enable this on devices you trust.",
+                            text = rememberPasskeyDescription,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp)
@@ -521,6 +542,49 @@ fun SettingsScreen(
             onDismiss = {
                 pendingAction = null
                 passkeyError = null
+            }
+        )
+    }
+
+    if (showSecureEnrollmentDialog && webAuthnSessionManager != null) {
+        PasskeyDialog(
+            isVisible = true,
+            isLoading = isLoading,
+            error = secureEnrollmentError,
+            onPasskeySubmit = { passkey ->
+                secureEnrollmentError = null
+                isLoading = true
+                coroutineScope.launch {
+                    try {
+                        if (twoFacLib == null) {
+                            secureEnrollmentError = "Secure unlock is unavailable"
+                            return@launch
+                        }
+                        twoFacLib.unlock(passkey)
+                        webAuthnSessionManager.setSecureUnlockEnabled(true)
+                        val enrolled = webAuthnSessionManager.enrollPasskey(passkey)
+                        if (enrolled) {
+                            isRememberPasskeyEnabled =
+                                webAuthnSessionManager.isSecureUnlockEnabled()
+                            showSecureEnrollmentDialog = false
+                            snackbarHostState.showSnackbar("Secure unlock enabled")
+                        } else {
+                            webAuthnSessionManager.setSecureUnlockEnabled(false)
+                            isRememberPasskeyEnabled = false
+                            secureEnrollmentError = "Secure unlock enrollment cancelled"
+                        }
+                    } catch (e: Exception) {
+                        webAuthnSessionManager.setSecureUnlockEnabled(false)
+                        isRememberPasskeyEnabled = false
+                        secureEnrollmentError = e.message ?: "Failed to verify passkey"
+                    } finally {
+                        isLoading = false
+                    }
+                }
+            },
+            onDismiss = {
+                showSecureEnrollmentDialog = false
+                secureEnrollmentError = null
             }
         )
     }
