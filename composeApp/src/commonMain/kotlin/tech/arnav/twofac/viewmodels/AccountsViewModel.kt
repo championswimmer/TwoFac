@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.session.WebAuthnSessionManager
 import kotlin.time.Clock
@@ -113,9 +114,10 @@ class AccountsViewModel(
                 // Persist the passkey for session auto-unlock (if the user opted in)
                 if (passkey != null) {
                     sessionManager?.savePasskey(passkey)
-                    val webAuthnSessionManager = sessionManager as? WebAuthnSessionManager
-                    if (!fromAutoUnlock && webAuthnSessionManager?.isSecureUnlockEnabled() == true) {
-                        webAuthnSessionManager.enrollPasskey(passkey)
+                    val secureSessionManager =
+                        sessionManagerForPostUnlockEnrollment(sessionManager, fromAutoUnlock)
+                    if (secureSessionManager is WebAuthnSessionManager) {
+                        secureSessionManager.enrollPasskey(passkey)
                     }
                 }
             } catch (e: Exception) {
@@ -183,4 +185,13 @@ class AccountsViewModel(
     fun clearError() {
         _error.value = null
     }
+}
+
+internal fun sessionManagerForPostUnlockEnrollment(
+    sessionManager: SessionManager?,
+    fromAutoUnlock: Boolean,
+): SecureSessionManager? {
+    if (fromAutoUnlock) return null
+    val secureSessionManager = sessionManager as? SecureSessionManager ?: return null
+    return secureSessionManager.takeIf { it.isSecureUnlockEnabled() }
 }

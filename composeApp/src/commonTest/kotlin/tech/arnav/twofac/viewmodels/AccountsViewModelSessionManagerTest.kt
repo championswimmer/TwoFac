@@ -1,0 +1,61 @@
+package tech.arnav.twofac.viewmodels
+
+import tech.arnav.twofac.session.SecureSessionManager
+import tech.arnav.twofac.session.SessionManager
+import kotlin.test.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+
+class AccountsViewModelSessionManagerTest {
+    @Test
+    fun sessionManagerForPostUnlockEnrollmentReturnsNullForNonSecureManager() {
+        val manager = FakeSessionManager()
+        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
+        assertNull(result)
+    }
+
+    @Test
+    fun sessionManagerForPostUnlockEnrollmentReturnsNullForAutoUnlock() {
+        val manager = FakeSecureSessionManager(secureEnabled = true)
+        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = true)
+        assertNull(result)
+    }
+
+    @Test
+    fun sessionManagerForPostUnlockEnrollmentReturnsNullWhenSecureUnlockDisabled() {
+        val manager = FakeSecureSessionManager(secureEnabled = false)
+        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
+        assertNull(result)
+    }
+
+    @Test
+    fun sessionManagerForPostUnlockEnrollmentReturnsSecureManagerWhenManualUnlockAndEnabled() {
+        val manager = FakeSecureSessionManager(secureEnabled = true)
+        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
+        assertNotNull(result)
+    }
+}
+
+private class FakeSessionManager : SessionManager {
+    override fun isAvailable(): Boolean = true
+    override fun isRememberPasskeyEnabled(): Boolean = false
+    override fun setRememberPasskey(enabled: Boolean) = Unit
+    override suspend fun getSavedPasskey(): String? = null
+    override fun savePasskey(passkey: String) = Unit
+    override fun clearPasskey() = Unit
+}
+
+private class FakeSecureSessionManager(
+    private val secureEnabled: Boolean,
+) : SecureSessionManager {
+    override fun isAvailable(): Boolean = true
+    override fun isRememberPasskeyEnabled(): Boolean = secureEnabled
+    override fun setRememberPasskey(enabled: Boolean) = Unit
+    override suspend fun getSavedPasskey(): String? = null
+    override fun savePasskey(passkey: String) = Unit
+    override fun clearPasskey() = Unit
+    override fun isSecureUnlockAvailable(): Boolean = true
+    override fun isSecureUnlockEnabled(): Boolean = secureEnabled
+    override fun setSecureUnlockEnabled(enabled: Boolean) = Unit
+    override suspend fun enrollPasskey(passkey: String): Boolean = true
+}
