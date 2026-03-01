@@ -242,7 +242,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		B9DA97F42DC1497100A4DA20 /* Compile Kotlin Framework */ = {
+		B9DA97F42DC1497100A4DA20 /* Compile TwoFacUIKit Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -252,7 +252,7 @@
 			);
 			inputPaths = (
 			);
-			name = "Compile Kotlin Framework";
+			name = "Compile TwoFacUIKit Framework";
 			outputFileListPaths = (
 			);
 			outputPaths = (

@@ -96,6 +96,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Setup WiX
+        run: choco install wixtoolset
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
@@ -134,8 +137,33 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
+      - name: Build CLI (macOS arm64)
+        run: ./gradlew :cliApp:linkReleaseExecutableMacosArm64
+
+      - name: Build CLI (macOS x64)
+        run: ./gradlew :cliApp:linkReleaseExecutableMacosX64
+
+      - name: Upload CLI (macOS arm64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-macos-arm64
+          path: cliApp/build/bin/macosArm64/releaseExecutable/2fac.kexe
+
+      - name: Upload CLI (macOS x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-macos-x64
+          path: cliApp/build/bin/macosX64/releaseExecutable/2fac.kexe
+
       - name: Build macOS Desktop (DMG)
         run: ./gradlew :composeApp:packageDmg
+
+      - name: Upload macOS Desktop (DMG)
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-desktop-dmg
+          path: composeApp/build/compose/binaries/main/dmg/*.dmg
+
 
       - name: Build iOS frameworks (arm64, simulator)
         run: ./gradlew :composeApp:linkReleaseFrameworkIosArm64 :composeApp:linkReleaseFrameworkIosSimulatorArm64
@@ -144,11 +172,11 @@ jobs:
         run: |
           mkdir -p composeApp/build/XCFrameworks/release
           xcodebuild -create-xcframework \
-            -framework composeApp/build/bin/iosArm64/releaseFramework/TwoFacKit.framework \
-            -framework composeApp/build/bin/iosSimulatorArm64/releaseFramework/TwoFacKit.framework \
-            -output composeApp/build/XCFrameworks/release/TwoFacKit.xcframework
+            -framework composeApp/build/bin/iosArm64/releaseFramework/TwoFacUIKit.framework \
+            -framework composeApp/build/bin/iosSimulatorArm64/releaseFramework/TwoFacUIKit.framework \
+            -output composeApp/build/XCFrameworks/release/TwoFacUIKit.xcframework
           cd composeApp/build/XCFrameworks/release
-          zip -r TwoFacKit.xcframework.zip TwoFacKit.xcframework
+          zip -r TwoFacUIKit.xcframework.zip TwoFacUIKit.xcframework
 
       - name: Import signing certificate
         if: ${{ env.IOS_SIGNING_CERTIFICATE_P12_BASE64 != '' }}
@@ -212,23 +240,11 @@ jobs:
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             -exportPath "$RUNNER_TEMP/ipa"
 
-      - name: Build CLI (macOS arm64)
-        run: ./gradlew :cliApp:linkReleaseExecutableMacosArm64
-
-      - name: Build CLI (macOS x64)
-        run: ./gradlew :cliApp:linkReleaseExecutableMacosX64
-
-      - name: Upload macOS Desktop (DMG)
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-desktop-dmg
-          path: composeApp/build/compose/binaries/main/dmg/*.dmg
-
       - name: Upload iOS XCFramework
         uses: actions/upload-artifact@v4
         with:
           name: ios-xcframework
-          path: composeApp/build/XCFrameworks/release/TwoFacKit.xcframework.zip
+          path: composeApp/build/XCFrameworks/release/TwoFacUIKit.xcframework.zip
 
       - name: Upload iOS IPA
         if: ${{ env.IOS_TEAM_ID != '' }}
@@ -237,21 +253,9 @@ jobs:
           name: ios-ipa
           path: ${{ runner.temp }}/ipa/*.ipa
 
-      - name: Upload CLI (macOS arm64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: cli-macos-arm64
-          path: cliApp/build/bin/macosArm64/releaseExecutable/2fac.kexe
-
-      - name: Upload CLI (macOS x64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: cli-macos-x64
-          path: cliApp/build/bin/macosX64/releaseExecutable/2fac.kexe
-
   release:
     name: "Create GitHub Release"
-    needs: [build-ubuntu, build-windows, build-macos]
+    needs: [ build-ubuntu, build-windows, build-macos ]
     if: always() && (needs.build-ubuntu.result == 'success' || needs.build-windows.result == 'success' || needs.build-macos.result == 'success')
     runs-on: ubuntu-latest
     permissions:
@@ -303,7 +307,7 @@ jobs:
             artifacts/windows-desktop-msi/*.msi
             artifacts/2fac-windows-x64.exe
             artifacts/macos-desktop-dmg/*.dmg
-            artifacts/ios-xcframework/TwoFacKit.xcframework.zip
+            artifacts/ios-xcframework/TwoFacUIKit.xcframework.zip
             artifacts/ios-ipa/*.ipa
             artifacts/2fac-macos-arm64.tar.gz
             artifacts/2fac-macos-x64.tar.gz

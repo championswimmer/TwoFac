@@ -228,7 +228,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "tech.arnav.twofac"
+            packageName = "TwoFac"
             packageVersion = rootProject.extra["appVersionName"] as String
 
             linux {
