@@ -107,6 +107,11 @@ kotlin {
                     static(projectDirPath)
                 }
             }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
         }
         binaries.executable()
     }
@@ -157,6 +162,7 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.kstore.storage)
+            implementation(npm("webextension-polyfill", "0.12.0"))
         }
     }
 }
