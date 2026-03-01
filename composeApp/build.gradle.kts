@@ -162,7 +162,7 @@ kotlin {
 }
 
 dependencies {
-    androidRuntimeClasspath(compose.uiTooling)
+    androidRuntimeClasspath(libs.compose.uiTooling)
 }
 
 val appVersionName = rootProject.extra["appVersionName"] as String
