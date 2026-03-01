@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		C1A000012EC1000000A4DA20 /* watchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = C1A000032EC1000000A4DA20 /* watchApp.app */; };
-		C1A000022EC1000000A4DA20 /* watchAppExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C1A000042EC1000000A4DA20 /* watchAppExtension.appex */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -18,13 +17,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C1A0000D2EC1000000A4DA20;
 			remoteInfo = watchApp;
-		};
-		C1A0001D2EC1000000A4DA20 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B9DA97A92DC1472C00A4DA20 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C1A0000E2EC1000000A4DA20;
-			remoteInfo = watchAppExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -40,26 +32,23 @@
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C1A0000A2EC1000000A4DA20 /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				C1A000022EC1000000A4DA20 /* watchAppExtension.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B9DA97B12DC1472C00A4DA20 /* twofac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = twofac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1A000032EC1000000A4DA20 /* watchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = watchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C1A000042EC1000000A4DA20 /* watchAppExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = watchAppExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		950547452F53EE3A00A5ABB0 /* Exceptions for "watchAppExtension" folder in "watchApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				TwoFacWatchApp.swift,
+				WatchConnectivityManager.swift,
+				WatchExtensionContentView.swift,
+			);
+			target = C1A0000D2EC1000000A4DA20 /* watchApp */;
+		};
 		B99700CA2DC9B8D800C7335B /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -73,13 +62,6 @@
 				Info.plist,
 			);
 			target = C1A0000D2EC1000000A4DA20 /* watchApp */;
-		};
-		C1A000062EC1000000A4DA20 /* Exceptions for "watchAppExtension" folder in "watchAppExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = C1A0000E2EC1000000A4DA20 /* watchAppExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -108,7 +90,7 @@
 		C1A000082EC1000000A4DA20 /* watchAppExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				C1A000062EC1000000A4DA20 /* Exceptions for "watchAppExtension" folder in "watchAppExtension" target */,
+				950547452F53EE3A00A5ABB0 /* Exceptions for "watchAppExtension" folder in "watchApp" target */,
 			);
 			path = watchAppExtension;
 			sourceTree = "<group>";
@@ -149,7 +131,6 @@
 			children = (
 				B9DA97B12DC1472C00A4DA20 /* twofac.app */,
 				C1A000032EC1000000A4DA20 /* watchApp.app */,
-				C1A000042EC1000000A4DA20 /* watchAppExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -187,12 +168,13 @@
 			buildConfigurationList = C1A0001A2EC1000000A4DA20 /* Build configuration list for PBXNativeTarget "watchApp" */;
 			buildPhases = (
 				C1A000112EC1000000A4DA20 /* Resources */,
-				C1A0000A2EC1000000A4DA20 /* Embed App Extensions */,
+				C1A000152EC1000000A4DA20 /* Compile TwoFacKit Framework */,
+				C1A000142EC1000000A4DA20 /* Sources */,
+				C1A0000C2EC1000000A4DA20 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				C1A000102EC1000000A4DA20 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C1A000072EC1000000A4DA20 /* watchApp */,
@@ -202,30 +184,7 @@
 			);
 			productName = watchApp;
 			productReference = C1A000032EC1000000A4DA20 /* watchApp.app */;
-			productType = "com.apple.product-type.application.watchapp2";
-		};
-		C1A0000E2EC1000000A4DA20 /* watchAppExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C1A0001B2EC1000000A4DA20 /* Build configuration list for PBXNativeTarget "watchAppExtension" */;
-			buildPhases = (
-				C1A000152EC1000000A4DA20 /* Compile TwoFacKit Framework */,
-				C1A000142EC1000000A4DA20 /* Sources */,
-				C1A0000C2EC1000000A4DA20 /* Frameworks */,
-				C1A000122EC1000000A4DA20 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				C1A000082EC1000000A4DA20 /* watchAppExtension */,
-			);
-			name = watchAppExtension;
-			packageProductDependencies = (
-			);
-			productName = watchAppExtension;
-			productReference = C1A000042EC1000000A4DA20 /* watchAppExtension.appex */;
-			productType = "com.apple.product-type.watchkit2-extension";
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -235,15 +194,12 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					B9DA97B02DC1472C00A4DA20 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 					C1A0000D2EC1000000A4DA20 = {
-						CreatedOnToolsVersion = 16.2;
-					};
-					C1A0000E2EC1000000A4DA20 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
@@ -264,7 +220,6 @@
 			targets = (
 				B9DA97B02DC1472C00A4DA20 /* iosApp */,
 				C1A0000D2EC1000000A4DA20 /* watchApp */,
-				C1A0000E2EC1000000A4DA20 /* watchAppExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -278,13 +233,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C1A000112EC1000000A4DA20 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C1A000122EC1000000A4DA20 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -357,11 +305,6 @@
 			target = C1A0000D2EC1000000A4DA20 /* watchApp */;
 			targetProxy = C1A0001C2EC1000000A4DA20 /* PBXContainerItemProxy */;
 		};
-		C1A000102EC1000000A4DA20 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C1A0000E2EC1000000A4DA20 /* watchAppExtension */;
-			targetProxy = C1A0001D2EC1000000A4DA20 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -423,6 +366,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -479,6 +423,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -495,7 +440,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = 9UV5DX2Q64;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
 				EXCLUDED_ARCHS = x86_64;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -560,12 +505,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = watchApp/watchApp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9UV5DX2Q64;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				EXCLUDED_ARCHS = x86_64;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watchApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -581,12 +530,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = watchApp/watchApp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				EXCLUDED_ARCHS = x86_64;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watchApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -595,76 +548,6 @@
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 				WK_COMPANION_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.app;
-			};
-			name = Release;
-		};
-		C1A000182EC1000000A4DA20 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9UV5DX2Q64;
-				EXCLUDED_ARCHS = x86_64;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/../sharedLib/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
-				);
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = watchAppExtension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-framework",
-					TwoFacKit,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-				WK_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp;
-			};
-			name = Debug;
-		};
-		C1A000192EC1000000A4DA20 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = watchAppExtension/watchAppExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
-				EXCLUDED_ARCHS = x86_64;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/../sharedLib/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
-				);
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = watchAppExtension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-framework",
-					TwoFacKit,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-				WK_APP_BUNDLE_IDENTIFIER = tech.arnav.twofac.app.watchkitapp;
 			};
 			name = Release;
 		};
@@ -694,15 +577,6 @@
 			buildConfigurations = (
 				C1A000162EC1000000A4DA20 /* Debug */,
 				C1A000172EC1000000A4DA20 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C1A0001B2EC1000000A4DA20 /* Build configuration list for PBXNativeTarget "watchAppExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C1A000182EC1000000A4DA20 /* Debug */,
-				C1A000192EC1000000A4DA20 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
