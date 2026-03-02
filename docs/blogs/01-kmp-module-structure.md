@@ -42,36 +42,86 @@ Our CLI tool is completely separate from `composeApp`. It depends directly on `s
 You might notice we have separate `watchApp` (Android Wear) and iOS watch modules. Why not use `composeApp`?
 A full-blown Compose Multiplatform UI is heavy, and on a tiny circular screen, the UI needs are fundamentally different. I didn't want the watch apps to inherit the bloat of the main application. Instead, they are designed to be thin clients that simply display synced accounts. Therefore, they bypass `composeApp` entirely and depend directly on `sharedLib` to handle the decryption and TOTP generation locally, using native UI frameworks (like SwiftUI for the Apple Watch) for the best possible performance and look.
 
+### Desktop and CLI Applications
+
+Our desktop and command-line interfaces are tailored for each major operating system. The CLI links directly to the `sharedLib` for instant native execution, while the graphical desktop apps use `composeApp` to render the UI.
+
 ```mermaid
 graph TD
-    subgraph Core
-        sharedLib[sharedLib: Logic Engine]
-    end
-
-    subgraph UI_Layer
-        composeApp[composeApp: Shared UI]
-    end
-
-    subgraph Thin_Wrappers
-        androidApp[androidApp: Android Wrapper]
-        iosApp[iosApp: iOS Wrapper]
-    end
-
-    subgraph Standalone_Apps
-        cliApp[cliApp: Native CLI]
-        watchApp[watchApp: WearOS / SwiftUI]
-        desktopApp[Desktop Installers]
-        webApp[Wasm PWA & Extensions]
-    end
-
-    sharedLib --> composeApp
-    sharedLib --> cliApp
-    sharedLib --> watchApp
+    sharedLib["sharedLib<br/>(Pure KMP Logic)"]
+    composeApp["composeApp<br/>(Compose Multiplatform)"]
     
-    composeApp --> androidApp
-    composeApp --> iosApp
-    composeApp --> desktopApp
-    composeApp --> webApp
+    sharedLib -->|api| composeApp
+
+    subgraph Desktop Applications
+        deskMac["macOS (.dmg)"]
+        deskWin["Windows (.msi)"]
+        deskLin["Linux (.deb)"]
+    end
+
+    subgraph Native CLI Applications
+        cliMac["macOS (2fac)"]
+        cliWin["Windows (2fac.exe)"]
+        cliLin["Linux (2fac)"]
+    end
+    
+    composeApp -->|nativeDistributions| deskMac
+    composeApp -->|nativeDistributions| deskWin
+    composeApp -->|nativeDistributions| deskLin
+    
+    sharedLib -->|implementation| cliMac
+    sharedLib -->|implementation| cliWin
+    sharedLib -->|implementation| cliLin
+```
+
+### Mobile and Watch Applications
+
+For mobile devices, `composeApp` acts as the shared UI layer wrapped by very thin native application projects. However, the watch apps bypass the shared UI layer entirely, directly consuming `sharedLib` and using platform-native UIs (Compose for WearOS and SwiftUI for Apple Watch).
+
+```mermaid
+graph TD
+    sharedLib["sharedLib<br/>(Pure KMP Logic)"]
+    composeApp["composeApp<br/>(Compose Multiplatform)"]
+    
+    sharedLib -->|api| composeApp
+
+    subgraph Mobile Apps
+        androidApp["androidApp<br/>(Android)"]
+        iosApp["iosApp<br/>(iOS)"]
+    end
+
+    subgraph Standalone Watch Apps
+        wearApp["watchApp<br/>(Android WearOS)"]
+        appleWatch["watchApp<br/>(Apple watchOS)"]
+    end
+
+    composeApp -->|implementation| androidApp
+    composeApp -->|TwoFacUIKit.framework| iosApp
+    
+    sharedLib -->|implementation| wearApp
+    sharedLib -->|TwoFacKit.framework| appleWatch
+```
+
+### Web App and Browser Extensions
+
+Leveraging the power of Wasm, the exact same `composeApp` output is used to generate our Progressive Web App as well as our browser extensions, ensuring complete feature parity across the web ecosystem.
+
+```mermaid
+graph TD
+    sharedLib["sharedLib<br/>(Pure KMP Logic)"]
+    composeApp["composeApp<br/>(Compose Multiplatform)"]
+    
+    sharedLib -->|api| composeApp
+
+    subgraph Web Targets
+        webPwa["Web PWA<br/>(index.html)"]
+        chromeExt["Chrome Extension<br/>(Manifest V3)"]
+        firefoxExt["Firefox Extension<br/>(Manifest V2/V3)"]
+    end
+
+    composeApp -->|wasmJsBrowserDistribution| webPwa
+    composeApp -->|wasmJsBrowserDistribution| chromeExt
+    composeApp -->|wasmJsBrowserDistribution| firefoxExt
 ```
 
 ## The "Terminal First" Experience
