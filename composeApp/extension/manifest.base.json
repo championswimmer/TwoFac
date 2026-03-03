@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "TwoFac Authenticator",
+  "name": "TwoFac",
   "version": "0.0.0",
   "description": "Two-factor authentication codes in your browser",
   "icons": {
