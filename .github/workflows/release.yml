@@ -102,23 +102,23 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Build Windows Desktop (MSI)
-        run: .\gradlew.bat :composeApp:packageMsi
-
       - name: Build CLI (Windows)
         run: .\gradlew.bat :cliApp:linkReleaseExecutableMingwX64
-
-      - name: Upload Windows Desktop (MSI)
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-desktop-msi
-          path: composeApp/build/compose/binaries/main/msi/*.msi
 
       - name: Upload CLI (Windows)
         uses: actions/upload-artifact@v4
         with:
           name: cli-windows-x64
           path: cliApp/build/bin/mingwX64/releaseExecutable/2fac.exe
+
+      - name: Build Windows Desktop (MSI)
+        run: .\gradlew.bat :composeApp:packageMsi
+
+      - name: Upload Windows Desktop (MSI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-desktop-msi
+          path: composeApp/build/compose/binaries/main/msi/*.msi
 
   build-macos:
     name: "Build macOS Desktop, iOS Framework and App, CLI (macOS)"
