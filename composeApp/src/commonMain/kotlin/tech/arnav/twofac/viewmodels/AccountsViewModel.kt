@@ -160,6 +160,38 @@ class AccountsViewModel(
         }
     }
 
+    fun deleteAccount(accountId: String, onComplete: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+
+            try {
+                if (!twoFacLibUnlocked) {
+                    _error.value = "Passkey is required to delete an account while vault is locked"
+                    onComplete(false)
+                    return@launch
+                }
+
+                val success = twoFacLib.deleteAccount(accountId)
+                if (success) {
+                    val accountOtpList = twoFacLib.getAllAccountOTPs()
+                    _accountOtps.value = accountOtpList
+                    _accounts.value = accountOtpList.map { it.first }
+                    companionSyncCoordinator?.onAccountsChanged()
+                    onComplete(true)
+                } else {
+                    _error.value = "Failed to delete account"
+                    onComplete(false)
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to delete account"
+                onComplete(false)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
     fun getOtpForAccount(accountId: String): String? {
         if (!twoFacLibUnlocked) {
             _error.value = "Accounts are not loaded. Please unlock accounts first"

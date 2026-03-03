@@ -42,6 +42,21 @@ class FileStorage(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun deleteAccount(accountID: Uuid): Boolean {
+        return try {
+            val currentAccounts = getAccountList()
+            val updatedAccounts = currentAccounts.filterNot { it.accountID == accountID }
+            if (updatedAccounts.size == currentAccounts.size) {
+                return false
+            }
+            kstore.set(updatedAccounts)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     override suspend fun deleteAllAccounts(): Boolean {
         return deleteAccountsStorage()
     }

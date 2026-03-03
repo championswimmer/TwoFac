@@ -41,6 +41,11 @@ class MemoryStorage : Storage {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun deleteAccount(accountID: Uuid): Boolean {
+        return accounts.removeAll { it.accountID == accountID }
+    }
+
     override suspend fun deleteAllAccounts(): Boolean {
         accounts.clear()
         return true

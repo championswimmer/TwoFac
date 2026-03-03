@@ -163,6 +163,22 @@ class MemoryStorageTest {
     }
 
     @Test
+    fun testDeleteAccountRemovesOnlyMatchingEntry() = runTest {
+        val storage = MemoryStorage()
+        val account1 = createTestStoredAccount(accountLabel = "GitHub:user1@example.com")
+        val account2 = createTestStoredAccount(accountLabel = "Google:user2@example.com")
+
+        assertTrue(storage.saveAccount(account1))
+        assertTrue(storage.saveAccount(account2))
+        assertEquals(2, storage.getAccountList().size)
+
+        assertTrue(storage.deleteAccount(account1.accountID))
+        assertNull(storage.getAccount(account1.accountID))
+        assertEquals(account2, storage.getAccount(account2.accountID))
+        assertEquals(1, storage.getAccountList().size)
+    }
+
+    @Test
     fun testSaveAccountsWithSameLabelButDifferentID() = runTest {
         val storage = MemoryStorage()
         val accountID1 = Uuid.random()

@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,6 +40,8 @@ fun AccountDetailScreen(
 ) {
     var passkeyText by remember { mutableStateOf("") }
     var currentOtp by remember { mutableStateOf<String?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var isDeleteInProgress by remember { mutableStateOf(false) }
 
     val accounts by viewModel.accounts.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -106,6 +111,17 @@ fun AccountDetailScreen(
                     )
                 }
 
+                Button(
+                    onClick = { showDeleteDialog = true },
+                    enabled = !isDeleteInProgress && !isLoading,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                ) {
+                    Text("Delete Account")
+                }
+
                 error?.let { errorMessage ->
                     Text(
                         text = "Error: $errorMessage",
@@ -121,5 +137,44 @@ fun AccountDetailScreen(
             }
 
         }
+    }
+
+    if (showDeleteDialog && account != null) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!isDeleteInProgress) {
+                    showDeleteDialog = false
+                }
+            },
+            title = { Text("Delete account?") },
+            text = {
+                Text("This will permanently remove ${account.accountLabel} from your vault.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        isDeleteInProgress = true
+                        viewModel.deleteAccount(accountId) { success ->
+                            isDeleteInProgress = false
+                            showDeleteDialog = false
+                            if (success) {
+                                onNavigateBack()
+                            }
+                        }
+                    },
+                    enabled = !isDeleteInProgress
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false },
+                    enabled = !isDeleteInProgress
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

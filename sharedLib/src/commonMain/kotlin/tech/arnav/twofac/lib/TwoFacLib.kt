@@ -17,6 +17,8 @@ import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.concurrent.Volatile
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @PublicApi
 class TwoFacLib private constructor(
@@ -107,6 +109,17 @@ class TwoFacLib private constructor(
         val success = storage.saveAccount(account)
         if (success) {
             // Refresh the in-memory account list
+            accountList = storage.getAccountList()
+        }
+        return success
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun deleteAccount(accountId: String): Boolean {
+        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        val parsedAccountId = Uuid.parse(accountId)
+        val success = storage.deleteAccount(parsedAccountId)
+        if (success) {
             accountList = storage.getAccountList()
         }
         return success

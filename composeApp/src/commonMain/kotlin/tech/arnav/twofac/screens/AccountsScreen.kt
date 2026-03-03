@@ -41,7 +41,7 @@ import tech.arnav.twofac.viewmodels.AccountsViewModel
 fun AccountsScreen(
     onNavigateToAddAccount: () -> Unit,
     onNavigateToAccountDetail: (String) -> Unit,
-    onNavigateBack: () -> Unit = {},
+    onNavigateBack: (() -> Unit)? = null,
     viewModel: AccountsViewModel = koinViewModel()
 ) {
     val accounts by viewModel.accounts.collectAsState()
@@ -63,8 +63,10 @@ fun AccountsScreen(
             TopAppBar(
                 title = { Text("Accounts") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    onNavigateBack?.let { navigateBack ->
+                        IconButton(onClick = navigateBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 }
             )

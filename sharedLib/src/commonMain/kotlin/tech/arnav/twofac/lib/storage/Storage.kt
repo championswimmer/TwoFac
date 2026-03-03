@@ -16,6 +16,9 @@ interface Storage {
 
     suspend fun saveAccount(account: StoredAccount): Boolean
 
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun deleteAccount(accountID: Uuid): Boolean
+
     suspend fun deleteAllAccounts(): Boolean
 
 }

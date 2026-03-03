@@ -1,6 +1,6 @@
 ---
 task: Create watchOS companion app
-status: In Progress
+status: Completed
 progress:
 - "[x] Add watchOS app target in `iosApp` Xcode project"
 - "[x] iOS <> watchOS connectivity layer (iOS side)"

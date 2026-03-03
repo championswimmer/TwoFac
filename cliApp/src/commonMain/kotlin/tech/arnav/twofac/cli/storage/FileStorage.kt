@@ -41,6 +41,21 @@ class FileStorage(
         true
     }.await()
 
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun deleteAccount(accountID: Uuid): Boolean = coroutineScope.async {
+        return@async try {
+            val currentAccounts = kstore.getOrEmpty()
+            val updatedAccounts = currentAccounts.filterNot { it.accountID == accountID }
+            if (updatedAccounts.size == currentAccounts.size) {
+                return@async false
+            }
+            kstore.set(updatedAccounts)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }.await()
+
     override suspend fun deleteAllAccounts(): Boolean = coroutineScope.async {
         return@async try {
             if (SystemFileSystem.exists(storageFilePath)) {

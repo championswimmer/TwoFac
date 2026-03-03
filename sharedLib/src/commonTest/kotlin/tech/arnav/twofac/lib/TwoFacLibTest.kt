@@ -100,4 +100,20 @@ class TwoFacLibTest {
         assertTrue(lib.isUnlocked())
         assertTrue(lib.getAllAccounts().isEmpty())
     }
+
+    @Test
+    fun testDeleteAccountRemovesSingleAccountFromStorage() = runTest {
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        assertTrue(
+            lib.addAccount(
+                "otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example"
+            )
+        )
+        val accountId = lib.getAllAccounts().single().accountID
+
+        val deleted = lib.deleteAccount(accountId)
+
+        assertTrue(deleted)
+        assertTrue(lib.getAllAccounts().isEmpty())
+    }
 }

@@ -7,7 +7,7 @@ progress:
    - "[x] Phase 2 - Implement wasmJs WebAuthnSessionManager secure unlock path with library-backed interop"
    - "[x] Phase 3 - Persist encrypted passkey and keep decrypted key session-only"
    - "[x] Phase 4 - Wire Settings/Home unlock flows (secure-only, no legacy plaintext)"
-  - "[ ] Phase 5 - Add tests and hardening"
+   - "[ ] Phase 5 - Add tests and hardening"
 ---
 
 # Web Device-Credential Unlock for Extension/PWA

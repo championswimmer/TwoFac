@@ -1,6 +1,6 @@
 ---
 task: Implement Biometric Authentication for Mobile Apps (Android & iOS)
-status: Not Started
+status: Completed
 progress:
   - "[x] Phase 0 — Common SessionManager groundwork"
   - "[x] Phase 1 — Android BiometricSessionManager"
