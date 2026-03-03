@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.ncgroup.kscan.Barcode
 import org.ncgroup.kscan.BarcodeFormat
 import org.ncgroup.kscan.BarcodeResult
 import org.ncgroup.kscan.ScannerView
@@ -16,6 +17,7 @@ import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVMediaTypeVideo
 import platform.AVFoundation.authorizationStatusForMediaType
 import platform.AVFoundation.requestAccessForMediaType
+import platform.Foundation.NSProcessInfo
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -24,6 +26,9 @@ class IosCameraQRCodeReader : ComposableCameraQRCodeReader {
     private val pendingScanResult = MutableStateFlow<CompletableDeferred<QRCodeReadResult>?>(null)
 
     override suspend fun readQRCode(): QRCodeReadResult {
+        if (isRunningOnSimulator()) {
+            return QRCodeReadResult.Unsupported
+        }
         if (!ensureCameraAccess()) {
             return QRCodeReadResult.PermissionDenied
         }
@@ -46,17 +51,18 @@ class IosCameraQRCodeReader : ComposableCameraQRCodeReader {
 
         ScannerView(
             modifier = modifier,
-            codeTypes = listOf(BarcodeFormat.FORMAT_QR_CODE),
+            codeTypes = listOf(BarcodeFormat.FORMAT_ALL_FORMATS),
         ) { result ->
             if (pendingScanResult.value !== scan || scan.isCompleted) {
                 return@ScannerView
             }
 
             val mappedResult = when (result) {
-                is BarcodeResult.OnSuccess -> decodedPayloadToQRCodeReadResult(result.barcode.data)
-                is BarcodeResult.OnFailed -> QRCodeReadResult.DecodeFailure(
-                    result.exception.message ?: "Failed to scan QR code",
-                )
+                is BarcodeResult.OnSuccess -> mapScannedBarcode(result.barcode)
+                is BarcodeResult.OnFailed ->
+                    QRCodeReadResult.DecodeFailure(
+                        result.exception.message ?: "Failed to scan QR code",
+                    )
                 BarcodeResult.OnCanceled -> QRCodeReadResult.Canceled
             }
 
@@ -77,5 +83,15 @@ class IosCameraQRCodeReader : ComposableCameraQRCodeReader {
         AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo) { granted: Boolean ->
             continuation.resume(granted)
         }
+    }
+
+    private fun mapScannedBarcode(barcode: Barcode): QRCodeReadResult =
+        QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(
+            primaryPayload = barcode.data,
+            rawBytes = barcode.rawBytes,
+        )
+
+    private fun isRunningOnSimulator(): Boolean {
+        return NSProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != null
     }
 }

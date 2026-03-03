@@ -78,7 +78,13 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
         ) { result ->
             when (result) {
                 is BarcodeResult.OnSuccess ->
-                    finishScan(activeScan, decodedPayloadToQRCodeReadResult(result.barcode.data))
+                    finishScan(
+                        activeScan,
+                        QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(
+                            primaryPayload = result.barcode.data,
+                            rawBytes = result.barcode.rawBytes,
+                        ),
+                    )
 
                 is BarcodeResult.OnFailed ->
                     finishScan(
