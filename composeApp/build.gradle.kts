@@ -144,6 +144,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
         androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.biometric)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.play.services.wearable)

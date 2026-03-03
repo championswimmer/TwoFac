@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import org.koin.dsl.module
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
+import tech.arnav.twofac.qr.AndroidCameraQRCodeReader
+import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.session.AndroidBiometricSessionManager
 import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SecureSessionManager
@@ -35,4 +37,8 @@ fun androidBiometricModule(
     }
     single<SecureSessionManager> { get<BiometricSessionManager>() }
     single<SessionManager> { get<BiometricSessionManager>() }
+}
+
+val androidQrModule = module {
+    single<CameraQRCodeReader> { AndroidCameraQRCodeReader() }
 }

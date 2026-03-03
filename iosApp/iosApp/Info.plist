@@ -4,5 +4,7 @@
     <dict>
         <key>CADisableMinimumFrameDurationOnPhone</key>
         <true />
+        <key>NSCameraUsageDescription</key>
+        <string>Camera access is required to scan 2FA QR codes.</string>
     </dict>
 </plist>
