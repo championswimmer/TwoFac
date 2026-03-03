@@ -1,10 +1,12 @@
 package tech.arnav.twofac.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -21,7 +23,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.compose_multiplatform
 import tech.arnav.twofac.components.OTPCard
 import tech.arnav.twofac.components.PasskeyDialog
 import tech.arnav.twofac.viewmodels.AccountsViewModel
@@ -108,9 +113,10 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
                 ) {
-                    Text(
-                        text = "🔐",
-                        style = MaterialTheme.typography.displayLarge
+                    Image(
+                        painter = painterResource(Res.drawable.compose_multiplatform),
+                        contentDescription = "TwoFac",
+                        modifier = Modifier.size(120.dp)
                     )
                     Text(
                         text = "No accounts added",
