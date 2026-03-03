@@ -7,6 +7,9 @@ tags: kotlin, kmp, architecture, opensource, multiplatform
 
 ---
 
+![](./img/01-kmp-hero-image.png)
+
+
 In my [previous post](https://arnav.tech/my-next-project-building-the-open-source-cross-platform-authenticator-i-always-wanted), I talked about why I'm building **TwoFac**. The short version? I got tired of proprietary "digital cages" like Authy and wanted an authenticator that was open, secure, and—most importantly—everywhere I am.
 
 When I started sketching out the project, I knew I wanted it to run on everything from my Android phone and Apple Watch to my Linux terminal and Chrome browser. But as usually happens during such "yak shaving sessions," I spent a good chunk of time just thinking about the architecture. How do you share code between a SwiftUI Watch app, a Wasm-based browser extension, and a native Linux CLI without losing your mind?
@@ -14,6 +17,8 @@ When I started sketching out the project, I knew I wanted it to run on everythin
 Today, I want to walk you through the technical decisions and the module structure that makes TwoFac possible.
 
 ## The Core Philosophy: Logic as a Library
+
+![](./img/01-kmp-architecture.jpg)
 
 A mistake I see often in cross-platform development is trying to force a single UI framework onto every device. While Compose Multiplatform is amazing (and we use it!), sometimes you just want a native experience—like on the tiny circular screen of a watch.
 
@@ -36,6 +41,9 @@ If `composeApp` holds the UI, how do the mobile apps work? We have very thin `an
 *   Similarly, `iosApp` is just a standard Xcode project with a Swift entry point that delegates to the shared Compose UI framework.
 
 **The Pure Native CLI (`cliApp`):**
+
+![](./img/01-kmp-cli.jpg)
+
 Our CLI tool is completely separate from `composeApp`. It depends directly on `sharedLib`. But here is the cool part: `cliApp` uses Kotlin/Native to compile into a pure native binary for Mac, Windows, and Linux. There is zero JVM involved when you run `2fac` in your terminal; it links against `sharedLib` as a native `klib`, making it incredibly fast.
 
 **Why the Watches Stand Alone:**
@@ -150,6 +158,8 @@ crypto-core = { module = "dev.whyoleg.cryptography:cryptography-core", version.r
 ```
 
 ## Data Persistence: Enter KStore
+
+![](./img/01-kmp-kstore.jpg)
 
 One problem I faced early on was how to handle data storage. A browser extension uses `localStorage`, a mobile app uses files (or DataStore), and a CLI tool might use a hidden folder in `$HOME`.
 
