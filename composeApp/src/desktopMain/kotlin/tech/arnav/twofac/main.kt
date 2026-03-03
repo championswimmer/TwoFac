@@ -13,7 +13,7 @@ fun main() {
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "twofac",
+            title = "TwoFac",
             icon = painterResource("twofac_icon.png"),
         ) {
             App()
