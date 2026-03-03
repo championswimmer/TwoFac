@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -65,7 +65,7 @@ fun AccountsScreen(
                 navigationIcon = {
                     onNavigateBack?.let { navigateBack ->
                         IconButton(onClick = navigateBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                         }
                     }
                 }
@@ -73,7 +73,7 @@ fun AccountsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToAddAccount) {
-                Icon(Icons.Default.Add, contentDescription = "Add Account")
+                Icon(Icons.Rounded.Add, contentDescription = "Add Account")
             }
         }
     ) { paddingValues ->

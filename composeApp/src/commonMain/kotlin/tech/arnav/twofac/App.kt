@@ -2,9 +2,9 @@ package tech.arnav.twofac
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.ManageAccounts
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -40,9 +40,9 @@ private enum class TopLevelDestination(
     val icon: ImageVector,
     val contentDescription: String,
 ) {
-    HOME("Home", Icons.Filled.Home, "Home"),
-    ACCOUNTS("Accounts", Icons.Filled.ManageAccounts, "Accounts"),
-    SETTINGS("Settings", Icons.Filled.Settings, "Settings"),
+    HOME("Home", Icons.Rounded.Home, "Home"),
+    ACCOUNTS("Accounts", Icons.Rounded.ManageAccounts, "Accounts"),
+    SETTINGS("Settings", Icons.Rounded.Settings, "Settings"),
 }
 
 @Composable
