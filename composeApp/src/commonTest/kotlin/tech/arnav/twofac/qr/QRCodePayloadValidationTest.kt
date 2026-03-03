@@ -50,4 +50,34 @@ class QRCodePayloadValidationTest {
         val success = assertIs<QRCodeReadResult.Success>(result)
         assertEquals(validOtpAuthUri, success.otpAuthUri)
     }
+
+    @Test
+    fun decodedPayloadCandidatesToQRCodeReadResultExtractsEmbeddedOtpAuthUri() {
+        val result = QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(
+            primaryPayload = "Scanned payload: $validOtpAuthUri",
+        )
+
+        val success = assertIs<QRCodeReadResult.Success>(result)
+        assertEquals(validOtpAuthUri, success.otpAuthUri)
+    }
+
+    @Test
+    fun decodedPayloadCandidatesToQRCodeReadResultRecoversFromNullInterleavedRawBytes() {
+        val result = QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(
+            primaryPayload = null,
+            rawBytes = validOtpAuthUri.toNullInterleavedBytes(),
+        )
+
+        val success = assertIs<QRCodeReadResult.Success>(result)
+        assertEquals(validOtpAuthUri, success.otpAuthUri)
+    }
+
+    private fun String.toNullInterleavedBytes(): ByteArray {
+        val interleavedBytes = ByteArray(length * 2)
+        forEachIndexed { index, char ->
+            interleavedBytes[index * 2] = char.code.toByte()
+            interleavedBytes[index * 2 + 1] = 0
+        }
+        return interleavedBytes
+    }
 }
