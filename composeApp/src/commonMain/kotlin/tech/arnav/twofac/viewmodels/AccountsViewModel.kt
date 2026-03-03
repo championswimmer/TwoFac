@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.qr.CameraQRCodeReader
+import tech.arnav.twofac.qr.ClipboardQRCodeReader
 import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.session.WebAuthnSessionManager
@@ -24,6 +26,8 @@ class AccountsViewModel(
     private val twoFacLib: TwoFacLib,
     private val companionSyncCoordinator: CompanionSyncCoordinator? = null,
     private val sessionManager: SessionManager? = null,
+    val cameraQRCodeReader: CameraQRCodeReader? = null,
+    val clipboardQRCodeReader: ClipboardQRCodeReader? = null,
 ) : ViewModel() {
 
     companion object {

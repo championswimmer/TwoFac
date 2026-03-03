@@ -1,9 +1,9 @@
 ---
 name: QR Account Scanning (Camera + Clipboard)
-status: Planned
+status: In Progress
 progress:
-  - "[ ] Phase 0 - Lock QR stack and DI contract shape"
-  - "[ ] Phase 1 - Add common QR reader contracts and result model"
+  - "[x] Phase 0 - Lock QR stack and DI contract shape"
+  - "[x] Phase 1 - Add common QR reader contracts and result model"
   - "[ ] Phase 2 - Implement Android+iOS camera QR readers with permission flows"
   - "[ ] Phase 3 - Implement Desktop+Web clipboard image QR readers"
   - "[ ] Phase 4 - Wire Add Account UX for scan/paste/manual entry"
@@ -134,20 +134,34 @@ Design note: keep result/error mapping platform-agnostic in common code and isol
 
 ### Phase 0 - Lock QR stack and DI contract shape
 
+Status: ✅ Completed
+
 1. Finalize implementation choice:
-   - KScan for Android+iOS camera scanning
-   - jsQR for web paste decode
-   - ZXing for desktop paste decode
+   - KScan for Android+iOS camera scanning ✅
+   - jsQR for web paste decode ✅
+   - ZXing for desktop paste decode ✅
 2. Lock contract boundaries:
-   - `QRCodeReader`, `CameraQRCodeReader`, `ClipboardQRCodeReader`
-   - common result model
-3. Lock fallback behavior for unsupported targets (optional DI + disabled UI action)
+   - `QRCodeReader`, `CameraQRCodeReader`, `ClipboardQRCodeReader` ✅
+   - common result model ✅
+3. Lock fallback behavior for unsupported targets (optional DI + disabled UI action) ✅
+4. Implemented in:
+   - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/qr/QRCodeReader.kt`
+   - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/qr/QRCodeReadResult.kt`
+   - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/di/modules.kt`
+   - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/viewmodels/AccountsViewModel.kt`
+   - `composeApp/build.gradle.kts`
+   - `gradle/libs.versions.toml`
 
 ### Phase 1 - Add common QR reader contracts and result model
 
-1. Add QR contract/result types in `composeApp/src/commonMain/.../qr/`.
-2. Add helper(s) in common code to validate decoded strings as `otpauth://...` before sending to `addAccount`.
-3. Keep business logic in sharedLib unchanged (decode only feeds existing URI workflow).
+Status: ✅ Completed
+
+1. Add QR contract/result types in `composeApp/src/commonMain/.../qr/`. ✅
+2. Add helper(s) in common code to validate decoded strings as `otpauth://...` before sending to `addAccount`. ✅
+3. Keep business logic in sharedLib unchanged (decode only feeds existing URI workflow). ✅
+4. Implemented in:
+   - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/qr/QRCodePayloadValidation.kt`
+   - `composeApp/src/commonTest/kotlin/tech/arnav/twofac/qr/QRCodePayloadValidationTest.kt`
 
 ### Phase 2 - Implement Android+iOS camera QR readers with permission flows
 
@@ -198,12 +212,17 @@ Design note: keep result/error mapping platform-agnostic in common code and isol
 1. Add common tests for URI validation/result mapping helpers.
 2. Add desktop reader tests around clipboard-image decode path where feasible.
 3. Add wasm unit/integration tests for paste/image decode adapters where feasible.
-4. Manual smoke validation matrix:
-   - Android: permission deny/allow + scan success/failure
-   - iOS: permission deny/allow + scan success/failure
-   - Desktop: paste image with/without QR
-   - Web: paste image with Async API and paste-event fallback
-5. Run compose module compile/tests for changed targets.
+4. Generate deterministic QR PNG fixtures with `qrencode` and commit them as test resources for CI:
+   - `qrencode -o composeApp/src/commonTest/resources/qr/valid-totp.png "otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Example"`
+   - `qrencode -o composeApp/src/commonTest/resources/qr/invalid-http.png "https://example.com/not-otpauth"`
+   - Optional stability flags for fixture generation: `-s 8 -m 2 -l M`
+5. Use generated fixtures in desktop+wasm decode tests to validate full decode + payload validation behavior in CI.
+6. Manual smoke validation matrix:
+    - Android: permission deny/allow + scan success/failure
+    - iOS: permission deny/allow + scan success/failure
+    - Desktop: paste image with/without QR
+    - Web: paste image with Async API and paste-event fallback
+7. Run compose module compile/tests for changed targets.
 
 ## Files likely impacted
 
@@ -223,6 +242,7 @@ Design note: keep result/error mapping platform-agnostic in common code and isol
 - `composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/di/WasmModules.kt`
 - `composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/qr/*` (new)
 - `composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/qr/interop/*` (new)
+- `composeApp/src/commonTest/resources/qr/*` (new fixtures generated via `qrencode`)
 - `composeApp/build.gradle.kts`
 - `gradle/libs.versions.toml`
 
@@ -274,3 +294,4 @@ Design note: keep result/error mapping platform-agnostic in common code and isol
 - Java Clipboard API: https://docs.oracle.com/en/java/javase/21/docs/api/java.datatransfer/java/awt/datatransfer/Clipboard.html
 - Java DataFlavor API (`imageFlavor`): https://docs.oracle.com/en/java/javase/21/docs/api/java.datatransfer/java/awt/datatransfer/DataFlavor.html
 - ZXing `MultiFormatReader` API: https://zxing.github.io/zxing/apidocs/com/google/zxing/MultiFormatReader.html
+- `qrencode` CLI usage: `qrencode --help`

@@ -149,19 +149,23 @@ kotlin {
             implementation(libs.play.services.wearable)
             implementation(libs.kstore.file)
             implementation(libs.kotlin.multiplatform.appdirs)
+            implementation(libs.kscan)
         }
         iosMain.dependencies {
             implementation(libs.kstore.file)
+            implementation(libs.kscan)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.kstore.file)
             implementation(libs.kotlin.multiplatform.appdirs)
+            implementation(libs.zxing.javase)
             implementation(project(":sharedLib"))
         }
         wasmJsMain.dependencies {
             implementation(libs.kstore.storage)
+            implementation(npm("jsqr", libs.versions.jsqr.get()))
             implementation(npm("webextension-polyfill", "0.12.0"))
         }
     }

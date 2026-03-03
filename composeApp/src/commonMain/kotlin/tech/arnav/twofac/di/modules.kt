@@ -1,12 +1,14 @@
 package tech.arnav.twofac.di
 
 import org.koin.dsl.module
+import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.Storage
+import tech.arnav.twofac.qr.CameraQRCodeReader
+import tech.arnav.twofac.qr.ClipboardQRCodeReader
 import tech.arnav.twofac.storage.FileStorage
 import tech.arnav.twofac.storage.createAccountsStore
 import tech.arnav.twofac.viewmodels.AccountsViewModel
-import tech.arnav.twofac.companion.CompanionSyncCoordinator
 
 val storageModule = module {
     single<Storage> {
@@ -26,6 +28,8 @@ val viewModelModule = module {
             twoFacLib = get(),
             companionSyncCoordinator = getOrNull<CompanionSyncCoordinator>(),
             sessionManager = getOrNull(),
+            cameraQRCodeReader = getOrNull<CameraQRCodeReader>(),
+            clipboardQRCodeReader = getOrNull<ClipboardQRCodeReader>(),
         )
     }
 }

@@ -108,6 +108,9 @@ kstore = "2.0.4"
 kover = "0.9.7"
 playServicesWearable = "19.0.0"
 composeBom = "2026.02.01"
+kscan = "0.7.0"
+jsqr = "1.4.0"
+zxing = "3.5.3"
 composeMaterial = "1.5.6"
 ##           ⬆ = "1.6.0-alpha01"
 ##           ⬆ = "1.6.0-alpha02"
@@ -199,3 +202,5 @@ compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.re
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+kscan = { module = "io.github.ismai117:KScan", version.ref = "kscan" }
+zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }
