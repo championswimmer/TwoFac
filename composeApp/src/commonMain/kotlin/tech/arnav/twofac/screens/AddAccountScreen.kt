@@ -3,11 +3,14 @@ package tech.arnav.twofac.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -84,9 +87,10 @@ fun AddAccountScreen(
                 if (cameraReader != null) {
                     Button(
                         onClick = {
+                            if (isScanning) return@Button
+                            isScanning = true
                             scanError = null
                             coroutineScope.launch {
-                                isScanning = true
                                 try {
                                     when (val scanResult = cameraReader.readQRCode()) {
                                         is QRCodeReadResult.Success -> {
@@ -115,6 +119,8 @@ fun AddAccountScreen(
                         enabled = !isLoading && !isScanning,
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        Icon(Icons.Rounded.PhotoCamera, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(if (isScanning) "Scanning..." else "Scan QR with Camera")
                     }
                 }

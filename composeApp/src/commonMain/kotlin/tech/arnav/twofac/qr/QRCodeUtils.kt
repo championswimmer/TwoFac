@@ -1,5 +1,7 @@
 package tech.arnav.twofac.qr
 
+// Some scanner backends occasionally return "otpauth://" with spaces between characters
+// (for example "o t p a u t h : //"). Keep this regex precompiled and reused across scans.
 private val spacedOtpAuthRegex = Regex(
     pattern = "o\\s*t\\s*p\\s*a\\s*u\\s*t\\s*h\\s*:\\s*/\\s*/",
     options = setOf(RegexOption.IGNORE_CASE),
