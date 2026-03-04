@@ -2,29 +2,29 @@
 
 `cliApp` is the native command-line frontend for TwoFac.
 
-## Key files
+## What this module does
+It provides a terminal-based interface to interact with TwoFac. It allows users to add accounts, backup data, examine system info, and securely view live 2FA codes with an auto-refreshing progress indicator right in the shell.
 
-- Entry point: `src/commonMain/kotlin/tech/arnav/twofac/cli/Main.kt`
-- Commands: `commands/` (`DisplayCommand`, `AddCommand`, `InfoCommand`)
-- DI modules: `di/`
-- View models: `viewmodels/`
-- Storage helpers: `storage/`
+## Dependencies
+Depends directly on `:sharedLib` for all 2FA logic, cryptography, and storage interfaces.
 
-## Build targets
+## Platforms
+Compiles natively (Kotlin/Native) to:
+- **macOS** (`macosArm64`, `macosX64`)
+- **Linux** (`linuxX64`)
+- **Windows** (`mingwX64`)
 
-- `macosArm64`, `macosX64`, `linuxX64`, `mingwX64`
-- Produces executable binary named `2fac`
+## Libraries Used
+- [Clikt](https://github.com/ajalt/clikt) - Command-line argument and option parsing.
+- [Mordant](https://github.com/ajalt/mordant) - Terminal styling, tables, colors, and dynamic screen animations (used for the live OTP countdown).
+- [Koin](https://github.com/InsertKoinIO/koin) - Dependency injection wiring for the CLI context.
+- [KStore](https://github.com/xxfast/KStore) - Reading/writing to the local `accounts.json` file.
+- [AppDirs](https://github.com/Syer123/kotlin-multiplatform-appdirs) - Finding the local application data directory.
 
-## Testing focus
-
-- `commonTest` contains command behavior and DI verification tests.
-
-## UI and Terminal Rendering (Mordant)
-
-The CLI relies heavily on the [Mordant](https://github.com/ajalt/mordant) library for styling and stateful terminal capabilities:
-
-- **Styling**: Uses `table`, borders, text colors, and dimension styling to create a clean, modern command-line interface.
-- **Dynamic Screens & Timers**: To display live OTP countdowns without constantly flooding or flickering the terminal, `DisplayCommand` leverages Mordant's built-in animations.
-  - An animation `Terminal.animation<DisplayAccountsStatic>` is declared which renders a styled table layout based on the current state framework.
-  - A coroutine loop securely delays for 1 second intervals via `runBlocking` and invokes `animation.update(data)` repeatedly. 
-  - On each loop iteration, Mordant efficiently recalculates the layout state, handles terminal ANSI escape codes to clear lines or reposition the cursor relative to screen size, and injects updated representations—such as updated remaining seconds text and dynamic `ProgressBar` widgets—seamlessly into the same footprint, mimicking a dynamic digital screen.
+## Code Structure
+- `src/commonMain/kotlin/tech/arnav/twofac/cli/`:
+  - `Main.kt`: Entry point routing via Clikt subcommands.
+  - `commands/`: CLI command implementations (`DisplayCommand`, `AddCommand`, `BackupCommand`, `InfoCommand`, `StorageCommand`).
+  - `viewmodels/`: View models acting as a bridge to `TwoFacLib` methods.
+  - `storage/`: Configuration for local path resolution and FileStorage via KStore.
+  - `backup/`: CLI-specific implementation of the local filesystem `BackupTransport`.
