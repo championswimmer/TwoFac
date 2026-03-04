@@ -118,6 +118,7 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
+        val wasmJsMain by getting
 
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -164,6 +165,7 @@ kotlin {
             implementation(libs.zxing.javase)
             implementation(project(":sharedLib"))
         }
+        wasmJsMain.resources.srcDir(layout.buildDirectory.dir("generated/wasmJs/resources"))
         wasmJsMain.dependencies {
             implementation(libs.kstore.storage)
             implementation(npm("jsqr", libs.versions.jsqr.get()))
@@ -177,9 +179,32 @@ dependencies {
 }
 
 val appVersionName = rootProject.extra["appVersionName"] as String
+val wasmInteropTypescriptDir = file("src/wasmJsMain/typescript")
+val wasmInteropGeneratedResourcesDir = layout.buildDirectory.dir("generated/wasmJs/resources")
 val extensionResourcesDir = layout.projectDirectory.dir("extension")
 val extensionManifestOutputDir = layout.buildDirectory.dir("generated/extensionManifests")
 val extensionBuildDir = layout.buildDirectory.dir("extension")
+
+val installWasmInteropDependencies by tasks.registering(Exec::class) {
+    workingDir = wasmInteropTypescriptDir
+    commandLine("npm", "ci")
+    inputs.file(wasmInteropTypescriptDir.resolve("package.json"))
+    inputs.file(wasmInteropTypescriptDir.resolve("package-lock.json"))
+    outputs.dir(wasmInteropTypescriptDir.resolve("node_modules"))
+}
+
+val compileWasmInterop by tasks.registering(Exec::class) {
+    dependsOn(installWasmInteropDependencies)
+    workingDir = wasmInteropTypescriptDir
+    commandLine("npx", "tsc", "-p", "tsconfig.json")
+    inputs.dir(wasmInteropTypescriptDir.resolve("src"))
+    inputs.file(wasmInteropTypescriptDir.resolve("tsconfig.json"))
+    outputs.dir(wasmInteropGeneratedResourcesDir)
+}
+
+tasks.named("wasmJsProcessResources") {
+    dependsOn(compileWasmInterop)
+}
 
 val generateBrowserExtensionManifests by tasks.registering(GenerateBrowserExtensionManifestsTask::class) {
     baseManifestFile.set(extensionResourcesDir.file("manifest.base.json"))

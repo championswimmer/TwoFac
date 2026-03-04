@@ -2,8 +2,8 @@
 
 package tech.arnav.twofac.session.interop
 
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.await
+import kotlin.js.Promise
 
 internal data class WebCryptoEncryptResult(
     val saltBase64Url: String,
@@ -30,237 +30,67 @@ internal class BrowserWebCryptoClient : WebCryptoClient {
         plaintext: String,
         prfFirstOutputBase64Url: String,
         context: String,
-    ): WebCryptoEncryptResult? = suspendCoroutine { continuation ->
-        runCatching {
-            encryptPasskeyWithWebCrypto(
-                plaintext,
-                prfFirstOutputBase64Url,
-                context
-            ) { status, salt, nonce, ciphertext, _ ->
-                if (status == "SUCCESS" && salt != null && nonce != null && ciphertext != null) {
-                    continuation.resume(
-                        WebCryptoEncryptResult(
-                            saltBase64Url = salt,
-                            nonceBase64Url = nonce,
-                            ciphertextBase64Url = ciphertext,
-                        )
-                    )
-                } else {
-                    continuation.resume(null)
-                }
-            }
-        }.onFailure {
-            continuation.resume(null)
+    ): WebCryptoEncryptResult? = runCatching {
+        val result = CryptoInterop.encryptPasskeyWithWebCrypto(
+            plaintext = plaintext,
+            prfFirstOutputBase64Url = prfFirstOutputBase64Url,
+            context = context,
+        ).await<WebCryptoEncryptInteropResult>()
+        val salt = result.salt
+        val nonce = result.nonce
+        val ciphertext = result.ciphertext
+        if (result.status == "SUCCESS" && salt != null && nonce != null && ciphertext != null) {
+            WebCryptoEncryptResult(
+                saltBase64Url = salt,
+                nonceBase64Url = nonce,
+                ciphertextBase64Url = ciphertext,
+            )
+        } else {
+            null
         }
-    }
+    }.getOrNull()
 
     override suspend fun decrypt(
         encryptedResult: WebCryptoEncryptResult,
         prfFirstOutputBase64Url: String,
         context: String,
-    ): String? = suspendCoroutine { continuation ->
-        runCatching {
-            decryptPasskeyWithWebCrypto(
-                encryptedResult.saltBase64Url,
-                encryptedResult.nonceBase64Url,
-                encryptedResult.ciphertextBase64Url,
-                prfFirstOutputBase64Url,
-                context,
-            ) { status, plaintext, _ ->
-                if (status == "SUCCESS") {
-                    continuation.resume(plaintext)
-                } else {
-                    continuation.resume(null)
-                }
-            }
-        }.onFailure {
-            continuation.resume(null)
-        }
-    }
+    ): String? = runCatching {
+        val result = CryptoInterop.decryptPasskeyWithWebCrypto(
+            saltBase64Url = encryptedResult.saltBase64Url,
+            nonceBase64Url = encryptedResult.nonceBase64Url,
+            ciphertextBase64Url = encryptedResult.ciphertextBase64Url,
+            prfFirstOutputBase64Url = prfFirstOutputBase64Url,
+            context = context,
+        ).await<WebCryptoDecryptInteropResult>()
+        if (result.status == "SUCCESS") result.plaintext else null
+    }.getOrNull()
 }
 
-@JsFun(
-    """
-    (plaintext, prfFirstOutputBase64Url, context, onResult) => {
-      if (
-        typeof crypto === "undefined" ||
-        crypto == null ||
-        typeof crypto.subtle === "undefined" ||
-        crypto.subtle == null
-      ) {
-        onResult("UNAVAILABLE", null, null, null, "WebCryptoUnavailable");
-        return;
-      }
+private external interface WebCryptoEncryptInteropResult {
+    val status: String
+    val salt: String?
+    val nonce: String?
+    val ciphertext: String?
+}
 
-      const textEncoder = new TextEncoder();
+private external interface WebCryptoDecryptInteropResult {
+    val status: String
+    val plaintext: String?
+}
 
-      const base64UrlToBytes = (value) => {
-        const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
-        const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-        const binary = atob(padded);
-        const bytes = new Uint8Array(binary.length);
-        for (let index = 0; index < binary.length; index++) {
-          bytes[index] = binary.charCodeAt(index);
-        }
-        return bytes;
-      };
+@JsModule("./crypto.mjs")
+private external object CryptoInterop {
+    fun encryptPasskeyWithWebCrypto(
+        plaintext: String,
+        prfFirstOutputBase64Url: String,
+        context: String,
+    ): Promise<JsAny?>
 
-      const bytesToBase64Url = (bytes) => {
-        let binary = "";
-        for (let index = 0; index < bytes.length; index++) {
-          binary += String.fromCharCode(bytes[index]);
-        }
-        return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-      };
-
-      const deriveAesGcmKey = (saltBytes) => {
-        const inputKeyMaterial = base64UrlToBytes(prfFirstOutputBase64Url);
-        return crypto.subtle
-          .importKey("raw", inputKeyMaterial, "HKDF", false, ["deriveKey"])
-          .then((baseKey) => {
-            return crypto.subtle.deriveKey(
-              {
-                name: "HKDF",
-                hash: "SHA-256",
-                salt: saltBytes,
-                info: textEncoder.encode(context),
-              },
-              baseKey,
-              { name: "AES-GCM", length: 256 },
-              false,
-              ["encrypt", "decrypt"],
-            );
-          });
-      };
-
-      const saltBytes = crypto.getRandomValues(new Uint8Array(16));
-      const nonceBytes = crypto.getRandomValues(new Uint8Array(12));
-
-      deriveAesGcmKey(saltBytes)
-        .then((derivedKey) => {
-          return crypto.subtle.encrypt(
-            {
-              name: "AES-GCM",
-              iv: nonceBytes,
-              additionalData: textEncoder.encode(context),
-              tagLength: 128,
-            },
-            derivedKey,
-            textEncoder.encode(plaintext),
-          );
-        })
-        .then((cipherBuffer) => {
-          const ciphertextBytes = new Uint8Array(cipherBuffer);
-          onResult(
-            "SUCCESS",
-            bytesToBase64Url(saltBytes),
-            bytesToBase64Url(nonceBytes),
-            bytesToBase64Url(ciphertextBytes),
-            null,
-          );
-        })
-        .catch((error) => {
-          const name = (error && error.name) || "CryptoError";
-          onResult("FAILED", null, null, null, name);
-        });
-    }
-    """
-)
-private external fun encryptPasskeyWithWebCrypto(
-    plaintext: String,
-    prfFirstOutputBase64Url: String,
-    context: String,
-    onResult: (String, String?, String?, String?, String?) -> Unit,
-)
-
-@JsFun(
-    """
-    (saltBase64Url, nonceBase64Url, ciphertextBase64Url, prfFirstOutputBase64Url, context, onResult) => {
-      if (
-        typeof crypto === "undefined" ||
-        crypto == null ||
-        typeof crypto.subtle === "undefined" ||
-        crypto.subtle == null
-      ) {
-        onResult("UNAVAILABLE", null, "WebCryptoUnavailable");
-        return;
-      }
-
-      const textEncoder = new TextEncoder();
-      const textDecoder = new TextDecoder();
-
-      const base64UrlToBytes = (value) => {
-        const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
-        const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-        const binary = atob(padded);
-        const bytes = new Uint8Array(binary.length);
-        for (let index = 0; index < binary.length; index++) {
-          bytes[index] = binary.charCodeAt(index);
-        }
-        return bytes;
-      };
-
-      const deriveAesGcmKey = (saltBytes) => {
-        const inputKeyMaterial = base64UrlToBytes(prfFirstOutputBase64Url);
-        return crypto.subtle
-          .importKey("raw", inputKeyMaterial, "HKDF", false, ["deriveKey"])
-          .then((baseKey) => {
-            return crypto.subtle.deriveKey(
-              {
-                name: "HKDF",
-                hash: "SHA-256",
-                salt: saltBytes,
-                info: textEncoder.encode(context),
-              },
-              baseKey,
-              { name: "AES-GCM", length: 256 },
-              false,
-              ["encrypt", "decrypt"],
-            );
-          });
-      };
-
-      let saltBytes;
-      let nonceBytes;
-      let ciphertextBytes;
-      try {
-        saltBytes = base64UrlToBytes(saltBase64Url);
-        nonceBytes = base64UrlToBytes(nonceBase64Url);
-        ciphertextBytes = base64UrlToBytes(ciphertextBase64Url);
-      } catch (_) {
-        onResult("FAILED", null, "DecodeError");
-        return;
-      }
-
-      deriveAesGcmKey(saltBytes)
-        .then((derivedKey) => {
-          return crypto.subtle.decrypt(
-            {
-              name: "AES-GCM",
-              iv: nonceBytes,
-              additionalData: textEncoder.encode(context),
-              tagLength: 128,
-            },
-            derivedKey,
-            ciphertextBytes,
-          );
-        })
-        .then((plaintextBuffer) => {
-          const plaintext = textDecoder.decode(new Uint8Array(plaintextBuffer));
-          onResult("SUCCESS", plaintext, null);
-        })
-        .catch((error) => {
-          const name = (error && error.name) || "CryptoError";
-          onResult("FAILED", null, name);
-        });
-    }
-    """
-)
-private external fun decryptPasskeyWithWebCrypto(
-    saltBase64Url: String,
-    nonceBase64Url: String,
-    ciphertextBase64Url: String,
-    prfFirstOutputBase64Url: String,
-    context: String,
-    onResult: (String, String?, String?) -> Unit,
-)
+    fun decryptPasskeyWithWebCrypto(
+        saltBase64Url: String,
+        nonceBase64Url: String,
+        ciphertextBase64Url: String,
+        prfFirstOutputBase64Url: String,
+        context: String,
+    ): Promise<JsAny?>
+}

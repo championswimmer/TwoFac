@@ -10,27 +10,23 @@ internal interface WebStorageClient {
 }
 
 internal class LocalStorageClient : WebStorageClient {
-    override fun isAvailable(): Boolean = isLocalStorageAccessible()
+    override fun isAvailable(): Boolean = StorageInterop.isLocalStorageAccessible()
 
-    override fun getItem(key: String): String? = localStorageGetItem(key)
+    override fun getItem(key: String): String? = StorageInterop.localStorageGetItem(key)
 
     override fun setItem(key: String, value: String) {
-        localStorageSetItem(key, value)
+        StorageInterop.localStorageSetItem(key, value)
     }
 
     override fun removeItem(key: String) {
-        localStorageRemoveItem(key)
+        StorageInterop.localStorageRemoveItem(key)
     }
 }
 
-@JsFun("(key) => window.localStorage.getItem(key)")
-private external fun localStorageGetItem(key: String): String?
-
-@JsFun("(key, value) => { window.localStorage.setItem(key, value); }")
-private external fun localStorageSetItem(key: String, value: String)
-
-@JsFun("(key) => { window.localStorage.removeItem(key); }")
-private external fun localStorageRemoveItem(key: String)
-
-@JsFun("() => { try { window.localStorage.setItem('twofac_ls_test', '1'); window.localStorage.removeItem('twofac_ls_test'); return true; } catch(e) { return false; } }")
-private external fun isLocalStorageAccessible(): Boolean
+@JsModule("./storage.mjs")
+private external object StorageInterop {
+    fun localStorageGetItem(key: String): String?
+    fun localStorageSetItem(key: String, value: String)
+    fun localStorageRemoveItem(key: String)
+    fun isLocalStorageAccessible(): Boolean
+}

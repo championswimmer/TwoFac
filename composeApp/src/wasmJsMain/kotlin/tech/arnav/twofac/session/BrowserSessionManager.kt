@@ -403,7 +403,9 @@ private fun decodeEncryptedPasskeyBlob(encoded: String): EncryptedPasskeyBlob? {
     )
 }
 
-@JsFun("() => Date.now()")
-private external fun nowEpochMillisJs(): Double
+@JsModule("./time.mjs")
+private external object TimeInterop {
+    fun nowEpochMillisJs(): Double
+}
 
-private fun nowEpochMillis(): Long = nowEpochMillisJs().toLong()
+private fun nowEpochMillis(): Long = TimeInterop.nowEpochMillisJs().toLong()
