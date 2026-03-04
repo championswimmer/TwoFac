@@ -240,7 +240,7 @@ class WasmClipboardQRCodeReader(
         }
       };
 
-      const readUsingPasteEventFallback = () => new Promise((resolve) => {
+      const readUsingPasteEvent = (timeoutMs, timeoutStatus, timeoutMessage) => new Promise((resolve) => {
         if (
           typeof window.addEventListener !== "function" ||
           typeof window.removeEventListener !== "function"
@@ -248,11 +248,6 @@ class WasmClipboardQRCodeReader(
           resolve({ status: "UNSUPPORTED", payload: null, message: "Paste event API is unavailable" });
           return;
         }
-
-        const timeoutMs =
-          typeof pasteTimeoutMs === "number" && pasteTimeoutMs > 0
-            ? pasteTimeoutMs
-            : 10000;
 
         let completed = false;
         let timeoutHandle = null;
@@ -279,18 +274,36 @@ class WasmClipboardQRCodeReader(
 
         window.addEventListener("paste", onPaste, true);
         timeoutHandle = setTimeout(
-          () => finalize({ status: "CANCELED", payload: null, message: "Paste event timed out" }),
+          () => finalize({ status: timeoutStatus, payload: null, message: timeoutMessage }),
           timeoutMs,
         );
       });
 
       (async () => {
+        const immediatePasteResult = await readUsingPasteEvent(
+          250,
+          "NO_PASTE_EVENT",
+          "No immediate paste event",
+        );
+        if (immediatePasteResult.status !== "NO_PASTE_EVENT") {
+          finishOnce(immediatePasteResult.status, immediatePasteResult.payload, immediatePasteResult.message);
+          return;
+        }
+
         const asyncClipboardResult = await readUsingAsyncClipboardApi();
         if (
           asyncClipboardResult.status === "UNAVAILABLE" ||
           asyncClipboardResult.status === "UNSUPPORTED"
         ) {
-          const pasteFallbackResult = await readUsingPasteEventFallback();
+          const fallbackTimeoutMs =
+            typeof pasteTimeoutMs === "number" && pasteTimeoutMs > 0
+              ? pasteTimeoutMs
+              : 10000;
+          const pasteFallbackResult = await readUsingPasteEvent(
+            fallbackTimeoutMs,
+            "CANCELED",
+            "Paste event timed out",
+          );
           if (
             pasteFallbackResult.status === "UNSUPPORTED" &&
             asyncClipboardResult.status === "UNSUPPORTED"
