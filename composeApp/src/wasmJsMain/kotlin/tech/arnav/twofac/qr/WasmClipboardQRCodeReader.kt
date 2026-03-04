@@ -47,7 +47,7 @@ class WasmClipboardQRCodeReader(
     }
 }
 
-private external interface ClipboardQRCodeInteropResult {
+private external interface ClipboardQRCodeInteropResult : JsAny {
     val status: String
     val decodedPayload: String?
     val message: String?
