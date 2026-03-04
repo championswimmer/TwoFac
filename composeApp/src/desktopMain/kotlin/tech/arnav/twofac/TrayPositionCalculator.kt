@@ -22,23 +22,21 @@ object TrayPositionCalculator {
         } ?: graphicsEnvironment.defaultScreenDevice
 
         val config = screenDevice.defaultConfiguration
-        val scale = config.defaultTransform.scaleX.toFloat()
-        
-        // Convert all AWT pixel-based values to DP
-        val mouseX = mouseLocationPx.x / scale
-        val mouseY = mouseLocationPx.y / scale
+        // AWT coordinates are already in "user space" (points/DP) on most modern platforms (macOS/Retina, etc.)
+        val mouseX = mouseLocationPx.x.toFloat()
+        val mouseY = mouseLocationPx.y.toFloat()
         
         val screenBounds = config.bounds
-        val screenX = screenBounds.x / scale
-        val screenY = screenBounds.y / scale
-        val screenWidth = screenBounds.width / scale
-        val screenHeight = screenBounds.height / scale
+        val screenX = screenBounds.x.toFloat()
+        val screenY = screenBounds.y.toFloat()
+        val screenWidth = screenBounds.width.toFloat()
+        val screenHeight = screenBounds.height.toFloat()
         
         val insets = Toolkit.getDefaultToolkit().getScreenInsets(config)
-        val usableX = screenX + (insets.left / scale)
-        val usableY = screenY + (insets.top / scale)
-        val usableWidth = screenWidth - ((insets.left + insets.right) / scale)
-        val usableHeight = screenHeight - ((insets.top + insets.bottom) / scale)
+        val usableX = screenX + insets.left
+        val usableY = screenY + insets.top
+        val usableWidth = screenWidth - (insets.left + insets.right)
+        val usableHeight = screenHeight - (insets.top + insets.bottom)
 
         val popupWidth = popupSize.width.value
         val popupHeight = popupSize.height.value
