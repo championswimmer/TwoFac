@@ -22,6 +22,15 @@ import tech.arnav.twofac.di.desktopBackupModule
 import tech.arnav.twofac.di.desktopQrModule
 import tech.arnav.twofac.di.desktopSettingsModule
 import tech.arnav.twofac.settings.DesktopSettingsManager
+import javax.swing.JDialog
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
+import javax.swing.SwingUtilities
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import androidx.compose.foundation.isSystemInDarkTheme
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.LaunchedEffect
 
 fun main() = runBlocking {
     val koinApp = initKoin {
@@ -60,31 +69,107 @@ fun main() = runBlocking {
         if (isTrayEnabled) {
             val os = System.getProperty("os.name").lowercase()
             val isMac = os.contains("mac")
-            val trayIconPath = if (isMac) "tray_lock_monochrome.svg" else "tray_lock_color.svg"
+            val isDark = isSystemInDarkTheme()
+            val trayIconPath = if (isMac) {
+                if (isDark) "tray_lock_monochrome_dark.svg" else "tray_lock_monochrome_light.svg"
+            } else {
+                "tray_lock_color.svg"
+            }
+
+            var ignoreNextAction by remember { mutableStateOf(false) }
+            val closeApp = { exitApplication() }
             
-            Tray(
-                icon = painterResource(trayIconPath),
-                tooltip = "TwoFac",
-                onAction = {
-                    if (!isTrayPopupVisible) {
-                        trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
-                    }
-                    isTrayPopupVisible = !isTrayPopupVisible
-                },
-                menu = {
-                    Item(
-                        text = "Open TwoFac",
-                        onClick = {
+            LaunchedEffect(isMac, isTrayEnabled) {
+                if (isMac && isTrayEnabled) {
+                    delay(500)
+                    val tray = java.awt.SystemTray.getSystemTray()
+                    if (tray.trayIcons.isNotEmpty()) {
+                        val trayIcon = tray.trayIcons.last()
+                        
+                        val popup = JPopupMenu()
+                        val openItem = JMenuItem("Open TwoFac")
+                        openItem.addActionListener { 
                             isMainWindowOpen = true
                             isTrayPopupVisible = false
                         }
-                    )
-                    Item(
-                        text = "Quit TwoFac",
-                        onClick = ::exitApplication
-                    )
+                        val quitItem = JMenuItem("Quit TwoFac")
+                        quitItem.addActionListener { 
+                            closeApp() 
+                        }
+                        popup.add(openItem)
+                        popup.add(quitItem)
+
+                        val hiddenDialog = JDialog()
+                        hiddenDialog.isUndecorated = true
+                        hiddenDialog.setSize(0, 0)
+
+                        // Using a boolean array to safely toggle ignore state from the listener
+                        val ignoreState = BooleanArray(1) { false }
+
+                        trayIcon.addMouseListener(object : MouseAdapter() {
+                            override fun mousePressed(e: MouseEvent) {
+                                if (SwingUtilities.isRightMouseButton(e) || e.isPopupTrigger) {
+                                    ignoreNextAction = true
+                                    hiddenDialog.location = e.locationOnScreen
+                                    hiddenDialog.isVisible = true
+                                    popup.show(hiddenDialog, 0, 0)
+                                    
+                                    popup.addPopupMenuListener(object : javax.swing.event.PopupMenuListener {
+                                        override fun popupMenuWillBecomeVisible(e: javax.swing.event.PopupMenuEvent?) {}
+                                        override fun popupMenuWillBecomeInvisible(e: javax.swing.event.PopupMenuEvent?) {
+                                            hiddenDialog.isVisible = false
+                                        }
+                                        override fun popupMenuCanceled(e: javax.swing.event.PopupMenuEvent?) {
+                                            hiddenDialog.isVisible = false
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                    }
                 }
-            )
+            }
+
+            if (isMac) {
+                Tray(
+                    icon = painterResource(trayIconPath),
+                    tooltip = "TwoFac",
+                    onAction = {
+                        if (ignoreNextAction) {
+                            ignoreNextAction = false
+                            return@Tray
+                        }
+                        if (!isTrayPopupVisible) {
+                            trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
+                        }
+                        isTrayPopupVisible = !isTrayPopupVisible
+                    }
+                )
+            } else {
+                Tray(
+                    icon = painterResource(trayIconPath),
+                    tooltip = "TwoFac",
+                    onAction = {
+                        if (!isTrayPopupVisible) {
+                            trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
+                        }
+                        isTrayPopupVisible = !isTrayPopupVisible
+                    },
+                    menu = {
+                        Item(
+                            text = "Open TwoFac",
+                            onClick = {
+                                isMainWindowOpen = true
+                                isTrayPopupVisible = false
+                            }
+                        )
+                        Item(
+                            text = "Quit TwoFac",
+                            onClick = ::exitApplication
+                        )
+                    }
+                )
+            }
 
             Window(
                 onCloseRequest = { isTrayPopupVisible = false },
