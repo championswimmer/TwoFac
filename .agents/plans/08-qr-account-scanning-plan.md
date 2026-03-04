@@ -4,9 +4,9 @@ status: In Progress
 progress:
   - "[x] Phase 0 - Lock QR stack and DI contract shape"
   - "[x] Phase 1 - Add common QR reader contracts and result model"
-  - "[ ] Phase 2 - Implement Android+iOS camera QR readers with permission flows"
-  - "[ ] Phase 3 - Implement Desktop+Web clipboard image QR readers"
-  - "[ ] Phase 4 - Wire Add Account UX for scan/paste/manual entry"
+  - "[x] Phase 2 - Implement Android+iOS camera QR readers with permission flows"
+  - "[x] Phase 3 - Implement Desktop+Web clipboard image QR readers"
+  - "[x] Phase 4 - Wire Add Account UX for scan/paste/manual entry"
   - "[ ] Phase 5 - Register per-platform DI modules and host configuration"
   - "[ ] Phase 6 - Add tests and run cross-target validation"
 ---

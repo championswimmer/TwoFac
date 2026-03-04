@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ContentPaste
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +30,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -47,13 +56,49 @@ fun AddAccountScreen(
     var passkeyText by remember { mutableStateOf("") }
     var scanError by remember { mutableStateOf<String?>(null) }
     var isScanning by remember { mutableStateOf(false) }
+    var isPasting by remember { mutableStateOf(false) }
+    var isUriFieldFocused by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val requiresUnlock = !viewModel.twoFacLibUnlocked
     val cameraReader = viewModel.cameraQRCodeReader
+    val clipboardReader = viewModel.clipboardQRCodeReader
     val composableCameraReader = cameraReader as? ComposableCameraQRCodeReader
 
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+
+    fun triggerClipboardRead(suppressNoImageFailure: Boolean = false) {
+        if (clipboardReader == null || isScanning || isPasting) return
+        isPasting = true
+        scanError = null
+        coroutineScope.launch {
+            try {
+                when (val scanResult = clipboardReader.readQRCode()) {
+                    is QRCodeReadResult.Success -> {
+                        uriText = scanResult.otpAuthUri
+                    }
+                    is QRCodeReadResult.DecodeFailure -> {
+                        if (!suppressNoImageFailure || !scanResult.reason.isNoClipboardImageReason()) {
+                            scanError = scanResult.reason
+                        }
+                    }
+                    QRCodeReadResult.PermissionDenied -> {
+                        scanError = "Clipboard permission denied"
+                    }
+                    QRCodeReadResult.Unsupported -> {
+                        scanError = "Clipboard QR reading is not supported on this platform"
+                    }
+                    QRCodeReadResult.Canceled -> Unit
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                scanError = e.message ?: "Failed to read QR code from clipboard"
+            } finally {
+                isPasting = false
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -81,13 +126,25 @@ fun AddAccountScreen(
                     onValueChange = { uriText = it },
                     label = { Text("2FA URI") },
                     placeholder = { Text("otpauth://totp/...") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { isUriFieldFocused = it.isFocused }
+                        .onPreviewKeyEvent { keyEvent ->
+                            val isPasteShortcut =
+                                keyEvent.type == KeyEventType.KeyDown &&
+                                    keyEvent.key == Key.V &&
+                                    (keyEvent.isMetaPressed || keyEvent.isCtrlPressed)
+                            if (isUriFieldFocused && isPasteShortcut) {
+                                triggerClipboardRead(suppressNoImageFailure = true)
+                            }
+                            false
+                        }
                 )
 
                 if (cameraReader != null) {
                     Button(
                         onClick = {
-                            if (isScanning) return@Button
+                            if (isScanning || isPasting) return@Button
                             isScanning = true
                             scanError = null
                             coroutineScope.launch {
@@ -116,12 +173,26 @@ fun AddAccountScreen(
                                 }
                             }
                         },
-                        enabled = !isLoading && !isScanning,
+                        enabled = !isLoading && !isScanning && !isPasting,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Rounded.PhotoCamera, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(if (isScanning) "Scanning..." else "Scan QR with Camera")
+                    }
+                }
+
+                if (clipboardReader != null) {
+                    Button(
+                        onClick = {
+                            triggerClipboardRead()
+                        },
+                        enabled = !isLoading && !isScanning && !isPasting,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Rounded.ContentPaste, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(if (isPasting) "Reading Clipboard..." else "Paste QR from Clipboard")
                     }
                 }
 
@@ -137,7 +208,7 @@ fun AddAccountScreen(
 
                 scanError?.let { scanErrorMessage ->
                     Text(
-                        text = "Scan error: $scanErrorMessage",
+                        text = "QR error: $scanErrorMessage",
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(8.dp)
                     )
@@ -173,4 +244,9 @@ fun AddAccountScreen(
         }
         composableCameraReader?.RenderScanner(modifier = Modifier.fillMaxSize())
     }
+}
+
+private fun String.isNoClipboardImageReason(): Boolean {
+    val normalized = lowercase()
+    return normalized.contains("no image") || normalized.contains("does not contain an image")
 }

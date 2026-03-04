@@ -8,6 +8,8 @@ import tech.arnav.twofac.backup.LocalFileBackupTransport
 import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.BackupTransport
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.qr.ClipboardQRCodeReader
+import tech.arnav.twofac.qr.DesktopClipboardQRCodeReader
 
 private val appDirs = AppDirs {
     appName = "TwoFac"
@@ -28,4 +30,8 @@ val desktopBackupModule = module {
     single<BackupService> {
         BackupService(get<TwoFacLib>())
     }
+}
+
+val desktopQrModule = module {
+    single<ClipboardQRCodeReader> { DesktopClipboardQRCodeReader() }
 }

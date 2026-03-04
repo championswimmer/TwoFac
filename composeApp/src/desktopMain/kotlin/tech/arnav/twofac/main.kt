@@ -4,10 +4,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import tech.arnav.twofac.di.desktopBackupModule
+import tech.arnav.twofac.di.desktopQrModule
 
 fun main() {
     initKoin {
-        modules(desktopBackupModule)
+        modules(desktopBackupModule, desktopQrModule)
     }
 
     application {
