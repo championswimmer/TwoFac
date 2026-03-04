@@ -27,18 +27,31 @@
     - [x] Add new accounts
     - [x] Display accounts with 2FA codes
     - [x] Save accounts to a storage
+    - [x] Delete account storage
     - [ ] Backup & Restore via a backup transport
     - [ ] Export & Import accounts (encrypted with passkey)
+    - [x] QR Account Scanning (Camera + Clipboard)
     - [x] Import from other 2FA apps
         - [x] Authy (JSON format)
         - [x] 2FAS (JSON format)
         - [x] Ente (plaintext otpauth:// URIs)
-- [ ] Mobile App
+- [ ] Mobile Apps (Android & iOS)
+    - [x] Biometric Authentication
+    - [ ] Home / Accounts / Settings Bottom Tabs
+- [x] Wearable Apps
+    - [x] Wear OS companion app with offline sync
+    - [x] watchOS companion app with offline sync
 - [ ] Desktop App
-- [ ] Web Extension
+    - [ ] System Tray / Menu Bar Application
+- [x] Web & Browser Extensions
+    - [x] Progressive Web App (PWA)
+    - [x] Chrome Extension
+    - [x] Firefox Extension
+    - [x] WebAuthn / Device-Credential Unlock
 - [ ] CLI App
-    - [ ] Add new accounts
+    - [x] Add new accounts
     - [x] Display 2FA codes with auto-refresh
+    - [x] Delete account storage
 
 ## Documentation
 
