@@ -55,5 +55,5 @@ private external interface ClipboardQRCodeInteropResult {
 
 @JsModule("./qr-reader.mjs")
 private external object QRReaderInterop {
-    fun readQRCodeFromClipboard(pasteTimeoutMs: Int): Promise<JsAny?>
+    fun readQRCodeFromClipboard(pasteTimeoutMs: Int): Promise<ClipboardQRCodeInteropResult>
 }

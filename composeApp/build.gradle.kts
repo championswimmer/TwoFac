@@ -187,8 +187,9 @@ val extensionBuildDir = layout.buildDirectory.dir("extension")
 
 val installWasmInteropDependencies by tasks.registering(Exec::class) {
     workingDir = wasmInteropTypescriptDir
-    commandLine("npm", "install")
+    commandLine("npm", "ci")
     inputs.file(wasmInteropTypescriptDir.resolve("package.json"))
+    inputs.file(wasmInteropTypescriptDir.resolve("package-lock.json"))
     outputs.dir(wasmInteropTypescriptDir.resolve("node_modules"))
 }
 
