@@ -1,4 +1,6 @@
 module.exports = {
+    skipWaiting: true,
+    clientsClaim: true,
     globDirectory: "build/dist/wasmJs/productionExecutable/",
     globPatterns: [
         "**/*.{html,js,wasm,css,png,json}"
