@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import twofac.composeapp.generated.resources.Res
-import twofac.composeapp.generated.resources.compose_multiplatform
+import twofac.composeapp.generated.resources.app_logo
 import tech.arnav.twofac.components.OTPCard
 import tech.arnav.twofac.components.PasskeyDialog
 import tech.arnav.twofac.viewmodels.AccountsViewModel
@@ -114,7 +114,7 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
                 ) {
                     Image(
-                        painter = painterResource(Res.drawable.compose_multiplatform),
+                        painter = painterResource(Res.drawable.app_logo),
                         contentDescription = "TwoFac",
                         modifier = Modifier.size(120.dp)
                     )
