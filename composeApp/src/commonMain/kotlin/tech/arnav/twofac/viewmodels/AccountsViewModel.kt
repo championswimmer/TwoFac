@@ -149,7 +149,9 @@ class AccountsViewModel(
                 val success = twoFacLib.addAccount(uri)
                 if (success) {
                     companionSyncCoordinator?.onAccountsChanged()
-                    loadAccounts()
+                    val accountOtpList = twoFacLib.getAllAccountOTPs()
+                    _accountOtps.value = accountOtpList
+                    _accounts.value = accountOtpList.map { it.first }
                     onComplete(true)
                 } else {
                     _error.value = "Failed to add account"
