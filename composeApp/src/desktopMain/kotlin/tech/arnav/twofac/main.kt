@@ -34,6 +34,11 @@ fun main() = runBlocking {
         val isTrayEnabled by settingsManager.isTrayIconEnabledFlow.collectAsState(initial = initialTrayEnabled)
         var isMainWindowOpen by remember { mutableStateOf(true) }
         var isTrayPopupVisible by remember { mutableStateOf(false) }
+        
+        val trayWindowState = rememberWindowState(
+            width = 360.dp,
+            height = 500.dp,
+        )
 
         if (isMainWindowOpen) {
             Window(
@@ -61,6 +66,9 @@ fun main() = runBlocking {
                 icon = painterResource(trayIconPath),
                 tooltip = "TwoFac",
                 onAction = {
+                    if (!isTrayPopupVisible) {
+                        trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
+                    }
                     isTrayPopupVisible = !isTrayPopupVisible
                 },
                 menu = {
@@ -80,10 +88,7 @@ fun main() = runBlocking {
 
             Window(
                 onCloseRequest = { isTrayPopupVisible = false },
-                state = rememberWindowState(
-                    width = 360.dp,
-                    height = 500.dp,
-                ),
+                state = trayWindowState,
                 visible = isTrayPopupVisible,
                 undecorated = true,
                 transparent = true,
