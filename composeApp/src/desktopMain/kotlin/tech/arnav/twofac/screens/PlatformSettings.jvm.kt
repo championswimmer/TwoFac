@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,12 +23,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import tech.arnav.twofac.settings.DesktopSettingsManager
-import kotlin.system.exitProcess
 
 @Composable
-actual fun PlatformSettingsContent() {
+actual fun PlatformSettingsContent(onQuit: (() -> Unit)?) {
     val settingsManager = koinInject<DesktopSettingsManager>()
-    val isTrayIconEnabled by settingsManager.isTrayIconEnabledFlow.collectAsState(initial = false)
+    val initialTrayEnabled = remember { settingsManager.isTrayIconEnabledSync() }
+    val isTrayIconEnabled by settingsManager.isTrayIconEnabledFlow.collectAsState(initial = initialTrayEnabled)
     val coroutineScope = rememberCoroutineScope()
 
     val osName = System.getProperty("os.name").lowercase()
@@ -67,7 +68,7 @@ actual fun PlatformSettingsContent() {
             }
             
             OutlinedButton(
-                onClick = { exitProcess(0) },
+                onClick = { onQuit?.invoke() },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = MaterialTheme.colorScheme.error

@@ -47,7 +47,7 @@ private enum class TopLevelDestination(
 
 @Composable
 @Preview
-fun App() {
+fun App(onQuit: (() -> Unit)? = null) {
     MaterialTheme {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -105,7 +105,10 @@ fun App() {
                 }
 
                 composable<Settings> {
-                    SettingsScreen()
+                    SettingsScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onQuit = onQuit
+                    )
                 }
 
                 composable<AddAccount> {

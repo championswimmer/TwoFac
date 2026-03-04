@@ -56,7 +56,8 @@ private enum class BackupAction { EXPORT, IMPORT, SYNC_COMPANION }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onNavigateBack: (() -> Unit)? = null
+    onNavigateBack: (() -> Unit)? = null,
+    onQuit: (() -> Unit)? = null
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -384,7 +385,7 @@ fun SettingsScreen(
                 }
             }
 
-            PlatformSettingsContent()
+            PlatformSettingsContent(onQuit = onQuit)
         }
     }
 

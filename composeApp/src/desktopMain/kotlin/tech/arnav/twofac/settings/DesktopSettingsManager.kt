@@ -15,22 +15,44 @@ class DesktopSettingsManager {
         macOS.useSpaceBetweenAuthorAndApp = false
     }
 
-    private val store: KStore<Boolean> by lazy {
-        val dir = appDirs.getUserDataDir()
-        SystemFileSystem.createDirectories(Path(dir))
-        storeOf(
-            file = Path(dir, "desktop_settings.json"),
-            default = false
-        )
+    private val store: KStore<Boolean>? by lazy {
+        try {
+            val dir = appDirs.getUserDataDir()
+            SystemFileSystem.createDirectories(Path(dir))
+            storeOf(
+                file = Path(dir, "desktop_settings.json"),
+                default = false
+            )
+        } catch (e: Exception) {
+            println("Failed to initialize desktop settings store: ${e.message}")
+            null
+        }
     }
 
     suspend fun isTrayIconEnabled(): Boolean {
-        return store.get() ?: false
+        return try {
+            store?.get() ?: false
+        } catch (e: Exception) {
+            false
+        }
     }
 
-    val isTrayIconEnabledFlow: Flow<Boolean> = store.updates.map { it ?: false }
+    fun isTrayIconEnabledSync(): Boolean = try {
+        kotlinx.coroutines.runBlocking {
+            store?.get() ?: false
+        }
+    } catch (e: Exception) {
+        false
+    }
+
+    val isTrayIconEnabledFlow: Flow<Boolean> = store?.updates?.map { it ?: false } 
+        ?: kotlinx.coroutines.flow.flowOf(false)
 
     suspend fun setTrayIconEnabled(enabled: Boolean) {
-        store.set(enabled)
+        try {
+            store?.set(enabled)
+        } catch (e: Exception) {
+            println("Failed to save tray icon setting: ${e.message}")
+        }
     }
 }

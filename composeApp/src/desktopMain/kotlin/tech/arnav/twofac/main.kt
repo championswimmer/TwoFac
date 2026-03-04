@@ -37,7 +37,12 @@ fun main() = runBlocking {
         modules(desktopBackupModule, desktopQrModule, desktopSettingsModule)
     }
     val settingsManager = koinApp.koin.get<DesktopSettingsManager>()
-    val initialTrayEnabled = settingsManager.isTrayIconEnabled()
+    val initialTrayEnabled = try {
+        settingsManager.isTrayIconEnabled()
+    } catch (e: Exception) {
+        println("Failed to fetch initial tray icon setting: ${e.message}")
+        false
+    }
 
     application {
         val isTrayEnabled by settingsManager.isTrayIconEnabledFlow.collectAsState(initial = initialTrayEnabled)
@@ -60,7 +65,7 @@ fun main() = runBlocking {
                 title = "TwoFac",
                 icon = painterResource("twofac_icon.png"),
             ) {
-                App()
+                App(onQuit = { exitApplication() })
             }
         } else if (!isTrayEnabled) {
             exitApplication()
@@ -201,7 +206,7 @@ fun main() = runBlocking {
                     color = MaterialTheme.colorScheme.background,
                     shadowElevation = 8.dp
                 ) {
-                    App()
+                    App(onQuit = { exitApplication() })
                 }
             }
         }
