@@ -1,12 +1,12 @@
 ---
 name: Wasm TypeScript Interop Migration
-status: Planned
+status: Complete
 progress:
-  - "[ ] Phase 0 - Setup TypeScript Project & Gradle Wiring"
-  - "[ ] Phase 1 - Migrate WebCrypto Interop"
-  - "[ ] Phase 2 - Migrate WebAuthn Interop"
-  - "[ ] Phase 3 - Migrate QR & Storage Interop"
-  - "[ ] Phase 4 - Clean up & Validate"
+  - "[x] Phase 0 - Setup TypeScript Project & Gradle Wiring"
+  - "[x] Phase 1 - Migrate WebCrypto Interop"
+  - "[x] Phase 2 - Migrate WebAuthn Interop"
+  - "[x] Phase 3 - Migrate QR & Storage Interop"
+  - "[x] Phase 4 - Clean up & Validate"
 ---
 
 # Wasm TypeScript Interop Migration Plan
