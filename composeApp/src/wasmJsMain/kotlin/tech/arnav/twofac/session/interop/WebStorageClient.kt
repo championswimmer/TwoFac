@@ -23,14 +23,14 @@ internal class LocalStorageClient : WebStorageClient {
     }
 }
 
-@JsFun("(key) => window.localStorage.getItem(key)")
+@JsModule("storage.js")
 private external fun localStorageGetItem(key: String): String?
 
-@JsFun("(key, value) => { window.localStorage.setItem(key, value); }")
+@JsModule("storage.js")
 private external fun localStorageSetItem(key: String, value: String)
 
-@JsFun("(key) => { window.localStorage.removeItem(key); }")
+@JsModule("storage.js")
 private external fun localStorageRemoveItem(key: String)
 
-@JsFun("() => { try { window.localStorage.setItem('twofac_ls_test', '1'); window.localStorage.removeItem('twofac_ls_test'); return true; } catch(e) { return false; } }")
+@JsModule("storage.js")
 private external fun isLocalStorageAccessible(): Boolean

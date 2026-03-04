@@ -403,7 +403,8 @@ private fun decodeEncryptedPasskeyBlob(encoded: String): EncryptedPasskeyBlob? {
     )
 }
 
-@JsFun("() => Date.now()")
+@JsModule("storage.js")
+@JsName("nowEpochMillis")
 private external fun nowEpochMillisJs(): Double
 
 private fun nowEpochMillis(): Long = nowEpochMillisJs().toLong()

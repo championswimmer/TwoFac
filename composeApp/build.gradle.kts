@@ -164,12 +164,37 @@ kotlin {
             implementation(libs.zxing.javase)
             implementation(project(":sharedLib"))
         }
-        wasmJsMain.dependencies {
-            implementation(libs.kstore.storage)
-            implementation(npm("jsqr", libs.versions.jsqr.get()))
-            implementation(npm("webextension-polyfill", "0.12.0"))
+        wasmJsMain {
+            dependencies {
+                implementation(libs.kstore.storage)
+                implementation(npm("jsqr", libs.versions.jsqr.get()))
+                implementation(npm("webextension-polyfill", "0.12.0"))
+            }
+            resources.srcDir(layout.buildDirectory.dir("generated/wasmJs/resources"))
         }
     }
+}
+
+val tsDir = file("src/wasmJsMain/typescript")
+
+val installWasmInteropDependencies by tasks.registering(Exec::class) {
+    workingDir = tsDir
+    commandLine = listOf("npm", "install")
+    inputs.file(tsDir.resolve("package.json"))
+    outputs.dir(tsDir.resolve("node_modules"))
+}
+
+val compileWasmInterop by tasks.registering(Exec::class) {
+    dependsOn(installWasmInteropDependencies)
+    workingDir = tsDir
+    commandLine = listOf("npx", "tsc")
+    inputs.dir(tsDir.resolve("src"))
+    inputs.file(tsDir.resolve("tsconfig.json"))
+    outputs.dir(layout.buildDirectory.dir("generated/wasmJs/resources"))
+}
+
+tasks.named("wasmJsProcessResources") {
+    dependsOn(compileWasmInterop)
 }
 
 dependencies {
