@@ -5,8 +5,8 @@ progress:
   - "[x] Phase 0 - Asset Preparation and Desktop-Only Settings"
   - "[x] Phase 1 - Basic System Tray implementation in Compose"
   - "[x] Phase 2 - Dual Window Management (Main App vs Tray Popup)"
-  - "[ ] Phase 3 - Dynamic Window Positioning Logic for Popup"
-  - "[ ] Phase 4 - App State and UI Refinement for Tray context"
+  - "[x] Phase 3 - Dynamic Window Positioning Logic for Popup"
+  - "[x] Phase 4 - App State and UI Refinement for Tray context"
 ---
 
 # System Tray / Menu Bar Application Plan
