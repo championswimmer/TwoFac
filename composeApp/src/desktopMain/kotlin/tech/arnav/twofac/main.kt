@@ -74,8 +74,9 @@ fun main() = runBlocking {
         if (isTrayEnabled) {
             val os = System.getProperty("os.name").lowercase()
             val isMac = os.contains("mac")
+            val isLinux = os.contains("linux") || os.contains("nix")
             val isDark = isSystemInDarkTheme()
-            val trayIconPath = if (isMac) {
+            val trayIconPath = if (isMac || isLinux) {
                 if (isDark) "tray_lock_monochrome_dark.svg" else "tray_lock_monochrome_light.svg"
             } else {
                 "tray_lock_color.svg"
