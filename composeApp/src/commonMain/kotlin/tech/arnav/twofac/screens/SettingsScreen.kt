@@ -383,6 +383,8 @@ fun SettingsScreen(
                     }
                 }
             }
+
+            PlatformSettingsContent()
         }
     }
 
