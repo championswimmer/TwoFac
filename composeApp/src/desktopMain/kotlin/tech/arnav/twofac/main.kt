@@ -11,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
@@ -23,6 +22,13 @@ import tech.arnav.twofac.di.desktopQrModule
 import tech.arnav.twofac.di.desktopSettingsModule
 import tech.arnav.twofac.settings.DesktopSettingsManager
 import androidx.compose.foundation.isSystemInDarkTheme
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.tray_lock_color
+import twofac.composeapp.generated.resources.tray_lock_monochrome_dark
+import twofac.composeapp.generated.resources.tray_lock_monochrome_light
+import twofac.composeapp.generated.resources.twofac_icon
 
 fun main() = runBlocking {
     val koinApp = initKoin {
@@ -55,7 +61,7 @@ fun main() = runBlocking {
                     }
                 },
                 title = "TwoFac",
-                icon = painterResource("twofac_icon.png"),
+                icon = painterResource(Res.drawable.twofac_icon),
             ) {
                 App(onQuit = { exitApplication() })
             }
@@ -68,14 +74,14 @@ fun main() = runBlocking {
             val isMac = os.contains("mac")
             val isLinux = os.contains("linux") || os.contains("nix")
             val isDark = isSystemInDarkTheme()
-            val trayIconPath = if (isMac || isLinux) {
-                if (isDark) "tray_lock_monochrome_dark.svg" else "tray_lock_monochrome_light.svg"
+            val trayIcon: DrawableResource = if (isMac || isLinux) {
+                if (isDark) Res.drawable.tray_lock_monochrome_dark else Res.drawable.tray_lock_monochrome_light
             } else {
-                "tray_lock_color.svg"
+                Res.drawable.tray_lock_color
             }
 
             Tray(
-                icon = painterResource(trayIconPath),
+                icon = painterResource(trayIcon),
                 tooltip = "TwoFac",
                 onAction = {
                     if (!isTrayPopupVisible) {
