@@ -82,6 +82,17 @@ jobs:
           name: cli-linux-x64
           path: cliApp/build/bin/linuxX64/releaseExecutable/2fac.kexe
 
+      - name: Upload release build logs (Ubuntu) on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build-logs-ubuntu
+          if-no-files-found: ignore
+          path: |
+            build/reports/problems/**
+            composeApp/build/compose/logs/**
+            composeApp/build/compose/tmp/*.args.txt
+
   build-windows:
     name: "Build Windows Desktop and CLI"
     runs-on: windows-latest
@@ -119,6 +130,17 @@ jobs:
         with:
           name: windows-desktop-msi
           path: composeApp/build/compose/binaries/main/msi/*.msi
+
+      - name: Upload release build logs (Windows) on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build-logs-windows
+          if-no-files-found: ignore
+          path: |
+            build/reports/problems/**
+            composeApp/build/compose/logs/**
+            composeApp/build/compose/tmp/*.args.txt
 
   build-macos:
     name: "Build macOS Desktop, iOS Framework and App, CLI (macOS)"
@@ -252,6 +274,17 @@ jobs:
         with:
           name: ios-ipa
           path: ${{ runner.temp }}/ipa/*.ipa
+
+      - name: Upload release build logs (macOS) on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build-logs-macos
+          if-no-files-found: ignore
+          path: |
+            build/reports/problems/**
+            composeApp/build/compose/logs/**
+            composeApp/build/compose/tmp/*.args.txt
 
   release:
     name: "Create GitHub Release"
