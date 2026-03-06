@@ -1,14 +1,14 @@
 ---
 name: Centralized Cohesive Theming Across App Surfaces
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0 - Baseline audit, palette extraction, and semantic token contract"
-  - "[ ] Phase 1 - Add sharedLib color-token source of truth (colors only)"
-  - "[ ] Phase 2 - Build composeApp Material3 theme foundation from shared tokens"
-  - "[ ] Phase 3 - Centralize timer bar red/yellow/green semantics across Compose + watchApp + iOS watch"
-  - "[ ] Phase 4 - Adopt shared tokens in watchApp (Wear Compose) and iosApp watch extension (SwiftUI)"
-  - "[ ] Phase 5 - Adopt shared tokens in cliApp via Mordant color mapping"
-  - "[ ] Phase 6 - Validation matrix, accessibility checks, and rollout sequence"
+  - "[x] Phase 0 - Baseline audit, palette extraction, and semantic token contract"
+  - "[x] Phase 1 - Add sharedLib color-token source of truth (colors only)"
+  - "[x] Phase 2 - Build composeApp Material3 theme foundation from shared tokens"
+  - "[x] Phase 3 - Centralize timer bar red/yellow/green semantics across Compose + watchApp + iOS watch"
+  - "[x] Phase 4 - Adopt shared tokens in watchApp (Wear Compose) and iosApp watch extension (SwiftUI)"
+  - "[x] Phase 5 - Adopt shared tokens in cliApp via Mordant color mapping"
+  - "[x] Phase 6 - Validation matrix, accessibility checks, and rollout sequence"
 ---
 
 # Centralized Cohesive Theming Across App Surfaces
