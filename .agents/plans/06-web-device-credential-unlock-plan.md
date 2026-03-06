@@ -1,13 +1,13 @@
 ---
 name: Web Device-Credential Unlock for Extension/PWA
-status: In Progress
+status: Completed
 progress:
    - "[x] Phase 0 - Apply locked scope and interface hierarchy"
    - "[x] Phase 1 - Add secure session abstractions in commonMain"
    - "[x] Phase 2 - Implement wasmJs WebAuthnSessionManager secure unlock path with library-backed interop"
    - "[x] Phase 3 - Persist encrypted passkey and keep decrypted key session-only"
    - "[x] Phase 4 - Wire Settings/Home unlock flows (secure-only, no legacy plaintext)"
-   - "[ ] Phase 5 - Add tests and hardening"
+   - "[x] Phase 5 - Add tests and hardening"
 ---
 
 # Web Device-Credential Unlock for Extension/PWA

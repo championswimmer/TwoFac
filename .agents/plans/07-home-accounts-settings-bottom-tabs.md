@@ -1,14 +1,14 @@
 ---
 name: Home / Accounts / Settings Bottom Tabs
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0 - Lock UX scope and tab behavior"
-  - "[ ] Phase 1 - Define top-level tab destinations and metadata"
-  - "[ ] Phase 2 - Move bottom navigation to app-level Scaffold"
-  - "[ ] Phase 3 - Refactor screen contracts for tab-first navigation"
-  - "[ ] Phase 4 - Wire Accounts subflows (details, add, delete)"
-  - "[ ] Phase 5 - Add/adjust tests for tab navigation and back stack behavior"
-  - "[ ] Phase 6 - Run validation and UX/accessibility regression checks"
+  - "[X] Phase 0 - Lock UX scope and tab behavior"
+  - "[x] Phase 1 - Define top-level tab destinations and metadata"
+  - "[x] Phase 2 - Move bottom navigation to app-level Scaffold"
+  - "[x] Phase 3 - Refactor screen contracts for tab-first navigation"
+  - "[x] Phase 4 - Wire Accounts subflows (details, add, delete)"
+  - "[x] Phase 5 - Add/adjust tests for tab navigation and back stack behavior"
+  - "[X] Phase 6 - Run validation and UX/accessibility regression checks"
 ---
 
 # Home / Accounts / Settings Bottom Tabs
