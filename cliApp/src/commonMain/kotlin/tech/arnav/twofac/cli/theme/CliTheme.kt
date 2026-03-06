@@ -48,7 +48,7 @@ object CliTheme {
         timerHealthy = trueColor(tokens.timer.healthy),
         timerWarning = trueColor(tokens.timer.warning),
         timerCritical = trueColor(tokens.timer.critical),
-        timerTrack = trueColor(tokens.timerTrack),
+        timerTrack = TextStyles.dim + trueColor(tokens.timerTrack),
         danger = TextStyles.bold + trueColor(tokens.danger),
     )
 
