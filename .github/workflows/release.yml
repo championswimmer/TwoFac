@@ -107,9 +107,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Setup WiX
-        run: choco install wixtoolset
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
