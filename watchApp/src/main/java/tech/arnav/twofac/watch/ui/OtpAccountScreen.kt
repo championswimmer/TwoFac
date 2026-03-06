@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontFamily
@@ -123,7 +124,7 @@ private fun CountdownArc(
     val tokens = TwofacTheme.tokens
     val timerState = timerStateByRemainingProgress(progress)
     val arcColor = tokens.timer.colorForState(timerState).toComposeColor()
-    val trackColor = tokens.timerTrack.toComposeColor()
+    val trackColor = Color.Black
 
     Canvas(modifier = Modifier.fillMaxSize()) {
         val strokeWidth = 8.dp.toPx()
