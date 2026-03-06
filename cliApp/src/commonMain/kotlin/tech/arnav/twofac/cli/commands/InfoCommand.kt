@@ -4,11 +4,10 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.rendering.BorderType
-import com.github.ajalt.mordant.rendering.TextColors
-import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.ajalt.mordant.table.Borders
 import com.github.ajalt.mordant.table.table
 import tech.arnav.twofac.cli.getPlatform
+import tech.arnav.twofac.cli.theme.CliTheme
 import tech.arnav.twofac.lib.libPlatform
 
 class InfoCommand : CliktCommand("info") {
@@ -17,17 +16,18 @@ class InfoCommand : CliktCommand("info") {
     }
 
     override fun run() {
+        val styles = CliTheme.styles(terminal)
 
         terminal.println(table {
             borderType = BorderType.SQUARE_DOUBLE_SECTION_SEPARATOR
             header {
-                style = TextStyles.bold + TextColors.yellow
+                style = styles.header
                 cellBorders = Borders.NONE
                 row("TwoFac CLI Info")
             }
             body {
                 column(0) {
-                    style = TextStyles.bold + TextColors.green
+                    style = styles.key
                 }
                 row("Platform", getPlatform().name)
                 row("Library", libPlatform()) // TODO: add version via buildkonfig

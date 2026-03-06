@@ -66,14 +66,14 @@ internal class BrowserWebCryptoClient : WebCryptoClient {
     }.getOrNull()
 }
 
-private external interface WebCryptoEncryptInteropResult {
+private external interface WebCryptoEncryptInteropResult : JsAny {
     val status: String
     val salt: String?
     val nonce: String?
     val ciphertext: String?
 }
 
-private external interface WebCryptoDecryptInteropResult {
+private external interface WebCryptoDecryptInteropResult : JsAny {
     val status: String
     val plaintext: String?
 }
@@ -84,7 +84,7 @@ private external object CryptoInterop {
         plaintext: String,
         prfFirstOutputBase64Url: String,
         context: String,
-    ): Promise<JsAny?>
+    ): Promise<WebCryptoEncryptInteropResult>
 
     fun decryptPasskeyWithWebCrypto(
         saltBase64Url: String,
@@ -92,5 +92,5 @@ private external object CryptoInterop {
         ciphertextBase64Url: String,
         prfFirstOutputBase64Url: String,
         context: String,
-    ): Promise<JsAny?>
+    ): Promise<WebCryptoDecryptInteropResult>
 }

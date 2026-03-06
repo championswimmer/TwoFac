@@ -6,7 +6,6 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.ManageAccounts
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -33,6 +32,7 @@ import tech.arnav.twofac.screens.AccountsScreen
 import tech.arnav.twofac.screens.AddAccountScreen
 import tech.arnav.twofac.screens.HomeScreen
 import tech.arnav.twofac.screens.SettingsScreen
+import tech.arnav.twofac.theme.TwoFacTheme
 import kotlin.reflect.KClass
 
 private enum class TopLevelDestination(
@@ -48,7 +48,7 @@ private enum class TopLevelDestination(
 @Composable
 @Preview
 fun App(onQuit: (() -> Unit)? = null) {
-    MaterialTheme {
+    TwoFacTheme {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination

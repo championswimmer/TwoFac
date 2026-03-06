@@ -30,7 +30,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import tech.arnav.twofac.lib.theme.TimerState
+import tech.arnav.twofac.lib.theme.timerStateByElapsedProgress
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.theme.TwoFacTheme
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -126,14 +129,17 @@ fun OTPCard(
             }
 
             // Progress bar
+            val timerState = timerStateByElapsedProgress(progress)
+            val extendedColors = TwoFacTheme.extendedColors
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth(),
-                color = when {
-                    progress < 0.5f -> MaterialTheme.colorScheme.primary
-                    progress < 0.8f -> MaterialTheme.colorScheme.secondary
-                    else -> MaterialTheme.colorScheme.error
-                }
+                color = when (timerState) {
+                    TimerState.Healthy -> extendedColors.timerHealthy
+                    TimerState.Warning -> extendedColors.timerWarning
+                    TimerState.Critical -> extendedColors.timerCritical
+                },
+                trackColor = extendedColors.timerTrack ?: MaterialTheme.colorScheme.surfaceVariant
             )
         }
     }
@@ -142,14 +148,16 @@ fun OTPCard(
 @Preview
 @Composable
 fun OTPCardPreview() {
-    OTPCard(
-        account = StoredAccount.DisplayAccount(
-            "arnav@gmail.com",
-            accountLabel = "Google",
-        ),
-        otpCode = "123456",
-        onRefreshOTP = {},
-    )
+    TwoFacTheme {
+        OTPCard(
+            account = StoredAccount.DisplayAccount(
+                "arnav@gmail.com",
+                accountLabel = "Google",
+            ),
+            otpCode = "123456",
+            onRefreshOTP = {},
+        )
+    }
 }
 
 private fun formatOTPCode(code: String): String {
