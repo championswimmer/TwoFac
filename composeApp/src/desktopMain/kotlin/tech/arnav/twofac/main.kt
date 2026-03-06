@@ -25,6 +25,10 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.tray_lock_color
+import twofac.composeapp.generated.resources.tray_lock_monochrome_dark
+import twofac.composeapp.generated.resources.tray_lock_monochrome_light
+import twofac.composeapp.generated.resources.twofac_icon
 
 fun main() = runBlocking {
     val koinApp = initKoin {
