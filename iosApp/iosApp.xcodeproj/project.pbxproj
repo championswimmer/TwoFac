@@ -46,6 +46,7 @@
 				TwoFacWatchApp.swift,
 				WatchConnectivityManager.swift,
 				WatchExtensionContentView.swift,
+				WatchThemeTokens.swift,
 			);
 			target = C1A0000D2EC1000000A4DA20 /* watchApp */;
 		};

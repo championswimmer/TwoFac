@@ -85,14 +85,14 @@ private fun String.toWebAuthnOperationStatus(): WebAuthnOperationStatus = when (
     else -> WebAuthnOperationStatus.FAILED
 }
 
-private external interface WebAuthnCapabilitiesInteropResult {
+private external interface WebAuthnCapabilitiesInteropResult : JsAny {
     val publicKeyCredentialAvailable: Boolean
     val userVerifyingAuthenticatorAvailable: Boolean
     val clientCapabilitiesAvailable: Boolean
     val prfSupported: Boolean
 }
 
-private external interface WebAuthnOperationInteropResult {
+private external interface WebAuthnOperationInteropResult : JsAny {
     val status: String
     val credentialId: String?
     val extensionResults: String?
@@ -113,7 +113,7 @@ private fun WebAuthnOperationInteropResult.toOperationResult(
 @JsModule("./webauthn.mjs")
 private external object WebAuthnInterop {
     fun isWebAuthnSupported(): Boolean
-    fun queryWebAuthnCapabilities(): Promise<JsAny?>
-    fun createWebAuthnCredential(): Promise<JsAny?>
-    fun authenticateWebAuthnCredential(credentialId: String?): Promise<JsAny?>
+    fun queryWebAuthnCapabilities(): Promise<WebAuthnCapabilitiesInteropResult>
+    fun createWebAuthnCredential(): Promise<WebAuthnOperationInteropResult>
+    fun authenticateWebAuthnCredential(credentialId: String?): Promise<WebAuthnOperationInteropResult>
 }

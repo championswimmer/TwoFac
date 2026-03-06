@@ -24,9 +24,12 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
+import tech.arnav.twofac.lib.theme.colorForState
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.theme.timerStateByRemainingProgress
 import tech.arnav.twofac.watch.otp.WatchOtpEntry
 import tech.arnav.twofac.watch.presentation.theme.TwofacTheme
+import tech.arnav.twofac.watch.presentation.theme.toComposeColor
 
 @Composable
 fun OtpAccountScreen(
@@ -98,7 +101,7 @@ fun OtpAccountScreen(
                     Text(
                         text = "Error",
                         fontSize = 18.sp,
-                        color = Color.Red,
+                        color = TwofacTheme.tokens.danger.toComposeColor(),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 4.dp),
                     )
@@ -118,22 +121,18 @@ private fun CountdownArc(
     val nextRefreshAtMillis = nextRefreshAtEpochSec * 1000L
     val remainingMillis = (nextRefreshAtMillis - currentEpochMillis).coerceIn(0L, periodMillis)
     val progress = remainingMillis.toFloat() / periodMillis.toFloat()
-
-    // Color transitions: green (full) → amber (half) → red (nearly expired)
-    val arcColor = when {
-        progress > 0.5f -> Color(0xFF4CAF50) // green
-        progress > 0.25f -> Color(0xFFFF9800) // amber
-        else -> Color(0xFFF44336) // red
-    }
+    val tokens = TwofacTheme.tokens
+    val timerState = timerStateByRemainingProgress(progress)
+    val arcColor = tokens.timer.colorForState(timerState).toComposeColor()
+    val trackColor = Color.Black
 
     Canvas(modifier = Modifier.fillMaxSize()) {
         val strokeWidth = 8.dp.toPx()
         val inset = strokeWidth / 2f
         val arcSize = Size(size.width - strokeWidth, size.height - strokeWidth)
 
-        // Background track (dim ring)
         drawArc(
-            color = Color.White.copy(alpha = 0.1f),
+            color = trackColor,
             startAngle = -90f,
             sweepAngle = 360f,
             useCenter = false,
@@ -142,7 +141,6 @@ private fun CountdownArc(
             size = arcSize,
         )
 
-        // Foreground arc — full circle at start, shrinks as time runs out
         if (progress > 0f) {
             drawArc(
                 color = arcColor,

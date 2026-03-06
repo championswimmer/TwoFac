@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -33,6 +34,7 @@ import tech.arnav.twofac.screens.AccountsScreen
 import tech.arnav.twofac.screens.AddAccountScreen
 import tech.arnav.twofac.screens.HomeScreen
 import tech.arnav.twofac.screens.SettingsScreen
+import tech.arnav.twofac.theme.TwoFacTheme
 import kotlin.reflect.KClass
 
 private enum class TopLevelDestination(
@@ -48,15 +50,21 @@ private enum class TopLevelDestination(
 @Composable
 @Preview
 fun App(onQuit: (() -> Unit)? = null) {
-    MaterialTheme {
+    TwoFacTheme {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
         Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
             bottomBar = {
                 if (currentDestination.shouldShowBottomBar()) {
-                    NavigationBar {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        tonalElevation = 0.dp,
+                    ) {
                         TopLevelDestination.entries.forEach { destination ->
                             NavigationBarItem(
                                 selected = currentDestination.isSelected(destination),

@@ -166,6 +166,101 @@ public final class tech/arnav/twofac/lib/storage/StoredAccount {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class tech/arnav/twofac/lib/theme/ThemeColor {
+	public static final field Companion Ltech/arnav/twofac/lib/theme/ThemeColor$Companion;
+	public fun <init> (J)V
+	public final fun component1 ()J
+	public final fun copy (J)Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/theme/ThemeColor;JILjava/lang/Object;)Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAlpha ()I
+	public final fun getArgb ()J
+	public final fun getBlue ()I
+	public final fun getGreen ()I
+	public final fun getRed ()I
+	public fun hashCode ()I
+	public final fun toArgbHex (Z)Ljava/lang/String;
+	public static synthetic fun toArgbHex$default (Ltech/arnav/twofac/lib/theme/ThemeColor;ZILjava/lang/Object;)Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class tech/arnav/twofac/lib/theme/TimerColorSemantics {
+	public fun <init> (Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;)V
+	public final fun component1 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component2 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component3 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun copy (Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;)Ltech/arnav/twofac/lib/theme/TimerColorSemantics;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/theme/TimerColorSemantics;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;ILjava/lang/Object;)Ltech/arnav/twofac/lib/theme/TimerColorSemantics;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCritical ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getHealthy ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getWarning ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class tech/arnav/twofac/lib/theme/TimerColorSemanticsKt {
+	public static final fun colorForState (Ltech/arnav/twofac/lib/theme/TimerColorSemantics;Ltech/arnav/twofac/lib/theme/TimerState;)Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public static final fun timerStateByElapsedProgress (F)Ltech/arnav/twofac/lib/theme/TimerState;
+	public static final fun timerStateByRemainingProgress (F)Ltech/arnav/twofac/lib/theme/TimerState;
+}
+
+public final class tech/arnav/twofac/lib/theme/TimerSemantics {
+	public static final field HEALTHY_THRESHOLD F
+	public static final field INSTANCE Ltech/arnav/twofac/lib/theme/TimerSemantics;
+	public static final field WARNING_THRESHOLD F
+}
+
+public final class tech/arnav/twofac/lib/theme/TimerState : java/lang/Enum {
+	public static final field Critical Ltech/arnav/twofac/lib/theme/TimerState;
+	public static final field Healthy Ltech/arnav/twofac/lib/theme/TimerState;
+	public static final field Warning Ltech/arnav/twofac/lib/theme/TimerState;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ltech/arnav/twofac/lib/theme/TimerState;
+	public static fun values ()[Ltech/arnav/twofac/lib/theme/TimerState;
+}
+
+public final class tech/arnav/twofac/lib/theme/TwoFacColorTokens {
+	public fun <init> (Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/TimerColorSemantics;Ltech/arnav/twofac/lib/theme/ThemeColor;)V
+	public final fun component1 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component10 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component11 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component12 ()Ltech/arnav/twofac/lib/theme/TimerColorSemantics;
+	public final fun component13 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component2 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component3 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component4 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component5 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component6 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component7 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component8 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun component9 ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun copy (Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/TimerColorSemantics;Ltech/arnav/twofac/lib/theme/ThemeColor;)Ltech/arnav/twofac/lib/theme/TwoFacColorTokens;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/theme/TwoFacColorTokens;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/ThemeColor;Ltech/arnav/twofac/lib/theme/TimerColorSemantics;Ltech/arnav/twofac/lib/theme/ThemeColor;ILjava/lang/Object;)Ltech/arnav/twofac/lib/theme/TwoFacColorTokens;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAccent ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getBackground ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getBrand ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getDanger ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getOnBackground ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getOnBrand ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getOnDanger ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getOnSurface ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getOnSurfaceVariant ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getSurface ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getSurfaceVariant ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public final fun getTimer ()Ltech/arnav/twofac/lib/theme/TimerColorSemantics;
+	public final fun getTimerTrack ()Ltech/arnav/twofac/lib/theme/ThemeColor;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class tech/arnav/twofac/lib/theme/TwoFacThemeTokens {
+	public static final field INSTANCE Ltech/arnav/twofac/lib/theme/TwoFacThemeTokens;
+	public final fun getDark ()Ltech/arnav/twofac/lib/theme/TwoFacColorTokens;
+	public final fun getLight ()Ltech/arnav/twofac/lib/theme/TwoFacColorTokens;
+}
+
 public final class tech/arnav/twofac/lib/watchsync/IosWatchSyncHelper {
 	public static final field INSTANCE Ltech/arnav/twofac/lib/watchsync/IosWatchSyncHelper;
 	public final fun decodeWatchSyncPayloadString (Ljava/lang/String;)Ltech/arnav/twofac/lib/watchsync/WatchSyncSnapshot;

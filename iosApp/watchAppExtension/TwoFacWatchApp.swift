@@ -8,6 +8,7 @@ struct TwoFacWatchApp: App {
         WindowGroup {
             WatchExtensionContentView()
                 .environmentObject(connectivityManager)
+                .preferredColorScheme(.dark)
         }
     }
 }
