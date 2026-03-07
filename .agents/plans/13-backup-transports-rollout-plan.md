@@ -1,8 +1,8 @@
 ---
 name: Backup Transports Rollout Plan
-status: Planned
+status: In Progress
 progress:
-  - "[ ] Phase 0 - Refactor current single-transport code into a multi-transport registry"
+  - "[x] Phase 0 - Refactor current single-transport code into a multi-transport registry"
   - "[ ] Phase 1 - Define provider capability metadata and single-provider automatic restore policy"
   - "[ ] Phase 2 - Implement Apple iCloud transport and entitlement wiring"
   - "[ ] Phase 3 - Implement Google Drive appDataFolder transport across supported platforms"

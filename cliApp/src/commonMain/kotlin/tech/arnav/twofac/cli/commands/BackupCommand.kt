@@ -3,6 +3,7 @@ package tech.arnav.twofac.cli.commands
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import kotlinx.coroutines.runBlocking
@@ -12,8 +13,13 @@ import org.koin.core.component.inject
 import tech.arnav.twofac.cli.backup.LocalFileBackupTransport
 import tech.arnav.twofac.cli.storage.AppDirUtils
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
+import tech.arnav.twofac.lib.backup.BackupTransport
+import tech.arnav.twofac.lib.backup.BackupTransportRegistry
+import tech.arnav.twofac.lib.backup.LocalBackupProviderInfo
+import tech.arnav.twofac.lib.backup.backupTransportRegistryOf
 
 class BackupCommand : CliktCommand(name = "backup") {
     override fun help(context: Context) = "Backup and restore accounts via local JSON files"
@@ -34,6 +40,10 @@ class ExportCommand : CliktCommand(name = "export"), KoinComponent {
         "-o", "--output-dir",
         help = "Directory where the backup file will be written (defaults to app backup dir)"
     )
+    private val providerId by option(
+        "--provider",
+        help = "Backup provider ID to use (defaults to local)"
+    ).default(LocalBackupProviderInfo.id)
     private val passkey by option("-p", "--passkey", help = "Passkey to decrypt accounts").prompt(
         "Enter passkey",
         hideInput = true
@@ -43,8 +53,13 @@ class ExportCommand : CliktCommand(name = "export"), KoinComponent {
         twoFacLib.unlock(passkey)
 
         val dir = outputDir?.let { Path(it) } ?: AppDirUtils.getBackupDirPath(forceCreate = true)
-        val transport = LocalFileBackupTransport(dir)
+        val registry = localBackupRegistry(dir)
+        val transport = registry.requireTransport(providerId) { message, err ->
+            echo(message, err = err)
+        }
         val service = BackupService(twoFacLib)
+
+        if (transport == null) return@runBlocking
 
         when (val result = service.createBackup(transport)) {
             is BackupResult.Success -> {
@@ -71,6 +86,10 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
         "-f", "--file",
         help = "Specific backup file name to restore (defaults to most recent backup)"
     )
+    private val providerId by option(
+        "--provider",
+        help = "Backup provider ID to use (defaults to local)"
+    ).default(LocalBackupProviderInfo.id)
     private val passkey by option("-p", "--passkey", help = "Passkey to encrypt imported accounts").prompt(
         "Enter passkey",
         hideInput = true
@@ -80,7 +99,12 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
         twoFacLib.unlock(passkey)
 
         val dir = inputDir?.let { Path(it) } ?: AppDirUtils.getBackupDirPath()
-        val transport = LocalFileBackupTransport(dir)
+        val registry = localBackupRegistry(dir)
+        val transport = registry.requireTransport(providerId) { message, err ->
+            echo(message, err = err)
+        }
+
+        if (transport == null) return@runBlocking
 
         // Determine which backup to restore
         val resolvedBackupId = backupFile ?: run {
@@ -102,5 +126,30 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
             is BackupResult.Success -> echo("✓ Imported ${result.value} account(s) from $resolvedBackupId")
             is BackupResult.Failure -> echo("✗ Import failed: ${result.message}", err = true)
         }
+    }
+}
+
+private fun localBackupRegistry(directory: Path): BackupTransportRegistry {
+    return backupTransportRegistryOf(
+        BackupProvider(
+            info = LocalBackupProviderInfo,
+            transport = LocalFileBackupTransport(directory),
+        )
+    )
+}
+
+private fun BackupTransportRegistry.requireTransport(
+    providerId: String,
+    echo: (message: Any?, err: Boolean) -> Unit,
+): BackupTransport? {
+    return get(providerId)?.transport ?: run {
+        val availableProviders = all().joinToString { it.info.id }
+        val suffix = if (availableProviders.isEmpty()) {
+            ""
+        } else {
+            " Available providers: $availableProviders"
+        }
+        echo("✗ Unknown backup provider: $providerId.$suffix", true)
+        null
     }
 }
