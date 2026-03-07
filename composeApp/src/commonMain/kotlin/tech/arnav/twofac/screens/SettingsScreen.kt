@@ -481,16 +481,26 @@ fun SettingsScreen(
                 coroutineScope.launch {
                     try {
                         twoFacLib?.unlock(passkey)
+                        // Resolve the selected backup transport before dispatching
+                        val backupTransport = if (action == BackupAction.EXPORT || action == BackupAction.IMPORT) {
+                            val transport = pendingProviderId?.let { backupRegistry?.transport(it) }
+                            if (transport == null) {
+                                snackbarHostState.showSnackbar("Backup provider '${pendingProviderId ?: "unknown"}' is not available")
+                                pendingAction = null
+                                pendingProviderId = null
+                                return@launch
+                            }
+                            if (backupService == null) {
+                                snackbarHostState.showSnackbar("Backup service is not configured")
+                                pendingAction = null
+                                pendingProviderId = null
+                                return@launch
+                            }
+                            transport
+                        } else null
                         when (action) {
                             BackupAction.EXPORT -> {
-                                val transport = pendingProviderId?.let { backupRegistry?.transport(it) }
-                                if (transport == null || backupService == null) {
-                                    snackbarHostState.showSnackbar("Backup provider unavailable")
-                                    pendingAction = null
-                                    pendingProviderId = null
-                                    return@launch
-                                }
-                                val result = backupService.createBackup(transport)
+                                val result = backupService!!.createBackup(backupTransport!!)
                                 val message = when (result) {
                                     is BackupResult.Success ->
                                         "Backup exported: ${result.value.id}"
@@ -502,14 +512,7 @@ fun SettingsScreen(
                                 pendingProviderId = null
                             }
                             BackupAction.IMPORT -> {
-                                val transport = pendingProviderId?.let { backupRegistry?.transport(it) }
-                                if (transport == null || backupService == null) {
-                                    snackbarHostState.showSnackbar("Backup provider unavailable")
-                                    pendingAction = null
-                                    pendingProviderId = null
-                                    return@launch
-                                }
-                                val listResult = transport.listBackups()
+                                val listResult = backupTransport!!.listBackups()
                                 if (listResult is BackupResult.Failure) {
                                     snackbarHostState.showSnackbar("No backups found: ${listResult.message}")
                                     pendingAction = null
@@ -524,7 +527,7 @@ fun SettingsScreen(
                                     return@launch
                                 }
                                 val latest = backups.maxBy { it.createdAt }
-                                val result = backupService.restoreBackup(transport, latest.id)
+                                val result = backupService!!.restoreBackup(backupTransport, latest.id)
                                 val message = when (result) {
                                     is BackupResult.Success ->
                                         "Imported ${result.value} account(s) from ${latest.id}"
