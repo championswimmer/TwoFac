@@ -67,7 +67,8 @@ class BackupPreferencesManager(
 
 private fun BackupDescriptor.toRemoteMarker(): BackupRemoteMarker {
     return BackupRemoteMarker(
-        identifier = id,
+        identifier = remoteId ?: id,
         modifiedAtEpochSeconds = createdAt,
+        versionTag = checksum,
     )
 }

@@ -128,6 +128,8 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.components.resources)
             implementation(libs.kotlinx.io.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.core)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
@@ -143,6 +145,7 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
@@ -150,17 +153,20 @@ kotlin {
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.play.services.wearable)
             implementation(libs.kstore.file)
+            implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlin.multiplatform.appdirs)
             implementation(libs.kscan)
         }
         iosMain.dependencies {
             implementation(libs.kstore.file)
+            implementation(libs.ktor.client.darwin)
             implementation(libs.kscan)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.kstore.file)
+            implementation(libs.ktor.client.java)
             implementation(libs.kotlin.multiplatform.appdirs)
             implementation(libs.zxing.javase)
             implementation(project(":sharedLib"))

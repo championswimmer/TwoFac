@@ -11,4 +11,6 @@ data class BackupDescriptor(
     val createdAt: Long,
     val schemaVersion: Int = 1,
     val byteSize: Long,
+    val remoteId: String? = null,
+    val checksum: String? = null,
 )

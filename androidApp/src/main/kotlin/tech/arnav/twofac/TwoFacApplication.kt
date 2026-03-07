@@ -2,6 +2,7 @@ package tech.arnav.twofac
 
 import android.app.Application
 import ca.gosyer.appdirs.impl.attachAppDirs
+import tech.arnav.twofac.di.androidBackupModule
 import tech.arnav.twofac.di.androidBiometricModule
 import tech.arnav.twofac.di.androidQrModule
 import tech.arnav.twofac.di.androidWearSyncModule
@@ -15,6 +16,7 @@ class TwoFacApplication : Application() {
         initKoin {
             modules(
                 androidWearSyncModule(this@TwoFacApplication),
+                androidBackupModule,
                 androidBiometricModule(this@TwoFacApplication) {
                     MainActivity.currentActivityOrThrow()
                 },

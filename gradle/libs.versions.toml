@@ -139,6 +139,7 @@ uiTooling = "1.10.1"
 wearToolingPreview = "1.0.0"
 coreSplashscreen = "1.2.0"
 androidxWork = "2.11.1"
+ktor = "3.4.1"
 
 [libraries]
 
@@ -202,5 +203,10 @@ compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.re
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 kscan = { module = "io.github.ismai117:KScan", version.ref = "kscan" }
 zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }

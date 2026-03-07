@@ -5,7 +5,7 @@ progress:
   - "[x] Phase 0 - Refactor current single-transport code into a multi-transport registry"
   - "[x] Phase 1 - Define provider capability metadata and single-provider automatic restore policy"
   - "[x] Phase 2 - Implement Apple iCloud transport and entitlement wiring"
-  - "[ ] Phase 3 - Implement Google Drive appDataFolder transport across supported platforms"
+  - "[x] Phase 3 - Implement Google Drive appDataFolder transport across supported platforms"
   - "[ ] Phase 4 - Ship manual backup and restore UX for every available provider"
   - "[ ] Phase 5 - Add automatic restore guardrails, tests, and rollout hardening"
 ---
@@ -306,6 +306,13 @@ Current implementation note:
     - empty `appDataFolder`
     - multiple devices creating snapshots
     - interrupted upload/download
+
+Current implementation note:
+
+- Google Drive `appDataFolder` backup is now implemented as a shared transport core backed by Google OAuth device-code authorization and Drive REST calls.
+- The provider is registered on Android, Desktop JVM, and iOS, which all already have persistent settings/auth storage and practical user browser access for the device authorization step.
+- Wasm/Web is still intentionally deferred because the original feasibility concerns about Google Identity JS interop, CSP, and browser-only rollout remain unresolved.
+- CLI is still intentionally deferred because the plan treated it as an optional follow-up rather than MVP scope.
 
 ### Phase 4 - Ship manual backup and restore UX for every available provider
 

@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -41,7 +42,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.compose.getKoin
+import tech.arnav.twofac.backup.AuthorizableBackupTransport
 import tech.arnav.twofac.backup.BackupPreferencesManager
+import tech.arnav.twofac.backup.BackupAuthorizationChallenge
+import tech.arnav.twofac.backup.BackupAuthorizationState
+import tech.arnav.twofac.backup.BackupAuthorizationStatus
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 import tech.arnav.twofac.components.PasskeyDialog
@@ -76,6 +81,16 @@ private data class RestoreConfirmationState(
     val existingAccountCount: Int,
 )
 
+private data class BackupAuthorizationConfigState(
+    val provider: BackupProvider,
+    val clientId: String = "",
+)
+
+private data class BackupAuthorizationFlowState(
+    val provider: BackupProvider,
+    val challenge: BackupAuthorizationChallenge,
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -100,6 +115,11 @@ fun SettingsScreen(
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
     var restoreSelectionState by remember { mutableStateOf<RestoreSelectionState?>(null) }
     var restoreConfirmationState by remember { mutableStateOf<RestoreConfirmationState?>(null) }
+    var authorizationConfigState by remember { mutableStateOf<BackupAuthorizationConfigState?>(null) }
+    var authorizationFlowState by remember { mutableStateOf<BackupAuthorizationFlowState?>(null) }
+    var providerAuthorizationStates by remember {
+        mutableStateOf<Map<String, BackupAuthorizationStatus>>(emptyMap())
+    }
     var passkeyError by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var showDeleteStorageDialog by remember { mutableStateOf(false) }
@@ -134,6 +154,15 @@ fun SettingsScreen(
         companionDisplayName = companionSyncCoordinator?.companionDisplayName ?: "Watch"
         if (companionSyncCoordinator != null) {
             isCompanionActive = companionSyncCoordinator.isCompanionActive()
+        }
+    }
+
+    LaunchedEffect(backupProviders) {
+        providerAuthorizationStates = backupProviders.associate { provider ->
+            val authorizationStatus = (provider.transport as? AuthorizableBackupTransport)
+                ?.authorizationStatus()
+                ?: BackupAuthorizationStatus(BackupAuthorizationState.CONNECTED)
+            provider.info.id to authorizationStatus
         }
     }
 
@@ -312,6 +341,7 @@ fun SettingsScreen(
                                 BackupProviderActions(
                                     provider = provider,
                                     backupPreferences = backupPreferences,
+                                    authorizationStatus = providerAuthorizationStates[provider.info.id],
                                     isLoading = isLoading,
                                     onExport = {
                                         pendingAction = BackupAction(
@@ -343,6 +373,46 @@ fun SettingsScreen(
                                             } catch (e: IllegalArgumentException) {
                                                 snackbarHostState.showSnackbar(e.message ?: "Unable to update automatic restore")
                                             }
+                                        }
+                                    },
+                                    onConfigureAuthorization = {
+                                        authorizationConfigState = BackupAuthorizationConfigState(provider = provider)
+                                    },
+                                    onBeginAuthorization = {
+                                        coroutineScope.launch {
+                                            val authorizable = provider.transport as? AuthorizableBackupTransport
+                                            if (authorizable == null) {
+                                                snackbarHostState.showSnackbar("${provider.info.displayName} does not support sign-in from settings yet")
+                                                return@launch
+                                            }
+                                            val result = authorizable.beginAuthorization()
+                                            when (result) {
+                                                is BackupResult.Success -> {
+                                                    authorizationFlowState = BackupAuthorizationFlowState(
+                                                        provider = provider,
+                                                        challenge = result.value,
+                                                    )
+                                                }
+                                                is BackupResult.Failure -> {
+                                                    snackbarHostState.showSnackbar(result.message)
+                                                }
+                                            }
+                                            providerAuthorizationStates = providerAuthorizationStates +
+                                                (provider.info.id to authorizable.authorizationStatus())
+                                        }
+                                    },
+                                    onDisconnectAuthorization = {
+                                        coroutineScope.launch {
+                                            val authorizable = provider.transport as? AuthorizableBackupTransport
+                                            if (authorizable == null) return@launch
+                                            val result = authorizable.disconnectAuthorization()
+                                            val message = when (result) {
+                                                is BackupResult.Success -> "${provider.info.displayName} disconnected"
+                                                is BackupResult.Failure -> result.message
+                                            }
+                                            providerAuthorizationStates = providerAuthorizationStates +
+                                                (provider.info.id to authorizable.authorizationStatus())
+                                            snackbarHostState.showSnackbar(message)
                                         }
                                     },
                                 )
@@ -801,19 +871,148 @@ fun SettingsScreen(
             }
         )
     }
+
+    if (authorizationConfigState != null) {
+        val configState = authorizationConfigState!!
+        var clientId by remember(configState.provider.info.id) { mutableStateOf(configState.clientId) }
+        AlertDialog(
+            onDismissRequest = { authorizationConfigState = null },
+            title = { Text("Configure ${configState.provider.info.displayName}") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "Enter the Google OAuth client ID that should be used for device-code authentication.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    TextField(
+                        value = clientId,
+                        onValueChange = { clientId = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        label = { Text("OAuth Client ID") },
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            val authorizable = configState.provider.transport as? AuthorizableBackupTransport
+                            if (authorizable == null) {
+                                snackbarHostState.showSnackbar("${configState.provider.info.displayName} does not support configuration")
+                                authorizationConfigState = null
+                                return@launch
+                            }
+                            val result = authorizable.configureAuthorization(clientId)
+                            val message = when (result) {
+                                is BackupResult.Success -> {
+                                    providerAuthorizationStates = providerAuthorizationStates +
+                                        (configState.provider.info.id to authorizable.authorizationStatus())
+                                    authorizationConfigState = null
+                                    "${configState.provider.info.displayName} client ID saved"
+                                }
+                                is BackupResult.Failure -> result.message
+                            }
+                            snackbarHostState.showSnackbar(message)
+                        }
+                    },
+                    enabled = clientId.isNotBlank(),
+                ) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { authorizationConfigState = null }) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
+
+    if (authorizationFlowState != null) {
+        val flowState = authorizationFlowState!!
+        AlertDialog(
+            onDismissRequest = { authorizationFlowState = null },
+            title = { Text("Connect ${flowState.provider.info.displayName}") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "1. Open the verification URL below in a browser.\n" +
+                            "2. Enter the displayed user code.\n" +
+                            "3. Return here and continue once Google shows the backup access prompt has been approved.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = flowState.challenge.verificationUriComplete
+                            ?: flowState.challenge.verificationUri,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = "User code: ${flowState.challenge.userCode}",
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            val authorizable = flowState.provider.transport as? AuthorizableBackupTransport
+                            if (authorizable == null) {
+                                snackbarHostState.showSnackbar("${flowState.provider.info.displayName} does not support authorization")
+                                authorizationFlowState = null
+                                return@launch
+                            }
+                            isLoading = true
+                            val result = authorizable.completeAuthorization(flowState.challenge)
+                            val message = when (result) {
+                                is BackupResult.Success -> {
+                                    providerAuthorizationStates = providerAuthorizationStates +
+                                        (flowState.provider.info.id to authorizable.authorizationStatus())
+                                    authorizationFlowState = null
+                                    "${flowState.provider.info.displayName} connected"
+                                }
+                                is BackupResult.Failure -> result.message
+                            }
+                            snackbarHostState.showSnackbar(message)
+                            isLoading = false
+                        }
+                    },
+                    enabled = !isLoading,
+                ) {
+                    Text("I've approved access")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { authorizationFlowState = null },
+                    enabled = !isLoading,
+                ) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
 }
 
 @Composable
 private fun BackupProviderActions(
     provider: BackupProvider,
     backupPreferences: BackupPreferences,
+    authorizationStatus: BackupAuthorizationStatus?,
     isLoading: Boolean,
     onExport: () -> Unit,
     onImport: () -> Unit,
     automaticRestoreSelectedProviderId: String?,
     onAutomaticRestoreChange: (Boolean) -> Unit,
+    onConfigureAuthorization: () -> Unit,
+    onBeginAuthorization: () -> Unit,
+    onDisconnectAuthorization: () -> Unit,
 ) {
     val providerPreferences = backupPreferences.providerPreferences(provider.info.id)
+    val resolvedAuthorizationStatus = authorizationStatus
+        ?: BackupAuthorizationStatus(BackupAuthorizationState.CONNECTED)
     Column {
         Text(
             text = provider.info.displayName,
@@ -841,18 +1040,67 @@ private fun BackupProviderActions(
                 modifier = Modifier.padding(bottom = 8.dp),
             )
         }
+        if (provider.info.requiresAuthentication) {
+            Text(
+                text = resolvedAuthorizationStatus.detail ?: when (resolvedAuthorizationStatus.state) {
+                    BackupAuthorizationState.NOT_CONFIGURED -> "Provider authentication needs setup."
+                    BackupAuthorizationState.DISCONNECTED -> "Provider is ready to connect."
+                    BackupAuthorizationState.CONNECTED -> "Provider is connected."
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = onConfigureAuthorization,
+                    enabled = !isLoading,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        when (resolvedAuthorizationStatus.state) {
+                            BackupAuthorizationState.NOT_CONFIGURED -> "Set Client ID"
+                            BackupAuthorizationState.DISCONNECTED -> "Update Client ID"
+                            BackupAuthorizationState.CONNECTED -> "Change Client ID"
+                        }
+                    )
+                }
+                if (resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED) {
+                    OutlinedButton(
+                        onClick = onDisconnectAuthorization,
+                        enabled = !isLoading,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("Disconnect")
+                    }
+                } else {
+                    Button(
+                        onClick = onBeginAuthorization,
+                        enabled = !isLoading &&
+                            resolvedAuthorizationStatus.state != BackupAuthorizationState.NOT_CONFIGURED,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("Connect")
+                    }
+                }
+            }
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = onExport,
                 modifier = Modifier.weight(1f),
-                enabled = provider.info.supportsManualBackup && !isLoading,
+                enabled = provider.info.supportsManualBackup &&
+                    !isLoading &&
+                    (!provider.info.requiresAuthentication || resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED),
             ) {
                 Text("Export")
             }
             OutlinedButton(
                 onClick = onImport,
                 modifier = Modifier.weight(1f),
-                enabled = provider.info.supportsManualRestore && !isLoading,
+                enabled = provider.info.supportsManualRestore &&
+                    !isLoading &&
+                    (!provider.info.requiresAuthentication || resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED),
             ) {
                 Text("Import")
             }

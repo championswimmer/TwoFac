@@ -4,6 +4,7 @@ import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import tech.arnav.twofac.backup.GoogleDriveAuthState
 import tech.arnav.twofac.lib.backup.BackupPreferences
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
@@ -37,6 +38,15 @@ actual fun createBackupPreferencesStore(): KStore<BackupPreferences> {
     return storeOf(
         file = Path(dir, BACKUP_PREFERENCES_STORAGE_FILE),
         default = BackupPreferences(),
+    )
+}
+
+actual fun createGoogleDriveAuthStore(): KStore<GoogleDriveAuthState> {
+    val dir = getDocumentDirectory()
+    SystemFileSystem.createDirectories(Path(dir))
+    return storeOf(
+        file = Path(dir, GOOGLE_DRIVE_AUTH_STORAGE_FILE),
+        default = GoogleDriveAuthState(),
     )
 }
 
