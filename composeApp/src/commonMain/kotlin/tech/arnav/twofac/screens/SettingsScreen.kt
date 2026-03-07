@@ -45,7 +45,7 @@ import tech.arnav.twofac.components.PasskeyDialog
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
-import tech.arnav.twofac.lib.backup.BackupTransport
+import tech.arnav.twofac.lib.backup.BackupTransportRegistry
 import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.session.WebAuthnSessionManager
@@ -62,15 +62,16 @@ fun SettingsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    // Optional backup dependencies – only registered on platforms that support local file backup
+    // Optional backup dependencies – registered on platforms that support backup
     val koin = getKoin()
     val backupService = remember { koin.getOrNull<BackupService>() }
-    val backupTransport = remember { koin.getOrNull<BackupTransport>() }
+    val backupRegistry = remember { koin.getOrNull<BackupTransportRegistry>() }
     val twoFacLib = remember { koin.getOrNull<TwoFacLib>() }
     val companionSyncCoordinator = remember { koin.getOrNull<CompanionSyncCoordinator>() }
     val sessionManager = remember { koin.getOrNull<SessionManager>() }
 
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
+    var pendingProviderId by remember { mutableStateOf<String?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var showDeleteStorageDialog by remember { mutableStateOf(false) }
@@ -259,41 +260,53 @@ fun SettingsScreen(
                 }
             }
 
-            if (backupService != null && backupTransport != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "Local Backup",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 8.dp)
+            if (backupService != null && backupRegistry != null && !backupRegistry.isEmpty()) {
+                for (provider in backupRegistry.providers()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
-                        Text(
-                            text = "Export or import accounts as a plaintext JSON backup file.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Button(
-                                onClick = { pendingAction = BackupAction.EXPORT },
-                                modifier = Modifier.weight(1f),
-                                enabled = !isLoading
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = provider.displayName,
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            Text(
+                                text = "Export or import accounts as a plaintext JSON backup file.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text("Export")
-                            }
-                            OutlinedButton(
-                                onClick = { pendingAction = BackupAction.IMPORT },
-                                modifier = Modifier.weight(1f),
-                                enabled = !isLoading
-                            ) {
-                                Text("Import")
+                                if (provider.supportsManualBackup) {
+                                    Button(
+                                        onClick = {
+                                            pendingProviderId = provider.id
+                                            pendingAction = BackupAction.EXPORT
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        enabled = !isLoading
+                                    ) {
+                                        Text("Export")
+                                    }
+                                }
+                                if (provider.supportsManualRestore) {
+                                    OutlinedButton(
+                                        onClick = {
+                                            pendingProviderId = provider.id
+                                            pendingAction = BackupAction.IMPORT
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        enabled = !isLoading
+                                    ) {
+                                        Text("Import")
+                                    }
+                                }
                             }
                         }
                     }
@@ -470,7 +483,14 @@ fun SettingsScreen(
                         twoFacLib?.unlock(passkey)
                         when (action) {
                             BackupAction.EXPORT -> {
-                                val result = backupService!!.createBackup(backupTransport!!)
+                                val transport = pendingProviderId?.let { backupRegistry?.transport(it) }
+                                if (transport == null || backupService == null) {
+                                    snackbarHostState.showSnackbar("Backup provider unavailable")
+                                    pendingAction = null
+                                    pendingProviderId = null
+                                    return@launch
+                                }
+                                val result = backupService.createBackup(transport)
                                 val message = when (result) {
                                     is BackupResult.Success ->
                                         "Backup exported: ${result.value.id}"
@@ -479,22 +499,32 @@ fun SettingsScreen(
                                 }
                                 snackbarHostState.showSnackbar(message)
                                 pendingAction = null
+                                pendingProviderId = null
                             }
                             BackupAction.IMPORT -> {
-                                val listResult = backupTransport!!.listBackups()
+                                val transport = pendingProviderId?.let { backupRegistry?.transport(it) }
+                                if (transport == null || backupService == null) {
+                                    snackbarHostState.showSnackbar("Backup provider unavailable")
+                                    pendingAction = null
+                                    pendingProviderId = null
+                                    return@launch
+                                }
+                                val listResult = transport.listBackups()
                                 if (listResult is BackupResult.Failure) {
                                     snackbarHostState.showSnackbar("No backups found: ${listResult.message}")
                                     pendingAction = null
+                                    pendingProviderId = null
                                     return@launch
                                 }
                                 val backups = (listResult as BackupResult.Success).value
                                 if (backups.isEmpty()) {
                                     snackbarHostState.showSnackbar("No backup files found")
                                     pendingAction = null
+                                    pendingProviderId = null
                                     return@launch
                                 }
                                 val latest = backups.maxBy { it.createdAt }
-                                val result = backupService!!.restoreBackup(backupTransport, latest.id)
+                                val result = backupService.restoreBackup(transport, latest.id)
                                 val message = when (result) {
                                     is BackupResult.Success ->
                                         "Imported ${result.value} account(s) from ${latest.id}"
@@ -506,6 +536,7 @@ fun SettingsScreen(
                                     companionSyncCoordinator?.onAccountsChanged()
                                 }
                                 pendingAction = null
+                                pendingProviderId = null
                             }
 
                             BackupAction.SYNC_COMPANION -> {
@@ -546,6 +577,7 @@ fun SettingsScreen(
             },
             onDismiss = {
                 pendingAction = null
+                pendingProviderId = null
                 passkeyError = null
             }
         )
