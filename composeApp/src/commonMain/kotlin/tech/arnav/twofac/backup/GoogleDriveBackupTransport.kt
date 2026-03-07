@@ -258,6 +258,7 @@ class GoogleDriveBackupTransport(
                             append(
                                 "metadata",
                                 json.encodeToString(
+                                    GoogleDriveCreateRequest.serializer(),
                                     GoogleDriveCreateRequest(
                                         name = descriptor.id,
                                         parents = listOf("appDataFolder"),
@@ -381,7 +382,7 @@ class GoogleDriveBackupTransport(
                 }
                 parameter("spaces", "appDataFolder")
                 parameter("fields", "files(id,name,size,appProperties)")
-                parameter("q", "name = '$backupId' and trashed = false")
+                parameter("q", "name = '${backupId.escapeDriveQueryValue()}' and trashed = false")
             }
             val body = response.bodyAsText()
             if (response.status != HttpStatusCode.OK) {
@@ -474,6 +475,10 @@ class GoogleDriveBackupTransport(
         const val DEFAULT_DEVICE_POLL_INTERVAL_SECONDS = 5L
         const val TOKEN_EXPIRY_SKEW_SECONDS = 60L
     }
+}
+
+private fun String.escapeDriveQueryValue(): String {
+    return replace("\\", "\\\\").replace("'", "\\'")
 }
 
 @Serializable

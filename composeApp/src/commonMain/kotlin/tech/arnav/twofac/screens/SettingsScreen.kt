@@ -881,7 +881,7 @@ fun SettingsScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        "Enter the Google OAuth client ID that should be used for device-code authentication.",
+                        "Create an OAuth 2.0 client ID in Google Cloud Console, then enter it here so TwoFac can start the Google Drive device-code flow.",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     TextField(
@@ -937,9 +937,15 @@ fun SettingsScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        "1. Open the verification URL below in a browser.\n" +
-                            "2. Enter the displayed user code.\n" +
-                            "3. Return here and continue once Google shows the backup access prompt has been approved.",
+                        "1. Open the verification URL below in a browser.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        "2. Enter the displayed user code.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        "3. Return here and continue once Google shows that the backup access prompt has been approved.",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
