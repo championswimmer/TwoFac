@@ -4,12 +4,16 @@ import io.github.xxfast.kstore.KStore
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import tech.arnav.twofac.lib.backup.BackupPreferences
 import tech.arnav.twofac.lib.storage.StoredAccount
 
 const val ACCOUNTS_STORAGE_KEY = "twofac_accounts"
 const val ACCOUNTS_STORAGE_FILE = "accounts.json"
+const val BACKUP_PREFERENCES_STORAGE_KEY = "twofac_backup_preferences"
+const val BACKUP_PREFERENCES_STORAGE_FILE = "backup_preferences.json"
 
 expect fun createAccountsStore(): KStore<List<StoredAccount>>
+expect fun createBackupPreferencesStore(): KStore<BackupPreferences>
 
 expect fun getStoragePath(): String
 

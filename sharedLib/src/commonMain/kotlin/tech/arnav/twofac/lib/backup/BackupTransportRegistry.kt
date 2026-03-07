@@ -46,3 +46,19 @@ val LocalBackupProviderInfo = BackupProviderInfo(
     displayName = "Local Backup",
     description = "Export or import accounts as a plaintext JSON backup file.",
 )
+
+val ICloudBackupProviderInfo = BackupProviderInfo(
+    id = "icloud",
+    displayName = "iCloud Backup",
+    description = "Sync backup snapshots with your private iCloud app container on iPhone and iPad.",
+    supportsAutomaticRestore = true,
+    requiresAuthentication = true,
+)
+
+val GoogleDriveAppDataBackupProviderInfo = BackupProviderInfo(
+    id = "gdrive-appdata",
+    displayName = "Google Drive Backup",
+    description = "Sync backup snapshots to your app-private Google Drive appData folder.",
+    supportsAutomaticRestore = true,
+    requiresAuthentication = true,
+)

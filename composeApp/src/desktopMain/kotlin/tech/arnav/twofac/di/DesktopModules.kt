@@ -5,7 +5,6 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.koin.dsl.module
 import tech.arnav.twofac.backup.LocalFileBackupTransport
-import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.lib.backup.BackupTransportRegistry
@@ -35,9 +34,6 @@ val desktopBackupModule = module {
                 transport = LocalFileBackupTransport(getBackupDir()),
             )
         )
-    }
-    single<BackupService> {
-        BackupService(get<TwoFacLib>())
     }
 }
 

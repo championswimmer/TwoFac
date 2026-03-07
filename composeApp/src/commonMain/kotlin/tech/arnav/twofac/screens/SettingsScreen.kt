@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -27,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,14 +41,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.compose.getKoin
+import tech.arnav.twofac.backup.BackupPreferencesManager
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 import tech.arnav.twofac.components.PasskeyDialog
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.backup.BackupDescriptor
+import tech.arnav.twofac.lib.backup.BackupPreferences
 import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.BackupTransportRegistry
+import tech.arnav.twofac.lib.backup.providerPreferences
 import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.session.WebAuthnSessionManager
@@ -57,6 +63,17 @@ private enum class BackupActionType { EXPORT, IMPORT, SYNC_COMPANION }
 private data class BackupAction(
     val type: BackupActionType,
     val providerId: String? = null,
+)
+
+private data class RestoreSelectionState(
+    val provider: BackupProvider,
+    val backups: List<BackupDescriptor>,
+)
+
+private data class RestoreConfirmationState(
+    val provider: BackupProvider,
+    val backup: BackupDescriptor,
+    val existingAccountCount: Int,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,12 +89,17 @@ fun SettingsScreen(
     val koin = getKoin()
     val backupService = remember { koin.getOrNull<BackupService>() }
     val backupRegistry = remember { koin.getOrNull<BackupTransportRegistry>() }
+    val backupPreferencesManager = remember { koin.getOrNull<BackupPreferencesManager>() }
     val backupProviders = remember(backupRegistry) { backupRegistry?.all().orEmpty() }
+    val backupPreferences by (backupPreferencesManager?.updates?.collectAsState(BackupPreferences())
+        ?: remember { mutableStateOf(BackupPreferences()) })
     val twoFacLib = remember { koin.getOrNull<TwoFacLib>() }
     val companionSyncCoordinator = remember { koin.getOrNull<CompanionSyncCoordinator>() }
     val sessionManager = remember { koin.getOrNull<SessionManager>() }
 
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
+    var restoreSelectionState by remember { mutableStateOf<RestoreSelectionState?>(null) }
+    var restoreConfirmationState by remember { mutableStateOf<RestoreConfirmationState?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var showDeleteStorageDialog by remember { mutableStateOf(false) }
@@ -289,6 +311,7 @@ fun SettingsScreen(
                             backupProviders.forEach { provider ->
                                 BackupProviderActions(
                                     provider = provider,
+                                    backupPreferences = backupPreferences,
                                     isLoading = isLoading,
                                     onExport = {
                                         pendingAction = BackupAction(
@@ -301,6 +324,26 @@ fun SettingsScreen(
                                             type = BackupActionType.IMPORT,
                                             providerId = provider.info.id,
                                         )
+                                    },
+                                    automaticRestoreSelectedProviderId =
+                                        backupPreferences.selectedAutomaticRestoreProviderId,
+                                    onAutomaticRestoreChange = { enabled ->
+                                        coroutineScope.launch {
+                                            try {
+                                                backupPreferencesManager?.setAutomaticRestoreProvider(
+                                                    providerId = if (enabled) provider.info.id else null,
+                                                    providers = backupProviders,
+                                                )
+                                                val message = if (enabled) {
+                                                    "Automatic restore enabled for ${provider.info.displayName}"
+                                                } else {
+                                                    "Automatic restore disabled"
+                                                }
+                                                snackbarHostState.showSnackbar(message)
+                                            } catch (e: IllegalArgumentException) {
+                                                snackbarHostState.showSnackbar(e.message ?: "Unable to update automatic restore")
+                                            }
+                                        }
                                     },
                                 )
                             }
@@ -497,6 +540,12 @@ fun SettingsScreen(
                                     is BackupResult.Failure ->
                                         "Export failed: ${result.message}"
                                 }
+                                if (result is BackupResult.Success) {
+                                    backupPreferencesManager?.recordBackupSuccess(
+                                        provider = backupProvider,
+                                        descriptor = result.value,
+                                    )
+                                }
                                 snackbarHostState.showSnackbar(message)
                                 pendingAction = null
                             }
@@ -523,18 +572,10 @@ fun SettingsScreen(
                                     pendingAction = null
                                     return@launch
                                 }
-                                val latest = backups.maxBy { it.createdAt }
-                                val result = backupService.restoreBackup(backupProvider.transport, latest.id)
-                                val message = when (result) {
-                                    is BackupResult.Success ->
-                                        "Imported ${result.value} account(s) from ${backupProvider.info.displayName}"
-                                    is BackupResult.Failure ->
-                                        "Import failed: ${result.message}"
-                                }
-                                snackbarHostState.showSnackbar(message)
-                                if (result is BackupResult.Success) {
-                                    companionSyncCoordinator?.onAccountsChanged()
-                                }
+                                restoreSelectionState = RestoreSelectionState(
+                                    provider = backupProvider,
+                                    backups = backups.sortedByDescending { it.createdAt },
+                                )
                                 pendingAction = null
                             }
 
@@ -663,15 +704,116 @@ fun SettingsScreen(
             }
         )
     }
+
+    if (restoreSelectionState != null) {
+        val restoreState = restoreSelectionState!!
+        AlertDialog(
+            onDismissRequest = { restoreSelectionState = null },
+            title = { Text("Restore from ${restoreState.provider.info.displayName}") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "Choose which backup snapshot to import.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    restoreState.backups.forEach { backup ->
+                        OutlinedButton(
+                            onClick = {
+                                restoreSelectionState = null
+                                val existingAccountCount = twoFacLib?.getAllAccounts()?.size ?: 0
+                                if (existingAccountCount > 0) {
+                                    restoreConfirmationState = RestoreConfirmationState(
+                                        provider = restoreState.provider,
+                                        backup = backup,
+                                        existingAccountCount = existingAccountCount,
+                                    )
+                                } else {
+                                    coroutineScope.launch {
+                                        restoreBackup(
+                                            backupService = backupService,
+                                            backupPreferencesManager = backupPreferencesManager,
+                                            provider = restoreState.provider,
+                                            backup = backup,
+                                            companionSyncCoordinator = companionSyncCoordinator,
+                                            snackbarHostState = snackbarHostState,
+                                        )
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(backup.id)
+                                Text(
+                                    text = "Snapshot created at ${timestampDisplayText(backup.createdAt)}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { restoreSelectionState = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (restoreConfirmationState != null) {
+        val confirmationState = restoreConfirmationState!!
+        AlertDialog(
+            onDismissRequest = { restoreConfirmationState = null },
+            title = { Text("Import into existing vault?") },
+            text = {
+                Text(
+                    "You already have ${confirmationState.existingAccountCount} account(s). " +
+                        "Importing ${confirmationState.backup.id} from ${confirmationState.provider.info.displayName} " +
+                        "will add accounts on top of your current vault and skip any duplicates or invalid entries."
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        restoreConfirmationState = null
+                        coroutineScope.launch {
+                            restoreBackup(
+                                backupService = backupService,
+                                backupPreferencesManager = backupPreferencesManager,
+                                provider = confirmationState.provider,
+                                backup = confirmationState.backup,
+                                companionSyncCoordinator = companionSyncCoordinator,
+                                snackbarHostState = snackbarHostState,
+                            )
+                        }
+                    }
+                ) {
+                    Text("Import")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { restoreConfirmationState = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable
 private fun BackupProviderActions(
     provider: BackupProvider,
+    backupPreferences: BackupPreferences,
     isLoading: Boolean,
     onExport: () -> Unit,
     onImport: () -> Unit,
+    automaticRestoreSelectedProviderId: String?,
+    onAutomaticRestoreChange: (Boolean) -> Unit,
 ) {
+    val providerPreferences = backupPreferences.providerPreferences(provider.info.id)
     Column {
         Text(
             text = provider.info.displayName,
@@ -683,6 +825,20 @@ private fun BackupProviderActions(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
+            )
+        }
+        if (providerPreferences.lastSuccessfulBackupAtEpochSeconds != null ||
+            providerPreferences.lastSuccessfulRestoreAtEpochSeconds != null
+        ) {
+            val backupText = providerPreferences.lastSuccessfulBackupAtEpochSeconds
+                ?.let { "Last backup: ${timestampDisplayText(it)}" }
+            val restoreText = providerPreferences.lastSuccessfulRestoreAtEpochSeconds
+                ?.let { "Last restore: ${timestampDisplayText(it)}" }
+            Text(
+                text = listOfNotNull(backupText, restoreText).joinToString(" • "),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp),
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -701,6 +857,69 @@ private fun BackupProviderActions(
                 Text("Import")
             }
         }
+        if (provider.info.supportsAutomaticRestore) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Automatic Restore",
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    Text(
+                        text = "Keep exactly one provider selected for future restore-on-startup checks. Automatic restore stays disabled until you explicitly choose a supported provider here.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                RadioButton(
+                    selected = automaticRestoreSelectedProviderId == provider.info.id,
+                    onClick = {
+                        onAutomaticRestoreChange(automaticRestoreSelectedProviderId != provider.info.id)
+                    },
+                    enabled = !isLoading,
+                )
+            }
+        }
+    }
+}
+
+private suspend fun restoreBackup(
+    backupService: BackupService?,
+    backupPreferencesManager: BackupPreferencesManager?,
+    provider: BackupProvider,
+    backup: BackupDescriptor,
+    companionSyncCoordinator: CompanionSyncCoordinator?,
+    snackbarHostState: SnackbarHostState,
+) {
+    if (backupService == null) {
+        snackbarHostState.showSnackbar("Backup service is unavailable")
+        return
+    }
+
+    val result = backupService.restoreBackup(provider.transport, backup.id)
+    val message = when (result) {
+        is BackupResult.Success ->
+            "Imported ${result.value} account(s) from ${provider.info.displayName}"
+        is BackupResult.Failure ->
+            "Import failed: ${result.message}"
+    }
+    if (result is BackupResult.Success) {
+        backupPreferencesManager?.recordRestoreSuccess(provider, backup)
+        companionSyncCoordinator?.onAccountsChanged()
+    }
+    snackbarHostState.showSnackbar(message)
+}
+
+private fun timestampDisplayText(epochSeconds: Long): String {
+    return if (epochSeconds > 0) {
+        "saved in snapshot metadata"
+    } else {
+        "unknown time"
     }
 }
 

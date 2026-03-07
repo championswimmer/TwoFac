@@ -4,6 +4,7 @@ import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import tech.arnav.twofac.lib.backup.BackupPreferences
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
@@ -27,6 +28,15 @@ actual fun createAccountsStore(): KStore<List<StoredAccount>> {
     return storeOf(
         file = filePath,
         default = emptyList()
+    )
+}
+
+actual fun createBackupPreferencesStore(): KStore<BackupPreferences> {
+    val dir = getDocumentDirectory()
+    SystemFileSystem.createDirectories(Path(dir))
+    return storeOf(
+        file = Path(dir, BACKUP_PREFERENCES_STORAGE_FILE),
+        default = BackupPreferences(),
     )
 }
 

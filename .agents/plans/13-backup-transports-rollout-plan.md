@@ -3,8 +3,8 @@ name: Backup Transports Rollout Plan
 status: In Progress
 progress:
   - "[x] Phase 0 - Refactor current single-transport code into a multi-transport registry"
-  - "[ ] Phase 1 - Define provider capability metadata and single-provider automatic restore policy"
-  - "[ ] Phase 2 - Implement Apple iCloud transport and entitlement wiring"
+  - "[x] Phase 1 - Define provider capability metadata and single-provider automatic restore policy"
+  - "[x] Phase 2 - Implement Apple iCloud transport and entitlement wiring"
   - "[ ] Phase 3 - Implement Google Drive appDataFolder transport across supported platforms"
   - "[ ] Phase 4 - Ship manual backup and restore UX for every available provider"
   - "[ ] Phase 5 - Add automatic restore guardrails, tests, and rollout hardening"
@@ -243,6 +243,12 @@ Automatic restore should come only after provider identity, remote markers, and 
 16. Wire entitlements and container setup.
     - Enable the needed iCloud / CloudKit capability in the Apple host app
     - Keep container naming/configuration documented in the plan as implementation proceeds
+
+Current implementation note:
+
+- iOS host entitlement configuration now declares the `iCloud.tech.arnav.twofac` container.
+- The first Apple transport implementation stores snapshot files in the app ubiquity container under `Documents/TwoFacBackups/`.
+- The shared backup contract remains provider/backend-neutral, so this Apple transport can still be swapped to a deeper CloudKit-record backend later without changing the shared backup orchestration surface.
 
 17. Manual provider operations.
     - availability check

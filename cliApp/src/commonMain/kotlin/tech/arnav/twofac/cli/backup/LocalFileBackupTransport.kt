@@ -93,6 +93,7 @@ class LocalFileBackupTransport(private val directory: Path) : BackupTransport {
         return filename
             .removePrefix("twofac-backup-")
             .removeSuffix(".json")
+            .substringBefore('-')
             .toLongOrNull() ?: 0L
     }
 
@@ -109,4 +110,3 @@ class LocalFileBackupTransport(private val directory: Path) : BackupTransport {
         }
     }
 }
-
