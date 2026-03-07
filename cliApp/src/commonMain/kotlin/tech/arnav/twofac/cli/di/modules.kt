@@ -2,10 +2,13 @@ package tech.arnav.twofac.cli.di
 
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import tech.arnav.twofac.cli.backup.LocalFileBackupTransport
 import tech.arnav.twofac.cli.storage.AppDirUtils
 import tech.arnav.twofac.cli.storage.FileStorage
 import tech.arnav.twofac.cli.viewmodels.AccountsViewModel
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.backup.BackupProviderInfo
+import tech.arnav.twofac.lib.backup.BackupTransportRegistry
 import tech.arnav.twofac.lib.storage.Storage
 
 val storageModule = module {
@@ -29,5 +32,23 @@ val appModule = module {
 
     single<AccountsViewModel> {
         AccountsViewModel(twoFacLib = get())
+    }
+}
+
+val backupModule = module {
+    single<BackupTransportRegistry> {
+        BackupTransportRegistry().apply {
+            register(
+                transport = LocalFileBackupTransport(AppDirUtils.getBackupDirPath(forceCreate = true)),
+                info = BackupProviderInfo(
+                    id = "local",
+                    displayName = "Local Backup",
+                    supportsManualBackup = true,
+                    supportsManualRestore = true,
+                    supportsAutomaticRestore = false,
+                    authRequired = false,
+                ),
+            )
+        }
     }
 }

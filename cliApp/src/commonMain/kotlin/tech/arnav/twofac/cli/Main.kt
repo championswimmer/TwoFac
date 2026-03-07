@@ -10,6 +10,7 @@ import tech.arnav.twofac.cli.commands.DisplayCommand
 import tech.arnav.twofac.cli.commands.InfoCommand
 import tech.arnav.twofac.cli.commands.StorageCommand
 import tech.arnav.twofac.cli.di.appModule
+import tech.arnav.twofac.cli.di.backupModule
 import tech.arnav.twofac.cli.di.storageModule
 
 class MainCommand(val args: Array<String>) : CliktCommand() {
@@ -26,7 +27,7 @@ class MainCommand(val args: Array<String>) : CliktCommand() {
 
 fun main(args: Array<String>) {
     startKoin {
-        modules(storageModule, appModule)
+        modules(storageModule, appModule, backupModule)
     }
 
     MainCommand(args).subcommands(
