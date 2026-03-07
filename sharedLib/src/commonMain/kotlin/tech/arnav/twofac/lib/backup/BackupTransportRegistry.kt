@@ -26,7 +26,7 @@ class StaticBackupTransportRegistry(
     private val providersById = linkedMapOf<String, BackupProvider>().apply {
         providers.forEach { provider ->
             require(provider.info.id == provider.transport.id) {
-                "Backup provider '${provider.info.displayName}' must use transport id '${provider.info.id}'"
+                "Backup provider '${provider.info.displayName}' info.id '${provider.info.id}' must match transport.id '${provider.transport.id}'"
             }
             put(provider.info.id, provider)
         }
