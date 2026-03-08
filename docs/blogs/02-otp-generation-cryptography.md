@@ -4,10 +4,11 @@ datePublished: Sun Mar 08 2026 10:00:00 GMT+0000 (Coordinated Universal Time)
 slug: under-the-hood-how-totp-works-and-how-twofac-generates-your-2fa-codes
 tags: kotlin, cryptography, totp, hotp, security, 2fa, opensource
 ---
-
 In the [previous article](https://arnav.tech/architecting-twofac-my-journey-into-kotlin-multiplatform-module-structure), I walked through how TwoFac is structured as a Kotlin Multiplatform project. Now that the architecture is in place, it's time to zoom into one of the most important pieces inside that shared core: the actual OTP generation. Ever wondered what actually happens when you open your authenticator app and see a 6-digit code counting down? Most of us just copy-paste it and move on, but there's some pretty elegant cryptography happening behind the scenes. In this post, I'm going to crack open the hood on **TOTP** — Time-based One-Time Passwords — explain the math, walk through the RFCs, and then show you exactly how we implement it in TwoFac.
 
 > **Note:** This post focuses only on OTP generation — how we take a shared secret and turn it into those familiar 6-digit codes. How we *store* secrets securely (PBKDF2, AES-GCM, the `accounts.json` file) is a story for the next post.
+
+![Cover Image](./img/02-cover-image.png)
 
 ## Why Do We Even Need a "Second Factor"?
 
