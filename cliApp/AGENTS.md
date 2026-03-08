@@ -3,7 +3,7 @@
 `cliApp` is the native command-line frontend for TwoFac.
 
 ## What this module does
-It provides a terminal-based interface to interact with TwoFac. It allows users to add accounts, backup data, examine system info, and securely view live 2FA codes with an auto-refreshing progress indicator right in the shell.
+It provides a terminal-based interface to interact with TwoFac. It allows users to add and delete accounts, reset local storage, back up data, examine system info, and securely view live 2FA codes with an auto-refreshing progress indicator right in the shell.
 
 ## Dependencies
 Depends directly on `:sharedLib` for all 2FA logic, cryptography, and storage interfaces.
@@ -25,6 +25,10 @@ Compiles natively (Kotlin/Native) to:
 - `src/commonMain/kotlin/tech/arnav/twofac/cli/`:
   - `Main.kt`: Entry point routing via Clikt subcommands.
   - `commands/`: CLI command implementations (`DisplayCommand`, `AddCommand`, `BackupCommand`, `InfoCommand`, `StorageCommand`).
+  - `di/`: Koin modules and qualifiers used to wire the CLI runtime.
+  - `theme/`: `CliTheme` terminal styling that maps shared theme/timer semantics into Mordant text styles.
   - `viewmodels/`: View models acting as a bridge to `TwoFacLib` methods.
   - `storage/`: Configuration for local path resolution and FileStorage via KStore.
   - `backup/`: CLI-specific implementation of the local filesystem `BackupTransport`.
+- `src/{linuxMain,macosMain,mingwMain}/kotlin/tech/arnav/twofac/cli/`: Native platform shims for filesystem and terminal integration.
+- `src/commonTest/kotlin/tech/arnav/twofac/cli/`: Command and DI tests (`DisplayCommandTest`, `InfoCommandTest`, `StorageCommandTest`, `KoinVerificationTest`).

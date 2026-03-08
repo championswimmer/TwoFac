@@ -1,9 +1,9 @@
 # watchApp AGENTS.md
 
-`watchApp` is the Android Wear OS companion application. 
+`watchApp` is the Android Wear OS companion application.
 
 ## What this module does
-It provides a specialized, offline-capable interface for Android smartwatches. It syncs securely with the primary Android app via Google Play Services Wearable APIs, caches the secrets locally on the watch, and provides a continuous ticker for generating and displaying the OTP codes via Compose for Wear OS.
+It provides a specialized, offline-capable interface for Android smartwatches. It syncs securely with the primary Android app via Google Play Services Wearable APIs, requests initialization from nearby phone companions, caches synced secrets locally on the watch, and renders pager-based OTP screens with a continuously updating countdown UI via Compose for Wear OS.
 
 ## Dependencies
 Depends on `:sharedLib` for data structures and OTP generation logic.
@@ -18,8 +18,9 @@ Depends on `:sharedLib` for data structures and OTP generation logic.
 
 ## Code Structure
 - `src/main/java/tech/arnav/twofac/watch/`:
-  - `datalayer/`: Manages capability registration and the `WatchSyncListenerService` which processes background updates from the phone.
-  - `storage/`: `WatchSyncSnapshotRepository` handles saving the received data to persistent storage.
-  - `otp/`: `WatchOtpProvider` uses `sharedLib` to convert synced URIs into real-time codes within a coroutine ticker.
+  - `WatchApplication.kt`: Registers the watch capability on startup so the phone app can discover the companion.
+  - `datalayer/`: Capability registration, `WatchCompanionRegistrar` initialization requests, and `WatchSyncListenerService` background sync handling.
+  - `storage/`: `WatchSyncSnapshotRepository` handles persisting snapshots plus sync-error state for malformed or unsupported payloads.
+  - `otp/`: `WatchOtpProvider` uses `sharedLib` to convert synced URIs into real-time `WatchOtpEntry` values within a coroutine ticker.
   - `ui/`: Compose Wear OS screens including `OtpPagerScreen`, `OtpAccountScreen`, and `EmptyState`.
-  - `presentation/`: Standard `MainActivity` and theme configuration.
+  - `presentation/`: `MainActivity` and theme configuration that switch between empty-state and synced-account experiences.

@@ -3,7 +3,7 @@
 `composeApp` is the Compose Multiplatform UI library that powers the graphical interface for Android, iOS, Desktop, and Web.
 
 ## What this module does
-It provides the visual interface and user flows (Home, Settings, Add Account). It bridges the platform-agnostic UI with platform-specific capabilities such as Biometric authentication, Camera-based QR scanning, Clipboard access, and companion device synchronization. It handles the injection of `sharedLib` into ViewModels to display data.
+It provides the visual interface and user flows (Home, Settings, Add Account). It bridges the platform-agnostic UI with platform-specific capabilities such as biometric/passkey unlock, camera and clipboard QR scanning, desktop tray integration, browser storage/WebAuthn interop, and companion device synchronization. It handles the injection of `sharedLib` into ViewModels to display data.
 
 ## Dependencies
 Depends heavily on `:sharedLib` for data structures, cryptographic unlock flows, and OTP generation.
@@ -26,9 +26,12 @@ Runs on:
 - `androidx.biometric` - Secure unlock via fingerprint/face (Android).
 
 ## Code Structure
-- `src/commonMain/`: Shared screens, ViewModels, navigation, and DI definitions.
-- `src/androidMain/`: Android entry points, Biometric prompt implementations, and Wear OS DataLayer publishing logic.
-- `src/iosMain/`: iOS UI controller bindings and iOS Keychain / FaceID integration.
-- `src/desktopMain/`: JVM `main()` entry, tray/window configuration, and local file system backup logic.
-- `src/wasmJsMain/`: Web WasmJS setup, `BrowserSessionManager` for WebAuthn secure unlock, and browser storage JS interop.
-- `extension/`: Overlay files (`manifest.json`, `background.js`, `popup.html`) used to package the Wasm output as browser extensions.
+- `src/commonMain/`: Shared screens, navigation, DI, storage/session abstractions, plus reusable `components/`, `theme/`, `viewmodels/`, `wear/`, and `companion/` packages.
+- `src/androidMain/`: Android platform bindings, biometric prompt implementations, QR scanner integrations, storage wiring, and Wear OS DataLayer publishing logic.
+- `src/iosMain/`: `MainViewController` entrypoint, iOS-specific DI, QR/session/storage integrations, and companion-sync helpers.
+- `src/desktopMain/`: JVM `main()` entry, tray/window configuration, desktop settings management, QR readers, and local file backup transport.
+- `src/wasmJsMain/`: Web/Wasm entrypoint, browser session/storage/QR code interop, and `@JsModule` bridges to TypeScript helpers.
+- `src/webMain/`: Web-only packaged resources layered on top of the Wasm app.
+- `src/{commonTest,androidInstrumentedTest,iosTest,wasmJsTest}/`: Module tests for shared flows and platform-specific integrations.
+- `src/wasmJsMain/typescript/src/`: TypeScript source files (`crypto.mts`, `storage.mts`, `qr-reader.mts`, `webauthn.mts`, `time.mts`) compiled into the Wasm/browser bundle.
+- `extension/`: Browser-extension overlay files (`manifest.base.json`, `background.js`, `popup.html`, `sidepanel.html`) used when packaging the Wasm output for Chrome/Firefox.
