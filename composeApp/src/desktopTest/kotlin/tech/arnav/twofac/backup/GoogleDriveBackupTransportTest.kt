@@ -18,6 +18,27 @@ import kotlin.test.assertIs
 
 class GoogleDriveBackupTransportTest {
     @Test
+    fun availabilityDetailReflectsAuthorizationState() = runTest {
+        val transport = buildTransport { request ->
+            error("Unexpected request: ${request.url}")
+        }
+
+        assertEquals(
+            "Google OAuth client ID is required before Drive backup can connect.",
+            transport.availabilityDetail(),
+        )
+
+        assertIs<tech.arnav.twofac.lib.backup.BackupResult.Success<Unit>>(
+            transport.configureAuthorization("test-client-id.apps.googleusercontent.com"),
+        )
+
+        assertEquals(
+            "Google Drive backup is configured but not connected.",
+            transport.availabilityDetail(),
+        )
+    }
+
+    @Test
     fun deviceAuthorizationRoundTripsIntoConnectedState() = runTest {
         val transport = buildTransport { request ->
             when {

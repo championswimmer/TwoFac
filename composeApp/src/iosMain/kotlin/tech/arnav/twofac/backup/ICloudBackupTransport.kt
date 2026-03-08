@@ -23,6 +23,14 @@ class ICloudBackupTransport(
         return resolveBackupsDirectoryPath(createIfMissing = false) != null
     }
 
+    override suspend fun availabilityDetail(): String? {
+        return if (resolveBackupsDirectoryPath(createIfMissing = false) == null) {
+            "Your iCloud app container is unavailable on this device or Apple account."
+        } else {
+            "Your iCloud app container is available."
+        }
+    }
+
     override suspend fun listBackups(): BackupResult<List<BackupDescriptor>> {
         val directory = resolveBackupsDirectoryPath(createIfMissing = false)
             ?: return BackupResult.Failure("iCloud container is unavailable")

@@ -43,6 +43,10 @@ class GoogleDriveBackupTransport(
         return authorizationStatus().state == BackupAuthorizationState.CONNECTED
     }
 
+    override suspend fun availabilityDetail(): String? {
+        return authorizationStatus().detail
+    }
+
     override suspend fun authorizationStatus(): BackupAuthorizationStatus {
         val state = authStore.get() ?: GoogleDriveAuthState()
         return when {

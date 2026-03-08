@@ -120,6 +120,9 @@ fun SettingsScreen(
     var providerAuthorizationStates by remember {
         mutableStateOf<Map<String, BackupAuthorizationStatus>>(emptyMap())
     }
+    var providerAvailabilityStates by remember {
+        mutableStateOf<Map<String, BackupProviderAvailability>>(emptyMap())
+    }
     var passkeyError by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var showDeleteStorageDialog by remember { mutableStateOf(false) }
@@ -163,6 +166,17 @@ fun SettingsScreen(
                 ?.authorizationStatus()
                 ?: BackupAuthorizationStatus(BackupAuthorizationState.CONNECTED)
             provider.info.id to authorizationStatus
+        }
+    }
+
+    LaunchedEffect(backupProviders, providerAuthorizationStates) {
+        providerAvailabilityStates = backupProviders.associate { provider ->
+            val isAvailable = provider.transport.isAvailable()
+            val detail = provider.transport.availabilityDetail()
+            provider.info.id to BackupProviderAvailability(
+                isAvailable = isAvailable,
+                detail = detail,
+            )
         }
     }
 
@@ -342,6 +356,7 @@ fun SettingsScreen(
                                     provider = provider,
                                     backupPreferences = backupPreferences,
                                     authorizationStatus = providerAuthorizationStates[provider.info.id],
+                                    availability = providerAvailabilityStates[provider.info.id],
                                     isLoading = isLoading,
                                     onExport = {
                                         pendingAction = BackupAction(
@@ -399,6 +414,13 @@ fun SettingsScreen(
                                             }
                                             providerAuthorizationStates = providerAuthorizationStates +
                                                 (provider.info.id to authorizable.authorizationStatus())
+                                            providerAvailabilityStates = providerAvailabilityStates +
+                                                (
+                                                    provider.info.id to BackupProviderAvailability(
+                                                        isAvailable = provider.transport.isAvailable(),
+                                                        detail = provider.transport.availabilityDetail(),
+                                                    )
+                                                    )
                                         }
                                     },
                                     onDisconnectAuthorization = {
@@ -412,6 +434,13 @@ fun SettingsScreen(
                                             }
                                             providerAuthorizationStates = providerAuthorizationStates +
                                                 (provider.info.id to authorizable.authorizationStatus())
+                                            providerAvailabilityStates = providerAvailabilityStates +
+                                                (
+                                                    provider.info.id to BackupProviderAvailability(
+                                                        isAvailable = provider.transport.isAvailable(),
+                                                        detail = provider.transport.availabilityDetail(),
+                                                    )
+                                                    )
                                             snackbarHostState.showSnackbar(message)
                                         }
                                     },
@@ -814,11 +843,13 @@ fun SettingsScreen(
                         ) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Text(backup.id)
-                                Text(
-                                    text = "Snapshot created at ${timestampDisplayText(backup.createdAt)}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
+                                backupDescriptorMetadataLines(backup).forEach { line ->
+                                    Text(
+                                        text = line,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
                     }
@@ -908,6 +939,13 @@ fun SettingsScreen(
                                 is BackupResult.Success -> {
                                     providerAuthorizationStates = providerAuthorizationStates +
                                         (configState.provider.info.id to authorizable.authorizationStatus())
+                                    providerAvailabilityStates = providerAvailabilityStates +
+                                        (
+                                            configState.provider.info.id to BackupProviderAvailability(
+                                                isAvailable = configState.provider.transport.isAvailable(),
+                                                detail = configState.provider.transport.availabilityDetail(),
+                                            )
+                                            )
                                     authorizationConfigState = null
                                     "${configState.provider.info.displayName} client ID saved"
                                 }
@@ -976,6 +1014,13 @@ fun SettingsScreen(
                                 is BackupResult.Success -> {
                                     providerAuthorizationStates = providerAuthorizationStates +
                                         (flowState.provider.info.id to authorizable.authorizationStatus())
+                                    providerAvailabilityStates = providerAvailabilityStates +
+                                        (
+                                            flowState.provider.info.id to BackupProviderAvailability(
+                                                isAvailable = flowState.provider.transport.isAvailable(),
+                                                detail = flowState.provider.transport.availabilityDetail(),
+                                            )
+                                            )
                                     authorizationFlowState = null
                                     "${flowState.provider.info.displayName} connected"
                                 }
@@ -1007,6 +1052,7 @@ private fun BackupProviderActions(
     provider: BackupProvider,
     backupPreferences: BackupPreferences,
     authorizationStatus: BackupAuthorizationStatus?,
+    availability: BackupProviderAvailability?,
     isLoading: Boolean,
     onExport: () -> Unit,
     onImport: () -> Unit,
@@ -1019,6 +1065,7 @@ private fun BackupProviderActions(
     val providerPreferences = backupPreferences.providerPreferences(provider.info.id)
     val resolvedAuthorizationStatus = authorizationStatus
         ?: BackupAuthorizationStatus(BackupAuthorizationState.CONNECTED)
+    val resolvedAvailability = availability ?: BackupProviderAvailability(isAvailable = true)
     Column {
         Text(
             text = provider.info.displayName,
@@ -1046,6 +1093,16 @@ private fun BackupProviderActions(
                 modifier = Modifier.padding(bottom = 8.dp),
             )
         }
+        Text(
+            text = "Availability: ${backupAvailabilityLabel(resolvedAvailability)}",
+            style = MaterialTheme.typography.bodySmall,
+            color = if (resolvedAvailability.isAvailable) {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.error
+            },
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
         if (provider.info.requiresAuthentication) {
             Text(
                 text = resolvedAuthorizationStatus.detail ?: when (resolvedAuthorizationStatus.state) {
@@ -1096,6 +1153,7 @@ private fun BackupProviderActions(
                 onClick = onExport,
                 modifier = Modifier.weight(1f),
                 enabled = provider.info.supportsManualBackup &&
+                    resolvedAvailability.isAvailable &&
                     !isLoading &&
                     (!provider.info.requiresAuthentication || resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED),
             ) {
@@ -1105,6 +1163,7 @@ private fun BackupProviderActions(
                 onClick = onImport,
                 modifier = Modifier.weight(1f),
                 enabled = provider.info.supportsManualRestore &&
+                    resolvedAvailability.isAvailable &&
                     !isLoading &&
                     (!provider.info.requiresAuthentication || resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED),
             ) {
@@ -1169,9 +1228,9 @@ private suspend fun restoreBackup(
     snackbarHostState.showSnackbar(message)
 }
 
-private fun timestampDisplayText(epochSeconds: Long): String {
+internal fun timestampDisplayText(epochSeconds: Long): String {
     return if (epochSeconds > 0) {
-        "saved in snapshot metadata"
+        "Unix epoch second $epochSeconds"
     } else {
         "unknown time"
     }

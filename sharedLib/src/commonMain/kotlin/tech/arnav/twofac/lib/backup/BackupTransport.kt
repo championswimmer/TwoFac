@@ -6,6 +6,7 @@ import tech.arnav.twofac.lib.PublicApi
 interface BackupTransport {
     val id: String
     suspend fun isAvailable(): Boolean
+    suspend fun availabilityDetail(): String? = null
     suspend fun listBackups(): BackupResult<List<BackupDescriptor>>
     suspend fun upload(content: ByteArray, descriptor: BackupDescriptor): BackupResult<BackupDescriptor>
     suspend fun download(backupId: String): BackupResult<BackupBlob>

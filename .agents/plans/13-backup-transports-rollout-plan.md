@@ -6,7 +6,7 @@ progress:
   - "[x] Phase 1 - Define provider capability metadata and single-provider automatic restore policy"
   - "[x] Phase 2 - Implement Apple iCloud transport and entitlement wiring"
   - "[x] Phase 3 - Implement Google Drive appDataFolder transport across supported platforms"
-  - "[ ] Phase 4 - Ship manual backup and restore UX for every available provider"
+  - "[x] Phase 4 - Ship manual backup and restore UX for every available provider"
   - "[ ] Phase 5 - Add automatic restore guardrails, tests, and rollout hardening"
 ---
 
@@ -343,6 +343,13 @@ Current implementation note:
 31. CLI follow-up.
     - retain current local backup commands
     - if/when more providers land in CLI, add provider selection as an argument instead of duplicating command trees
+
+Current implementation note:
+
+- Compose settings now enumerate every provider registered on the current platform and surface both availability state and sign-in state per provider.
+- Manual restore now lets users inspect snapshot metadata (created timestamp, size, schema version, and remote identifiers/checksum when present) before confirming the import.
+- Existing local/manual provider coverage is preserved where it was already supported (desktop app and CLI). Android still only registers Google Drive, and iOS still registers iCloud + Google Drive, matching the currently implemented platform transports.
+- Watch surfaces still expose no backup UI because backup services are not registered there.
 
 ### Phase 5 - Add automatic restore guardrails, tests, and rollout hardening
 
