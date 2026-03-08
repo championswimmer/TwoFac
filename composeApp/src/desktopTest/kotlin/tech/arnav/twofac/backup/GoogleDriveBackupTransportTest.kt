@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.io.files.Path
 import java.nio.file.Files
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
@@ -124,30 +125,35 @@ class GoogleDriveBackupTransportTest {
 
     @Test
     fun downloadResolvesByLogicalIdAndReturnsRemoteDescriptor() = runTest {
+        val backupBytes = byteArrayOf(0x00, 0x01, 0x7F, 0x80.toByte())
+        val requestedQueries = mutableListOf<String>()
         val transport = buildConnectedTransport { request ->
             when {
-                request.url.encodedPath.endsWith("/files") -> respond(
-                    content = """
-                        {
-                          "files": [
+                request.url.encodedPath.endsWith("/files") -> {
+                    requestedQueries += request.url.parameters["q"].orEmpty()
+                    respond(
+                        content = """
                             {
-                              "id": "drive-file-9",
-                              "name": "twofac-backup-42-0.json",
-                              "size": "12",
-                              "appProperties": {
-                                "logicalBackupId": "twofac-backup-42-0.json",
-                                "schemaVersion": "1"
-                              }
+                              "files": [
+                                {
+                                  "id": "drive-file-9",
+                                  "name": "twofac-backup-42-0.json",
+                                  "size": "${backupBytes.size}",
+                                  "appProperties": {
+                                    "logicalBackupId": "twofac-backup-42-0.json",
+                                    "schemaVersion": "1"
+                                  }
+                                }
+                              ]
                             }
-                          ]
-                        }
-                    """.trimIndent(),
-                    status = HttpStatusCode.OK,
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                )
+                        """.trimIndent(),
+                        status = HttpStatusCode.OK,
+                        headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                    )
+                }
 
                 request.url.encodedPath.endsWith("/files/drive-file-9") -> respond(
-                    content = """{"createdAt":42,"accounts":["otpauth://totp/Test:demo?secret=GEZDGNBVGY3TQOJQ&issuer=Test"]}""",
+                    content = backupBytes,
                     status = HttpStatusCode.OK,
                     headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                 )
@@ -158,8 +164,43 @@ class GoogleDriveBackupTransportTest {
 
         val result = transport.download("twofac-backup-42-0.json")
         val blob = assertIs<tech.arnav.twofac.lib.backup.BackupResult.Success<tech.arnav.twofac.lib.backup.BackupBlob>>(result).value
+        assertContentEquals(backupBytes, blob.content)
         assertEquals("drive-file-9", blob.descriptor.remoteId)
         assertEquals("twofac-backup-42-0.json", blob.descriptor.id)
+        assertEquals(1, requestedQueries.size)
+        assertEquals(true, requestedQueries.single().contains("logicalBackupId"))
+    }
+
+    @Test
+    fun completeAuthorizationReturnsFailureForUnreadableErrorBody() = runTest {
+        val transport = buildTransport { request ->
+            when {
+                request.url.encodedPath.endsWith("/token") -> respond(
+                    content = "<html>not json</html>",
+                    status = HttpStatusCode.BadRequest,
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Text.Html.toString()),
+                )
+
+                else -> error("Unexpected request: ${request.url}")
+            }
+        }
+
+        assertIs<tech.arnav.twofac.lib.backup.BackupResult.Success<Unit>>(
+            transport.configureAuthorization("test-client-id.apps.googleusercontent.com"),
+        )
+
+        val result = transport.completeAuthorization(
+            BackupAuthorizationChallenge(
+                verificationUri = "https://example.com/device",
+                userCode = "CODE-1234",
+                deviceCode = "device-code-1",
+                expiresInSeconds = 30,
+                pollIntervalSeconds = 1,
+            )
+        )
+
+        val failure = assertIs<tech.arnav.twofac.lib.backup.BackupResult.Failure>(result)
+        assertEquals("Google authorization failed with an unreadable error response", failure.message)
     }
 
     private fun buildConnectedTransport(

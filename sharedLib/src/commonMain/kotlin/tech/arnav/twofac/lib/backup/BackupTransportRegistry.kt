@@ -28,6 +28,9 @@ class StaticBackupTransportRegistry(
             require(provider.info.id == provider.transport.id) {
                 "Backup provider '${provider.info.displayName}' info.id '${provider.info.id}' must match transport.id '${provider.transport.id}'"
             }
+            require(!containsKey(provider.info.id)) {
+                "Duplicate backup provider id '${provider.info.id}' is not allowed"
+            }
             put(provider.info.id, provider)
         }
     }
@@ -52,7 +55,6 @@ val ICloudBackupProviderInfo = BackupProviderInfo(
     displayName = "iCloud Backup",
     description = "Sync backup snapshots with your private iCloud app container on iPhone and iPad.",
     supportsAutomaticRestore = true,
-    requiresAuthentication = true,
 )
 
 val GoogleDriveAppDataBackupProviderInfo = BackupProviderInfo(

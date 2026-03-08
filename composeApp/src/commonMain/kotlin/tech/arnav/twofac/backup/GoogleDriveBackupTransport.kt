@@ -1,6 +1,7 @@
 package tech.arnav.twofac.backup
 
 import io.github.xxfast.kstore.KStore
+import io.ktor.client.call.body
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.forms.FormDataContent
@@ -20,6 +21,7 @@ import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import kotlinx.coroutines.delay
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import tech.arnav.twofac.lib.backup.BackupBlob
@@ -164,7 +166,11 @@ class GoogleDriveBackupTransport(
 
             val body = response.bodyAsText()
             if (response.status == HttpStatusCode.OK) {
-                val token = json.decodeFromString<GoogleTokenResponse>(body)
+                val token = try {
+                    json.decodeFromString<GoogleTokenResponse>(body)
+                } catch (e: SerializationException) {
+                    return BackupResult.Failure("Google authorization returned an unreadable token response", e)
+                }
                 authStore.set(
                     current.copy(
                         accessToken = token.accessToken,
@@ -175,7 +181,11 @@ class GoogleDriveBackupTransport(
                 return BackupResult.Success(Unit)
             }
 
-            val error = json.decodeFromString<GoogleErrorResponse>(body)
+            val error = try {
+                json.decodeFromString<GoogleErrorResponse>(body)
+            } catch (e: SerializationException) {
+                return BackupResult.Failure("Google authorization failed with an unreadable error response", e)
+            }
             when (error.error) {
                 "authorization_pending" -> delay(pollDelaySeconds * 1_000)
                 "slow_down" -> {
@@ -332,7 +342,7 @@ class GoogleDriveBackupTransport(
             if (response.status != HttpStatusCode.OK) {
                 return BackupResult.Failure(parseError(response.bodyAsText()) ?: "Failed to download Google Drive backup")
             }
-            val bytes = response.bodyAsText().encodeToByteArray()
+            val bytes = response.body<ByteArray>()
             BackupResult.Success(
                 BackupBlob(
                     content = bytes,
@@ -386,7 +396,12 @@ class GoogleDriveBackupTransport(
                 }
                 parameter("spaces", "appDataFolder")
                 parameter("fields", "files(id,name,size,appProperties)")
-                parameter("q", "name = '${backupId.escapeDriveQueryValue()}' and trashed = false")
+                parameter(
+                    "q",
+                    "(name = '${backupId.escapeDriveQueryValue()}' or " +
+                        "appProperties has { key = 'logicalBackupId' and value = '${backupId.escapeDriveQueryValue()}' }) " +
+                        "and trashed = false",
+                )
             }
             val body = response.bodyAsText()
             if (response.status != HttpStatusCode.OK) {

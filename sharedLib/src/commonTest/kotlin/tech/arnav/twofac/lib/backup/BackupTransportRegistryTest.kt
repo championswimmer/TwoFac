@@ -2,6 +2,8 @@ package tech.arnav.twofac.lib.backup
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 
@@ -60,5 +62,22 @@ class BackupTransportRegistryTest {
         assertSame(localTransport, registry.get("local")?.transport)
         assertSame(cloudTransport, registry.get("cloud")?.transport)
         assertNull(registry.get("unknown"))
+    }
+
+    @Test
+    fun rejectsDuplicateProviderIds() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            backupTransportRegistryOf(
+                BackupProvider(LocalBackupProviderInfo, FakeTransport("local")),
+                BackupProvider(LocalBackupProviderInfo, FakeTransport("local")),
+            )
+        }
+
+        assertEquals("Duplicate backup provider id 'local' is not allowed", error.message)
+    }
+
+    @Test
+    fun iCloudProviderDoesNotRequireInteractiveAuthorization() {
+        assertFalse(ICloudBackupProviderInfo.requiresAuthentication)
     }
 }

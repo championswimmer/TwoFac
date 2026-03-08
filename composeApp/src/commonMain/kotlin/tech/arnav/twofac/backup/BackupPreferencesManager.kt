@@ -10,9 +10,12 @@ import tech.arnav.twofac.lib.backup.BackupRemoteMarker
 import tech.arnav.twofac.lib.backup.recordBackupSuccess
 import tech.arnav.twofac.lib.backup.recordRestoreSuccess
 import tech.arnav.twofac.lib.backup.withSelectedAutomaticRestoreProvider
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class BackupPreferencesManager(
     private val store: KStore<BackupPreferences>,
+    private val nowEpochSeconds: () -> Long = ::currentEpochSeconds,
 ) {
     val updates: Flow<BackupPreferences> = store.updates.map { it ?: BackupPreferences() }
 
@@ -37,7 +40,7 @@ class BackupPreferencesManager(
         return update { current ->
             current.recordBackupSuccess(
                 providerId = provider.info.id,
-                completedAtEpochSeconds = descriptor.createdAt,
+                completedAtEpochSeconds = nowEpochSeconds(),
                 remoteMarker = descriptor.toRemoteMarker(),
             )
         }
@@ -50,7 +53,7 @@ class BackupPreferencesManager(
         return update { current ->
             current.recordRestoreSuccess(
                 providerId = provider.info.id,
-                completedAtEpochSeconds = descriptor.createdAt,
+                completedAtEpochSeconds = nowEpochSeconds(),
                 remoteMarker = descriptor.toRemoteMarker(),
             )
         }
@@ -72,3 +75,6 @@ private fun BackupDescriptor.toRemoteMarker(): BackupRemoteMarker {
         versionTag = checksum,
     )
 }
+
+@OptIn(ExperimentalTime::class)
+private fun currentEpochSeconds(): Long = Clock.System.now().epochSeconds

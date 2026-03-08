@@ -1,10 +1,13 @@
 package tech.arnav.twofac.screens
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -815,40 +818,48 @@ fun SettingsScreen(
                         "Choose which backup snapshot to import.",
                         style = MaterialTheme.typography.bodyMedium,
                     )
-                    restoreState.backups.forEach { backup ->
-                        OutlinedButton(
-                            onClick = {
-                                restoreSelectionState = null
-                                val existingAccountCount = twoFacLib?.getAllAccounts()?.size ?: 0
-                                if (existingAccountCount > 0) {
-                                    restoreConfirmationState = RestoreConfirmationState(
-                                        provider = restoreState.provider,
-                                        backup = backup,
-                                        existingAccountCount = existingAccountCount,
-                                    )
-                                } else {
-                                    coroutineScope.launch {
-                                        restoreBackup(
-                                            backupService = backupService,
-                                            backupPreferencesManager = backupPreferencesManager,
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 320.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        restoreState.backups.forEach { backup ->
+                            OutlinedButton(
+                                onClick = {
+                                    restoreSelectionState = null
+                                    val existingAccountCount = twoFacLib?.getAllAccounts()?.size ?: 0
+                                    if (existingAccountCount > 0) {
+                                        restoreConfirmationState = RestoreConfirmationState(
                                             provider = restoreState.provider,
                                             backup = backup,
-                                            companionSyncCoordinator = companionSyncCoordinator,
-                                            snackbarHostState = snackbarHostState,
+                                            existingAccountCount = existingAccountCount,
+                                        )
+                                    } else {
+                                        coroutineScope.launch {
+                                            restoreBackup(
+                                                backupService = backupService,
+                                                backupPreferencesManager = backupPreferencesManager,
+                                                provider = restoreState.provider,
+                                                backup = backup,
+                                                companionSyncCoordinator = companionSyncCoordinator,
+                                                snackbarHostState = snackbarHostState,
+                                            )
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    Text(backup.id)
+                                    backupDescriptorMetadataLines(backup).forEach { line ->
+                                        Text(
+                                            text = line,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Text(backup.id)
-                                backupDescriptorMetadataLines(backup).forEach { line ->
-                                    Text(
-                                        text = line,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
                                 }
                             }
                         }
@@ -905,145 +916,153 @@ fun SettingsScreen(
 
     if (authorizationConfigState != null) {
         val configState = authorizationConfigState!!
-        var clientId by remember(configState.provider.info.id) { mutableStateOf(configState.clientId) }
-        AlertDialog(
-            onDismissRequest = { authorizationConfigState = null },
-            title = { Text("Configure ${configState.provider.info.displayName}") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        "Create an OAuth 2.0 client ID in Google Cloud Console, then enter it here so TwoFac can start the Google Drive device-code flow.",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    TextField(
-                        value = clientId,
-                        onValueChange = { clientId = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        label = { Text("OAuth Client ID") },
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            val authorizable = configState.provider.transport as? AuthorizableBackupTransport
-                            if (authorizable == null) {
-                                snackbarHostState.showSnackbar("${configState.provider.info.displayName} does not support configuration")
-                                authorizationConfigState = null
-                                return@launch
-                            }
-                            val result = authorizable.configureAuthorization(clientId)
-                            val message = when (result) {
-                                is BackupResult.Success -> {
-                                    providerAuthorizationStates = providerAuthorizationStates +
-                                        (configState.provider.info.id to authorizable.authorizationStatus())
-                                    providerAvailabilityStates = providerAvailabilityStates +
-                                        (
-                                            configState.provider.info.id to BackupProviderAvailability(
-                                                isAvailable = configState.provider.transport.isAvailable(),
-                                                detail = configState.provider.transport.availabilityDetail(),
-                                            )
-                                            )
-                                    authorizationConfigState = null
-                                    "${configState.provider.info.displayName} client ID saved"
+        val authorizable = configState.provider.transport as? AuthorizableBackupTransport
+        if (authorizable == null) {
+            LaunchedEffect(configState.provider.info.id) {
+                snackbarHostState.showSnackbar("${configState.provider.info.displayName} does not support configuration")
+                authorizationConfigState = null
+            }
+        } else {
+            var clientId by remember(configState.provider.info.id) { mutableStateOf(configState.clientId) }
+            val configurationLabel = when (configState.provider.info.id) {
+                "gdrive-appdata" -> "OAuth Client ID"
+                else -> "Configuration value"
+            }
+            AlertDialog(
+                onDismissRequest = { authorizationConfigState = null },
+                title = { Text("Configure ${configState.provider.info.displayName}") },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            "Enter the $configurationLabel required by ${configState.provider.info.displayName} so TwoFac can authorize backup access.",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        TextField(
+                            value = clientId,
+                            onValueChange = { clientId = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            label = { Text(configurationLabel) },
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                val result = authorizable.configureAuthorization(clientId)
+                                val message = when (result) {
+                                    is BackupResult.Success -> {
+                                        providerAuthorizationStates = providerAuthorizationStates +
+                                            (configState.provider.info.id to authorizable.authorizationStatus())
+                                        providerAvailabilityStates = providerAvailabilityStates +
+                                            (
+                                                configState.provider.info.id to BackupProviderAvailability(
+                                                    isAvailable = configState.provider.transport.isAvailable(),
+                                                    detail = configState.provider.transport.availabilityDetail(),
+                                                )
+                                                )
+                                        authorizationConfigState = null
+                                        "${configState.provider.info.displayName} configuration saved"
+                                    }
+                                    is BackupResult.Failure -> result.message
                                 }
-                                is BackupResult.Failure -> result.message
+                                snackbarHostState.showSnackbar(message)
                             }
-                            snackbarHostState.showSnackbar(message)
-                        }
-                    },
-                    enabled = clientId.isNotBlank(),
-                ) {
-                    Text("Save")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { authorizationConfigState = null }) {
-                    Text("Cancel")
-                }
-            },
-        )
+                        },
+                        enabled = clientId.isNotBlank(),
+                    ) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { authorizationConfigState = null }) {
+                        Text("Cancel")
+                    }
+                },
+            )
+        }
     }
 
     if (authorizationFlowState != null) {
         val flowState = authorizationFlowState!!
-        AlertDialog(
-            onDismissRequest = { authorizationFlowState = null },
-            title = { Text("Connect ${flowState.provider.info.displayName}") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        "1. Open the verification URL below in a browser.",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        "2. Enter the displayed user code.",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        "3. Return here and continue once Google shows that the backup access prompt has been approved.",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        text = flowState.challenge.verificationUriComplete
-                            ?: flowState.challenge.verificationUri,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = "User code: ${flowState.challenge.userCode}",
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            val authorizable = flowState.provider.transport as? AuthorizableBackupTransport
-                            if (authorizable == null) {
-                                snackbarHostState.showSnackbar("${flowState.provider.info.displayName} does not support authorization")
-                                authorizationFlowState = null
-                                return@launch
-                            }
-                            isLoading = true
-                            val result = authorizable.completeAuthorization(flowState.challenge)
-                            val message = when (result) {
-                                is BackupResult.Success -> {
-                                    providerAuthorizationStates = providerAuthorizationStates +
-                                        (flowState.provider.info.id to authorizable.authorizationStatus())
-                                    providerAvailabilityStates = providerAvailabilityStates +
-                                        (
-                                            flowState.provider.info.id to BackupProviderAvailability(
-                                                isAvailable = flowState.provider.transport.isAvailable(),
-                                                detail = flowState.provider.transport.availabilityDetail(),
-                                            )
-                                            )
-                                    authorizationFlowState = null
-                                    "${flowState.provider.info.displayName} connected"
+        val authorizable = flowState.provider.transport as? AuthorizableBackupTransport
+        if (authorizable == null) {
+            LaunchedEffect(flowState.provider.info.id) {
+                snackbarHostState.showSnackbar("${flowState.provider.info.displayName} does not support authorization")
+                authorizationFlowState = null
+            }
+        } else {
+            AlertDialog(
+                onDismissRequest = { authorizationFlowState = null },
+                title = { Text("Connect ${flowState.provider.info.displayName}") },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            "1. Open the verification URL below in a browser.",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            "2. Enter the displayed user code.",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            "3. Return here and continue once your authorization provider confirms access has been approved.",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = flowState.challenge.verificationUriComplete
+                                ?: flowState.challenge.verificationUri,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            text = "User code: ${flowState.challenge.userCode}",
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                isLoading = true
+                                val result = authorizable.completeAuthorization(flowState.challenge)
+                                val message = when (result) {
+                                    is BackupResult.Success -> {
+                                        providerAuthorizationStates = providerAuthorizationStates +
+                                            (flowState.provider.info.id to authorizable.authorizationStatus())
+                                        providerAvailabilityStates = providerAvailabilityStates +
+                                            (
+                                                flowState.provider.info.id to BackupProviderAvailability(
+                                                    isAvailable = flowState.provider.transport.isAvailable(),
+                                                    detail = flowState.provider.transport.availabilityDetail(),
+                                                )
+                                                )
+                                        authorizationFlowState = null
+                                        "${flowState.provider.info.displayName} connected"
+                                    }
+                                    is BackupResult.Failure -> result.message
                                 }
-                                is BackupResult.Failure -> result.message
+                                snackbarHostState.showSnackbar(message)
+                                isLoading = false
                             }
-                            snackbarHostState.showSnackbar(message)
-                            isLoading = false
-                        }
-                    },
-                    enabled = !isLoading,
-                ) {
-                    Text("I've approved access")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { authorizationFlowState = null },
-                    enabled = !isLoading,
-                ) {
-                    Text("Cancel")
-                }
-            },
-        )
+                        },
+                        enabled = !isLoading,
+                    ) {
+                        Text("I've approved access")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { authorizationFlowState = null },
+                        enabled = !isLoading,
+                    ) {
+                        Text("Cancel")
+                    }
+                },
+            )
+        }
     }
 }
 
@@ -1063,9 +1082,10 @@ private fun BackupProviderActions(
     onDisconnectAuthorization: () -> Unit,
 ) {
     val providerPreferences = backupPreferences.providerPreferences(provider.info.id)
+    val supportsInteractiveAuthorization = provider.transport is AuthorizableBackupTransport
     val resolvedAuthorizationStatus = authorizationStatus
-        ?: BackupAuthorizationStatus(BackupAuthorizationState.CONNECTED)
-    val resolvedAvailability = availability ?: BackupProviderAvailability(isAvailable = true)
+        ?: BackupAuthorizationStatus(BackupAuthorizationState.NOT_CONFIGURED)
+    val resolvedAvailability = availability ?: BackupProviderAvailability(isAvailable = false)
     Column {
         Text(
             text = provider.info.displayName,
@@ -1103,7 +1123,7 @@ private fun BackupProviderActions(
             },
             modifier = Modifier.padding(bottom = 8.dp),
         )
-        if (provider.info.requiresAuthentication) {
+        if (supportsInteractiveAuthorization) {
             Text(
                 text = resolvedAuthorizationStatus.detail ?: when (resolvedAuthorizationStatus.state) {
                     BackupAuthorizationState.NOT_CONFIGURED -> "Provider authentication needs setup."
@@ -1155,7 +1175,7 @@ private fun BackupProviderActions(
                 enabled = provider.info.supportsManualBackup &&
                     resolvedAvailability.isAvailable &&
                     !isLoading &&
-                    (!provider.info.requiresAuthentication || resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED),
+                    (!supportsInteractiveAuthorization || resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED),
             ) {
                 Text("Export")
             }
@@ -1165,7 +1185,7 @@ private fun BackupProviderActions(
                 enabled = provider.info.supportsManualRestore &&
                     resolvedAvailability.isAvailable &&
                     !isLoading &&
-                    (!provider.info.requiresAuthentication || resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED),
+                    (!supportsInteractiveAuthorization || resolvedAuthorizationStatus.state == BackupAuthorizationState.CONNECTED),
             ) {
                 Text("Import")
             }

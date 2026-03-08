@@ -135,12 +135,15 @@ class ICloudBackupTransport(
             ?: return null
         val backupsPath = "$containerPath/Documents/TwoFacBackups"
         if (createIfMissing && !fileManager.fileExistsAtPath(backupsPath)) {
-            fileManager.createDirectoryAtPath(
+            val created = fileManager.createDirectoryAtPath(
                 path = backupsPath,
                 withIntermediateDirectories = true,
                 attributes = null,
                 error = null,
             )
+            if (!created && !fileManager.fileExistsAtPath(backupsPath)) {
+                return null
+            }
         }
         return backupsPath
     }
