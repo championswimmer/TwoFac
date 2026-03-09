@@ -265,6 +265,7 @@ compose.desktop {
                 iconFile.set(project.file("src/desktopMain/resources/icons/linux.png"))
             }
             windows {
+                dirChooser = false
                 iconFile.set(project.file("src/desktopMain/resources/icons/windows.ico"))
             }
             macOS {
