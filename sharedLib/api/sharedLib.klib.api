@@ -27,7 +27,7 @@ final class tech.arnav.twofac.lib.backup/BackupDescriptor // tech.arnav.twofac.l
 
 final class tech.arnav.twofac.lib.backup/BackupPayload // tech.arnav.twofac.lib.backup/BackupPayload|null[0]
 
-final class tech.arnav.twofac.lib.backup/BackupProviderInfo // tech.arnav.twofac.lib.backup/BackupProviderInfo|null[0]
+final class tech.arnav.twofac.lib.backup/BackupProvider // tech.arnav.twofac.lib.backup/BackupProvider|null[0]
 
 final class tech.arnav.twofac.lib.backup/BackupService // tech.arnav.twofac.lib.backup/BackupService|null[0]
 

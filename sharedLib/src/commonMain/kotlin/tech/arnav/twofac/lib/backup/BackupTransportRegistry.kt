@@ -21,10 +21,10 @@ class BackupTransportRegistry(
 
     fun findById(id: String): BackupTransport? = transportsById[id]
 
-    suspend fun providerInfo(): List<BackupProviderInfo> {
+    suspend fun providerInfo(): List<BackupProvider> {
         return all().map { transport ->
             val available = runCatching { transport.isAvailable() }.getOrDefault(false)
-            BackupProviderInfo(
+            BackupProvider(
                 id = transport.id,
                 displayName = transport.displayName,
                 supportsManualBackup = transport.supportsManualBackup,

@@ -71,7 +71,7 @@ public final class tech/arnav/twofac/lib/backup/BackupPayloadCodec {
 	public final fun encode (Ltech/arnav/twofac/lib/backup/BackupPayload;)[B
 }
 
-public final class tech/arnav/twofac/lib/backup/BackupProviderInfo {
+public final class tech/arnav/twofac/lib/backup/BackupProvider {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;ZZZZZ)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/lang/String;
@@ -80,8 +80,8 @@ public final class tech/arnav/twofac/lib/backup/BackupProviderInfo {
 	public final fun component5 ()Z
 	public final fun component6 ()Z
 	public final fun component7 ()Z
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;ZZZZZ)Ltech/arnav/twofac/lib/backup/BackupProviderInfo;
-	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupProviderInfo;Ljava/lang/String;Ljava/lang/String;ZZZZZILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupProviderInfo;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;ZZZZZ)Ltech/arnav/twofac/lib/backup/BackupProvider;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupProvider;Ljava/lang/String;Ljava/lang/String;ZZZZZILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupProvider;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDisplayName ()Ljava/lang/String;
 	public final fun getId ()Ljava/lang/String;

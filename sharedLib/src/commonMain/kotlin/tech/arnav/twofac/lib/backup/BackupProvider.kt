@@ -3,7 +3,7 @@ package tech.arnav.twofac.lib.backup
 import tech.arnav.twofac.lib.PublicApi
 
 @PublicApi
-data class BackupProviderInfo(
+data class BackupProvider(
     val id: String,
     val displayName: String,
     val supportsManualBackup: Boolean,

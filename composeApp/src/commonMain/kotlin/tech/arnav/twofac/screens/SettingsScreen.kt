@@ -43,7 +43,7 @@ import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 import tech.arnav.twofac.components.PasskeyDialog
 import tech.arnav.twofac.lib.TwoFacLib
-import tech.arnav.twofac.lib.backup.BackupProviderInfo
+import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.session.BiometricSessionManager
@@ -102,7 +102,7 @@ fun SettingsScreen(
     var biometricEnrollmentError by remember { mutableStateOf<String?>(null) }
     var showSecureEnrollmentDialog by remember { mutableStateOf(false) }
     var secureEnrollmentError by remember { mutableStateOf<String?>(null) }
-    var backupProviders by remember { mutableStateOf<List<BackupProviderInfo>>(emptyList()) }
+    var backupProviders by remember { mutableStateOf<List<BackupProvider>>(emptyList()) }
 
     LaunchedEffect(backupService) {
         backupProviders = backupService?.listProviders().orEmpty()

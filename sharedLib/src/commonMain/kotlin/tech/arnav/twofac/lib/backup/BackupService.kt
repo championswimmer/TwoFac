@@ -18,7 +18,7 @@ class BackupService(
 ) {
     private var backupSequence = 0L
 
-    suspend fun listProviders(): List<BackupProviderInfo> = transportRegistry.providerInfo()
+    suspend fun listProviders(): List<BackupProvider> = transportRegistry.providerInfo()
 
     @OptIn(ExperimentalTime::class)
     suspend fun createBackup(providerId: String): BackupResult<BackupDescriptor> {
