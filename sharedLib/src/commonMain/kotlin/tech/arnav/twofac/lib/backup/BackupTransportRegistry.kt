@@ -1,5 +1,6 @@
 package tech.arnav.twofac.lib.backup
 
+import kotlin.coroutines.cancellation.CancellationException
 import tech.arnav.twofac.lib.PublicApi
 
 @PublicApi
@@ -23,7 +24,14 @@ class BackupTransportRegistry(
 
     suspend fun providerInfo(): List<BackupProvider> {
         return all().map { transport ->
-            val available = runCatching { transport.isAvailable() }.getOrDefault(false)
+            val available = try {
+                transport.isAvailable()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Throwable) {
+                false
+            }
+
             BackupProvider(
                 id = transport.id,
                 displayName = transport.displayName,

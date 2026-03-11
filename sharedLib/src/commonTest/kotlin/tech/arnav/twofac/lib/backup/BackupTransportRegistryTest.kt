@@ -1,5 +1,6 @@
 package tech.arnav.twofac.lib.backup
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,7 +10,7 @@ import kotlin.test.assertTrue
 
 class BackupTransportRegistryTest {
 
-    private class FakeTransport(
+    private open class FakeTransport(
         override val id: String,
         override val displayName: String = id,
         private val available: Boolean = true,
@@ -66,6 +67,28 @@ class BackupTransportRegistryTest {
         assertEquals(2, providers.size)
         assertTrue(providers.any { it.id == "local" && it.isAvailable })
         assertTrue(providers.any { it.id == "gdrive-appdata" && !it.isAvailable })
+    }
+
+    @Test
+    fun testProviderInfoMarksTransportUnavailableOnNonCancellationFailure() = runTest {
+        val flaky = object : FakeTransport(id = "flaky") {
+            override suspend fun isAvailable(): Boolean = error("boom")
+        }
+
+        val providers = BackupTransportRegistry(listOf(flaky)).providerInfo()
+        assertEquals(1, providers.size)
+        assertTrue(!providers.first().isAvailable)
+    }
+
+    @Test
+    fun testProviderInfoRethrowsCancellationException() = runTest {
+        val cancellable = object : FakeTransport(id = "cancelled") {
+            override suspend fun isAvailable(): Boolean = throw CancellationException("cancel")
+        }
+
+        assertFailsWith<CancellationException> {
+            BackupTransportRegistry(listOf(cancellable)).providerInfo()
+        }
     }
 
     @Test
