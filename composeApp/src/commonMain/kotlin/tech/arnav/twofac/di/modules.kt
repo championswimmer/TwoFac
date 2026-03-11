@@ -3,6 +3,9 @@ package tech.arnav.twofac.di
 import org.koin.dsl.module
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.backup.BackupService
+import tech.arnav.twofac.lib.backup.BackupTransport
+import tech.arnav.twofac.lib.backup.BackupTransportRegistry
 import tech.arnav.twofac.lib.storage.Storage
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.ClipboardQRCodeReader
@@ -19,6 +22,20 @@ val storageModule = module {
 val appModule = module {
     single<TwoFacLib> {
         TwoFacLib.initialise(storage = get())
+    }
+}
+
+val backupModule = module {
+    single<BackupTransportRegistry> {
+        BackupTransportRegistry(
+            transports = getAll<BackupTransport>(),
+        )
+    }
+    single<BackupService> {
+        BackupService(
+            twoFacLib = get(),
+            transportRegistry = get(),
+        )
     }
 }
 

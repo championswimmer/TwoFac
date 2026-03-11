@@ -3,11 +3,10 @@ package tech.arnav.twofac.di
 import ca.gosyer.appdirs.AppDirs
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import tech.arnav.twofac.backup.LocalFileBackupTransport
-import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.BackupTransport
-import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.qr.ClipboardQRCodeReader
 import tech.arnav.twofac.qr.DesktopClipboardQRCodeReader
 import tech.arnav.twofac.settings.DesktopSettingsManager
@@ -25,11 +24,8 @@ private fun getBackupDir(): Path {
 }
 
 val desktopBackupModule = module {
-    single<BackupTransport> {
+    single<BackupTransport>(named("local")) {
         LocalFileBackupTransport(getBackupDir())
-    }
-    single<BackupService> {
-        BackupService(get<TwoFacLib>())
     }
 }
 

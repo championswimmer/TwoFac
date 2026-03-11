@@ -55,22 +55,22 @@ class BackupServiceTest {
         sampleUris.forEach { lib.addAccount(it) }
 
         val transport = FakeTransport()
-        val service = BackupService(lib)
+        val service = BackupService(lib, BackupTransportRegistry(listOf(transport)))
 
-        val createResult = service.createBackup(transport)
+        val createResult = service.createBackup(transport.id)
         assertTrue(createResult is BackupResult.Success, "createBackup should succeed")
         assertEquals(1, transport.store.size, "One backup file should be stored")
 
         // Restore into a fresh lib
         val freshLib = buildLib()
         freshLib.unlock("test-passkey")
-        val freshService = BackupService(freshLib)
+        val freshService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
 
-        val backupId = (createResult as BackupResult.Success).value.id
-        val restoreResult = freshService.restoreBackup(transport, backupId)
+        val backupId = createResult.value.id
+        val restoreResult = freshService.restoreBackup(transport.id, backupId)
 
         assertTrue(restoreResult is BackupResult.Success)
-        assertEquals(sampleUris.size, (restoreResult as BackupResult.Success).value)
+        assertEquals(sampleUris.size, restoreResult.value)
         assertEquals(sampleUris.size, freshLib.getAllAccounts().size)
     }
 
@@ -81,24 +81,34 @@ class BackupServiceTest {
         sampleUris.forEach { lib.addAccount(it) }
 
         val transport = FakeTransport()
-        val service = BackupService(lib)
+        val service = BackupService(lib, BackupTransportRegistry(listOf(transport)))
 
-        service.createBackup(transport)
-        service.createBackup(transport)
+        service.createBackup(transport.id)
+        service.createBackup(transport.id)
 
-        val listResult = service.listBackups(transport)
+        val listResult = service.listBackups(transport.id)
         assertTrue(listResult is BackupResult.Success)
-        assertEquals(2, (listResult as BackupResult.Success).value.size)
+        assertEquals(2, listResult.value.size)
     }
 
     @Test
     fun testRestoreFromMissingBackupReturnsFailure() = runTest {
         val lib = buildLib()
         lib.unlock("test-passkey")
-        val service = BackupService(lib)
         val transport = FakeTransport()
+        val service = BackupService(lib, BackupTransportRegistry(listOf(transport)))
 
-        val result = service.restoreBackup(transport, "nonexistent.json")
+        val result = service.restoreBackup(transport.id, "nonexistent.json")
+        assertTrue(result is BackupResult.Failure)
+    }
+
+    @Test
+    fun testUnknownProviderReturnsFailure() = runTest {
+        val lib = buildLib()
+        lib.unlock("test-passkey")
+        val service = BackupService(lib, BackupTransportRegistry())
+
+        val result = service.createBackup("unknown")
         assertTrue(result is BackupResult.Failure)
     }
 
