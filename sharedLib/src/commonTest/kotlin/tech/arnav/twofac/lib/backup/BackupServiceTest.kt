@@ -103,6 +103,35 @@ class BackupServiceTest {
     }
 
     @Test
+    fun testRestoreValidatesPayloadBeforeMutatingVault() = runTest {
+        val lib = buildLib()
+        lib.unlock("test-passkey")
+        sampleUris.take(1).forEach { lib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val descriptor = BackupDescriptor(
+            id = "corrupt.json",
+            transportId = transport.id,
+            createdAt = 0,
+            byteSize = 0,
+        )
+        val corruptPayload = BackupPayload(
+            createdAt = 0,
+            accounts = listOf("this-is-not-an-otpauth-uri"),
+        )
+        transport.store[descriptor.id] = BackupBlob(
+            content = BackupPayloadCodec.encode(corruptPayload),
+            descriptor = descriptor,
+        )
+
+        val service = BackupService(lib, BackupTransportRegistry(listOf(transport)))
+        val result = service.restoreBackup(transport.id, descriptor.id)
+
+        assertTrue(result is BackupResult.Failure)
+        assertEquals(1, lib.getAllAccounts().size)
+    }
+
+    @Test
     fun testUnknownProviderReturnsFailure() = runTest {
         val lib = buildLib()
         lib.unlock("test-passkey")

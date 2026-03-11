@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib.backup
 
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -76,8 +77,15 @@ class BackupService(
             return BackupResult.Failure("Failed to decode backup payload: ${e.message}", e)
         }
 
+        val uris = payload.accounts
+        try {
+            uris.forEach(OtpAuthURI::parse)
+        } catch (e: Exception) {
+            return BackupResult.Failure("Backup payload contains invalid account URI: ${e.message}", e)
+        }
+
         var imported = 0
-        for (uri in payload.accounts) {
+        for (uri in uris) {
             try {
                 twoFacLib.addAccount(uri)
                 imported++
