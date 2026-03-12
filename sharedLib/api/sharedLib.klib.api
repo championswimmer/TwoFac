@@ -7,6 +7,14 @@
 // - Show declarations: true
 
 // Library unique name: <tech.arnav.twofac:sharedLib>
+final enum class tech.arnav.twofac.lib.backup/AutomaticRestoreDecision : kotlin/Enum<tech.arnav.twofac.lib.backup/AutomaticRestoreDecision> { // tech.arnav.twofac.lib.backup/AutomaticRestoreDecision|null[0]
+    enum entry ALREADY_CONSUMED // tech.arnav.twofac.lib.backup/AutomaticRestoreDecision.ALREADY_CONSUMED|null[0]
+    enum entry DISABLED // tech.arnav.twofac.lib.backup/AutomaticRestoreDecision.DISABLED|null[0]
+    enum entry NO_REMOTE_MARKER // tech.arnav.twofac.lib.backup/AutomaticRestoreDecision.NO_REMOTE_MARKER|null[0]
+    enum entry READY // tech.arnav.twofac.lib.backup/AutomaticRestoreDecision.READY|null[0]
+    enum entry REQUIRES_USER_CONFIRMATION // tech.arnav.twofac.lib.backup/AutomaticRestoreDecision.REQUIRES_USER_CONFIRMATION|null[0]
+}
+
 final enum class tech.arnav.twofac.lib.theme/TimerState : kotlin/Enum<tech.arnav.twofac.lib.theme/TimerState> { // tech.arnav.twofac.lib.theme/TimerState|null[0]
     enum entry Critical // tech.arnav.twofac.lib.theme/TimerState.Critical|null[0]
     enum entry Healthy // tech.arnav.twofac.lib.theme/TimerState.Healthy|null[0]
@@ -27,7 +35,19 @@ final class tech.arnav.twofac.lib.backup/BackupDescriptor // tech.arnav.twofac.l
 
 final class tech.arnav.twofac.lib.backup/BackupPayload // tech.arnav.twofac.lib.backup/BackupPayload|null[0]
 
+final class tech.arnav.twofac.lib.backup/BackupPreferences // tech.arnav.twofac.lib.backup/BackupPreferences|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupProvider // tech.arnav.twofac.lib.backup/BackupProvider|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupProviderCapabilities // tech.arnav.twofac.lib.backup/BackupProviderCapabilities|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupProviderMetadata // tech.arnav.twofac.lib.backup/BackupProviderMetadata|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupRemoteMarker // tech.arnav.twofac.lib.backup/BackupRemoteMarker|null[0]
+
 final class tech.arnav.twofac.lib.backup/BackupService // tech.arnav.twofac.lib.backup/BackupService|null[0]
+
+final class tech.arnav.twofac.lib.backup/BackupTransportRegistry // tech.arnav.twofac.lib.backup/BackupTransportRegistry|null[0]
 
 final class tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter|null[0]
 
@@ -49,7 +69,13 @@ sealed class <#A: out kotlin/Any?> tech.arnav.twofac.lib.backup/BackupResult // 
 
 sealed class tech.arnav.twofac.lib.importer/ImportResult // tech.arnav.twofac.lib.importer/ImportResult|null[0]
 
+final object tech.arnav.twofac.lib.backup/AutomaticRestorePolicy // tech.arnav.twofac.lib.backup/AutomaticRestorePolicy|null[0]
+
 final object tech.arnav.twofac.lib.backup/BackupPayloadCodec // tech.arnav.twofac.lib.backup/BackupPayloadCodec|null[0]
+
+final object tech.arnav.twofac.lib.backup/BackupProviderCapabilityRules // tech.arnav.twofac.lib.backup/BackupProviderCapabilityRules|null[0]
+
+final object tech.arnav.twofac.lib.backup/BackupProviderIds // tech.arnav.twofac.lib.backup/BackupProviderIds|null[0]
 
 final object tech.arnav.twofac.lib.theme/TimerSemantics // tech.arnav.twofac.lib.theme/TimerSemantics|null[0]
 

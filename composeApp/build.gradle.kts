@@ -128,6 +128,8 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.components.resources)
             implementation(libs.kotlinx.io.core)
+            implementation(libs.filekit.core)
+            implementation(libs.filekit.dialogs)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)

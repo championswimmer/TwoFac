@@ -45,15 +45,19 @@ import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 import tech.arnav.twofac.components.PasskeyDialog
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
-import tech.arnav.twofac.lib.backup.BackupTransport
 import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.session.WebAuthnSessionManager
 import tech.arnav.twofac.storage.getStoragePath
 
-private enum class BackupAction { EXPORT, IMPORT, SYNC_COMPANION }
+private sealed interface BackupAction {
+    data class Export(val providerId: String) : BackupAction
+    data class Import(val providerId: String) : BackupAction
+    data object SyncCompanion : BackupAction
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,10 +68,8 @@ fun SettingsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    // Optional backup dependencies – only registered on platforms that support local file backup
     val koin = getKoin()
     val backupService = remember { koin.getOrNull<BackupService>() }
-    val backupTransport = remember { koin.getOrNull<BackupTransport>() }
     val twoFacLib = remember { koin.getOrNull<TwoFacLib>() }
     val companionSyncCoordinator = remember { koin.getOrNull<CompanionSyncCoordinator>() }
     val sessionManager = remember { koin.getOrNull<SessionManager>() }
@@ -102,12 +104,48 @@ fun SettingsScreen(
     var biometricEnrollmentError by remember { mutableStateOf<String?>(null) }
     var showSecureEnrollmentDialog by remember { mutableStateOf(false) }
     var secureEnrollmentError by remember { mutableStateOf<String?>(null) }
+    var backupProviders by remember { mutableStateOf<List<BackupProvider>>(emptyList()) }
+
+    LaunchedEffect(backupService) {
+        backupProviders = backupService?.listProviders().orEmpty()
+    }
 
     LaunchedEffect(companionSyncCoordinator) {
         companionDisplayName = companionSyncCoordinator?.companionDisplayName ?: "Watch"
         if (companionSyncCoordinator != null) {
             isCompanionActive = companionSyncCoordinator.isCompanionActive()
         }
+    }
+
+    suspend fun executeBackupImport(providerId: String) {
+        val service = backupService
+        if (service == null) {
+            snackbarHostState.showSnackbar("Backup is unavailable")
+            return
+        }
+        val listResult = service.listBackups(providerId)
+        if (listResult is BackupResult.Failure) {
+            snackbarHostState.showSnackbar("No backups found: ${listResult.message}")
+            return
+        }
+        val backups = (listResult as BackupResult.Success).value
+        if (backups.isEmpty()) {
+            snackbarHostState.showSnackbar("No backup files found")
+            return
+        }
+        val latest = backups.maxBy { it.createdAt }
+        val result = service.restoreBackup(providerId, latest.id)
+        val message = when (result) {
+            is BackupResult.Success ->
+                "Imported ${result.value} account(s) from ${latest.id}"
+            is BackupResult.Failure ->
+                "Import failed: ${result.message}"
+        }
+        snackbarHostState.showSnackbar(message)
+        if (result is BackupResult.Success) {
+            companionSyncCoordinator?.onAccountsChanged()
+        }
+        backupProviders = service.listProviders()
     }
 
     Scaffold(
@@ -262,7 +300,7 @@ fun SettingsScreen(
                 }
             }
 
-            if (backupService != null && backupTransport != null) {
+            if (backupService != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -271,32 +309,86 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Local Backup",
+                            text = "Backups",
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            text = "Export or import accounts as a plaintext JSON backup file.",
+                            text = "Create or restore account snapshots from available backup providers.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Button(
-                                onClick = { pendingAction = BackupAction.EXPORT },
-                                modifier = Modifier.weight(1f),
-                                enabled = !isLoading
-                            ) {
-                                Text("Export")
-                            }
-                            OutlinedButton(
-                                onClick = { pendingAction = BackupAction.IMPORT },
-                                modifier = Modifier.weight(1f),
-                                enabled = !isLoading
-                            ) {
-                                Text("Import")
+
+                        if (backupProviders.isEmpty()) {
+                            Text(
+                                text = "No backup providers are currently available on this platform.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        } else {
+                            backupProviders.forEach { provider ->
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 12.dp)
+                                ) {
+                                    Text(
+                                        text = provider.displayName,
+                                        style = MaterialTheme.typography.titleSmall,
+                                    )
+                                    Text(
+                                        text = buildString {
+                                            append(if (provider.isAvailable) "Available" else "Unavailable")
+                                            append(" • ")
+                                            append(provider.id)
+                                            if (provider.requiresAuthentication) {
+                                                append(" • Sign-in required")
+                                            }
+                                        },
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
+                                    )
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Button(
+                                            onClick = {
+                                                pendingAction = BackupAction.Export(provider.id)
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            enabled = !isLoading && provider.isAvailable && provider.supportsManualBackup
+                                        ) {
+                                            Text("Export")
+                                        }
+                                        OutlinedButton(
+                                            onClick = {
+                                                if (twoFacLib != null && twoFacLib.isUnlocked()) {
+                                                    passkeyError = null
+                                                    isLoading = true
+                                                    coroutineScope.launch {
+                                                        try {
+                                                            executeBackupImport(provider.id)
+                                                        } catch (e: Exception) {
+                                                            snackbarHostState.showSnackbar(
+                                                                "Import failed: ${e.message ?: "unknown error"}"
+                                                            )
+                                                        } finally {
+                                                            isLoading = false
+                                                        }
+                                                    }
+                                                    return@OutlinedButton
+                                                }
+                                                pendingAction = BackupAction.Import(provider.id)
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            enabled = !isLoading && provider.isAvailable && provider.supportsManualRestore
+                                        ) {
+                                            Text("Import")
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -329,7 +421,7 @@ fun SettingsScreen(
                         Button(
                             onClick = {
                                 if (twoFacLib != null && !twoFacLib.isUnlocked()) {
-                                    pendingAction = BackupAction.SYNC_COMPANION
+                                    pendingAction = BackupAction.SyncCompanion
                                     return@Button
                                 }
                                 coroutineScope.launch {
@@ -472,46 +564,30 @@ fun SettingsScreen(
                     try {
                         twoFacLib?.unlock(passkey)
                         when (action) {
-                            BackupAction.EXPORT -> {
-                                val result = backupService!!.createBackup(backupTransport!!)
+                            is BackupAction.Export -> {
+                                val service = backupService
+                                if (service == null) {
+                                    snackbarHostState.showSnackbar("Backup is unavailable")
+                                    pendingAction = null
+                                    return@launch
+                                }
+                                val result = service.createBackup(action.providerId)
                                 val message = when (result) {
                                     is BackupResult.Success ->
-                                        "Backup exported: ${result.value.id}"
+                                        "Backup exported (${action.providerId}): ${result.value.id}"
                                     is BackupResult.Failure ->
                                         "Export failed: ${result.message}"
                                 }
                                 snackbarHostState.showSnackbar(message)
+                                backupProviders = service.listProviders()
                                 pendingAction = null
                             }
-                            BackupAction.IMPORT -> {
-                                val listResult = backupTransport!!.listBackups()
-                                if (listResult is BackupResult.Failure) {
-                                    snackbarHostState.showSnackbar("No backups found: ${listResult.message}")
-                                    pendingAction = null
-                                    return@launch
-                                }
-                                val backups = (listResult as BackupResult.Success).value
-                                if (backups.isEmpty()) {
-                                    snackbarHostState.showSnackbar("No backup files found")
-                                    pendingAction = null
-                                    return@launch
-                                }
-                                val latest = backups.maxBy { it.createdAt }
-                                val result = backupService!!.restoreBackup(backupTransport, latest.id)
-                                val message = when (result) {
-                                    is BackupResult.Success ->
-                                        "Imported ${result.value} account(s) from ${latest.id}"
-                                    is BackupResult.Failure ->
-                                        "Import failed: ${result.message}"
-                                }
-                                snackbarHostState.showSnackbar(message)
-                                if (result is BackupResult.Success) {
-                                    companionSyncCoordinator?.onAccountsChanged()
-                                }
+                            is BackupAction.Import -> {
+                                executeBackupImport(action.providerId)
                                 pendingAction = null
                             }
 
-                            BackupAction.SYNC_COMPANION -> {
+                            BackupAction.SyncCompanion -> {
                                 if (companionSyncCoordinator == null || twoFacLib == null) {
                                     snackbarHostState.showSnackbar("Companion sync is unavailable")
                                     pendingAction = null

@@ -2,7 +2,6 @@ package tech.arnav.twofac
 
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
@@ -12,6 +11,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.init
+import io.github.vinceglb.filekit.manualFileKitCoreInitialization
 import java.lang.ref.WeakReference
 
 class MainActivity : FragmentActivity() {
@@ -28,6 +30,8 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        FileKit.manualFileKitCoreInitialization(applicationContext)
+        FileKit.init(this)
         currentActivity = WeakReference(this)
 
         setContent {

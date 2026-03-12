@@ -2,8 +2,11 @@ package tech.arnav.twofac.di
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import tech.arnav.twofac.backup.LocalFileBackupTransport
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
+import tech.arnav.twofac.lib.backup.BackupTransport
 import tech.arnav.twofac.qr.AndroidCameraQRCodeReader
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.session.AndroidBiometricSessionManager
@@ -41,4 +44,10 @@ fun androidBiometricModule(
 
 val androidQrModule = module {
     single<CameraQRCodeReader> { AndroidCameraQRCodeReader() }
+}
+
+val androidBackupModule = module {
+    single<BackupTransport>(named("local")) {
+        LocalFileBackupTransport()
+    }
 }

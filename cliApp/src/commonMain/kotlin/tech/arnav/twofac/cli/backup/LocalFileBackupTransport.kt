@@ -19,6 +19,7 @@ import tech.arnav.twofac.lib.backup.BackupTransport
 class LocalFileBackupTransport(private val directory: Path) : BackupTransport {
 
     override val id: String = "local"
+    override val displayName: String = "Local Files"
 
     override suspend fun isAvailable(): Boolean = true
 
@@ -90,10 +91,10 @@ class LocalFileBackupTransport(private val directory: Path) : BackupTransport {
     }
 
     private fun parseTimestampFromFilename(filename: String): Long {
-        return filename
+        val raw = filename
             .removePrefix("twofac-backup-")
             .removeSuffix(".json")
-            .toLongOrNull() ?: 0L
+        return raw.substringBefore('-').toLongOrNull() ?: 0L
     }
 
     private fun readFile(path: Path): ByteArray {

@@ -1,8 +1,11 @@
 package tech.arnav.twofac.di
 
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import tech.arnav.twofac.backup.LocalFileBackupTransport
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.IosCompanionSyncCoordinator
+import tech.arnav.twofac.lib.backup.BackupTransport
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.IosCameraQRCodeReader
 import tech.arnav.twofac.session.BiometricSessionManager
@@ -24,4 +27,10 @@ val iosBiometricModule = module {
 
 val iosQrModule = module {
     single<CameraQRCodeReader> { IosCameraQRCodeReader() }
+}
+
+val iosBackupModule = module {
+    single<BackupTransport>(named("local")) {
+        LocalFileBackupTransport()
+    }
 }

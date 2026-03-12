@@ -14,6 +14,18 @@ import tech.arnav.twofac.cli.storage.AppDirUtils
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
+import tech.arnav.twofac.lib.backup.BackupTransportRegistry
+
+private const val LOCAL_PROVIDER_ID = "local"
+
+private fun localBackupService(twoFacLib: TwoFacLib, dir: Path): BackupService {
+    return BackupService(
+        twoFacLib = twoFacLib,
+        transportRegistry = BackupTransportRegistry(
+            transports = listOf(LocalFileBackupTransport(dir)),
+        ),
+    )
+}
 
 class BackupCommand : CliktCommand(name = "backup") {
     override fun help(context: Context) = "Backup and restore accounts via local JSON files"
@@ -43,10 +55,9 @@ class ExportCommand : CliktCommand(name = "export"), KoinComponent {
         twoFacLib.unlock(passkey)
 
         val dir = outputDir?.let { Path(it) } ?: AppDirUtils.getBackupDirPath(forceCreate = true)
-        val transport = LocalFileBackupTransport(dir)
-        val service = BackupService(twoFacLib)
+        val service = localBackupService(twoFacLib, dir)
 
-        when (val result = service.createBackup(transport)) {
+        when (val result = service.createBackup(LOCAL_PROVIDER_ID)) {
             is BackupResult.Success -> {
                 val descriptor = result.value
                 echo("✓ Exported ${twoFacLib.getAllAccounts().size} account(s) to ${Path(dir, descriptor.id)}")
@@ -80,11 +91,11 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
         twoFacLib.unlock(passkey)
 
         val dir = inputDir?.let { Path(it) } ?: AppDirUtils.getBackupDirPath()
-        val transport = LocalFileBackupTransport(dir)
+        val service = localBackupService(twoFacLib, dir)
 
         // Determine which backup to restore
         val resolvedBackupId = backupFile ?: run {
-            val listResult = transport.listBackups()
+            val listResult = service.listBackups(LOCAL_PROVIDER_ID)
             if (listResult is BackupResult.Failure) {
                 echo("✗ Failed to list backups: ${listResult.message}", err = true)
                 return@runBlocking
@@ -97,8 +108,7 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
             backups.maxBy { it.createdAt }.id
         }
 
-        val service = BackupService(twoFacLib)
-        when (val result = service.restoreBackup(transport, resolvedBackupId)) {
+        when (val result = service.restoreBackup(LOCAL_PROVIDER_ID, resolvedBackupId)) {
             is BackupResult.Success -> echo("✓ Imported ${result.value} account(s) from $resolvedBackupId")
             is BackupResult.Failure -> echo("✗ Import failed: ${result.message}", err = true)
         }

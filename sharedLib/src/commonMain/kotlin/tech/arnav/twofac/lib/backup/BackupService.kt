@@ -2,21 +2,34 @@ package tech.arnav.twofac.lib.backup
 
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 /**
- * Orchestrates backup and restore operations using a [BackupTransport].
+ * Orchestrates backup and restore operations using transports from [BackupTransportRegistry].
  *
  * Export flow: read account URIs from [TwoFacLib] → encode to [BackupPayload] → upload via transport.
  * Restore flow: download from transport → decode [BackupPayload] → import URIs into [TwoFacLib].
  */
 @PublicApi
-class BackupService(private val twoFacLib: TwoFacLib) {
+class BackupService(
+    private val twoFacLib: TwoFacLib,
+    private val transportRegistry: BackupTransportRegistry,
+) {
     private var backupSequence = 0L
 
+    suspend fun listProviders(): List<BackupProvider> = transportRegistry.providerInfo()
+
     @OptIn(ExperimentalTime::class)
-    suspend fun createBackup(transport: BackupTransport): BackupResult<BackupDescriptor> {
+    suspend fun createBackup(providerId: String): BackupResult<BackupDescriptor> {
+        val transport = resolveTransport(providerId) ?: return BackupResult.Failure(
+            "Backup provider not found: $providerId"
+        )
+        if (!transport.supportsManualBackup) {
+            return BackupResult.Failure("Provider '$providerId' does not support manual backup")
+        }
+
         val uris = try {
             twoFacLib.exportAccountURIs()
         } catch (e: Exception) {
@@ -36,11 +49,24 @@ class BackupService(private val twoFacLib: TwoFacLib) {
         return transport.upload(bytes, descriptor)
     }
 
-    suspend fun listBackups(transport: BackupTransport): BackupResult<List<BackupDescriptor>> {
+    suspend fun listBackups(providerId: String): BackupResult<List<BackupDescriptor>> {
+        val transport = resolveTransport(providerId) ?: return BackupResult.Failure(
+            "Backup provider not found: $providerId"
+        )
+        if (!transport.supportsManualRestore) {
+            return BackupResult.Failure("Provider '$providerId' does not support manual restore")
+        }
         return transport.listBackups()
     }
 
-    suspend fun restoreBackup(transport: BackupTransport, backupId: String): BackupResult<Int> {
+    suspend fun restoreBackup(providerId: String, backupId: String): BackupResult<Int> {
+        val transport = resolveTransport(providerId) ?: return BackupResult.Failure(
+            "Backup provider not found: $providerId"
+        )
+        if (!transport.supportsManualRestore) {
+            return BackupResult.Failure("Provider '$providerId' does not support manual restore")
+        }
+
         val blobResult = transport.download(backupId)
         if (blobResult is BackupResult.Failure) return blobResult
 
@@ -51,8 +77,15 @@ class BackupService(private val twoFacLib: TwoFacLib) {
             return BackupResult.Failure("Failed to decode backup payload: ${e.message}", e)
         }
 
+        val uris = payload.accounts
+        try {
+            uris.forEach(OtpAuthURI::parse)
+        } catch (e: Exception) {
+            return BackupResult.Failure("Backup payload contains invalid account URI: ${e.message}", e)
+        }
+
         var imported = 0
-        for (uri in payload.accounts) {
+        for (uri in uris) {
             try {
                 twoFacLib.addAccount(uri)
                 imported++
@@ -61,5 +94,9 @@ class BackupService(private val twoFacLib: TwoFacLib) {
             }
         }
         return BackupResult.Success(imported)
+    }
+
+    private fun resolveTransport(providerId: String): BackupTransport? {
+        return transportRegistry.findById(providerId)
     }
 }
