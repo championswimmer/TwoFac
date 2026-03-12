@@ -2,7 +2,7 @@ package tech.arnav.twofac.lib.backup
 
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.TwoFacLib
-import tech.arnav.twofac.lib.otp.OTP
+import tech.arnav.twofac.lib.otp.isEquivalent
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -18,12 +18,6 @@ class BackupService(
     private val twoFacLib: TwoFacLib,
     private val transportRegistry: BackupTransportRegistry,
 ) {
-    private data class AccountFingerprint(
-        val issuer: String,
-        val account: String,
-        val secret: String,
-    )
-
     private var backupSequence = 0L
 
     suspend fun listProviders(): List<BackupProvider> = transportRegistry.providerInfo()
@@ -90,23 +84,21 @@ class BackupService(
         } catch (e: Exception) {
             return BackupResult.Failure("Backup payload contains invalid account URI: ${e.message}", e)
         }
-        val existingFingerprints = try {
+        val existingAccounts = try {
             twoFacLib.exportAccountURIs()
                 .map(OtpAuthURI::parse)
-                .map(::fingerprint)
-                .toMutableSet()
+                .toMutableList()
         } catch (e: Exception) {
             return BackupResult.Failure("Failed to read existing accounts: ${e.message}", e)
         }
 
         var imported = 0
         for ((uri, parsedBackupAccount) in uris.zip(parsedBackupAccounts)) {
-            val backupFingerprint = fingerprint(parsedBackupAccount)
-            if (backupFingerprint in existingFingerprints) continue
+            if (existingAccounts.any { it.isEquivalent(parsedBackupAccount) }) continue
             try {
                 val added = twoFacLib.addAccount(uri)
                 if (added) {
-                    existingFingerprints += backupFingerprint
+                    existingAccounts += parsedBackupAccount
                     imported++
                 }
             } catch (_: Exception) {
@@ -118,13 +110,5 @@ class BackupService(
 
     private fun resolveTransport(providerId: String): BackupTransport? {
         return transportRegistry.findById(providerId)
-    }
-
-    private fun fingerprint(otp: OTP): AccountFingerprint {
-        return AccountFingerprint(
-            issuer = otp.issuer ?: "",
-            account = otp.accountName,
-            secret = otp.secret,
-        )
     }
 }

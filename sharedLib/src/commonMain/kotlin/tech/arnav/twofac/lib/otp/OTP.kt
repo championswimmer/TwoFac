@@ -61,3 +61,10 @@ interface OTP {
     suspend fun validateOTP(otp: String, counter: Long): Boolean
 
 }
+
+fun OTP.isEquivalent(other: OTP): Boolean {
+    return (issuer ?: "") == (other.issuer ?: "") &&
+            accountName == other.accountName &&
+            digits == other.digits &&
+            secret == other.secret
+}

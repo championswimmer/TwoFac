@@ -145,7 +145,7 @@ class BackupServiceTest {
         val freshLib = buildLib()
         freshLib.unlock("test-passkey")
         freshLib.addAccount(
-            "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub&digits=8"
+            "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub&period=60"
         )
 
         val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
