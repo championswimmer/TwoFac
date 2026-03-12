@@ -63,7 +63,7 @@ Reference: `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/backup/BackupP
 
 ### Export flow
 
-`BackupService.createBackup()` calls `twoFacLib.exportAccountURIs()` which:
+`BackupService.createBackup()` calls `twoFacLib.exportAccountsPlaintext()` (currently named `exportAccountURIs()`) which:
 
 1. Iterates over in-memory `StoredAccount` list.
 2. For each account: derives key from passkey + account salt → decrypts encryptedURI → returns plaintext URI.
@@ -127,13 +127,18 @@ Update `BackupPayloadCodec.decode()` to accept both schema version 1 and 2.
 
 ### Phase 1 — Add encrypted export path in BackupService
 
-Add a method to `TwoFacLib` that exports raw `StoredAccount` data without decryption:
+Rename the existing `exportAccountURIs()` to `exportAccountsPlaintext()` and add a new `exportAccountsEncrypted()`:
 
 ```kotlin
-suspend fun exportStoredAccounts(): List<StoredAccount>
+/** Decrypts and returns plaintext otpauth:// URIs for all accounts. */
+suspend fun exportAccountsPlaintext(): List<String>
+
+/** Returns raw StoredAccount entries (encrypted) without any decryption. */
+suspend fun exportAccountsEncrypted(): List<StoredAccount>
 ```
 
-This simply returns the in-memory account list (already loaded on unlock) without any decryption.
+`exportAccountsPlaintext()` is the existing decrypt-then-export behavior (renamed from `exportAccountURIs()`).
+`exportAccountsEncrypted()` simply returns the in-memory account list (already loaded on unlock) without any decryption.
 
 Update `BackupService.createBackup()` to accept an encryption mode parameter:
 
@@ -143,18 +148,18 @@ suspend fun createBackup(providerId: String, encrypted: Boolean = false): Backup
 
 When `encrypted == true`:
 
-1. Call `twoFacLib.exportStoredAccounts()` instead of `exportAccountURIs()`.
+1. Call `twoFacLib.exportAccountsEncrypted()`.
 2. Map each `StoredAccount` to `EncryptedAccountEntry(accountLabel, salt, encryptedURI)`.
 3. Build `BackupPayload(schemaVersion = 2, encrypted = true, encryptedAccounts = entries)`.
 
 When `encrypted == false`:
 
-1. Existing behavior: call `twoFacLib.exportAccountURIs()` for plaintext URIs.
+1. Call `twoFacLib.exportAccountsPlaintext()` for plaintext URIs.
 2. Build `BackupPayload(schemaVersion = 2, encrypted = false, accounts = uris)`.
 
 #### Files to change
 
-- `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/TwoFacLib.kt` — add `exportStoredAccounts()`.
+- `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/TwoFacLib.kt` — rename `exportAccountURIs()` → `exportAccountsPlaintext()`, add `exportAccountsEncrypted()`.
 - `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/backup/BackupService.kt` — add `encrypted` parameter to `createBackup()`, branch on it.
 
 ### Phase 2 — Add encrypted restore path in BackupService
