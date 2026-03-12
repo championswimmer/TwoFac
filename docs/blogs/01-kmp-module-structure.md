@@ -2,7 +2,6 @@
 title: "Architecting TwoFac: My Journey into Kotlin Multiplatform Module Structure"
 datePublished: Mon Mar 02 2026 10:00:00 GMT+0000 (Coordinated Universal Time)
 slug: architecting-twofac-kotlin-multiplatform-module-structure
-cover: https://cdn.hashnode.com/res/hashnode/image/upload/v1750547881820/742b92c6-38ae-4dcd-bad4-b5f156b2edd5.png
 tags: kotlin, kmp, architecture, opensource, multiplatform
 
 ---
