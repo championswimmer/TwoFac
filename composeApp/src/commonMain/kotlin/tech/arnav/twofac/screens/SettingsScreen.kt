@@ -11,6 +11,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -360,7 +362,14 @@ fun SettingsScreen(
                                             modifier = Modifier.weight(1f),
                                             enabled = !isLoading && provider.isAvailable && provider.supportsManualBackup
                                         ) {
-                                            Text("Export")
+                                            Icon(
+                                                imageVector = Icons.Rounded.Upload,
+                                                contentDescription = null,
+                                            )
+                                            Text(
+                                                text = "Export",
+                                                modifier = Modifier.padding(start = 6.dp),
+                                            )
                                         }
                                         OutlinedButton(
                                             onClick = {
@@ -385,7 +394,14 @@ fun SettingsScreen(
                                             modifier = Modifier.weight(1f),
                                             enabled = !isLoading && provider.isAvailable && provider.supportsManualRestore
                                         ) {
-                                            Text("Import")
+                                            Icon(
+                                                imageVector = Icons.Rounded.Download,
+                                                contentDescription = null,
+                                            )
+                                            Text(
+                                                text = "Import",
+                                                modifier = Modifier.padding(start = 6.dp),
+                                            )
                                         }
                                     }
                                 }
