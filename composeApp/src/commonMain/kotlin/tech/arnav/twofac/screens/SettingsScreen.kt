@@ -115,6 +115,37 @@ fun SettingsScreen(
         }
     }
 
+    suspend fun executeBackupImport(providerId: String) {
+        val service = backupService
+        if (service == null) {
+            snackbarHostState.showSnackbar("Backup is unavailable")
+            return
+        }
+        val listResult = service.listBackups(providerId)
+        if (listResult is BackupResult.Failure) {
+            snackbarHostState.showSnackbar("No backups found: ${listResult.message}")
+            return
+        }
+        val backups = (listResult as BackupResult.Success).value
+        if (backups.isEmpty()) {
+            snackbarHostState.showSnackbar("No backup files found")
+            return
+        }
+        val latest = backups.maxBy { it.createdAt }
+        val result = service.restoreBackup(providerId, latest.id)
+        val message = when (result) {
+            is BackupResult.Success ->
+                "Imported ${result.value} account(s) from ${latest.id}"
+            is BackupResult.Failure ->
+                "Import failed: ${result.message}"
+        }
+        snackbarHostState.showSnackbar(message)
+        if (result is BackupResult.Success) {
+            companionSyncCoordinator?.onAccountsChanged()
+        }
+        backupProviders = service.listProviders()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -330,6 +361,22 @@ fun SettingsScreen(
                                         }
                                         OutlinedButton(
                                             onClick = {
+                                                if (twoFacLib != null && twoFacLib.isUnlocked()) {
+                                                    passkeyError = null
+                                                    isLoading = true
+                                                    coroutineScope.launch {
+                                                        try {
+                                                            executeBackupImport(provider.id)
+                                                        } catch (e: Exception) {
+                                                            snackbarHostState.showSnackbar(
+                                                                "Import failed: ${e.message ?: "unknown error"}"
+                                                            )
+                                                        } finally {
+                                                            isLoading = false
+                                                        }
+                                                    }
+                                                    return@OutlinedButton
+                                                }
                                                 pendingAction = BackupAction.Import(provider.id)
                                             },
                                             modifier = Modifier.weight(1f),
@@ -533,37 +580,7 @@ fun SettingsScreen(
                                 pendingAction = null
                             }
                             is BackupAction.Import -> {
-                                val service = backupService
-                                if (service == null) {
-                                    snackbarHostState.showSnackbar("Backup is unavailable")
-                                    pendingAction = null
-                                    return@launch
-                                }
-                                val listResult = service.listBackups(action.providerId)
-                                if (listResult is BackupResult.Failure) {
-                                    snackbarHostState.showSnackbar("No backups found: ${listResult.message}")
-                                    pendingAction = null
-                                    return@launch
-                                }
-                                val backups = (listResult as BackupResult.Success).value
-                                if (backups.isEmpty()) {
-                                    snackbarHostState.showSnackbar("No backup files found")
-                                    pendingAction = null
-                                    return@launch
-                                }
-                                val latest = backups.maxBy { it.createdAt }
-                                val result = service.restoreBackup(action.providerId, latest.id)
-                                val message = when (result) {
-                                    is BackupResult.Success ->
-                                        "Imported ${result.value} account(s) from ${latest.id}"
-                                    is BackupResult.Failure ->
-                                        "Import failed: ${result.message}"
-                                }
-                                snackbarHostState.showSnackbar(message)
-                                if (result is BackupResult.Success) {
-                                    companionSyncCoordinator?.onAccountsChanged()
-                                }
-                                backupProviders = service.listProviders()
+                                executeBackupImport(action.providerId)
                                 pendingAction = null
                             }
 
