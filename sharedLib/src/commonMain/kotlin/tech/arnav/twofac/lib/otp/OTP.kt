@@ -66,5 +66,10 @@ fun OTP.isEquivalent(other: OTP): Boolean {
     return (issuer ?: "") == (other.issuer ?: "") &&
             accountName == other.accountName &&
             digits == other.digits &&
-            secret == other.secret
+            secret == other.secret &&
+            timeIntervalOrNull() == other.timeIntervalOrNull()
+}
+
+private fun OTP.timeIntervalOrNull(): Long? {
+    return (this as? TOTP)?.timeInterval
 }

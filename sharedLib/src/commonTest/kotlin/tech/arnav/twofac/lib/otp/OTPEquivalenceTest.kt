@@ -7,7 +7,7 @@ import kotlin.test.assertTrue
 class OTPEquivalenceTest {
 
     @Test
-    fun testEquivalentWhenIssuerAccountDigitsAndSecretMatch() {
+    fun testNotEquivalentWhenTimeIntervalDiffers() {
         val first = TOTP(
             digits = 6,
             secret = "JBSWY3DPEHPK3PXP",
@@ -21,6 +21,26 @@ class OTPEquivalenceTest {
             accountName = "test@example.com",
             issuer = "GitHub",
             timeInterval = 60,
+        )
+
+        assertFalse(first.isEquivalent(second))
+    }
+
+    @Test
+    fun testEquivalentWhenIssuerAccountDigitsSecretAndTimeIntervalMatch() {
+        val first = TOTP(
+            digits = 6,
+            secret = "JBSWY3DPEHPK3PXP",
+            accountName = "test@example.com",
+            issuer = "GitHub",
+            timeInterval = 30,
+        )
+        val second = TOTP(
+            digits = 6,
+            secret = "JBSWY3DPEHPK3PXP",
+            accountName = "test@example.com",
+            issuer = "GitHub",
+            timeInterval = 30,
         )
 
         assertTrue(first.isEquivalent(second))

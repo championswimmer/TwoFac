@@ -132,7 +132,7 @@ class BackupServiceTest {
     }
 
     @Test
-    fun testRestoreSkipsAccountsAlreadyPresentByIssuerAccountAndSecret() = runTest {
+    fun testRestoreSkipsAccountsAlreadyPresentByIssuerAccountDigitsSecretAndTimeInterval() = runTest {
         val sourceLib = buildLib()
         sourceLib.unlock("test-passkey")
         sampleUris.forEach { sourceLib.addAccount(it) }
@@ -145,7 +145,7 @@ class BackupServiceTest {
         val freshLib = buildLib()
         freshLib.unlock("test-passkey")
         freshLib.addAccount(
-            "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub&period=60"
+            "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub&algorithm=SHA256"
         )
 
         val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
