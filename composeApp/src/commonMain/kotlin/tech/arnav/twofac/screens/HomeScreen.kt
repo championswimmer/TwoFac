@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +41,7 @@ fun HomeScreen(
     val accountOtps by viewModel.accountOtps.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    val otpListState = rememberLazyListState()
 
     var showPasskeyDialog by remember { mutableStateOf(false) }
     var hasTriggeredUnlockFlow by remember { mutableStateOf(false) }
@@ -164,6 +166,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
+                    state = otpListState,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     item {
@@ -174,7 +177,7 @@ fun HomeScreen(
                         )
                     }
 
-                    items(accountOtps) { (account, otpCode) ->
+                    items(accountOtps, key = { (account, _) -> account.accountID }) { (account, otpCode) ->
                         OTPCard(
                             account = account,
                             otpCode = otpCode,
