@@ -25,15 +25,17 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
-import java.io.ByteArrayOutputStream
+import io.ktor.http.content.OutgoingContent
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import io.ktor.http.URLBuilder
-import io.ktor.http.URLProtocol
 import io.ktor.http.appendPathSegments
+import io.ktor.utils.io.ByteWriteChannel
+import io.ktor.utils.io.writeFully
+import io.ktor.utils.io.writeStringUtf8
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -131,7 +133,6 @@ class GoogleDriveAppDataBackupTransport(
         if (tokenResult is BackupResult.Failure) return tokenResult
         val accessToken = (tokenResult as BackupResult.Success).value
 
-        val boundary = "twofac-${UUID.randomUUID()}"
         val metadata = JSONObject().apply {
             put("name", descriptor.id)
             put("parents", JSONArray().put("appDataFolder"))
@@ -146,18 +147,14 @@ class GoogleDriveAppDataBackupTransport(
             )
         }
 
-        val multipartBody = buildMultipartBody(
-            boundary = boundary,
-            metadataJson = metadata.toString(),
-            content = content,
-        )
-
         val response = executeRequest(
             method = HttpMethod.Post,
             url = DRIVE_MULTIPART_UPLOAD_URL,
             accessToken = accessToken,
-            contentType = "multipart/related; boundary=$boundary",
-            requestBody = multipartBody,
+            requestBody = GoogleDriveMultipartRelatedContent(
+                metadataJson = metadata.toString(),
+                content = content,
+            ),
         )
         if (response is BackupResult.Failure) return response
 
@@ -383,44 +380,17 @@ class GoogleDriveAppDataBackupTransport(
         return raw.substringBefore('-').toLongOrNull() ?: 0L
     }
 
-    private fun buildMultipartBody(
-        boundary: String,
-        metadataJson: String,
-        content: ByteArray,
-    ): ByteArray {
-        val out = ByteArrayOutputStream()
-
-        fun writeUtf8(value: String) {
-            out.write(value.toByteArray(StandardCharsets.UTF_8))
-        }
-
-        writeUtf8("--$boundary\r\n")
-        writeUtf8("Content-Type: application/json; charset=UTF-8\r\n\r\n")
-        writeUtf8(metadataJson)
-        writeUtf8("\r\n")
-
-        writeUtf8("--$boundary\r\n")
-        writeUtf8("Content-Type: application/json\r\n\r\n")
-        out.write(content)
-        writeUtf8("\r\n")
-
-        writeUtf8("--$boundary--\r\n")
-        return out.toByteArray()
-    }
-
     private suspend fun executeRequest(
         method: HttpMethod,
         url: Url,
         accessToken: String,
-        contentType: String? = null,
-        requestBody: ByteArray? = null,
+        requestBody: Any? = null,
     ): BackupResult<ByteArray> {
         return try {
             val response = httpClient.request(url) {
                 this.method = method
                 header("Authorization", "Bearer $accessToken")
                 accept(ContentType.Application.Json)
-                contentType?.let { header("Content-Type", it) }
                 requestBody?.let { setBody(it) }
             }
             val body: ByteArray = response.body()
@@ -473,6 +443,31 @@ private data class GoogleCloudCredentials(
     val clientId: String,
     val projectId: String?,
 )
+
+private class GoogleDriveMultipartRelatedContent(
+    private val metadataJson: String,
+    private val content: ByteArray,
+    boundary: String = "twofac-${UUID.randomUUID()}",
+) : OutgoingContent.WriteChannelContent() {
+    private val boundaryMarker = "--$boundary"
+
+    override val contentType: ContentType = ContentType.MultiPart.Related
+        .withParameter("boundary", boundary)
+
+    override suspend fun writeTo(channel: ByteWriteChannel) {
+        channel.writeStringUtf8("$boundaryMarker\r\n")
+        channel.writeStringUtf8("Content-Type: application/json; charset=UTF-8\r\n\r\n")
+        channel.writeStringUtf8(metadataJson)
+        channel.writeStringUtf8("\r\n")
+
+        channel.writeStringUtf8("$boundaryMarker\r\n")
+        channel.writeStringUtf8("Content-Type: application/json\r\n\r\n")
+        channel.writeFully(content)
+        channel.writeStringUtf8("\r\n")
+
+        channel.writeStringUtf8("$boundaryMarker--\r\n")
+    }
+}
 
 private data class DriveFileMetadata(
     val id: String,
