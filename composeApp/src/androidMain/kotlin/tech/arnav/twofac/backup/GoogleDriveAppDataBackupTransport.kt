@@ -14,15 +14,26 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Tasks
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.request.accept
+import io.ktor.client.request.header
+import io.ktor.client.request.request
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
+import io.ktor.http.Url
 import java.io.ByteArrayOutputStream
-import java.net.HttpURLConnection
-import java.net.URI
-import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import io.ktor.http.URLBuilder
+import io.ktor.http.URLProtocol
+import io.ktor.http.appendPathSegments
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -53,6 +64,14 @@ class GoogleDriveAppDataBackupTransport(
     private val credentials: GoogleCloudCredentials? by lazy {
         loadGoogleCloudCredentials(context)
     }
+    private val httpClient = HttpClient(Android) {
+        expectSuccess = false
+        install(HttpTimeout) {
+            requestTimeoutMillis = NETWORK_TIMEOUT_MS.toLong()
+            connectTimeoutMillis = NETWORK_TIMEOUT_MS.toLong()
+            socketTimeoutMillis = NETWORK_TIMEOUT_MS.toLong()
+        }
+    }
 
     private val knownDescriptorsById = linkedMapOf<String, BackupDescriptor>()
 
@@ -68,53 +87,40 @@ class GoogleDriveAppDataBackupTransport(
         if (tokenResult is BackupResult.Failure) return tokenResult
         val accessToken = (tokenResult as BackupResult.Success).value
 
-        return withContext(Dispatchers.IO) {
-            val url = buildString {
-                append("$DRIVE_FILES_ENDPOINT?")
-                append("spaces=")
-                append(urlEncode("appDataFolder"))
-                append("&q=")
-                append(urlEncode("trashed=false and 'appDataFolder' in parents"))
-                append("&fields=")
-                append(urlEncode("files(id,name,createdTime,modifiedTime,size)"))
-                append("&pageSize=100")
+        val response = executeRequest(
+            method = HttpMethod.Get,
+            url = DRIVE_LIST_BACKUPS_URL,
+            accessToken = accessToken,
+        )
+        if (response is BackupResult.Failure) return response
+
+        val body = (response as BackupResult.Success).value
+        val descriptors = parseListResponse(body)
+            .filter { metadata ->
+                metadata.name.startsWith(BACKUP_FILE_PREFIX) && metadata.name.endsWith(".json")
             }
-
-            val response = executeRequest(
-                method = "GET",
-                url = url,
-                accessToken = accessToken,
-            )
-            if (response is BackupResult.Failure) return@withContext response
-
-            val body = (response as BackupResult.Success).value
-            val descriptors = parseListResponse(body)
-                .filter { metadata ->
-                    metadata.name.startsWith(BACKUP_FILE_PREFIX) && metadata.name.endsWith(".json")
-                }
-                .map { metadata ->
-                    val createdAt =
-                        metadata.createdAt
-                            ?: metadata.modifiedAt
-                            ?: parseTimestampFromFilename(metadata.name)
-                    BackupDescriptor(
-                        id = metadata.id,
-                        transportId = id,
-                        createdAt = createdAt,
-                        byteSize = metadata.size ?: 0L,
-                    )
-                }
-                .sortedByDescending { it.createdAt }
-
-            synchronized(knownDescriptorsById) {
-                knownDescriptorsById.clear()
-                descriptors.forEach { descriptor ->
-                    knownDescriptorsById[descriptor.id] = descriptor
-                }
+            .map { metadata ->
+                val createdAt =
+                    metadata.createdAt
+                        ?: metadata.modifiedAt
+                        ?: parseTimestampFromFilename(metadata.name)
+                BackupDescriptor(
+                    id = metadata.id,
+                    transportId = id,
+                    createdAt = createdAt,
+                    byteSize = metadata.size ?: 0L,
+                )
             }
+            .sortedByDescending { it.createdAt }
 
-            BackupResult.Success(descriptors)
+        synchronized(knownDescriptorsById) {
+            knownDescriptorsById.clear()
+            descriptors.forEach { descriptor ->
+                knownDescriptorsById[descriptor.id] = descriptor
+            }
         }
+
+        return BackupResult.Success(descriptors)
     }
 
     override suspend fun upload(
@@ -125,56 +131,54 @@ class GoogleDriveAppDataBackupTransport(
         if (tokenResult is BackupResult.Failure) return tokenResult
         val accessToken = (tokenResult as BackupResult.Success).value
 
-        return withContext(Dispatchers.IO) {
-            val boundary = "twofac-${UUID.randomUUID()}"
-            val metadata = JSONObject().apply {
-                put("name", descriptor.id)
-                put("parents", JSONArray().put("appDataFolder"))
-                put(
-                    "appProperties",
-                    JSONObject().apply {
-                        put("transport", id)
-                        put("logicalBackupId", descriptor.id)
-                        put("schemaVersion", descriptor.schemaVersion.toString())
-                        credentials?.projectId?.let { put("projectId", it) }
-                    }
-                )
-            }
-
-            val multipartBody = buildMultipartBody(
-                boundary = boundary,
-                metadataJson = metadata.toString(),
-                content = content,
+        val boundary = "twofac-${UUID.randomUUID()}"
+        val metadata = JSONObject().apply {
+            put("name", descriptor.id)
+            put("parents", JSONArray().put("appDataFolder"))
+            put(
+                "appProperties",
+                JSONObject().apply {
+                    put("transport", id)
+                    put("logicalBackupId", descriptor.id)
+                    put("schemaVersion", descriptor.schemaVersion.toString())
+                    credentials?.projectId?.let { put("projectId", it) }
+                }
             )
-
-            val response = executeRequest(
-                method = "POST",
-                url = "$DRIVE_UPLOAD_ENDPOINT?uploadType=multipart&fields=${urlEncode("id,name,createdTime,modifiedTime,size")}",
-                accessToken = accessToken,
-                contentType = "multipart/related; boundary=$boundary",
-                requestBody = multipartBody,
-            )
-            if (response is BackupResult.Failure) return@withContext response
-
-            val uploaded = parseFileMetadata((response as BackupResult.Success).value)
-                ?: return@withContext BackupResult.Failure(
-                    "Google Drive upload succeeded but response metadata was missing"
-                )
-
-            val uploadedDescriptor = BackupDescriptor(
-                id = uploaded.id,
-                transportId = id,
-                createdAt = uploaded.createdAt ?: descriptor.createdAt,
-                byteSize = uploaded.size ?: descriptor.byteSize,
-                schemaVersion = descriptor.schemaVersion,
-            )
-
-            synchronized(knownDescriptorsById) {
-                knownDescriptorsById[uploadedDescriptor.id] = uploadedDescriptor
-            }
-
-            BackupResult.Success(uploadedDescriptor)
         }
+
+        val multipartBody = buildMultipartBody(
+            boundary = boundary,
+            metadataJson = metadata.toString(),
+            content = content,
+        )
+
+        val response = executeRequest(
+            method = HttpMethod.Post,
+            url = DRIVE_MULTIPART_UPLOAD_URL,
+            accessToken = accessToken,
+            contentType = "multipart/related; boundary=$boundary",
+            requestBody = multipartBody,
+        )
+        if (response is BackupResult.Failure) return response
+
+        val uploaded = parseFileMetadata((response as BackupResult.Success).value)
+            ?: return BackupResult.Failure(
+                "Google Drive upload succeeded but response metadata was missing"
+            )
+
+        val uploadedDescriptor = BackupDescriptor(
+            id = uploaded.id,
+            transportId = id,
+            createdAt = uploaded.createdAt ?: descriptor.createdAt,
+            byteSize = uploaded.size ?: descriptor.byteSize,
+            schemaVersion = descriptor.schemaVersion,
+        )
+
+        synchronized(knownDescriptorsById) {
+            knownDescriptorsById[uploadedDescriptor.id] = uploadedDescriptor
+        }
+
+        return BackupResult.Success(uploadedDescriptor)
     }
 
     override suspend fun download(backupId: String): BackupResult<BackupBlob> {
@@ -182,30 +186,28 @@ class GoogleDriveAppDataBackupTransport(
         if (tokenResult is BackupResult.Failure) return tokenResult
         val accessToken = (tokenResult as BackupResult.Success).value
 
-        return withContext(Dispatchers.IO) {
-            val downloadResponse = executeRequest(
-                method = "GET",
-                url = "$DRIVE_FILES_ENDPOINT/${urlEncodePathSegment(backupId)}?alt=media",
-                accessToken = accessToken,
-            )
-            if (downloadResponse is BackupResult.Failure) return@withContext downloadResponse
-            val content = (downloadResponse as BackupResult.Success).value
+        val downloadResponse = executeRequest(
+            method = HttpMethod.Get,
+            url = driveFileContentUrl(backupId),
+            accessToken = accessToken,
+        )
+        if (downloadResponse is BackupResult.Failure) return downloadResponse
+        val content = (downloadResponse as BackupResult.Success).value
 
-            val knownDescriptor = synchronized(knownDescriptorsById) { knownDescriptorsById[backupId] }
-            val descriptor = knownDescriptor ?: BackupDescriptor(
-                id = backupId,
-                transportId = id,
-                createdAt = 0L,
-                byteSize = content.size.toLong(),
-            )
+        val knownDescriptor = synchronized(knownDescriptorsById) { knownDescriptorsById[backupId] }
+        val descriptor = knownDescriptor ?: BackupDescriptor(
+            id = backupId,
+            transportId = id,
+            createdAt = 0L,
+            byteSize = content.size.toLong(),
+        )
 
-            BackupResult.Success(
-                BackupBlob(
-                    content = content,
-                    descriptor = descriptor,
-                )
+        return BackupResult.Success(
+            BackupBlob(
+                content = content,
+                descriptor = descriptor,
             )
-        }
+        )
     }
 
     override suspend fun delete(backupId: String): BackupResult<Unit> {
@@ -213,19 +215,17 @@ class GoogleDriveAppDataBackupTransport(
         if (tokenResult is BackupResult.Failure) return tokenResult
         val accessToken = (tokenResult as BackupResult.Success).value
 
-        return withContext(Dispatchers.IO) {
-            val response = executeRequest(
-                method = "DELETE",
-                url = "$DRIVE_FILES_ENDPOINT/${urlEncodePathSegment(backupId)}",
-                accessToken = accessToken,
-            )
-            if (response is BackupResult.Failure) return@withContext response
+        val response = executeRequest(
+            method = HttpMethod.Delete,
+            url = driveFileUrl(backupId),
+            accessToken = accessToken,
+        )
+        if (response is BackupResult.Failure) return response
 
-            synchronized(knownDescriptorsById) {
-                knownDescriptorsById.remove(backupId)
-            }
-            BackupResult.Success(Unit)
+        synchronized(knownDescriptorsById) {
+            knownDescriptorsById.remove(backupId)
         }
+        return BackupResult.Success(Unit)
     }
 
     private suspend fun authorizeForDriveAccess(): BackupResult<String> {
@@ -306,27 +306,24 @@ class GoogleDriveAppDataBackupTransport(
     ): androidx.activity.result.ActivityResult {
         return suspendCancellableCoroutine { continuation ->
             val launcherKey = "twofac-gdrive-auth-${UUID.randomUUID()}"
-            var launcher: ActivityResultLauncher<IntentSenderRequest>? = null
+            lateinit var launcher: ActivityResultLauncher<IntentSenderRequest>
 
             launcher = activityResultRegistry.register(
                 launcherKey,
                 ActivityResultContracts.StartIntentSenderForResult(),
             ) { result ->
-                launcher?.unregister()
+                launcher.unregister()
                 if (continuation.isActive) continuation.resume(result)
             }
 
             continuation.invokeOnCancellation {
-                launcher?.unregister()
+                launcher.unregister()
             }
 
             try {
-                launcher?.launch(IntentSenderRequest.Builder(pendingIntent).build())
-                    ?: continuation.resumeWithException(
-                        IllegalStateException("Unable to start Google authorization flow")
-                    )
+                launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
             } catch (e: Exception) {
-                launcher?.unregister()
+                launcher.unregister()
                 continuation.resumeWithException(e)
             }
         }
@@ -411,51 +408,35 @@ class GoogleDriveAppDataBackupTransport(
         return out.toByteArray()
     }
 
-    private fun executeRequest(
-        method: String,
-        url: String,
+    private suspend fun executeRequest(
+        method: HttpMethod,
+        url: Url,
         accessToken: String,
         contentType: String? = null,
         requestBody: ByteArray? = null,
     ): BackupResult<ByteArray> {
-        val connection = (URI(url).toURL().openConnection() as HttpURLConnection).apply {
-            requestMethod = method
-            connectTimeout = NETWORK_TIMEOUT_MS
-            readTimeout = NETWORK_TIMEOUT_MS
-            setRequestProperty("Authorization", "Bearer $accessToken")
-            setRequestProperty("Accept", "application/json")
-            contentType?.let { setRequestProperty("Content-Type", it) }
-            doInput = true
-
-            if (requestBody != null) {
-                doOutput = true
-                outputStream.use { stream ->
-                    stream.write(requestBody)
-                }
-            }
-        }
-
         return try {
-            val statusCode = connection.responseCode
-            val body: ByteArray = if (statusCode in 200..299) {
-                connection.inputStream?.readBytes() ?: ByteArray(0)
-            } else {
-                connection.errorStream?.readBytes() ?: ByteArray(0)
+            val response = httpClient.request(url) {
+                this.method = method
+                header("Authorization", "Bearer $accessToken")
+                accept(ContentType.Application.Json)
+                contentType?.let { header("Content-Type", it) }
+                requestBody?.let { setBody(it) }
             }
+            val body: ByteArray = response.body()
 
-            if (statusCode !in 200..299) {
-                val message = parseApiError(
-                    statusCode = statusCode,
-                    response = body,
+            if (response.status.value !in 200..299) {
+                return BackupResult.Failure(
+                    parseApiError(
+                        statusCode = response.status.value,
+                        response = body,
+                    )
                 )
-                return BackupResult.Failure(message)
             }
 
             BackupResult.Success(body)
         } catch (e: Exception) {
             BackupResult.Failure("Google Drive request failed: ${e.message}", e)
-        } finally {
-            connection.disconnect()
         }
     }
 
@@ -475,12 +456,17 @@ class GoogleDriveAppDataBackupTransport(
         }
     }
 
-    private fun urlEncode(value: String): String =
-        URLEncoder.encode(value, StandardCharsets.UTF_8.name())
+    private fun driveFileUrl(backupId: String): Url = URLBuilder(DRIVE_FILES_ENDPOINT)
+        .apply {
+            appendPathSegments(backupId)
+        }
+        .build()
 
-    private fun urlEncodePathSegment(value: String): String =
-        URLEncoder.encode(value, StandardCharsets.UTF_8.name())
-            .replace("+", "%20")
+    private fun driveFileContentUrl(backupId: String): Url = URLBuilder(driveFileUrl(backupId).toString())
+        .apply {
+            parameters.append("alt", "media")
+        }
+        .build()
 }
 
 private data class GoogleCloudCredentials(
@@ -512,6 +498,23 @@ private fun loadGoogleCloudCredentials(context: Context): GoogleCloudCredentials
 
 private const val DRIVE_FILES_ENDPOINT = "https://www.googleapis.com/drive/v3/files"
 private const val DRIVE_UPLOAD_ENDPOINT = "https://www.googleapis.com/upload/drive/v3/files"
+private const val DRIVE_FILE_FIELDS = "id,name,createdTime,modifiedTime,size"
+private val DRIVE_LIST_BACKUPS_URL: Url = URLBuilder(DRIVE_FILES_ENDPOINT)
+    .apply {
+        parameters.append("spaces", "appDataFolder")
+        parameters.append("q", "trashed=false and 'appDataFolder' in parents")
+        parameters.append("fields", "files($DRIVE_FILE_FIELDS)")
+        parameters.append("pageSize", "100")
+    }
+    .build()
+
+private val DRIVE_MULTIPART_UPLOAD_URL: Url = URLBuilder(DRIVE_UPLOAD_ENDPOINT)
+    .apply {
+        parameters.append("uploadType", "multipart")
+        parameters.append("fields", DRIVE_FILE_FIELDS)
+    }
+    .build()
+
 private const val GOOGLE_DRIVE_APPDATA_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
 private const val GOOGLE_CLOUD_CREDENTIALS_ASSET = "google-cloud-credentials.json"
 private const val BACKUP_FILE_PREFIX = "twofac-backup-"
