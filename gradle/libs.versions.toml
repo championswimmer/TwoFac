@@ -77,6 +77,7 @@ kotlin = "2.3.10"
 ##  ⬆ = "2.3.20-Beta1"
 ##  ⬆ = "2.3.20-Beta2"
 ##  ⬆ = "2.3.20-RC"
+ktor = "3.4.1"
 kotlinx-io = "0.9.0"
 kotlinx-coroutines = "1.10.2"
 kotlinStdlib = "2.3.10"
@@ -208,4 +209,7 @@ compose-material3 = { module = "org.jetbrains.compose.material3:material3", vers
 kscan = { module = "io.github.ismai117:KScan", version.ref = "kscan" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
 filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekit" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }

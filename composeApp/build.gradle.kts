@@ -153,6 +153,8 @@ kotlin {
             implementation(libs.play.services.wearable)
             implementation(libs.play.services.auth)
             implementation(libs.kstore.file)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.android)
             implementation(libs.kotlin.multiplatform.appdirs)
             implementation(libs.kscan)
         }
