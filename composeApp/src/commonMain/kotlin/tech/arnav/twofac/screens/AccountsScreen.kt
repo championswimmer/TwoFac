@@ -116,6 +116,7 @@ fun AccountsScreen(
 
                 else -> {
                     LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(accounts) { account ->
