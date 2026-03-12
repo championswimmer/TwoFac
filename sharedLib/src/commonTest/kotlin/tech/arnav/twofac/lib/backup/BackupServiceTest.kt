@@ -132,6 +132,31 @@ class BackupServiceTest {
     }
 
     @Test
+    fun testRestoreSkipsAccountsAlreadyPresentByIssuerAccountDigitsSecretAndTimeInterval() = runTest {
+        val sourceLib = buildLib()
+        sourceLib.unlock("test-passkey")
+        sampleUris.forEach { sourceLib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val sourceService = BackupService(sourceLib, BackupTransportRegistry(listOf(transport)))
+        val createResult = sourceService.createBackup(transport.id)
+        assertTrue(createResult is BackupResult.Success)
+
+        val freshLib = buildLib()
+        freshLib.unlock("test-passkey")
+        freshLib.addAccount(
+            "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub&algorithm=SHA256"
+        )
+
+        val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
+        val restoreResult = restoreService.restoreBackup(transport.id, createResult.value.id)
+
+        assertTrue(restoreResult is BackupResult.Success)
+        assertEquals(1, restoreResult.value, "Only new accounts should be imported from backup")
+        assertEquals(2, freshLib.getAllAccounts().size, "Duplicate account should be skipped")
+    }
+
+    @Test
     fun testUnknownProviderReturnsFailure() = runTest {
         val lib = buildLib()
         lib.unlock("test-passkey")

@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib.backup
 
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.otp.isEquivalent
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -78,17 +79,28 @@ class BackupService(
         }
 
         val uris = payload.accounts
-        try {
-            uris.forEach(OtpAuthURI::parse)
+        val parsedBackupAccounts = try {
+            uris.map(OtpAuthURI::parse)
         } catch (e: Exception) {
             return BackupResult.Failure("Backup payload contains invalid account URI: ${e.message}", e)
         }
+        val existingAccounts = try {
+            twoFacLib.exportAccountURIs()
+                .map(OtpAuthURI::parse)
+                .toMutableList()
+        } catch (e: Exception) {
+            return BackupResult.Failure("Failed to read existing accounts: ${e.message}", e)
+        }
 
         var imported = 0
-        for (uri in uris) {
+        for ((uri, parsedBackupAccount) in uris.zip(parsedBackupAccounts)) {
+            if (existingAccounts.any { it.isEquivalent(parsedBackupAccount) }) continue
             try {
-                twoFacLib.addAccount(uri)
-                imported++
+                val added = twoFacLib.addAccount(uri)
+                if (added) {
+                    existingAccounts += parsedBackupAccount
+                    imported++
+                }
             } catch (_: Exception) {
                 // skip individual failures; caller can compare count to total
             }
