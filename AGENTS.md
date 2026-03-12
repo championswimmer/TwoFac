@@ -54,3 +54,11 @@ To keep this file concise, module-specific guidance is in:
 - `iosApp/AGENTS.md`
 
 `androidApp` intentionally has no dedicated `AGENTS.md`; it remains a thin Android wrapper around `composeApp`.
+
+## Google Cloud credentials files
+
+- `androidApp/src/main/assets/google-cloud-credentials.json`
+- `composeApp/src/desktopMain/google-cloud-credentials.json`
+- `iosApp/google-cloud-credentials.plist`
+
+Credential files such as `google-cloud-credentials.json` and `google-cloud-credentials.plist` are gitignored for security reasons and must not be committed.
