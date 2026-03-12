@@ -151,6 +151,7 @@ kotlin {
             implementation(libs.androidx.biometric)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.play.services.wearable)
+            implementation(libs.play.services.auth)
             implementation(libs.kstore.file)
             implementation(libs.kotlin.multiplatform.appdirs)
             implementation(libs.kscan)

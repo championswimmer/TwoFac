@@ -20,7 +20,9 @@ class TwoFacApplication : Application() {
                     MainActivity.currentActivityOrThrow()
                 },
                 androidQrModule,
-                androidBackupModule,
+                androidBackupModule(this@TwoFacApplication) {
+                    MainActivity.currentActivityOrThrow()
+                },
             )
         }
     }

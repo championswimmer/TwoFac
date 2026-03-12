@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import tech.arnav.twofac.backup.GoogleDriveAppDataBackupTransport
 import tech.arnav.twofac.backup.LocalFileBackupTransport
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
+import tech.arnav.twofac.lib.backup.BackupProviderIds
 import tech.arnav.twofac.lib.backup.BackupTransport
 import tech.arnav.twofac.qr.AndroidCameraQRCodeReader
 import tech.arnav.twofac.qr.CameraQRCodeReader
@@ -46,8 +48,17 @@ val androidQrModule = module {
     single<CameraQRCodeReader> { AndroidCameraQRCodeReader() }
 }
 
-val androidBackupModule = module {
-    single<BackupTransport>(named("local")) {
+fun androidBackupModule(
+    appContext: Context,
+    activityProvider: () -> FragmentActivity,
+) = module {
+    single<BackupTransport>(named(BackupProviderIds.LOCAL)) {
         LocalFileBackupTransport()
+    }
+    single<BackupTransport>(named(BackupProviderIds.GOOGLE_DRIVE_APPDATA)) {
+        GoogleDriveAppDataBackupTransport(
+            appContext = appContext,
+            activityProvider = activityProvider,
+        )
     }
 }
