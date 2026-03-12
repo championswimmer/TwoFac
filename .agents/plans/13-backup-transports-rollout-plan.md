@@ -4,7 +4,7 @@ status: In Progress
 progress:
   - "[x] Phase 0 - Refactor current single-transport code into a multi-transport registry"
   - "[x] Phase 1 - Define provider capability metadata and single-provider automatic restore policy"
-  - "[ ] Phase 2 - Implement Apple iCloud transport and entitlement wiring"
+  - "[x] Phase 2 - Implement Apple iCloud transport and entitlement wiring (iOS complete; macOS parity follow-up pending)"
   - "[ ] Phase 3 - Implement Google Drive appDataFolder transport across supported platforms"
   - "[ ] Phase 4 - Ship manual backup and restore UX for every available provider"
   - "[ ] Phase 5 - Add automatic restore guardrails, tests, and rollout hardening"
@@ -226,22 +226,32 @@ Automatic restore should come only after provider identity, remote markers, and 
 
 ### Phase 2 - Implement Apple iCloud transport and entitlement wiring
 
+Implementation update:
+
+- ✅ iOS now registers an `icloud` backup transport in `composeApp/src/iosMain`.
+- ✅ iOS host entitlements now include iCloud Documents (ubiquity container) capability and container identifier.
+- ✅ Manual transport operations are wired for availability, upload, list, download, and delete.
+- 🚧 macOS parity remains intentionally deferred and is tracked as explicit follow-up scope below.
+
 13. Choose Apple backend.
-    - Prefer **CloudKit private database** for app-private backup snapshots.
+    - For this rollout, use **iCloud Drive ubiquity container files** for the simplest operational model.
+    - Keep each backup as a file under the app's iCloud Documents scope so iOS handles sync automatically.
     - Do not use key-value storage for backups.
-    - Avoid tying the shared contract to CloudKit-specific types.
+    - Keep shared contracts provider-neutral.
 
 14. Build Apple-native provider client in Apple source sets.
     - Provider implementation should live behind Apple-native code (`iosMain`, with host app support from `iosApp`).
     - Shared code only sees `BackupTransport`.
 
 15. Define Apple backup record shape.
-    - one logical backup snapshot per record
-    - metadata: logical backup ID, createdAt, schema version, checksum, payload size
-    - payload stored in a record-friendly blob/asset field as appropriate
+    - one logical backup snapshot per file
+    - filename carries logical backup ID/timestamp
+    - file metadata (size/date) read from filesystem attributes when listing
 
 16. Wire entitlements and container setup.
-    - Enable the needed iCloud / CloudKit capability in the Apple host app
+    - Enable iCloud Documents capability in the Apple host app
+    - Use `com.apple.developer.ubiquity-container-identifiers` with the selected `iCloud.*` container
+    - Use `com.apple.developer.icloud-services` with `CloudDocuments`
     - Keep container naming/configuration documented in the plan as implementation proceeds
 
 17. Manual provider operations.
@@ -261,6 +271,13 @@ Automatic restore should come only after provider identity, remote markers, and 
     - The current repository has iOS native hosting (`iosApp`) but not a native macOS Apple host module.
     - Because current desktop packaging is JVM-based, macOS iCloud support needs a verified entitlement/bridge story before registration can be enabled there.
     - Do not block iPhone/iOS delivery on unresolved macOS packaging work; keep macOS parity as an explicit follow-up subphase if needed.
+    - Follow-up work required for macOS parity:
+      - decide host architecture: native Apple macOS host target vs. Compose Desktop entitlement bridge strategy
+      - establish a signed macOS target that can carry iCloud Documents ubiquity entitlements and the same iCloud container
+      - add a macOS-specific backup transport registration path once entitlement hosting is validated
+      - verify ubiquity-container availability, file sync/list/upload/download/delete on macOS devices
+      - add conflict-handling/file-coordination validation for concurrent edits across Apple devices
+      - add CI/build documentation for macOS entitlement signing and container provisioning
 
 ### Phase 3 - Implement Google Drive `appDataFolder` transport across supported platforms
 
