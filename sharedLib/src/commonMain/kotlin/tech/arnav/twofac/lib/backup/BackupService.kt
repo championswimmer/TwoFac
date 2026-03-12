@@ -17,6 +17,12 @@ class BackupService(
     private val twoFacLib: TwoFacLib,
     private val transportRegistry: BackupTransportRegistry,
 ) {
+    private data class AccountFingerprint(
+        val issuer: String,
+        val account: String,
+        val secret: String,
+    )
+
     private var backupSequence = 0L
 
     suspend fun listProviders(): List<BackupProvider> = transportRegistry.providerInfo()
@@ -78,17 +84,30 @@ class BackupService(
         }
 
         val uris = payload.accounts
-        try {
-            uris.forEach(OtpAuthURI::parse)
+        val parsedBackupAccounts = try {
+            uris.map(OtpAuthURI::parse)
         } catch (e: Exception) {
             return BackupResult.Failure("Backup payload contains invalid account URI: ${e.message}", e)
         }
+        val existingFingerprints = try {
+            twoFacLib.exportAccountURIs()
+                .map(OtpAuthURI::parse)
+                .map(::fingerprint)
+                .toMutableSet()
+        } catch (e: Exception) {
+            return BackupResult.Failure("Failed to read existing accounts: ${e.message}", e)
+        }
 
         var imported = 0
-        for (uri in uris) {
+        for ((index, parsedBackupAccount) in parsedBackupAccounts.withIndex()) {
+            val backupFingerprint = fingerprint(parsedBackupAccount)
+            if (backupFingerprint in existingFingerprints) continue
             try {
-                twoFacLib.addAccount(uri)
-                imported++
+                val added = twoFacLib.addAccount(uris[index])
+                if (added) {
+                    existingFingerprints += backupFingerprint
+                    imported++
+                }
             } catch (_: Exception) {
                 // skip individual failures; caller can compare count to total
             }
@@ -98,5 +117,13 @@ class BackupService(
 
     private fun resolveTransport(providerId: String): BackupTransport? {
         return transportRegistry.findById(providerId)
+    }
+
+    private fun fingerprint(otp: tech.arnav.twofac.lib.otp.OTP): AccountFingerprint {
+        return AccountFingerprint(
+            issuer = otp.issuer ?: "",
+            account = otp.accountName,
+            secret = otp.secret,
+        )
     }
 }
