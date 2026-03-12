@@ -444,6 +444,8 @@ private data class GoogleCloudCredentials(
     val projectId: String?,
 )
 
+// Ktor's MultiPartFormDataContent always emits Content-Disposition: form-data headers
+// for each part, but Google Drive uploadType=multipart expects multipart/related.
 private class GoogleDriveMultipartRelatedContent(
     private val metadataJson: String,
     private val content: ByteArray,
