@@ -29,7 +29,7 @@ This means:
 
 - **Encrypted backup** = export `StoredAccount` entries (encryptedURI + salt + label) as-is.
 - **Plaintext backup** = existing behavior: decrypt each URI before export.
-- **Restore from encrypted backup** = user must provide the passkey that was used at encryption time so each entry can be re-imported.
+- **Restore from encrypted backup** = user provides the backup passkey to decrypt, then accounts are re-encrypted with the current app passkey before saving.
 
 ---
 
@@ -172,30 +172,58 @@ Update `BackupService.restoreBackup()` to handle both payload types:
 
 **Encrypted payload** (`encrypted == true`):
 
-1. Read `encryptedAccounts` from the payload.
-2. For each `EncryptedAccountEntry`:
-   a. Reconstruct a `StoredAccount` (derive accountID from salt, use provided label/salt/encryptedURI).
-   b. Save the `StoredAccount` directly to storage via `storage.saveAccount()`.
-3. This preserves the original encryption — the accounts are stored as-is without needing the passkey at restore time for decryption.
+The restore flow uses a **decrypt-then-re-encrypt** approach. The backup's encrypted accounts may have been created with a different passkey than the current app passkey, so the flow must handle both passkeys explicitly.
 
-**Important nuance**: On restore of encrypted entries, the accounts are written with their _original_ encryption. This means:
+#### Restore steps for encrypted payloads
 
-- The user must use the **same passkey** that was active when the backup was created in order to later unlock and use those accounts.
-- If the user's current passkey differs from the backup's passkey, the restored accounts will fail to decrypt at use time.
-- The restore flow should **warn the user** that encrypted backups require the same passkey.
+1. **Prompt the user for the backup passkey** — the passkey that was active when the backup was created. The prompt must clearly state:
+   > "Enter the passkey that was used when this backup was created (needed to decrypt the backup accounts)"
+2. **Decrypt each `EncryptedAccountEntry`** using the backup passkey:
+   a. For each entry, derive the decryption key via `PBKDF2-SHA256(backupPasskey, entry.salt)`.
+   b. Decrypt `entry.encryptedURI` using AES-GCM with that key → obtain plaintext `otpauth://` URI.
+   c. Validate the decrypted URI via `OtpAuthURI.parse()`. If any entry fails to decrypt, abort and report that the backup passkey is incorrect.
+3. **Prompt the user for the current app passkey** — the passkey to use for re-encrypting the accounts in local storage. The prompt must clearly state:
+   > "Enter your current app passkey (needed to save the restored accounts to your device)"
+4. **Re-encrypt and save each account** using the current app passkey:
+   a. For each decrypted plaintext URI, call `twoFacLib.addAccount(uri)` — which re-encrypts with the current passkey and saves to storage.
+   b. Apply the same deduplication logic used for plaintext restore (skip accounts that already exist).
 
-Alternative approach (more user-friendly, can be evaluated during implementation):
+This approach ensures encrypted backups are fully portable across devices and passkey changes — the user only needs to remember the passkey from when the backup was created.
 
-- At restore time, ask the user for the passkey that was used to create the backup.
-- Attempt to decrypt each `EncryptedAccountEntry` using that passkey to validate it works.
-- Then re-encrypt each URI with the **current** passkey before saving.
-- This adds a validation step but allows restoring encrypted backups even when the passkey has changed.
+#### API surface
+
+Add a new `restoreBackup` overload or parameter to `BackupService` that accepts both passkeys:
+
+```kotlin
+suspend fun restoreBackup(
+    providerId: String,
+    backupId: String,
+    backupPasskey: String? = null,   // required when payload.encrypted == true
+    currentPasskey: String? = null,  // required when payload.encrypted == true
+): BackupResult<RestoreResult>
+```
+
+Alternatively, `BackupService.restoreBackup()` can return a result indicating the payload is encrypted, and the caller (UI/CLI) handles the passkey prompts before calling a second method:
+
+```kotlin
+// Step 1: detect payload type
+suspend fun inspectBackup(providerId: String, backupId: String): BackupInspection
+
+// Step 2: restore with passkeys if encrypted
+suspend fun restoreEncryptedBackup(
+    providerId: String,
+    backupId: String,
+    backupPasskey: String,
+): BackupResult<RestoreResult>
+```
+
+The exact API shape should be finalized during implementation; the key requirement is that the UI/CLI layer can prompt for passkeys with clear purpose labels before the restore proceeds.
 
 #### Files to change
 
-- `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/backup/BackupService.kt` — branch restore logic based on `payload.encrypted`.
-- `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/TwoFacLib.kt` — optionally add a method to import `StoredAccount` objects directly, or to decrypt-then-re-encrypt with current passkey.
-- `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/storage/Storage.kt` — ensure `saveAccount(StoredAccount)` is available (it likely already is).
+- `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/backup/BackupService.kt` — branch restore logic based on `payload.encrypted`, add decrypt-then-re-encrypt flow.
+- `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/TwoFacLib.kt` — add a method to decrypt an `EncryptedAccountEntry` using a provided passkey (reusing existing `StorageUtils` crypto).
+- `sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/storage/StorageUtils.kt` — ensure decrypt-with-arbitrary-passkey is exposed (may already be available).
 
 ### Phase 3 — Surface encryption choice in Compose UI
 
@@ -203,15 +231,33 @@ Add a toggle or option in the backup section of `SettingsScreen`:
 
 - When the user initiates a manual backup, present a choice:
   - **Plaintext backup** (current default) — readable export, no passkey needed to restore.
-  - **Encrypted backup** — secrets remain encrypted, requires same passkey to use after restore.
+  - **Encrypted backup** — secrets remain encrypted, requires backup passkey to restore.
 - Pass the chosen mode to `BackupService.createBackup(providerId, encrypted)`.
-- When restoring, detect `encrypted` flag in the payload and show appropriate messaging:
-  - For encrypted backups: inform the user that they must be using the same passkey that was active when the backup was created.
+
+#### Restore flow — passkey prompts for encrypted backups
+
+When restoring a backup that contains encrypted accounts (`encrypted == true`), the UI must prompt the user for passkeys in two steps with **clear purpose labels**:
+
+1. **Backup passkey dialog** — shown after detecting an encrypted payload:
+   - Title: "Backup Passkey Required"
+   - Body: "This backup contains encrypted accounts. Enter the passkey that was used when this backup was created."
+   - Input: passkey text field
+   - Actions: Cancel / Continue
+   - On failure (decryption fails): show error "Incorrect passkey — could not decrypt the backup accounts. Please try again."
+
+2. **Current app passkey dialog** — shown after successful decryption:
+   - Title: "Save to Device"
+   - Body: "Enter your current app passkey to save the restored accounts to your device."
+   - Input: passkey text field
+   - Actions: Cancel / Save
+   - This step re-encrypts the decrypted accounts with the current passkey before saving.
+
+For plaintext backups, no passkey dialogs are needed (existing behavior).
 
 #### Files to change
 
-- `composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/SettingsScreen.kt` — add encryption toggle to backup UI section.
-- Potentially a new composable for backup options dialog/bottom-sheet.
+- `composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/SettingsScreen.kt` — add encryption toggle to backup UI section, add passkey prompt dialogs for encrypted restore.
+- Potentially a new composable for the passkey prompt dialog (reusable for both steps).
 
 ### Phase 4 — Surface encryption choice in CLI
 
@@ -223,11 +269,30 @@ twofac backup restore --provider local <backup-id>
 ```
 
 - `--encrypted` flag on create: passes `encrypted = true` to `BackupService.createBackup()`.
-- Restore auto-detects whether the backup is encrypted from the payload and prints appropriate messages.
+- Restore auto-detects whether the backup is encrypted from the payload.
+
+#### Restore flow — passkey prompts for encrypted backups (CLI)
+
+When the CLI detects an encrypted backup during restore, it must prompt for passkeys with **clear purpose labels**:
+
+1. **Backup passkey prompt**:
+   ```
+   This backup contains encrypted accounts.
+   Enter the passkey used when this backup was created (to decrypt): 
+   ```
+   - On failure: print error `Error: Incorrect passkey — could not decrypt the backup accounts.` and exit with non-zero code.
+
+2. **Current app passkey prompt** (after successful decryption):
+   ```
+   Enter your current app passkey (to save restored accounts to storage): 
+   ```
+   - Proceed to re-encrypt and save.
+
+For plaintext backups, no passkey prompts are needed (existing behavior).
 
 #### Files to change
 
-- `cliApp/src/commonMain/kotlin/tech/arnav/twofac/cli/commands/BackupCommand.kt` — add `--encrypted` option to create subcommand.
+- `cliApp/src/commonMain/kotlin/tech/arnav/twofac/cli/commands/BackupCommand.kt` — add `--encrypted` option to create subcommand, add interactive passkey prompts for encrypted restore.
 
 ### Phase 5 — Tests and validation
 
@@ -243,7 +308,9 @@ twofac backup restore --provider local <backup-id>
    - `createBackup(encrypted = false)` → verify payload contains plaintext URIs.
    - `createBackup(encrypted = true)` → verify payload contains encrypted entries with correct salt/encryptedURI from storage.
    - `restoreBackup()` of plaintext payload → verify accounts added via `addAccount()`.
-   - `restoreBackup()` of encrypted payload → verify `StoredAccount` entries written to storage.
+   - `restoreBackup()` of encrypted payload with correct backup passkey → verify accounts are decrypted then re-encrypted with current passkey and saved.
+   - `restoreBackup()` of encrypted payload with wrong backup passkey → verify decryption failure is reported.
+   - `restoreBackup()` of encrypted payload with deduplication → verify existing accounts are skipped.
 
 3. **Backward compatibility**:
    - A v1 backup file (no `encrypted` field) decodes as plaintext with `encrypted = false`.
@@ -251,8 +318,9 @@ twofac backup restore --provider local <backup-id>
 #### Integration / manual tests
 
 - Create plaintext backup → restore → verify OTP codes match.
-- Create encrypted backup → restore on same vault with same passkey → verify OTP codes match.
-- Create encrypted backup → attempt restore with different passkey → verify appropriate error or warning.
+- Create encrypted backup → restore on same device with same passkey → verify OTP codes match.
+- Create encrypted backup → restore on different device with different current passkey → provide backup passkey when prompted → verify accounts are decrypted and re-encrypted with new passkey.
+- Create encrypted backup → attempt restore with wrong backup passkey → verify clear error message.
 - Create backup on one platform → restore on another platform → verify cross-platform compatibility.
 
 ---
@@ -319,9 +387,11 @@ twofac backup restore --provider local <backup-id>
 
 3. **Transport-agnostic**: the encryption choice is at the payload level, not the transport level. Both local and cloud transports can carry either plaintext or encrypted payloads. This is orthogonal to any transport-level encryption (e.g., Google Drive or iCloud encryption).
 
-4. **Passkey coupling**: encrypted backups are tied to the passkey used at creation time. This is an intentional trade-off — we avoid adding a separate backup password or key exchange mechanism and instead reuse the existing storage encryption as-is.
+4. **Decrypt-then-re-encrypt on restore**: when restoring encrypted backups, the flow always decrypts with the backup passkey and re-encrypts with the current app passkey. This makes encrypted backups fully portable — they work across devices and passkey changes. The user only needs to remember the passkey from when the backup was created.
 
 5. **Label visibility**: `accountLabel` remains in cleartext in encrypted backups. This allows the UI to display which accounts are in a backup without requiring decryption. The sensitive data (the OTP secret within the URI) is protected by the encryption.
+
+6. **Clear passkey purpose labels**: both Compose UI and CLI must clearly distinguish the two passkeys asked during encrypted restore — the "backup passkey" (to decrypt) and the "current app passkey" (to save). This avoids confusion when the user has changed their passkey since creating the backup.
 
 ---
 
@@ -335,7 +405,7 @@ twofac backup restore --provider local <backup-id>
 
 ## Open questions to resolve during implementation
 
-1. **Restore with different passkey**: should the restore flow require the original passkey and re-encrypt with the current one, or should it write the encrypted entries as-is (requiring the same passkey)? The re-encrypt approach is more user-friendly but adds complexity.
+1. ~~**Restore with different passkey**~~: **Resolved** — the restore flow will always decrypt with the backup passkey and re-encrypt with the current app passkey. This is the definitive approach (see Phase 2).
 
 2. **Default encryption mode**: should encrypted backup be the default for cloud transports? Plan 00 suggested "encrypted-by-default for cloud providers" — this feature could enable that by defaulting `encrypted = true` for non-local transports.
 
