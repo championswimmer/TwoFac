@@ -1,0 +1,5 @@
+
+- status: pending
+  task: >
+    we also need to refactor AutomaticRestorePolicy to BackupRestorePolicy and the enum inside it AutomaticRestoreDecision to just BackupRestoreDecison and write more
+    ktdoc comments in that file to make it more descriptive what each part does

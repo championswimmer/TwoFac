@@ -342,7 +342,7 @@ fun SettingsScreen(
                                             append(if (provider.isAvailable) "Available" else "Unavailable")
                                             append(" • ")
                                             append(provider.id)
-                                            if (provider.requiresAuthentication) {
+                                            if (provider.requiresAuthentication && !provider.isAvailable) {
                                                 append(" • Sign-in required")
                                             }
                                         },
