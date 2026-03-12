@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class AutomaticRestorePolicyTest {
+class BackupRestorePolicyTest {
 
     private fun provider(
         id: String,
@@ -23,13 +23,13 @@ class AutomaticRestorePolicyTest {
 
     @Test
     fun testAutomaticRestoreIsDisabledByDefault() {
-        val decision = AutomaticRestorePolicy.evaluateAutomaticRestore(
+        val decision = BackupRestorePolicy.evaluateAutomaticRestore(
             preferences = BackupPreferences(),
             localAccountCount = 0,
             remoteMarker = BackupRemoteMarker(remoteId = "remote-1"),
         )
 
-        assertEquals(AutomaticRestoreDecision.DISABLED, decision)
+        assertEquals(BackupRestoreDecison.DISABLED, decision)
     }
 
     @Test
@@ -39,7 +39,7 @@ class AutomaticRestorePolicyTest {
             provider(BackupProviderIds.ICLOUD, supportsAutomaticRestore = true),
         )
 
-        val result = AutomaticRestorePolicy.selectAutomaticRestoreProvider(
+        val result = BackupRestorePolicy.selectAutomaticRestoreProvider(
             preferences = BackupPreferences(),
             providers = providers,
             providerId = BackupProviderIds.ICLOUD,
@@ -56,7 +56,7 @@ class AutomaticRestorePolicyTest {
     fun testAutomaticRestoreSelectionRejectsIneligibleProvider() {
         val providers = listOf(provider(BackupProviderIds.LOCAL, supportsAutomaticRestore = false))
 
-        val result = AutomaticRestorePolicy.selectAutomaticRestoreProvider(
+        val result = BackupRestorePolicy.selectAutomaticRestoreProvider(
             preferences = BackupPreferences(),
             providers = providers,
             providerId = BackupProviderIds.LOCAL,
@@ -69,14 +69,14 @@ class AutomaticRestorePolicyTest {
     fun testAutomaticRestoreSelectionCanBeCleared() {
         val providers = listOf(provider(BackupProviderIds.ICLOUD, supportsAutomaticRestore = true))
 
-        val selected = AutomaticRestorePolicy.selectAutomaticRestoreProvider(
+        val selected = BackupRestorePolicy.selectAutomaticRestoreProvider(
             preferences = BackupPreferences(),
             providers = providers,
             providerId = BackupProviderIds.ICLOUD,
         )
         val selectedPreferences = assertIs<BackupResult.Success<BackupPreferences>>(selected).value
 
-        val cleared = AutomaticRestorePolicy.selectAutomaticRestoreProvider(
+        val cleared = BackupRestorePolicy.selectAutomaticRestoreProvider(
             preferences = selectedPreferences,
             providers = providers,
             providerId = null,
@@ -93,14 +93,14 @@ class AutomaticRestorePolicyTest {
             provider(BackupProviderIds.GOOGLE_DRIVE_APPDATA, supportsAutomaticRestore = true),
         )
 
-        val first = AutomaticRestorePolicy.selectAutomaticRestoreProvider(
+        val first = BackupRestorePolicy.selectAutomaticRestoreProvider(
             preferences = BackupPreferences(),
             providers = providers,
             providerId = BackupProviderIds.ICLOUD,
         )
         val firstSuccess = assertIs<BackupResult.Success<BackupPreferences>>(first)
 
-        val second = AutomaticRestorePolicy.selectAutomaticRestoreProvider(
+        val second = BackupRestorePolicy.selectAutomaticRestoreProvider(
             preferences = firstSuccess.value,
             providers = providers,
             providerId = BackupProviderIds.GOOGLE_DRIVE_APPDATA,
@@ -117,21 +117,21 @@ class AutomaticRestorePolicyTest {
         val preferences = BackupPreferences(selectedAutomaticRestoreProviderId = BackupProviderIds.ICLOUD)
         val marker = BackupRemoteMarker(remoteId = "record-1", modifiedAt = 123)
 
-        val decisionWithoutConfirmation = AutomaticRestorePolicy.evaluateAutomaticRestore(
+        val decisionWithoutConfirmation = BackupRestorePolicy.evaluateAutomaticRestore(
             preferences = preferences,
             localAccountCount = 2,
             remoteMarker = marker,
             userConfirmedOnNonEmptyVault = false,
         )
-        assertEquals(AutomaticRestoreDecision.REQUIRES_USER_CONFIRMATION, decisionWithoutConfirmation)
+        assertEquals(BackupRestoreDecison.REQUIRES_USER_CONFIRMATION, decisionWithoutConfirmation)
 
-        val decisionWithConfirmation = AutomaticRestorePolicy.evaluateAutomaticRestore(
+        val decisionWithConfirmation = BackupRestorePolicy.evaluateAutomaticRestore(
             preferences = preferences,
             localAccountCount = 2,
             remoteMarker = marker,
             userConfirmedOnNonEmptyVault = true,
         )
-        assertEquals(AutomaticRestoreDecision.READY, decisionWithConfirmation)
+        assertEquals(BackupRestoreDecison.READY, decisionWithConfirmation)
     }
 
     @Test
@@ -146,13 +146,13 @@ class AutomaticRestorePolicyTest {
             ),
         )
 
-        val decision = AutomaticRestorePolicy.evaluateAutomaticRestore(
+        val decision = BackupRestorePolicy.evaluateAutomaticRestore(
             preferences = preferences,
             localAccountCount = 0,
             remoteMarker = marker,
         )
 
-        assertEquals(AutomaticRestoreDecision.ALREADY_CONSUMED, decision)
+        assertEquals(BackupRestoreDecison.ALREADY_CONSUMED, decision)
     }
 
     @Test

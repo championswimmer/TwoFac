@@ -14,27 +14,6 @@ public final class tech/arnav/twofac/lib/TwoFacLib {
 	public final fun unlock (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class tech/arnav/twofac/lib/backup/AutomaticRestoreDecision : java/lang/Enum {
-	public static final field ALREADY_CONSUMED Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-	public static final field DISABLED Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-	public static final field NO_REMOTE_MARKER Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-	public static final field READY Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-	public static final field REQUIRES_USER_CONFIRMATION Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-	public static fun values ()[Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-}
-
-public final class tech/arnav/twofac/lib/backup/AutomaticRestorePolicy {
-	public static final field INSTANCE Ltech/arnav/twofac/lib/backup/AutomaticRestorePolicy;
-	public final fun evaluateAutomaticRestore (Ltech/arnav/twofac/lib/backup/BackupPreferences;ILtech/arnav/twofac/lib/backup/BackupRemoteMarker;Z)Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-	public static synthetic fun evaluateAutomaticRestore$default (Ltech/arnav/twofac/lib/backup/AutomaticRestorePolicy;Ltech/arnav/twofac/lib/backup/BackupPreferences;ILtech/arnav/twofac/lib/backup/BackupRemoteMarker;ZILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/AutomaticRestoreDecision;
-	public final fun markObservedRemoteMarker (Ltech/arnav/twofac/lib/backup/BackupPreferences;Ljava/lang/String;Ltech/arnav/twofac/lib/backup/BackupRemoteMarker;)Ltech/arnav/twofac/lib/backup/BackupPreferences;
-	public final fun markSuccessfulBackup (Ltech/arnav/twofac/lib/backup/BackupPreferences;Ljava/lang/String;J)Ltech/arnav/twofac/lib/backup/BackupPreferences;
-	public final fun markSuccessfulRestore (Ltech/arnav/twofac/lib/backup/BackupPreferences;Ljava/lang/String;JLtech/arnav/twofac/lib/backup/BackupRemoteMarker;)Ltech/arnav/twofac/lib/backup/BackupPreferences;
-	public final fun selectAutomaticRestoreProvider (Ltech/arnav/twofac/lib/backup/BackupPreferences;Ljava/util/List;Ljava/lang/String;)Ltech/arnav/twofac/lib/backup/BackupResult;
-}
-
 public final class tech/arnav/twofac/lib/backup/BackupBlob {
 	public fun <init> ([BLtech/arnav/twofac/lib/backup/BackupDescriptor;)V
 	public final fun component1 ()[B
@@ -193,6 +172,27 @@ public final class tech/arnav/twofac/lib/backup/BackupRemoteMarker {
 	public final fun getVersionToken ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class tech/arnav/twofac/lib/backup/BackupRestoreDecison : java/lang/Enum {
+	public static final field ALREADY_CONSUMED Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+	public static final field DISABLED Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+	public static final field NO_REMOTE_MARKER Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+	public static final field READY Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+	public static final field REQUIRES_USER_CONFIRMATION Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+	public static fun values ()[Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+}
+
+public final class tech/arnav/twofac/lib/backup/BackupRestorePolicy {
+	public static final field INSTANCE Ltech/arnav/twofac/lib/backup/BackupRestorePolicy;
+	public final fun evaluateAutomaticRestore (Ltech/arnav/twofac/lib/backup/BackupPreferences;ILtech/arnav/twofac/lib/backup/BackupRemoteMarker;Z)Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+	public static synthetic fun evaluateAutomaticRestore$default (Ltech/arnav/twofac/lib/backup/BackupRestorePolicy;Ltech/arnav/twofac/lib/backup/BackupPreferences;ILtech/arnav/twofac/lib/backup/BackupRemoteMarker;ZILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupRestoreDecison;
+	public final fun markObservedRemoteMarker (Ltech/arnav/twofac/lib/backup/BackupPreferences;Ljava/lang/String;Ltech/arnav/twofac/lib/backup/BackupRemoteMarker;)Ltech/arnav/twofac/lib/backup/BackupPreferences;
+	public final fun markSuccessfulBackup (Ltech/arnav/twofac/lib/backup/BackupPreferences;Ljava/lang/String;J)Ltech/arnav/twofac/lib/backup/BackupPreferences;
+	public final fun markSuccessfulRestore (Ltech/arnav/twofac/lib/backup/BackupPreferences;Ljava/lang/String;JLtech/arnav/twofac/lib/backup/BackupRemoteMarker;)Ltech/arnav/twofac/lib/backup/BackupPreferences;
+	public final fun selectAutomaticRestoreProvider (Ltech/arnav/twofac/lib/backup/BackupPreferences;Ljava/util/List;Ljava/lang/String;)Ltech/arnav/twofac/lib/backup/BackupResult;
 }
 
 public abstract class tech/arnav/twofac/lib/backup/BackupResult {

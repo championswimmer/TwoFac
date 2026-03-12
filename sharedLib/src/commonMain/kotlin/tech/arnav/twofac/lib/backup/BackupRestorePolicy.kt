@@ -2,18 +2,41 @@ package tech.arnav.twofac.lib.backup
 
 import tech.arnav.twofac.lib.PublicApi
 
+/**
+ * Outcome of evaluating whether a backup restore flow should start automatically.
+ */
 @PublicApi
-enum class AutomaticRestoreDecision {
+enum class BackupRestoreDecison {
+    /** No automatic restore provider is configured in preferences. */
     DISABLED,
+
+    /** A provider is configured, but the remote source currently has no marker to restore from. */
     NO_REMOTE_MARKER,
+
+    /** The current remote marker has already been consumed by a successful restore. */
     ALREADY_CONSUMED,
+
+    /** A restore is possible, but user confirmation is required because local data exists. */
     REQUIRES_USER_CONFIRMATION,
+
+    /** Preconditions are satisfied and restore can proceed immediately. */
     READY,
 }
 
+/**
+ * Central policy for selecting, evaluating, and recording backup restore behavior.
+ *
+ * The policy is intentionally stateless; callers provide [BackupPreferences] and contextual
+ * inputs, and receive either updated preferences or a decision describing the next action.
+ */
 @PublicApi
-object AutomaticRestorePolicy {
+object BackupRestorePolicy {
 
+    /**
+     * Validates and stores the provider selected for automatic restore.
+     *
+     * Passing `null` clears the current selection.
+     */
     fun selectAutomaticRestoreProvider(
         preferences: BackupPreferences,
         providers: List<BackupProvider>,
@@ -37,33 +60,46 @@ object AutomaticRestorePolicy {
         )
     }
 
+    /**
+     * Evaluates whether an automatic restore should run for the currently selected provider.
+     *
+     * Decision order:
+     * 1. Ensure automatic restore is enabled by selection.
+     * 2. Ensure a remote marker exists.
+     * 3. Skip markers already restored in the past.
+     * 4. Require user confirmation when local accounts already exist.
+     * 5. Otherwise, allow restore to start.
+     */
     fun evaluateAutomaticRestore(
         preferences: BackupPreferences,
         localAccountCount: Int,
         remoteMarker: BackupRemoteMarker?,
         userConfirmedOnNonEmptyVault: Boolean = false,
-    ): AutomaticRestoreDecision {
+    ): BackupRestoreDecison {
         require(localAccountCount >= 0) { "localAccountCount cannot be negative" }
 
         val providerId = preferences.selectedAutomaticRestoreProviderId
-            ?: return AutomaticRestoreDecision.DISABLED
+            ?: return BackupRestoreDecison.DISABLED
 
         if (remoteMarker == null) {
-            return AutomaticRestoreDecision.NO_REMOTE_MARKER
+            return BackupRestoreDecison.NO_REMOTE_MARKER
         }
 
         val metadata = preferences.providerMetadata[providerId]
         if (metadata?.lastConsumedRemoteMarker == remoteMarker) {
-            return AutomaticRestoreDecision.ALREADY_CONSUMED
+            return BackupRestoreDecison.ALREADY_CONSUMED
         }
 
         if (localAccountCount > 0 && !userConfirmedOnNonEmptyVault) {
-            return AutomaticRestoreDecision.REQUIRES_USER_CONFIRMATION
+            return BackupRestoreDecison.REQUIRES_USER_CONFIRMATION
         }
 
-        return AutomaticRestoreDecision.READY
+        return BackupRestoreDecison.READY
     }
 
+    /**
+     * Records the timestamp of a successful backup for [providerId].
+     */
     fun markSuccessfulBackup(
         preferences: BackupPreferences,
         providerId: String,
@@ -74,6 +110,9 @@ object AutomaticRestorePolicy {
         }
     }
 
+    /**
+     * Records the latest remote marker observed for [providerId], regardless of restore outcome.
+     */
     fun markObservedRemoteMarker(
         preferences: BackupPreferences,
         providerId: String,
@@ -84,6 +123,9 @@ object AutomaticRestorePolicy {
         }
     }
 
+    /**
+     * Records successful restore metadata and optionally marks a remote marker as consumed.
+     */
     fun markSuccessfulRestore(
         preferences: BackupPreferences,
         providerId: String,
@@ -98,6 +140,9 @@ object AutomaticRestorePolicy {
         }
     }
 
+    /**
+     * Utility for atomically updating per-provider metadata within immutable preferences.
+     */
     private inline fun BackupPreferences.updateProviderMetadata(
         providerId: String,
         transform: (BackupProviderMetadata) -> BackupProviderMetadata,
