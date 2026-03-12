@@ -109,6 +109,7 @@ kover = "0.9.7"
 playServicesWearable = "19.0.0"
 composeBom = "2026.02.01"
 kscan = "0.7.0"
+filekit = "0.10.0"
 jsqr = "1.4.0"
 zxing = "3.5.3"
 composeMaterial = "1.5.6"
@@ -203,4 +204,6 @@ compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-previ
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 kscan = { module = "io.github.ismai117:KScan", version.ref = "kscan" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
+filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekit" }
 zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }
