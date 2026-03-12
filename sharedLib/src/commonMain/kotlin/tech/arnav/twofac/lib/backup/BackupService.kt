@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib.backup
 
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.otp.OTP
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -99,11 +100,11 @@ class BackupService(
         }
 
         var imported = 0
-        for ((index, parsedBackupAccount) in parsedBackupAccounts.withIndex()) {
+        for ((uri, parsedBackupAccount) in uris.zip(parsedBackupAccounts)) {
             val backupFingerprint = fingerprint(parsedBackupAccount)
             if (backupFingerprint in existingFingerprints) continue
             try {
-                val added = twoFacLib.addAccount(uris[index])
+                val added = twoFacLib.addAccount(uri)
                 if (added) {
                     existingFingerprints += backupFingerprint
                     imported++
@@ -119,7 +120,7 @@ class BackupService(
         return transportRegistry.findById(providerId)
     }
 
-    private fun fingerprint(otp: tech.arnav.twofac.lib.otp.OTP): AccountFingerprint {
+    private fun fingerprint(otp: OTP): AccountFingerprint {
         return AccountFingerprint(
             issuer = otp.issuer ?: "",
             account = otp.accountName,
