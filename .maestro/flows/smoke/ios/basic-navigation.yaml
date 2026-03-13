@@ -1,0 +1,8 @@
+appId: ${APP_ID}
+tags:
+  - smoke
+  - platform-ios
+---
+- runFlow: ../../subflows/shared/launch-app.yaml
+- assertVisible:
+    id: ".*" # We will refine this later
