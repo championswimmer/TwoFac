@@ -40,4 +40,10 @@ object StorageUtils {
         val decryptedURI = cryptoTools.decrypt(encryptedURI.toByteString(), signingKey.key)
         return decryptedURI.decodeToString()
     }
+
+    suspend fun decryptURI(encryptedURI: String, passKey: String, salt: String): String {
+        val signingKey = cryptoTools.createSigningKey(passKey, salt.toByteString())
+        val decryptedURI = cryptoTools.decrypt(encryptedURI.toByteString(), signingKey.key)
+        return decryptedURI.decodeToString()
+    }
 }

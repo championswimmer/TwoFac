@@ -5,10 +5,12 @@ import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
 import tech.arnav.twofac.lib.crypto.Encoding.toByteString
 import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
+import tech.arnav.twofac.lib.backup.EncryptedAccountEntry
 import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.TOTP
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import tech.arnav.twofac.lib.storage.Storage
+import tech.arnav.twofac.lib.storage.StorageUtils.decryptURI
 import tech.arnav.twofac.lib.storage.StorageUtils.toDecryptedURI
 import tech.arnav.twofac.lib.storage.StorageUtils.toOTP
 import tech.arnav.twofac.lib.storage.StorageUtils.toStoredAccount
@@ -206,6 +208,18 @@ class TwoFacLib private constructor(
     suspend fun exportAccountsEncrypted(): List<StoredAccount> {
         check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
         return accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+    }
+
+    suspend fun decryptEncryptedBackupAccount(
+        entry: EncryptedAccountEntry,
+        passKey: String,
+    ): String {
+        require(passKey.isNotBlank()) { "Password key cannot be blank" }
+        return decryptURI(
+            encryptedURI = entry.encryptedURI,
+            passKey = passKey,
+            salt = entry.salt,
+        )
     }
 
     @Deprecated("Use exportAccountsPlaintext()", ReplaceWith("exportAccountsPlaintext()"))

@@ -4,7 +4,7 @@ status: In Progress
 progress:
   - "[x] Phase 0 - Extend backup payload format to support encrypted entries"
   - "[x] Phase 1 - Add encrypted export path in BackupService"
-  - "[ ] Phase 2 - Add encrypted restore path in BackupService"
+  - "[x] Phase 2 - Add encrypted restore path in BackupService"
   - "[ ] Phase 3 - Surface encryption choice in Compose UI"
   - "[ ] Phase 4 - Surface encryption choice in CLI"
   - "[ ] Phase 5 - Tests and validation"

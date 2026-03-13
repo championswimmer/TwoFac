@@ -78,7 +78,12 @@ class BackupService(
         return transport.listBackups()
     }
 
-    suspend fun restoreBackup(providerId: String, backupId: String): BackupResult<Int> {
+    suspend fun restoreBackup(
+        providerId: String,
+        backupId: String,
+        backupPasskey: String? = null,
+        currentPasskey: String? = null,
+    ): BackupResult<Int> {
         val transport = resolveTransport(providerId) ?: return BackupResult.Failure(
             "Backup provider not found: $providerId"
         )
@@ -96,11 +101,39 @@ class BackupService(
             return BackupResult.Failure("Failed to decode backup payload: ${e.message}", e)
         }
 
-        val uris = payload.accounts
+        val uris = if (payload.encrypted) {
+            val normalizedBackupPasskey = backupPasskey?.takeIf(String::isNotBlank)
+                ?: return BackupResult.Failure("Encrypted backups require the backup passkey")
+            val normalizedCurrentPasskey = currentPasskey?.takeIf(String::isNotBlank)
+                ?: return BackupResult.Failure("Encrypted backups require the current app passkey")
+            val decryptedUris = try {
+                payload.encryptedAccounts.map { entry ->
+                    twoFacLib.decryptEncryptedBackupAccount(entry, normalizedBackupPasskey)
+                }
+            } catch (e: Exception) {
+                return BackupResult.Failure(
+                    "Incorrect backup passkey — could not decrypt the backup accounts",
+                    e,
+                )
+            }
+            try {
+                twoFacLib.unlock(normalizedCurrentPasskey)
+            } catch (e: Exception) {
+                return BackupResult.Failure("Failed to unlock app storage: ${e.message}", e)
+            }
+            decryptedUris
+        } else {
+            payload.accounts
+        }
         val parsedBackupAccounts = try {
             uris.map(OtpAuthURI::parse)
         } catch (e: Exception) {
-            return BackupResult.Failure("Backup payload contains invalid account URI: ${e.message}", e)
+            val message = if (payload.encrypted) {
+                "Incorrect backup passkey — could not decrypt the backup accounts"
+            } else {
+                "Backup payload contains invalid account URI: ${e.message}"
+            }
+            return BackupResult.Failure(message, e)
         }
         val existingAccounts = try {
             twoFacLib.exportAccountsPlaintext()
