@@ -33,12 +33,14 @@ import org.koin.compose.getKoin
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 import tech.arnav.twofac.components.security.PasskeyDialog
+import tech.arnav.twofac.components.settings.BackupExportModeDialog
 import tech.arnav.twofac.components.settings.BackupProvidersCard
 import tech.arnav.twofac.components.settings.CompanionSyncCard
 import tech.arnav.twofac.components.settings.DeleteStorageDialog
 import tech.arnav.twofac.components.settings.RememberPasskeyCard
 import tech.arnav.twofac.components.settings.StorageLocationCard
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.backup.EncryptedAccountEntry
 import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
@@ -48,10 +50,17 @@ import tech.arnav.twofac.session.WebAuthnSessionManager
 import tech.arnav.twofac.storage.getStoragePath
 
 private sealed interface BackupAction {
-    data class Export(val providerId: String) : BackupAction
-    data class Import(val providerId: String) : BackupAction
+    data class Export(val providerId: String, val encrypted: Boolean) : BackupAction
+    data class Import(val providerId: String, val backupId: String) : BackupAction
     data object SyncCompanion : BackupAction
 }
+
+private data class EncryptedImportRequest(
+    val providerId: String,
+    val backupId: String,
+    val encryptedAccounts: List<EncryptedAccountEntry>,
+    val backupPasskey: String? = null,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +79,11 @@ fun SettingsScreen(
 
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
+    var backupRestorePasskeyError by remember { mutableStateOf<String?>(null) }
+    var currentRestorePasskeyError by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var exportProviderId by remember { mutableStateOf<String?>(null) }
+    var encryptedImportRequest by remember { mutableStateOf<EncryptedImportRequest?>(null) }
     var showDeleteStorageDialog by remember { mutableStateOf(false) }
     var isDeleteStorageInProgress by remember { mutableStateOf(false) }
     var isCompanionActive by remember { mutableStateOf(false) }
@@ -111,7 +124,54 @@ fun SettingsScreen(
         }
     }
 
-    suspend fun executeBackupImport(providerId: String) {
+    suspend fun executeBackupExport(providerId: String, encrypted: Boolean) {
+        val service = backupService
+        if (service == null) {
+            snackbarHostState.showSnackbar("Backup is unavailable")
+            return
+        }
+        val result = service.createBackup(providerId, encrypted = encrypted)
+        val message = when (result) {
+            is BackupResult.Success ->
+                "Backup exported (${if (encrypted) "encrypted" else "plaintext"}): ${result.value.id}"
+            is BackupResult.Failure ->
+                "Export failed: ${result.message}"
+        }
+        snackbarHostState.showSnackbar(message)
+        backupProviders = service.listProviders()
+    }
+
+    suspend fun executeBackupImport(
+        providerId: String,
+        backupId: String,
+        backupPasskey: String? = null,
+        currentPasskey: String? = null,
+    ) {
+        val service = backupService
+        if (service == null) {
+            snackbarHostState.showSnackbar("Backup is unavailable")
+            return
+        }
+        val result = service.restoreBackup(
+            providerId = providerId,
+            backupId = backupId,
+            backupPasskey = backupPasskey,
+            currentPasskey = currentPasskey,
+        )
+        val message = when (result) {
+            is BackupResult.Success ->
+                "Imported ${result.value} account(s) from $backupId"
+            is BackupResult.Failure ->
+                "Import failed: ${result.message}"
+        }
+        snackbarHostState.showSnackbar(message)
+        if (result is BackupResult.Success) {
+            companionSyncCoordinator?.onAccountsChanged()
+        }
+        backupProviders = service.listProviders()
+    }
+
+    suspend fun prepareBackupImport(providerId: String) {
         val service = backupService
         if (service == null) {
             snackbarHostState.showSnackbar("Backup is unavailable")
@@ -128,18 +188,30 @@ fun SettingsScreen(
             return
         }
         val latest = backups.maxBy { it.createdAt }
-        val result = service.restoreBackup(providerId, latest.id)
-        val message = when (result) {
-            is BackupResult.Success ->
-                "Imported ${result.value} account(s) from ${latest.id}"
-            is BackupResult.Failure ->
-                "Import failed: ${result.message}"
+        val inspectionResult = service.inspectBackup(providerId, latest.id)
+        val payload = when (inspectionResult) {
+            is BackupResult.Success -> inspectionResult.value
+            is BackupResult.Failure -> {
+                snackbarHostState.showSnackbar("Import failed: ${inspectionResult.message}")
+                return
+            }
         }
-        snackbarHostState.showSnackbar(message)
-        if (result is BackupResult.Success) {
-            companionSyncCoordinator?.onAccountsChanged()
+        if (payload.encrypted) {
+            encryptedImportRequest = EncryptedImportRequest(
+                providerId = providerId,
+                backupId = latest.id,
+                encryptedAccounts = payload.encryptedAccounts,
+            )
+            backupRestorePasskeyError = null
+            currentRestorePasskeyError = null
+            return
         }
-        backupProviders = service.listProviders()
+        if (twoFacLib != null && twoFacLib.isUnlocked()) {
+            executeBackupImport(providerId = providerId, backupId = latest.id)
+        } else {
+            pendingAction = BackupAction.Import(providerId = providerId, backupId = latest.id)
+            passkeyError = null
+        }
     }
 
     Scaffold(
@@ -212,25 +284,20 @@ fun SettingsScreen(
                     providers = backupProviders,
                     isLoading = isLoading,
                     onExportClick = { provider ->
-                        pendingAction = BackupAction.Export(provider.id)
+                        exportProviderId = provider.id
                     },
                     onImportClick = { provider ->
-                        if (twoFacLib != null && twoFacLib.isUnlocked()) {
-                            passkeyError = null
-                            isLoading = true
-                            coroutineScope.launch {
-                                try {
-                                    executeBackupImport(provider.id)
-                                } catch (e: Exception) {
-                                    snackbarHostState.showSnackbar(
-                                        "Import failed: ${e.message ?: "unknown error"}"
-                                    )
-                                } finally {
-                                    isLoading = false
-                                }
+                        isLoading = true
+                        coroutineScope.launch {
+                            try {
+                                prepareBackupImport(provider.id)
+                            } catch (e: Exception) {
+                                snackbarHostState.showSnackbar(
+                                    "Import failed: ${e.message ?: "unknown error"}"
+                                )
+                            } finally {
+                                isLoading = false
                             }
-                        } else {
-                            pendingAction = BackupAction.Import(provider.id)
                         }
                     },
                 )
@@ -337,40 +404,92 @@ fun SettingsScreen(
         )
     }
 
+    if (exportProviderId != null) {
+        BackupExportModeDialog(
+            isVisible = true,
+            onPlaintextSelected = {
+                val providerId = exportProviderId ?: return@BackupExportModeDialog
+                exportProviderId = null
+                if (twoFacLib != null && twoFacLib.isUnlocked()) {
+                    isLoading = true
+                    coroutineScope.launch {
+                        try {
+                            executeBackupExport(providerId, encrypted = false)
+                        } finally {
+                            isLoading = false
+                        }
+                    }
+                } else {
+                    pendingAction = BackupAction.Export(providerId, encrypted = false)
+                    passkeyError = null
+                }
+            },
+            onEncryptedSelected = {
+                val providerId = exportProviderId ?: return@BackupExportModeDialog
+                exportProviderId = null
+                if (twoFacLib != null && twoFacLib.isUnlocked()) {
+                    isLoading = true
+                    coroutineScope.launch {
+                        try {
+                            executeBackupExport(providerId, encrypted = true)
+                        } finally {
+                            isLoading = false
+                        }
+                    }
+                } else {
+                    pendingAction = BackupAction.Export(providerId, encrypted = true)
+                    passkeyError = null
+                }
+            },
+            onDismiss = {
+                exportProviderId = null
+            },
+        )
+    }
+
     // Passkey dialog for backup operations
-    if (pendingAction != null) {
+    pendingAction?.let { action ->
+        val (dialogTitle, dialogDescription, confirmLabel) = when (action) {
+            is BackupAction.Export -> Triple(
+                "Unlock Accounts",
+                "Enter your current app passkey to ${if (action.encrypted) "create an encrypted backup" else "create a plaintext backup"}.",
+                "Continue",
+            )
+            is BackupAction.Import -> Triple(
+                "Save to Device",
+                "Enter your current app passkey to save the restored accounts to your device.",
+                "Save",
+            )
+            BackupAction.SyncCompanion -> Triple(
+                "Unlock Accounts",
+                "Enter your passkey to decrypt and view your accounts",
+                "Unlock",
+            )
+        }
         PasskeyDialog(
             isVisible = true,
             isLoading = isLoading,
             error = passkeyError,
+            title = dialogTitle,
+            description = dialogDescription,
+            confirmLabel = confirmLabel,
             onPasskeySubmit = { passkey ->
-                val action = pendingAction ?: return@PasskeyDialog
+                val selectedAction = pendingAction ?: return@PasskeyDialog
                 passkeyError = null
                 isLoading = true
                 coroutineScope.launch {
                     try {
                         twoFacLib?.unlock(passkey)
-                        when (action) {
+                        when (selectedAction) {
                             is BackupAction.Export -> {
-                                val service = backupService
-                                if (service == null) {
-                                    snackbarHostState.showSnackbar("Backup is unavailable")
-                                    pendingAction = null
-                                    return@launch
-                                }
-                                val result = service.createBackup(action.providerId)
-                                val message = when (result) {
-                                    is BackupResult.Success ->
-                                        "Backup exported (${action.providerId}): ${result.value.id}"
-                                    is BackupResult.Failure ->
-                                        "Export failed: ${result.message}"
-                                }
-                                snackbarHostState.showSnackbar(message)
-                                backupProviders = service.listProviders()
+                                executeBackupExport(selectedAction.providerId, selectedAction.encrypted)
                                 pendingAction = null
                             }
                             is BackupAction.Import -> {
-                                executeBackupImport(action.providerId)
+                                executeBackupImport(
+                                    providerId = selectedAction.providerId,
+                                    backupId = selectedAction.backupId,
+                                )
                                 pendingAction = null
                             }
 
@@ -414,6 +533,98 @@ fun SettingsScreen(
                 pendingAction = null
                 passkeyError = null
             }
+        )
+    }
+
+    val importRequest = encryptedImportRequest
+    if (importRequest != null && importRequest.backupPasskey == null) {
+        PasskeyDialog(
+            isVisible = true,
+            isLoading = isLoading,
+            error = backupRestorePasskeyError,
+            title = "Backup Passkey Required",
+            description = "This backup contains encrypted accounts. Enter the passkey that was used when this backup was created.",
+            confirmLabel = "Continue",
+            onPasskeySubmit = { passkey ->
+                backupRestorePasskeyError = null
+                isLoading = true
+                coroutineScope.launch {
+                    try {
+                        if (twoFacLib == null) {
+                            backupRestorePasskeyError = "Backup restore is unavailable"
+                            return@launch
+                        }
+                        importRequest.encryptedAccounts.forEach { account ->
+                            twoFacLib.decryptEncryptedBackupAccount(account, passkey)
+                        }
+                        encryptedImportRequest = importRequest.copy(backupPasskey = passkey)
+                    } catch (_: Exception) {
+                        backupRestorePasskeyError =
+                            "Incorrect passkey — could not decrypt the backup accounts. Please try again."
+                    } finally {
+                        isLoading = false
+                    }
+                }
+            },
+            onDismiss = {
+                encryptedImportRequest = null
+                backupRestorePasskeyError = null
+                currentRestorePasskeyError = null
+            },
+        )
+    }
+
+    if (importRequest != null && importRequest.backupPasskey != null) {
+        PasskeyDialog(
+            isVisible = true,
+            isLoading = isLoading,
+            error = currentRestorePasskeyError,
+            title = "Save to Device",
+            description = "Enter your current app passkey to save the restored accounts to your device.",
+            confirmLabel = "Save",
+            onPasskeySubmit = { currentPasskey ->
+                currentRestorePasskeyError = null
+                isLoading = true
+                coroutineScope.launch {
+                    try {
+                        val service = backupService
+                        if (service == null) {
+                            currentRestorePasskeyError = "Backup restore is unavailable"
+                            return@launch
+                        }
+                        twoFacLib?.unlock(currentPasskey)
+                        val result = service.restoreBackup(
+                            providerId = importRequest.providerId,
+                            backupId = importRequest.backupId,
+                            backupPasskey = importRequest.backupPasskey,
+                            currentPasskey = currentPasskey,
+                        )
+                        when (result) {
+                            is BackupResult.Success -> {
+                                snackbarHostState.showSnackbar(
+                                    "Imported ${result.value} account(s) from ${importRequest.backupId}"
+                                )
+                                companionSyncCoordinator?.onAccountsChanged()
+                                backupProviders = service.listProviders()
+                                encryptedImportRequest = null
+                            }
+
+                            is BackupResult.Failure -> {
+                                currentRestorePasskeyError = result.message
+                            }
+                        }
+                    } catch (e: Exception) {
+                        currentRestorePasskeyError = e.message ?: "Failed to verify passkey"
+                    } finally {
+                        isLoading = false
+                    }
+                }
+            },
+            onDismiss = {
+                encryptedImportRequest = null
+                backupRestorePasskeyError = null
+                currentRestorePasskeyError = null
+            },
         )
     }
 
