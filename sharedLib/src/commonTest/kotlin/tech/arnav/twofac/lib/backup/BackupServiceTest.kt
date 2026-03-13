@@ -220,6 +220,55 @@ class BackupServiceTest {
     }
 
     @Test
+    fun testRestorePlaintextBackupWithCurrentPasskeyUnlocksAndSucceeds() = runTest {
+        val sourceLib = buildLib()
+        sourceLib.unlock(TEST_PASSKEY)
+        sampleUris.forEach { sourceLib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val sourceService = BackupService(sourceLib, BackupTransportRegistry(listOf(transport)))
+        val createResult = sourceService.createBackup(transport.id)
+        assertTrue(createResult is BackupResult.Success)
+
+        val freshLib = buildLib()
+        val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
+        val restoreResult = restoreService.restoreBackup(
+            providerId = transport.id,
+            backupId = createResult.value.id,
+            currentPasskey = TEST_PASSKEY,
+        )
+
+        assertTrue(restoreResult is BackupResult.Success)
+        assertEquals(sampleUris.size, restoreResult.value)
+        assertEquals(sampleUris.size, freshLib.getAllAccounts().size)
+    }
+
+    @Test
+    fun testRestorePlaintextBackupWithoutUnlockReturnsClearFailure() = runTest {
+        val sourceLib = buildLib()
+        sourceLib.unlock(TEST_PASSKEY)
+        sampleUris.forEach { sourceLib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val sourceService = BackupService(sourceLib, BackupTransportRegistry(listOf(transport)))
+        val createResult = sourceService.createBackup(transport.id)
+        assertTrue(createResult is BackupResult.Success)
+
+        val freshLib = TwoFacLib.initialise(MemoryStorage())
+        val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
+        val restoreResult = restoreService.restoreBackup(
+            providerId = transport.id,
+            backupId = createResult.value.id,
+        )
+
+        assertTrue(restoreResult is BackupResult.Failure)
+        assertEquals(
+            "Plaintext backups require an unlocked vault or current app passkey",
+            restoreResult.message,
+        )
+    }
+
+    @Test
     fun testUnknownProviderReturnsFailure() = runTest {
         val lib = buildLib()
         lib.unlock(TEST_PASSKEY)

@@ -132,11 +132,12 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
             if (resolvedBackupPasskey.isNullOrBlank()) {
                 fail("Error: Backup passkey is required.")
             }
-            try {
-                payload.encryptedAccounts.forEach { account ->
+            val isBackupPasskeyValid = payload.encryptedAccounts.firstOrNull()?.let { account ->
+                runCatching {
                     twoFacLib.decryptEncryptedBackupAccount(account, resolvedBackupPasskey)
-                }
-            } catch (_: Exception) {
+                }.isSuccess
+            } ?: true
+            if (!isBackupPasskeyValid) {
                 fail("Error: Incorrect passkey — could not decrypt the backup accounts.")
             }
             resolvedCurrentPasskey = currentPasskey ?: prompt(

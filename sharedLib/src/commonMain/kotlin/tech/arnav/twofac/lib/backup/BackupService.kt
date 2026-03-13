@@ -112,12 +112,21 @@ class BackupService(
         val inspectResult = inspectBackup(providerId, backupId)
         if (inspectResult is BackupResult.Failure) return inspectResult
         val payload = (inspectResult as BackupResult.Success).value
+        val normalizedCurrentPasskey = currentPasskey?.takeIf(String::isNotBlank)
+        if (normalizedCurrentPasskey != null) {
+            try {
+                twoFacLib.unlock(normalizedCurrentPasskey)
+            } catch (e: Exception) {
+                return BackupResult.Failure("Failed to unlock app storage: ${e.message}", e)
+            }
+        }
 
         val uris = if (payload.encrypted) {
             val normalizedBackupPasskey = backupPasskey?.takeIf(String::isNotBlank)
                 ?: return BackupResult.Failure("Encrypted backups require the backup passkey")
-            val normalizedCurrentPasskey = currentPasskey?.takeIf(String::isNotBlank)
-                ?: return BackupResult.Failure("Encrypted backups require the current app passkey")
+            if (normalizedCurrentPasskey == null) {
+                return BackupResult.Failure("Encrypted backups require the current app passkey")
+            }
             val decryptedUris = try {
                 payload.encryptedAccounts.map { entry ->
                     twoFacLib.decryptEncryptedBackupAccount(entry, normalizedBackupPasskey)
@@ -127,11 +136,6 @@ class BackupService(
                     "Incorrect backup passkey — could not decrypt the backup accounts.",
                     e,
                 )
-            }
-            try {
-                twoFacLib.unlock(normalizedCurrentPasskey)
-            } catch (e: Exception) {
-                return BackupResult.Failure("Failed to unlock app storage: ${e.message}", e)
             }
             decryptedUris
         } else {
@@ -148,6 +152,11 @@ class BackupService(
             return BackupResult.Failure(message, e)
         }
         val existingAccounts = try {
+            if (!twoFacLib.isUnlocked()) {
+                return BackupResult.Failure(
+                    "Plaintext backups require an unlocked vault or current app passkey"
+                )
+            }
             twoFacLib.exportAccountsPlaintext()
                 .map(OtpAuthURI::parse)
                 .toMutableList()

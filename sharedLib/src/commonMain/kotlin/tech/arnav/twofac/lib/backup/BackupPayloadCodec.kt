@@ -27,7 +27,7 @@ object BackupPayloadCodec {
 
     private fun validate(payload: BackupPayload) {
         when (payload.schemaVersion) {
-            1 -> require(payload.encryptedAccounts.isEmpty()) {
+            1 -> require(!payload.encrypted && payload.encryptedAccounts.isEmpty()) {
                 "Schema version 1 backups do not support encrypted accounts"
             }
 
