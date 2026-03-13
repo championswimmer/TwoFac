@@ -10,13 +10,19 @@ import kotlin.test.assertTrue
 
 class BackupServiceTest {
 
+    private companion object {
+        const val TEST_PASSKEY = "test-passkey"
+        const val BACKUP_PASSKEY = "backup-passkey"
+        const val CURRENT_PASSKEY = "current-passkey"
+    }
+
     private val sampleUris = listOf(
         "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub",
         "otpauth://totp/Google:test@gmail.com?secret=JBSWY3DPEHPK3PXP&issuer=Google",
     )
 
-    private fun buildLib(): TwoFacLib {
-        return TwoFacLib.initialise(MemoryStorage(), "test-passkey")
+    private fun buildLib(passkey: String = TEST_PASSKEY): TwoFacLib {
+        return TwoFacLib.initialise(MemoryStorage(), passkey)
     }
 
     /** In-memory transport for testing */
@@ -52,7 +58,7 @@ class BackupServiceTest {
     @Test
     fun testCreateAndRestoreBackup() = runTest {
         val lib = buildLib()
-        lib.unlock("test-passkey")
+        lib.unlock(TEST_PASSKEY)
         sampleUris.forEach { lib.addAccount(it) }
 
         val transport = FakeTransport()
@@ -64,7 +70,7 @@ class BackupServiceTest {
 
         // Restore into a fresh lib
         val freshLib = buildLib()
-        freshLib.unlock("test-passkey")
+        freshLib.unlock(TEST_PASSKEY)
         val freshService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
 
         val backupId = createResult.value.id
@@ -78,7 +84,7 @@ class BackupServiceTest {
     @Test
     fun testCreatePlaintextBackupWritesPlaintextAccounts() = runTest {
         val lib = buildLib()
-        lib.unlock("test-passkey")
+        lib.unlock(TEST_PASSKEY)
         sampleUris.forEach { lib.addAccount(it) }
 
         val transport = FakeTransport()
@@ -96,7 +102,7 @@ class BackupServiceTest {
     @Test
     fun testCreateEncryptedBackupWritesEncryptedAccounts() = runTest {
         val lib = buildLib()
-        lib.unlock("test-passkey")
+        lib.unlock(TEST_PASSKEY)
         sampleUris.forEach { lib.addAccount(it) }
 
         val transport = FakeTransport()
@@ -116,7 +122,7 @@ class BackupServiceTest {
     @Test
     fun testListBackups() = runTest {
         val lib = buildLib()
-        lib.unlock("test-passkey")
+        lib.unlock(TEST_PASSKEY)
         sampleUris.forEach { lib.addAccount(it) }
 
         val transport = FakeTransport()
@@ -133,7 +139,7 @@ class BackupServiceTest {
     @Test
     fun testRestoreFromMissingBackupReturnsFailure() = runTest {
         val lib = buildLib()
-        lib.unlock("test-passkey")
+        lib.unlock(TEST_PASSKEY)
         val transport = FakeTransport()
         val service = BackupService(lib, BackupTransportRegistry(listOf(transport)))
 
@@ -173,7 +179,7 @@ class BackupServiceTest {
     @Test
     fun testRestoreSkipsAccountsAlreadyPresentByIssuerAccountDigitsSecretAndTimeInterval() = runTest {
         val sourceLib = buildLib()
-        sourceLib.unlock("test-passkey")
+        sourceLib.unlock(TEST_PASSKEY)
         sampleUris.forEach { sourceLib.addAccount(it) }
 
         val transport = FakeTransport()
@@ -182,7 +188,7 @@ class BackupServiceTest {
         assertTrue(createResult is BackupResult.Success)
 
         val freshLib = buildLib()
-        freshLib.unlock("test-passkey")
+        freshLib.unlock(TEST_PASSKEY)
         freshLib.addAccount(
             "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub&algorithm=SHA256"
         )
@@ -198,7 +204,7 @@ class BackupServiceTest {
     @Test
     fun testUnknownProviderReturnsFailure() = runTest {
         val lib = buildLib()
-        lib.unlock("test-passkey")
+        lib.unlock(TEST_PASSKEY)
         val service = BackupService(lib, BackupTransportRegistry())
 
         val result = service.createBackup("unknown")
@@ -222,5 +228,98 @@ class BackupServiceTest {
         } catch (e: IllegalStateException) {
             assertTrue(e.message?.contains("not unlocked") == true)
         }
+    }
+
+    @Test
+    fun testRestoreEncryptedBackupDecryptsWithBackupPasskeyAndReencryptsWithCurrentPasskey() = runTest {
+        val sourceLib = buildLib(BACKUP_PASSKEY)
+        sourceLib.unlock(BACKUP_PASSKEY)
+        sampleUris.forEach { sourceLib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val sourceService = BackupService(sourceLib, BackupTransportRegistry(listOf(transport)))
+        val createResult = sourceService.createBackup(transport.id, encrypted = true)
+
+        assertTrue(createResult is BackupResult.Success)
+        val originalEncryptedAccounts = sourceLib.exportAccountsEncrypted()
+
+        val freshLib = buildLib(CURRENT_PASSKEY)
+        freshLib.unlock(CURRENT_PASSKEY)
+        val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
+
+        val restoreResult = restoreService.restoreBackup(
+            providerId = transport.id,
+            backupId = createResult.value.id,
+            backupPasskey = BACKUP_PASSKEY,
+            currentPasskey = CURRENT_PASSKEY,
+        )
+
+        assertTrue(restoreResult is BackupResult.Success)
+        assertEquals(sampleUris.size, restoreResult.value)
+        assertEquals(sourceLib.exportAccountsPlaintext(), freshLib.exportAccountsPlaintext())
+        assertEquals(sampleUris.size, freshLib.getAllAccounts().size)
+        assertTrue(
+            originalEncryptedAccounts.zip(freshLib.exportAccountsEncrypted())
+                .any { (before, after) -> before.salt != after.salt || before.encryptedURI != after.encryptedURI }
+        )
+    }
+
+    @Test
+    fun testRestoreEncryptedBackupRejectsWrongBackupPasskey() = runTest {
+        val sourceLib = buildLib(BACKUP_PASSKEY)
+        sourceLib.unlock(BACKUP_PASSKEY)
+        sampleUris.forEach { sourceLib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val sourceService = BackupService(sourceLib, BackupTransportRegistry(listOf(transport)))
+        val createResult = sourceService.createBackup(transport.id, encrypted = true)
+
+        assertTrue(createResult is BackupResult.Success)
+
+        val freshLib = buildLib(CURRENT_PASSKEY)
+        freshLib.unlock(CURRENT_PASSKEY)
+        val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
+
+        val restoreResult = restoreService.restoreBackup(
+            providerId = transport.id,
+            backupId = createResult.value.id,
+            backupPasskey = "wrong-passkey",
+            currentPasskey = CURRENT_PASSKEY,
+        )
+
+        assertTrue(restoreResult is BackupResult.Failure)
+        assertTrue(restoreResult.message.contains("Incorrect backup passkey"))
+        assertEquals(0, freshLib.getAllAccounts().size)
+    }
+
+    @Test
+    fun testRestoreEncryptedBackupSkipsExistingEquivalentAccounts() = runTest {
+        val sourceLib = buildLib(BACKUP_PASSKEY)
+        sourceLib.unlock(BACKUP_PASSKEY)
+        sampleUris.forEach { sourceLib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val sourceService = BackupService(sourceLib, BackupTransportRegistry(listOf(transport)))
+        val createResult = sourceService.createBackup(transport.id, encrypted = true)
+
+        assertTrue(createResult is BackupResult.Success)
+
+        val freshLib = buildLib(CURRENT_PASSKEY)
+        freshLib.unlock(CURRENT_PASSKEY)
+        freshLib.addAccount(
+            "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub&algorithm=SHA256"
+        )
+        val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
+
+        val restoreResult = restoreService.restoreBackup(
+            providerId = transport.id,
+            backupId = createResult.value.id,
+            backupPasskey = BACKUP_PASSKEY,
+            currentPasskey = CURRENT_PASSKEY,
+        )
+
+        assertTrue(restoreResult is BackupResult.Success)
+        assertEquals(1, restoreResult.value)
+        assertEquals(2, freshLib.getAllAccounts().size)
     }
 }
