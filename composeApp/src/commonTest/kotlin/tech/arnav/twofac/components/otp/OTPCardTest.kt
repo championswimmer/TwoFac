@@ -1,4 +1,4 @@
-package tech.arnav.twofac.components
+package tech.arnav.twofac.components.otp
 
 import kotlin.test.Test
 import kotlin.test.assertFalse

@@ -1,24 +1,17 @@
 package tech.arnav.twofac.screens
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -33,7 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
-import tech.arnav.twofac.components.PasskeyDialog
+import tech.arnav.twofac.components.accounts.AccountsErrorState
+import tech.arnav.twofac.components.accounts.AccountsListContent
+import tech.arnav.twofac.components.accounts.AccountsLockedState
+import tech.arnav.twofac.components.security.PasskeyDialog
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +58,7 @@ fun AccountsScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Accounts") },
+                windowInsets = WindowInsets(0, 0, 0, 0),
                 navigationIcon = {
                     onNavigateBack?.let { navigateBack ->
                         IconButton(onClick = navigateBack) {
@@ -92,50 +89,22 @@ fun AccountsScreen(
                 }
 
                 requiresUnlock -> {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "Vault is locked. Unlock to manage accounts.",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Button(onClick = { showPasskeyDialog = true }) {
-                            Text("Unlock Vault")
-                        }
-                    }
+                    AccountsLockedState(
+                        onUnlockClick = { showPasskeyDialog = true }
+                    )
                 }
 
                 error != null -> {
-                    Text(
-                        text = "Error: $error",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(16.dp)
+                    AccountsErrorState(
+                        error = error.orEmpty()
                     )
                 }
 
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(accounts) { account ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = { onNavigateToAccountDetail(account.accountID) }
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = account.accountLabel,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    AccountsListContent(
+                        accounts = accounts,
+                        onAccountClick = onNavigateToAccountDetail,
+                    )
                 }
             }
         }

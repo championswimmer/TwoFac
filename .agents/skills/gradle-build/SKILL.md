@@ -74,6 +74,16 @@ Output: `composeApp/build/compose/binaries/main/`
 
 Output: `androidApp/build/outputs/apk/` or `androidApp/build/outputs/bundle/`
 
+Run/install on a specific emulator and launch the app explicitly:
+
+```bash
+ANDROID_SERIAL=emulator-5554 ./gradlew :androidApp:installDebug
+adb -s emulator-5554 shell am start -n tech.arnav.twofac/.MainActivity
+adb -s emulator-5554 shell dumpsys activity activities | rg 'Resumed: ActivityRecord|mCurrentFocus|mFocusedApp'
+```
+
+When multiple Android devices are connected, always set `ANDROID_SERIAL` for Gradle and use `adb -s <serial>` for launch/verification commands.
+
 ### Wear OS Watch App (`watchApp`)
 
 | Action | Command |

@@ -1,0 +1,78 @@
+package tech.arnav.twofac.components.otp
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.theme.TwoFacTheme
+
+@Composable
+fun HomeOtpListSection(
+    accountsWithOtps: List<Pair<StoredAccount.DisplayAccount, String>>,
+    listState: LazyListState,
+    onRefreshOtp: () -> Unit,
+    heading: String = "Your Accounts",
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item {
+            Text(
+                text = heading,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+        }
+
+        items(accountsWithOtps, key = { (account, _) -> account.accountID }) { (account, otpCode) ->
+            OTPCard(
+                account = account,
+                otpCode = otpCode,
+                timeInterval = 30L,
+                onRefreshOTP = onRefreshOtp,
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun HomeOtpListSectionPreview() {
+    TwoFacTheme {
+        HomeOtpListSection(
+            accountsWithOtps = previewAccountsWithOtps,
+            listState = rememberLazyListState(),
+            onRefreshOtp = {},
+        )
+    }
+}
+
+private val previewAccountsWithOtps = listOf(
+    StoredAccount.DisplayAccount(
+        accountID = "google",
+        accountLabel = "Google",
+    ) to "123456",
+    StoredAccount.DisplayAccount(
+        accountID = "github",
+        accountLabel = "GitHub",
+    ) to "654321",
+    StoredAccount.DisplayAccount(
+        accountID = "microsoft",
+        accountLabel = "Microsoft",
+    ) to "987654",
+)

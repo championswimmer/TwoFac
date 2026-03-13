@@ -1,4 +1,4 @@
-package tech.arnav.twofac.components
+package tech.arnav.twofac.components.security
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
