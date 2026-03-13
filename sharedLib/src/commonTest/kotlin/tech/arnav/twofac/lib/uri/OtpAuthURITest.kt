@@ -134,6 +134,35 @@ class OtpAuthURITest {
     }
 
     @Test
+    fun testParseURLEncodedLabel() = runTest {
+        val uri = "otpauth://totp/GitHub%3Auser%40example.com?secret=$testSecret&issuer=GitHub"
+        val otp = OtpAuthURI.parse(uri)
+
+        assertTrue(otp is TOTP, "Parsed OTP should be a TOTP instance")
+        assertEquals("GitHub", otp.issuer, "Issuer should be URL-decoded")
+        assertEquals("user@example.com", otp.accountName, "Account name should be URL-decoded")
+    }
+
+    @Test
+    fun testRoundTripWithSpecialChars() = runTest {
+        val originalTotp = TOTP(
+            digits = 6,
+            algorithm = CryptoTools.Algo.SHA1,
+            secret = testSecret,
+            timeInterval = 30,
+            accountName = "user@example.com",
+            issuer = "GitHub"
+        )
+
+        val uri = OtpAuthURI.create(originalTotp)
+        val parsedOtp = OtpAuthURI.parse(uri)
+
+        assertTrue(parsedOtp is TOTP)
+        assertEquals("GitHub", parsedOtp.issuer, "Issuer should survive round-trip without encoding")
+        assertEquals("user@example.com", parsedOtp.accountName, "Account name should survive round-trip without encoding")
+    }
+
+    @Test
     fun testRoundTrip() = runTest {
         // Create a TOTP object with default timeInterval (30)
         val originalTotp = TOTP(

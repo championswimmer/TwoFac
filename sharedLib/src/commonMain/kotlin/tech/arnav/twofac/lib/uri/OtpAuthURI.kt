@@ -1,6 +1,7 @@
 package tech.arnav.twofac.lib.uri
 
 import tech.arnav.twofac.lib.crypto.CryptoTools
+import tech.arnav.twofac.lib.crypto.Encoding.decodeURIComponent
 import tech.arnav.twofac.lib.crypto.Encoding.encodeURIComponent
 import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.OTP
@@ -106,10 +107,12 @@ object OtpAuthURI {
         val label = uri.substring(typeEndIndex + 1, labelEndIndex)
         require(label.isNotEmpty()) { "Label cannot be empty" }
 
+        // URL-decode the label before splitting, so special characters are properly handled
+        val decodedLabel = decodeURIComponent(label)
 
         // Extract the issuer from the label if present
-        val labelIssuer = label.substringBefore(":", "")
-        val accountName = label.substringAfter(":", label).trim()
+        val labelIssuer = decodedLabel.substringBefore(":", "")
+        val accountName = decodedLabel.substringAfter(":", decodedLabel).trim()
 
 
 
@@ -123,7 +126,7 @@ object OtpAuthURI {
 
         // Extract required parameters
         val secret = params["secret"] ?: throw IllegalArgumentException("Missing required parameter: secret")
-        val issuer = params["issuer"] ?: labelIssuer // Use label as issuer if not provided
+        val issuer = params["issuer"]?.let { decodeURIComponent(it) } ?: labelIssuer // Use label as issuer if not provided
 
         require(issuer.isNotEmpty()) { "Issuer cannot be empty" }
         // Only check if labelIssuer is not empty
