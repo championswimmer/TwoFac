@@ -34,6 +34,8 @@ Use shell output to set `ANDROID_SERIAL`:
 ```bash
 eval "$(node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --boot --shell)"
 ANDROID_SERIAL="$ANDROID_SERIAL" ./gradlew :androidApp:installDebug
+adb -s "$ANDROID_SERIAL" shell am start -n tech.arnav.twofac/.MainActivity
+adb -s "$ANDROID_SERIAL" shell dumpsys activity activities | rg 'Resumed: ActivityRecord|mCurrentFocus|mFocusedApp'
 ```
 
 When multiple emulators/devices are connected, always pass `ANDROID_SERIAL` (or `adb -s <serial>`) to avoid ambiguous target errors.
@@ -67,4 +69,3 @@ UDID is preferred over simulator name because names are often duplicated across 
 - iOS boot uses `xcrun simctl bootstatus <UDID> -b` to wait for full readiness.
 - Android script reads AVD metadata from `avdmanager list avd` and running serials from `adb devices -l`.
 - iOS script reads simulator inventory from `xcrun simctl list --json` and filters to available iOS runtimes/devices.
-

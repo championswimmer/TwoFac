@@ -1,13 +1,13 @@
 ---
 name: Compose Screen Component Extraction Plan
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0 - Lock domain package map and migration boundaries"
-  - "[ ] Phase 1 - Move existing root components into domain packages"
-  - "[ ] Phase 2 - Extract preview-friendly Home and Accounts domain components"
-  - "[ ] Phase 3 - Extract Add Account and Settings domain components"
-  - "[ ] Phase 4 - Add previews with mocked UI state in each domain package"
-  - "[ ] Phase 5 - Rewire screen entrypoints and run validation"
+  - "[x] Phase 0 - Lock domain package map and migration boundaries"
+  - "[x] Phase 1 - Move existing root components into domain packages"
+  - "[x] Phase 2 - Extract preview-friendly Home and Accounts domain components"
+  - "[x] Phase 3 - Extract Add Account and Settings domain components"
+  - "[x] Phase 4 - Add previews with mocked UI state in each domain package"
+  - "[x] Phase 5 - Rewire screen entrypoints and run validation"
 ---
 
 # Compose Screen Component Extraction Plan

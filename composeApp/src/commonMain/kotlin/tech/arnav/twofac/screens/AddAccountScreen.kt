@@ -3,21 +3,16 @@ package tech.arnav.twofac.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.ContentPaste
-import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -30,18 +25,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isCtrlPressed
-import androidx.compose.ui.input.key.isMetaPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import tech.arnav.twofac.components.accounts.AddAccountPasskeyField
+import tech.arnav.twofac.components.accounts.InlineErrorMessage
+import tech.arnav.twofac.components.accounts.OtpUriInputField
+import tech.arnav.twofac.components.accounts.QrImportActions
 import tech.arnav.twofac.qr.ComposableCameraQRCodeReader
 import tech.arnav.twofac.qr.QRCodeReadResult
 import tech.arnav.twofac.viewmodels.AccountsViewModel
@@ -105,6 +96,7 @@ fun AddAccountScreen(
             topBar = {
                 TopAppBar(
                     title = { Text("Add Account") },
+                    windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {
                             Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
@@ -121,104 +113,77 @@ fun AddAccountScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
             ) {
-                OutlinedTextField(
+                OtpUriInputField(
                     value = uriText,
                     onValueChange = { uriText = it },
-                    label = { Text("2FA URI") },
-                    placeholder = { Text("otpauth://totp/...") },
+                    isFocused = isUriFieldFocused,
+                    onFocusChanged = { isUriFieldFocused = it },
+                    onPasteShortcut = {
+                        triggerClipboardRead(suppressNoImageFailure = true)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .onFocusChanged { isUriFieldFocused = it.isFocused }
-                        .onPreviewKeyEvent { keyEvent ->
-                            val isPasteShortcut =
-                                keyEvent.type == KeyEventType.KeyDown &&
-                                    keyEvent.key == Key.V &&
-                                    (keyEvent.isMetaPressed || keyEvent.isCtrlPressed)
-                            if (isUriFieldFocused && isPasteShortcut) {
-                                triggerClipboardRead(suppressNoImageFailure = true)
-                            }
-                            false
-                        }
                 )
 
-                if (cameraReader != null) {
-                    Button(
-                        onClick = {
-                            if (isScanning || isPasting) return@Button
-                            isScanning = true
-                            scanError = null
-                            coroutineScope.launch {
-                                try {
-                                    when (val scanResult = cameraReader.readQRCode()) {
-                                        is QRCodeReadResult.Success -> {
-                                            uriText = scanResult.otpAuthUri
-                                        }
-                                        is QRCodeReadResult.DecodeFailure -> {
-                                            scanError = scanResult.reason
-                                        }
-                                        QRCodeReadResult.PermissionDenied -> {
-                                            scanError = "Camera permission denied"
-                                        }
-                                        QRCodeReadResult.Unsupported -> {
-                                            scanError = "Camera QR scanning is not supported on this platform"
-                                        }
-                                        QRCodeReadResult.Canceled -> Unit
+                QrImportActions(
+                    hasCameraImport = cameraReader != null,
+                    hasClipboardImport = clipboardReader != null,
+                    isLoading = isLoading,
+                    isScanning = isScanning,
+                    isPasting = isPasting,
+                    onScanWithCamera = {
+                        if (cameraReader == null || isScanning || isPasting) return@QrImportActions
+                        isScanning = true
+                        scanError = null
+                        coroutineScope.launch {
+                            try {
+                                when (val scanResult = cameraReader.readQRCode()) {
+                                    is QRCodeReadResult.Success -> {
+                                        uriText = scanResult.otpAuthUri
                                     }
-                                } catch (e: CancellationException) {
-                                    throw e
-                                } catch (e: Exception) {
-                                    scanError = e.message ?: "Failed to scan QR code"
-                                } finally {
-                                    isScanning = false
+                                    is QRCodeReadResult.DecodeFailure -> {
+                                        scanError = scanResult.reason
+                                    }
+                                    QRCodeReadResult.PermissionDenied -> {
+                                        scanError = "Camera permission denied"
+                                    }
+                                    QRCodeReadResult.Unsupported -> {
+                                        scanError = "Camera QR scanning is not supported on this platform"
+                                    }
+                                    QRCodeReadResult.Canceled -> Unit
                                 }
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                scanError = e.message ?: "Failed to scan QR code"
+                            } finally {
+                                isScanning = false
                             }
-                        },
-                        enabled = !isLoading && !isScanning && !isPasting,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Rounded.PhotoCamera, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(if (isScanning) "Scanning..." else "Scan QR with Camera")
-                    }
-                }
-
-                if (clipboardReader != null) {
-                    Button(
-                        onClick = {
-                            triggerClipboardRead()
-                        },
-                        enabled = !isLoading && !isScanning && !isPasting,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Rounded.ContentPaste, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(if (isPasting) "Reading Clipboard..." else "Paste QR from Clipboard")
-                    }
-                }
+                        }
+                    },
+                    onPasteFromClipboard = {
+                        triggerClipboardRead()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
                 if (requiresUnlock) {
-                    OutlinedTextField(
+                    AddAccountPasskeyField(
                         value = passkeyText,
                         onValueChange = { passkeyText = it },
-                        label = { Text("Passkey") },
-                        placeholder = { Text("Enter your passkey") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
 
                 scanError?.let { scanErrorMessage ->
-                    Text(
-                        text = "QR error: $scanErrorMessage",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(8.dp)
+                    InlineErrorMessage(
+                        message = "QR error: $scanErrorMessage",
                     )
                 }
 
                 error?.let { errorMessage ->
-                    Text(
-                        text = "Error: $errorMessage",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(8.dp)
+                    InlineErrorMessage(
+                        message = "Error: $errorMessage",
                     )
                 }
 

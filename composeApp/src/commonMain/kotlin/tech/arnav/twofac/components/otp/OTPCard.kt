@@ -1,4 +1,4 @@
-package tech.arnav.twofac.components
+package tech.arnav.twofac.components.otp
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
