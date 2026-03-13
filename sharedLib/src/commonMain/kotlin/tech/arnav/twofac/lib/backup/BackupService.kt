@@ -124,7 +124,7 @@ class BackupService(
                 }
             } catch (e: Exception) {
                 return BackupResult.Failure(
-                    "Incorrect backup passkey — could not decrypt the backup accounts",
+                    "Incorrect backup passkey — could not decrypt the backup accounts.",
                     e,
                 )
             }
@@ -141,7 +141,7 @@ class BackupService(
             uris.map(OtpAuthURI::parse)
         } catch (e: Exception) {
             val message = if (payload.encrypted) {
-                "Incorrect backup passkey — could not decrypt the backup accounts"
+                "Incorrect backup passkey — could not decrypt the backup accounts."
             } else {
                 "Backup payload contains invalid account URI: ${e.message}"
             }
