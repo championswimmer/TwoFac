@@ -2,3 +2,4 @@ appId: ${APP_ID}
 ---
 - launchApp:
     clearState: true
+    clearKeychain: true
