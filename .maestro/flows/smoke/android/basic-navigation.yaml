@@ -3,6 +3,6 @@ tags:
   - smoke
   - platform-android
 ---
-- runFlow: ../../subflows/shared/launch-app.yaml
+- runFlow: ../../../subflows/shared/launch-app.yaml
 - assertVisible:
     id: ".*" # We will refine this later

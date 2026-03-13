@@ -3,6 +3,6 @@ tags:
   - smoke
   - shared
 ---
-- runFlow: ../../subflows/shared/launch-app.yaml
+- runFlow: ../../../subflows/shared/launch-app.yaml
 - assertVisible:
     id: ".*" # We will refine this later, just assert something is visible
