@@ -4,7 +4,7 @@ model: gpt-5-mini
 description: Concise git commit / push / PR guidance for repository contributors.
 ---
 
-# Git Agent (very concise)
+# Git Agent
 
 Model: gpt-5-mini
 
