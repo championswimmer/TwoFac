@@ -3,6 +3,7 @@ package tech.arnav.twofac.cli.commands
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import kotlinx.coroutines.runBlocking
@@ -46,8 +47,12 @@ class ExportCommand : CliktCommand(name = "export"), KoinComponent {
         "-o", "--output-dir",
         help = "Directory where the backup file will be written (defaults to app backup dir)"
     )
+    private val encrypted by option(
+        "--encrypted",
+        help = "Keep account data encrypted in the backup file"
+    ).flag(default = false)
     private val passkey by option("-p", "--passkey", help = "Passkey to decrypt accounts").prompt(
-        "Enter passkey",
+        "Enter your current app passkey",
         hideInput = true
     )
 
@@ -57,13 +62,16 @@ class ExportCommand : CliktCommand(name = "export"), KoinComponent {
         val dir = outputDir?.let { Path(it) } ?: AppDirUtils.getBackupDirPath(forceCreate = true)
         val service = localBackupService(twoFacLib, dir)
 
-        when (val result = service.createBackup(LOCAL_PROVIDER_ID)) {
+        when (val result = service.createBackup(LOCAL_PROVIDER_ID, encrypted = encrypted)) {
             is BackupResult.Success -> {
                 val descriptor = result.value
-                echo("✓ Exported ${twoFacLib.getAllAccounts().size} account(s) to ${Path(dir, descriptor.id)}")
+                echo(
+                    "✓ Exported ${twoFacLib.getAllAccounts().size} account(s) " +
+                        "as ${if (encrypted) "an encrypted" else "a plaintext"} backup to ${Path(dir, descriptor.id)}"
+                )
             }
             is BackupResult.Failure -> {
-                echo("✗ Export failed: ${result.message}", err = true)
+                fail("Error: Export failed: ${result.message}")
             }
         }
     }
@@ -82,14 +90,16 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
         "-f", "--file",
         help = "Specific backup file name to restore (defaults to most recent backup)"
     )
-    private val passkey by option("-p", "--passkey", help = "Passkey to encrypt imported accounts").prompt(
-        "Enter passkey",
-        hideInput = true
+    private val currentPasskey by option(
+        "-p", "--passkey",
+        help = "Current app passkey to save restored accounts to storage"
+    )
+    private val backupPasskey by option(
+        "--backup-passkey",
+        help = "Passkey that was used when the encrypted backup was created"
     )
 
     override fun run() = runBlocking {
-        twoFacLib.unlock(passkey)
-
         val dir = inputDir?.let { Path(it) } ?: AppDirUtils.getBackupDirPath()
         val service = localBackupService(twoFacLib, dir)
 
@@ -97,20 +107,66 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
         val resolvedBackupId = backupFile ?: run {
             val listResult = service.listBackups(LOCAL_PROVIDER_ID)
             if (listResult is BackupResult.Failure) {
-                echo("✗ Failed to list backups: ${listResult.message}", err = true)
-                return@runBlocking
+                fail("Error: Failed to list backups: ${listResult.message}")
             }
             val backups = (listResult as BackupResult.Success).value
             if (backups.isEmpty()) {
-                echo("✗ No backup files found in $dir", err = true)
-                return@runBlocking
+                fail("Error: No backup files found in $dir")
             }
             backups.maxBy { it.createdAt }.id
         }
 
-        when (val result = service.restoreBackup(LOCAL_PROVIDER_ID, resolvedBackupId)) {
+        val inspectionResult = service.inspectBackup(LOCAL_PROVIDER_ID, resolvedBackupId)
+        val payload = when (inspectionResult) {
+            is BackupResult.Success -> inspectionResult.value
+            is BackupResult.Failure -> fail("Error: Import failed: ${inspectionResult.message}")
+        }
+
+        val resolvedBackupPasskey: String?
+        val resolvedCurrentPasskey: String
+        if (payload.encrypted) {
+            resolvedBackupPasskey = backupPasskey ?: prompt(
+                text = "This backup contains encrypted accounts.\nEnter the passkey used when this backup was created (to decrypt)",
+                hideInput = true,
+            )
+            if (resolvedBackupPasskey.isNullOrBlank()) {
+                fail("Error: Backup passkey is required.")
+            }
+            try {
+                payload.encryptedAccounts.forEach { account ->
+                    twoFacLib.decryptEncryptedBackupAccount(account, resolvedBackupPasskey)
+                }
+            } catch (_: Exception) {
+                fail("Error: Incorrect passkey — could not decrypt the backup accounts.")
+            }
+            resolvedCurrentPasskey = currentPasskey ?: prompt(
+                text = "Enter your current app passkey (to save restored accounts to storage)",
+                hideInput = true,
+            )
+            if (resolvedCurrentPasskey.isNullOrBlank()) {
+                fail("Error: Current app passkey is required.")
+            }
+            twoFacLib.unlock(resolvedCurrentPasskey)
+        } else {
+            resolvedBackupPasskey = null
+            resolvedCurrentPasskey = currentPasskey ?: prompt(
+                text = "Enter your current app passkey (to save restored accounts to storage)",
+                hideInput = true,
+            )
+            if (resolvedCurrentPasskey.isNullOrBlank()) {
+                fail("Error: Current app passkey is required.")
+            }
+            twoFacLib.unlock(resolvedCurrentPasskey)
+        }
+
+        when (val result = service.restoreBackup(
+            LOCAL_PROVIDER_ID,
+            resolvedBackupId,
+            backupPasskey = resolvedBackupPasskey,
+            currentPasskey = resolvedCurrentPasskey,
+        )) {
             is BackupResult.Success -> echo("✓ Imported ${result.value} account(s) from $resolvedBackupId")
-            is BackupResult.Failure -> echo("✗ Import failed: ${result.message}", err = true)
+            is BackupResult.Failure -> fail("Error: Import failed: ${result.message}")
         }
     }
 }
