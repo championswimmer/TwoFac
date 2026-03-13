@@ -8,7 +8,7 @@ progress:
   - "[x] Phase 3 - Add iOS local execution path (simulator or USB device)"
   - "[x] Phase 4 - Build shared flow architecture, tags, and suite segmentation"
   - "[x] Phase 5 - Integrate local-only Maestro runs into CI workflows"
-  - "[ ] Phase 6 - Add .agents/skills/ui-testing skill for Maestro usage"
+  - "[x] Phase 6 - Add .agents/skills/ui-testing skill for Maestro usage"
   - "[ ] Phase 7 - Stabilization, governance, and rollout"
 ---
 
