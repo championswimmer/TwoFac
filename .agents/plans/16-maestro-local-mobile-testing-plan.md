@@ -4,8 +4,8 @@ status: Planned
 progress:
   - "[ ] Phase 0 - Confirm constraints, tooling baseline, and support matrix"
   - "[ ] Phase 1 - Establish repository structure for Maestro YAML flows"
-  - "[ ] Phase 2 - Add Android local execution path (emulator + USB device)"
-  - "[ ] Phase 3 - Add iOS local execution path (simulator-first)"
+  - "[ ] Phase 2 - Add Android local execution path (emulator or USB device)"
+  - "[ ] Phase 3 - Add iOS local execution path (simulator or USB device)"
   - "[ ] Phase 4 - Build shared flow architecture, tags, and suite segmentation"
   - "[ ] Phase 5 - Integrate local-only Maestro runs into CI workflows"
   - "[ ] Phase 6 - Add .agents/skills/ui-testing skill for Maestro usage"
@@ -19,11 +19,10 @@ progress:
 Integrate Maestro as this repository's local UI E2E test tool for Android and iOS without using Maestro Cloud or any paid offering.  
 The end state should support:
 
-1. Android emulator runs
-2. Android real-device runs (USB-connected)
-3. iOS simulator runs
-4. A clear repository layout for Maestro YAML flows
-5. A dedicated `ui-testing` skill under `.agents/skills/` for contributor guidance
+1. Android local runs on at least one target type (emulator or USB-connected device)
+2. iOS local runs on at least one target type (simulator or USB-connected device)
+3. A clear repository layout for Maestro YAML flows
+4. A dedicated `ui-testing` skill under `.agents/skills/` for contributor guidance
 
 ## Non-goals
 
@@ -96,8 +95,8 @@ Initial direction for `.maestro/config.yaml`:
 1. Verify Maestro CLI install path(s) and pinned version strategy for contributors and CI.
 2. Confirm Java requirement and local prerequisites (Android SDK/ADB, Xcode CLI tools).
 3. Validate current platform support assumptions in docs and capture in `Known Constraints`:
-   - Android: emulator + USB physical device
-   - iOS: simulator path is primary and required
+   - Android: emulator or USB physical device (either one is acceptable for smoke validation)
+   - iOS: simulator or USB physical device (either one is acceptable for smoke validation)
 4. Lock explicit policy: **no Cloud commands** (`maestro cloud`) in scripts/workflows/docs.
 
 ### Deliverables
@@ -124,9 +123,9 @@ Initial direction for `.maestro/config.yaml`:
 1. Working folder layout and starter YAML flow set.
 2. Documented naming conventions for flows/subflows/tags.
 
-## Phase 2 - Add Android local execution path (emulator + USB device)
+## Phase 2 - Add Android local execution path (emulator or USB device)
 
-1. Reuse existing emulator picker script flow:
+1. Reuse existing emulator picker script flow (for emulator mode):
    - `eval "$(node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --boot --shell)"`
 2. Build/install app using existing module commands:
    - `ANDROID_SERIAL="$ANDROID_SERIAL" ./gradlew :androidApp:installDebug`
@@ -144,24 +143,25 @@ Initial direction for `.maestro/config.yaml`:
 ### Deliverables
 
 1. `run-android-local.sh` script + usage docs.
-2. Smoke suite passing on emulator and at least one USB-device run path.
+2. Smoke suite passing on at least one Android target path (emulator or USB device).
 
-## Phase 3 - Add iOS local execution path (simulator-first)
+## Phase 3 - Add iOS local execution path (simulator or USB device)
 
-1. Reuse existing iOS picker script flow:
+1. Reuse existing iOS picker script flow (for simulator mode):
    - `eval "$(node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs --boot --shell)"`
-2. Build and launch iOS app for simulator using existing project workflow (`xcodebuild` path from current skills/docs).
-3. Add scriptized Maestro commands for iOS simulator:
+2. Add USB-device mode for iOS where available:
+   - discover/select explicit target device UDID
+   - target explicit device with `--device`
+3. Build and launch iOS app for chosen target using existing project workflow (`xcodebuild` path from current skills/docs).
+4. Add scriptized Maestro commands for iOS:
    - explicit UDID targeting with `--device`
-   - pass platform app id env var (`APP_ID`).
-4. Normalize iOS-specific selectors/permission handling via shared subflows.
-5. Track iOS real-device support status in a dedicated constraints note and revisit cadence.
+   - pass platform app id env var (`APP_ID`)
+5. Normalize iOS-specific selectors/permission handling via shared subflows.
 
 ### Deliverables
 
 1. `run-ios-local.sh` script + usage docs.
-2. Smoke suite passing on booted simulator.
-3. Explicit issue/decision log entry for physical iOS status.
+2. Smoke suite passing on at least one iOS target path (simulator or USB device).
 
 ## Phase 4 - Build shared flow architecture, tags, and suite segmentation
 
@@ -170,6 +170,7 @@ Initial direction for `.maestro/config.yaml`:
 2. Define journey-first suites for this app:
    - account onboarding/import
    - unlock + OTP visibility
+   - passkey smoke journey using fixed test key `123456`
    - settings and backup entry points
 3. Keep platform-specific divergence in thin wrappers; maximize shared subflows.
 4. Define execution profiles:
@@ -207,8 +208,8 @@ Initial direction for `.maestro/config.yaml`:
 1. Create `.agents/skills/ui-testing/SKILL.md` with repository-specific guidance.
 2. Skill sections should include:
    - when to use Maestro vs existing tests
-   - local Android flow (emulator + USB)
-   - local iOS simulator flow
+   - local Android flow (emulator or USB)
+   - local iOS flow (simulator or USB)
    - test folder conventions and YAML patterns
    - tag strategy and command examples
    - troubleshooting and artifact capture
@@ -245,7 +246,7 @@ Initial direction for `.maestro/config.yaml`:
 ## Risks and mitigations
 
 1. **Platform capability mismatch (especially iOS real-device expectations)**  
-   Mitigation: keep simulator path as hard requirement, track physical-device status explicitly, and avoid hidden assumptions.
+   Mitigation: support both simulator and USB-device paths, require only one validated path per platform for smoke, and keep constraints explicit.
 
 2. **Flaky selectors on dynamic Compose screens**  
    Mitigation: shared selector conventions, explicit wait/assert subflows, and burn-in before enforcing hard CI gates.
@@ -259,8 +260,8 @@ Initial direction for `.maestro/config.yaml`:
 ## Success criteria
 
 1. Repository has a standard `.maestro/` structure with maintainable YAML flow organization.
-2. Contributors can run smoke flows locally on Android emulator and iOS simulator with one command path each.
-3. Android USB real-device path is documented and validated.
+2. Contributors can run smoke flows locally on Android using either emulator or USB device.
+3. Contributors can run smoke flows locally on iOS using either simulator or USB device.
 4. CI executes local Maestro smoke runs for Android and iOS without cloud dependencies.
 5. `.agents/skills/ui-testing/SKILL.md` exists and is referenced in contributor workflow.
 6. No Maestro Cloud/API key dependency exists in committed scripts or workflows.
