@@ -1,0 +1,94 @@
+name: Maestro Local UI Tests
+
+on:
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  android-test:
+    runs-on: macos-14
+    timeout-minutes: 45
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Run Android UI Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: aosp_atd
+          arch: arm64-v8a
+          profile: pixel_6
+          script: |
+            export ANDROID_SERIAL="emulator-5554"
+            ./gradlew :androidApp:installDebug
+            maestro --device "$ANDROID_SERIAL" test -e APP_ID="tech.arnav.twofac" --include-tags="smoke" --exclude-tags="platform-ios" --format junit --output .maestro/outputs/report-android.xml .maestro/
+            
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-android-outputs
+          path: .maestro/outputs/
+
+  ios-test:
+    runs-on: macos-14
+    timeout-minutes: 45
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Setup iOS Simulator
+        id: setup-simulator
+        run: |
+          UDID=$(xcrun simctl create "MaestroTestSim" "iPhone 16" "iOS18.4" || xcrun simctl create "MaestroTestSim" "iPhone 15" "iOS17.5" || xcrun simctl list devices available | grep iPhone | head -n 1 | grep -E -o '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')
+          xcrun simctl bootstatus "$UDID" -b || true
+          echo "UDID=$UDID" >> $GITHUB_ENV
+
+      - name: Build iOS App
+        run: |
+          xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Debug -destination "id=${{ env.UDID }}" -derivedDataPath build/ios_build build -quiet
+          xcrun simctl install "${{ env.UDID }}" build/ios_build/Build/Products/Debug-iphonesimulator/TwoFac.app
+
+      - name: Run iOS UI Tests
+        run: |
+          maestro --device "${{ env.UDID }}" test -e APP_ID="tech.arnav.twofac.app" --include-tags="smoke" --exclude-tags="platform-android" --format junit --output .maestro/outputs/report-ios.xml .maestro/
+          
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-ios-outputs
+          path: .maestro/outputs/

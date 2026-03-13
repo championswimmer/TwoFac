@@ -45,3 +45,11 @@ This matrix maps Maestro flows to the core user journeys and platforms supported
 *   **Local Full Regression:** `maestro test --include-tags=regression .maestro/`
 *   **CI PR Gate:** Executed via `run-android-local.sh` and `run-ios-local.sh` with `--suite smoke`.
 *   **Nightly Full Regression:** Run via scheduled CI or manually with `--suite regression`.
+
+## Continuous Integration (CI)
+
+Local Maestro runs are integrated into the GitHub Actions pipeline (`.github/workflows/maestro-ui-tests.yml`).
+
+*   **No Cloud Dependency:** CI tests are executed completely locally on GitHub-hosted runners (macOS for both Android and iOS) without requiring any Maestro Cloud API keys.
+*   **Artifacts:** In the event of a test failure, screenshots and execution logs are uploaded as artifacts (`maestro-android-outputs`, `maestro-ios-outputs`) to the GitHub Actions run summary. You can download these to inspect the test run step-by-step.
+*   **Pull Requests:** The `smoke` suite is required to pass on both Android and iOS before merging.
