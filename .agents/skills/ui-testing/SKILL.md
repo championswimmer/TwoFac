@@ -48,7 +48,7 @@ You can use a local simulator (interactive picker) or a connected USB device.
 .maestro/scripts/run-ios-local.sh --suite smoke
 
 # Run tests on a specific simulator UDID
-.maestro/scripts/run-ios-local.sh --suite smoke --udid C8481DE9-800D-46E9-8F5C-009E1F7FE258
+.maestro/scripts/run-ios-local.sh --suite smoke --udid E3D48ABA-2D66-4980-8EFB-E3B880AA8A3D
 
 # Run tests on a connected physical USB device
 .maestro/scripts/run-ios-local.sh --suite smoke --usb
