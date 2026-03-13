@@ -83,6 +83,17 @@ tags:
 *   **AppId Undefined:** Ensure you are running flows using the provided wrapper scripts, which inject the `APP_ID` environment variable.
 *   **Selectors Failing:** Use `maestro hierarchy` to inspect the UI tree. Note that Jetpack Compose selectors may differ from standard Android Views. Consider adding `testTags` in the Compose code.
 
+## Governance & Rollout
+
+*   **Flow Authoring Rules:**
+    *   **Selector Robustness:** Prefer IDs and semantic text over brittle index-based locators.
+    *   **Subflow Reuse:** Do not duplicate launch/auth flows. Use the `subflows/` library.
+    *   **No Flaky Sleeps:** Avoid hardcoded `extendedWaitUntil` or `sleep` commands unless absolutely necessary (e.g., waiting for an external system).
+*   **Quality Gate:** The `smoke` suite must pass on PRs before they are merged. 
+*   **Triage Workflow:** Flaky tests should be tagged `wip` and investigated. If a test fails in `smoke` on CI, review the `maestro-android-outputs` or `maestro-ios-outputs` artifacts.
+*   **Release-Readiness Checklist:** Ensure `smoke` is green on Android and iOS and verify artifacts are captured upon any failure.
+*   **Upgrade Policy:** Maestro CLI upgrades (from v2.3.0) should be validated locally with the full `regression` suite before merging into the main CI and `UI_TESTING_CONSTRAINTS.md`.
+
 ## Related Skills
 
 *   [Simulators and Emulators](../simulators-emulators/SKILL.md)
