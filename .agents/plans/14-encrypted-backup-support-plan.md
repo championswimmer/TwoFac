@@ -6,7 +6,7 @@ progress:
   - "[x] Phase 1 - Add encrypted export path in BackupService"
   - "[x] Phase 2 - Add encrypted restore path in BackupService"
   - "[x] Phase 3 - Surface encryption choice in Compose UI"
-  - "[ ] Phase 4 - Surface encryption choice in CLI"
+  - "[x] Phase 4 - Surface encryption choice in CLI"
   - "[ ] Phase 5 - Tests and validation"
 ---
 
