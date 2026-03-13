@@ -1,0 +1,18 @@
+appId: ${APP_ID}
+tags:
+  - smoke
+  - auth
+  - shared
+---
+- runFlow: ../../../subflows/shared/launch-app.yaml
+
+# The app should show the passkey dialog on launch
+- assertVisible: "Enter Passkey"
+- tapOn:
+    id: ".*"
+    text: "Passkey"
+- inputText: "123456"
+- tapOn: "Unlock"
+
+# After unlock, since there are no accounts on fresh install, the empty state should be visible
+- assertVisible: "No accounts added"
