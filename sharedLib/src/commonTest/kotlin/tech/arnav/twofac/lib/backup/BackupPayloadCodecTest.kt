@@ -111,6 +111,22 @@ class BackupPayloadCodecTest {
     }
 
     @Test
+    fun testDecodeRejectsVersion1EncryptedFlag() {
+        val json = """
+            {
+              "schemaVersion": 1,
+              "createdAt": 1700000000,
+              "encrypted": true,
+              "accounts": ["${sampleUris.first()}"]
+            }
+        """.trimIndent()
+
+        assertFailsWith<IllegalArgumentException> {
+            BackupPayloadCodec.decode(json.encodeToByteArray())
+        }
+    }
+
+    @Test
     fun testDecodeRejectsMixedPayload() {
         val json = """
             {

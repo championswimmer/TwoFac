@@ -592,7 +592,6 @@ fun SettingsScreen(
                             currentRestorePasskeyError = "Backup restore is unavailable"
                             return@launch
                         }
-                        twoFacLib?.unlock(currentPasskey)
                         val result = service.restoreBackup(
                             providerId = importRequest.providerId,
                             backupId = importRequest.backupId,

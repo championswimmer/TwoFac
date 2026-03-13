@@ -8,6 +8,7 @@ import tech.arnav.twofac.lib.PublicApi
  *
  * v1 format contains a list of plaintext otpauth:// URIs.
  * v2 adds support for carrying already-encrypted stored account entries.
+ * Plaintext backups (v1 and v2 with encrypted=false) contain secrets in cleartext.
  */
 @PublicApi
 @Serializable

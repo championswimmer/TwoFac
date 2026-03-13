@@ -214,7 +214,7 @@ class TwoFacLib private constructor(
         entry: EncryptedAccountEntry,
         passKey: String,
     ): String {
-        require(passKey.isNotBlank()) { "Password key cannot be blank" }
+        require(passKey.isNotBlank()) { "Passkey cannot be blank" }
         return decryptURI(
             encryptedURI = entry.encryptedURI,
             passKey = passKey,
