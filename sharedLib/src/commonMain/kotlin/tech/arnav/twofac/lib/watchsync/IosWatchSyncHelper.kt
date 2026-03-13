@@ -21,7 +21,7 @@ object IosWatchSyncHelper {
         val accounts = lib.getAllAccounts()
         if (accounts.isEmpty()) return null
         
-        val uris = lib.exportAccountURIs()
+        val uris = lib.exportAccountsPlaintext()
         
         val watchAccounts = accounts.zip(uris).map { (account, uri) ->
             WatchSyncAccount(

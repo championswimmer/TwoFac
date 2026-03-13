@@ -23,7 +23,7 @@ class BackupService(
     suspend fun listProviders(): List<BackupProvider> = transportRegistry.providerInfo()
 
     @OptIn(ExperimentalTime::class)
-    suspend fun createBackup(providerId: String): BackupResult<BackupDescriptor> {
+    suspend fun createBackup(providerId: String, encrypted: Boolean = false): BackupResult<BackupDescriptor> {
         val transport = resolveTransport(providerId) ?: return BackupResult.Failure(
             "Backup provider not found: $providerId"
         )
@@ -31,14 +31,32 @@ class BackupService(
             return BackupResult.Failure("Provider '$providerId' does not support manual backup")
         }
 
-        val uris = try {
-            twoFacLib.exportAccountURIs()
+        val payload = try {
+            if (encrypted) {
+                val encryptedAccounts = twoFacLib.exportAccountsEncrypted().map { account ->
+                    EncryptedAccountEntry(
+                        accountLabel = account.accountLabel,
+                        salt = account.salt,
+                        encryptedURI = account.encryptedURI,
+                    )
+                }
+                BackupPayload(
+                    createdAt = Clock.System.now().epochSeconds,
+                    encrypted = true,
+                    encryptedAccounts = encryptedAccounts,
+                )
+            } else {
+                val uris = twoFacLib.exportAccountsPlaintext()
+                BackupPayload(
+                    createdAt = Clock.System.now().epochSeconds,
+                    accounts = uris,
+                )
+            }
         } catch (e: Exception) {
             return BackupResult.Failure("Failed to read accounts: ${e.message}", e)
         }
 
-        val createdAt = Clock.System.now().epochSeconds
-        val payload = BackupPayload(createdAt = createdAt, accounts = uris)
+        val createdAt = payload.createdAt
         val bytes = BackupPayloadCodec.encode(payload)
         val id = "twofac-backup-$createdAt-${backupSequence++}.json"
         val descriptor = BackupDescriptor(
@@ -85,7 +103,7 @@ class BackupService(
             return BackupResult.Failure("Backup payload contains invalid account URI: ${e.message}", e)
         }
         val existingAccounts = try {
-            twoFacLib.exportAccountURIs()
+            twoFacLib.exportAccountsPlaintext()
                 .map(OtpAuthURI::parse)
                 .toMutableList()
         } catch (e: Exception) {
