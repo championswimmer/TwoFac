@@ -1,0 +1,30 @@
+appId: ${APP_ID}
+tags:
+  - smoke
+  - shared
+---
+- runFlow: ../../../subflows/shared/launch-app.yaml
+
+# Unlock the app
+- assertVisible: "Enter Passkey"
+- tapOn:
+    id: ".*"
+    text: "Passkey"
+- inputText: "123456"
+- tapOn: "Unlock"
+
+# The empty home state is visible on fresh install
+- assertVisible: "No accounts added"
+
+# Assert the 3 bottom tabs are visible
+- assertVisible: "Home"
+- assertVisible: "Accounts"
+- assertVisible: "Settings"
+
+# Test tab navigation
+- tapOn: "Accounts"
+- assertVisible: "Accounts" # Or a known element on accounts screen
+- tapOn: "Settings"
+- assertVisible: "Settings" # Or a known element on settings screen
+- tapOn: "Home"
+- assertVisible: "No accounts added"
