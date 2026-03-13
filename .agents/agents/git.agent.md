@@ -1,6 +1,6 @@
 ---
 name: Git Agent
-model: gpt-5-mini
+model: claude-haiku-4.5
 description: Concise git commit / push / PR guidance for repository contributors.
 ---
 
