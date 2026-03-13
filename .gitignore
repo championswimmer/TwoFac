@@ -19,4 +19,6 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 google-cloud-credentials.json
 google-cloud-credentials.plist
-\n# Maestro UI Testing\n.maestro/outputs/
+
+# Maestro UI Testing
+.maestro/outputs/
