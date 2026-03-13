@@ -1,13 +1,13 @@
 ---
 name: Encrypted Backup Support Plan
-status: In Progress
+status: Completed
 progress:
   - "[x] Phase 0 - Extend backup payload format to support encrypted entries"
   - "[x] Phase 1 - Add encrypted export path in BackupService"
   - "[x] Phase 2 - Add encrypted restore path in BackupService"
   - "[x] Phase 3 - Surface encryption choice in Compose UI"
   - "[x] Phase 4 - Surface encryption choice in CLI"
-  - "[ ] Phase 5 - Tests and validation"
+  - "[x] Phase 5 - Tests and validation"
 ---
 
 # Encrypted Backup Support Plan

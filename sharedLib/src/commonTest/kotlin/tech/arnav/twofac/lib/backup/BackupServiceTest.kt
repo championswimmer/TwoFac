@@ -306,7 +306,10 @@ class BackupServiceTest {
         )
 
         assertTrue(restoreResult is BackupResult.Failure)
-        assertTrue(restoreResult.message.contains("Incorrect backup passkey"))
+        assertEquals(
+            "Incorrect backup passkey — could not decrypt the backup accounts.",
+            restoreResult.message,
+        )
         assertEquals(0, freshLib.getAllAccounts().size)
     }
 
