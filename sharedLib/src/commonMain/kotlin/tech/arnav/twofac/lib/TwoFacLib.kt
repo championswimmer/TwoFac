@@ -189,7 +189,7 @@ class TwoFacLib private constructor(
      *
      * @return List of plaintext otpauth:// URIs for all accounts
      */
-    suspend fun exportAccountURIs(): List<String> {
+    suspend fun exportAccountsPlaintext(): List<String> {
         check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
@@ -199,4 +199,15 @@ class TwoFacLib private constructor(
             )
         }
     }
+
+    /**
+     * Returns encrypted stored accounts exactly as they exist in storage.
+     */
+    suspend fun exportAccountsEncrypted(): List<StoredAccount> {
+        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        return accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+    }
+
+    @Deprecated("Use exportAccountsPlaintext()", ReplaceWith("exportAccountsPlaintext()"))
+    suspend fun exportAccountURIs(): List<String> = exportAccountsPlaintext()
 }

@@ -5,6 +5,7 @@ import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class BackupServiceTest {
@@ -72,6 +73,44 @@ class BackupServiceTest {
         assertTrue(restoreResult is BackupResult.Success)
         assertEquals(sampleUris.size, restoreResult.value)
         assertEquals(sampleUris.size, freshLib.getAllAccounts().size)
+    }
+
+    @Test
+    fun testCreatePlaintextBackupWritesPlaintextAccounts() = runTest {
+        val lib = buildLib()
+        lib.unlock("test-passkey")
+        sampleUris.forEach { lib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val service = BackupService(lib, BackupTransportRegistry(listOf(transport)))
+
+        val createResult = service.createBackup(transport.id, encrypted = false)
+
+        assertTrue(createResult is BackupResult.Success)
+        val payload = BackupPayloadCodec.decode(transport.store.getValue(createResult.value.id).content)
+        assertFalse(payload.encrypted)
+        assertEquals(lib.exportAccountsPlaintext(), payload.accounts)
+        assertTrue(payload.encryptedAccounts.isEmpty())
+    }
+
+    @Test
+    fun testCreateEncryptedBackupWritesEncryptedAccounts() = runTest {
+        val lib = buildLib()
+        lib.unlock("test-passkey")
+        sampleUris.forEach { lib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val service = BackupService(lib, BackupTransportRegistry(listOf(transport)))
+
+        val createResult = service.createBackup(transport.id, encrypted = true)
+
+        assertTrue(createResult is BackupResult.Success)
+        val payload = BackupPayloadCodec.decode(transport.store.getValue(createResult.value.id).content)
+        assertTrue(payload.encrypted)
+        assertTrue(payload.accounts.isEmpty())
+        assertEquals(lib.exportAccountsEncrypted().map { it.accountLabel }, payload.encryptedAccounts.map { it.accountLabel })
+        assertEquals(lib.exportAccountsEncrypted().map { it.salt }, payload.encryptedAccounts.map { it.salt })
+        assertEquals(lib.exportAccountsEncrypted().map { it.encryptedURI }, payload.encryptedAccounts.map { it.encryptedURI })
     }
 
     @Test
@@ -167,11 +206,18 @@ class BackupServiceTest {
     }
 
     @Test
-    fun testExportAccountURIsRequiresUnlock() = runTest {
+    fun testExportAccountsRequireUnlock() = runTest {
         val lib = TwoFacLib.initialise(MemoryStorage())
         // Not unlocked
         try {
-            lib.exportAccountURIs()
+            lib.exportAccountsPlaintext()
+            error("Should have thrown")
+        } catch (e: IllegalStateException) {
+            assertTrue(e.message?.contains("not unlocked") == true)
+        }
+
+        try {
+            lib.exportAccountsEncrypted()
             error("Should have thrown")
         } catch (e: IllegalStateException) {
             assertTrue(e.message?.contains("not unlocked") == true)

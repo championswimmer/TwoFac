@@ -31,7 +31,7 @@ suspend fun loadCompanionSyncSourceAccounts(
         onEmpty?.invoke()
         return null
     }
-    val uris = twoFacLib.exportAccountURIs()
+    val uris = twoFacLib.exportAccountsPlaintext()
     return accounts.zip(uris).map { (account, uri) ->
         CompanionSyncSourceAccount(
             accountId = account.accountID,
