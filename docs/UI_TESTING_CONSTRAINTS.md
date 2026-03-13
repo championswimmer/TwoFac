@@ -7,7 +7,7 @@ This document outlines the constraints, tooling baseline, and support matrix for
 *   **Maestro Version:** Pinned to `2.3.0` for all local and CI runs.
 *   **Android Support:** Emulator or USB physical device. At least one must be used for smoke validation.
 *   **iOS Support:** Simulator or USB physical device. At least one must be used for smoke validation.
-*   **Java Requirement:** JDK 17+ (aligns with project requirements).
+*   **Java Requirement:** JDK 21+ (aligns with project requirements).
 *   **Android Prerequisites:** Android SDK and `adb` available in `$PATH`.
 *   **iOS Prerequisites:** Xcode CLI tools installed and configured.
 

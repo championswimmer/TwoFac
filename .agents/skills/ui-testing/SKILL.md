@@ -16,7 +16,7 @@ For unit and integration tests, please refer to the specific module's testing pr
 ## Setup & Prerequisites
 
 *   Maestro CLI must be installed: `curl -Ls "https://get.maestro.mobile.dev" | bash` (Pinned internally to v2.3.0).
-*   Java JDK 17+ installed.
+*   Java JDK 21+ installed.
 *   Android: SDK tools (`adb`) and `emulator` must be available in `$PATH`.
 *   iOS: Xcode 16+ and Command Line Tools must be installed.
 
