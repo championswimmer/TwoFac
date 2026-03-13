@@ -35,6 +35,9 @@ fun PasskeyDialog(
     isVisible: Boolean,
     isLoading: Boolean,
     error: String?,
+    title: String = "Enter Passkey",
+    description: String = "Enter your passkey to decrypt and view your accounts",
+    confirmLabel: String = "Unlock",
     onPasskeySubmit: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -47,7 +50,7 @@ fun PasskeyDialog(
             onDismissRequest = onDismiss,
             title = {
                 Text(
-                    text = "Enter Passkey",
+                    text = title,
                     style = MaterialTheme.typography.headlineSmall
                 )
             },
@@ -56,7 +59,7 @@ fun PasskeyDialog(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Enter your passkey to decrypt and view your accounts",
+                        text = description,
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -111,7 +114,7 @@ fun PasskeyDialog(
                         },
                         enabled = passkey.isNotBlank() && !isLoading
                     ) {
-                        Text("Unlock")
+                        Text(confirmLabel)
                     }
                 }
             },

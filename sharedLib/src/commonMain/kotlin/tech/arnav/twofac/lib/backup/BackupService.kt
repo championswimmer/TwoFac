@@ -78,6 +78,24 @@ class BackupService(
         return transport.listBackups()
     }
 
+    suspend fun inspectBackup(providerId: String, backupId: String): BackupResult<BackupPayload> {
+        val transport = resolveTransport(providerId) ?: return BackupResult.Failure(
+            "Backup provider not found: $providerId"
+        )
+        if (!transport.supportsManualRestore) {
+            return BackupResult.Failure("Provider '$providerId' does not support manual restore")
+        }
+        val blobResult = transport.download(backupId)
+        if (blobResult is BackupResult.Failure) return blobResult
+
+        val blob = (blobResult as BackupResult.Success).value
+        return try {
+            BackupResult.Success(BackupPayloadCodec.decode(blob.content))
+        } catch (e: Exception) {
+            BackupResult.Failure("Failed to decode backup payload: ${e.message}", e)
+        }
+    }
+
     suspend fun restoreBackup(
         providerId: String,
         backupId: String,
@@ -91,15 +109,9 @@ class BackupService(
             return BackupResult.Failure("Provider '$providerId' does not support manual restore")
         }
 
-        val blobResult = transport.download(backupId)
-        if (blobResult is BackupResult.Failure) return blobResult
-
-        val blob = (blobResult as BackupResult.Success).value
-        val payload = try {
-            BackupPayloadCodec.decode(blob.content)
-        } catch (e: Exception) {
-            return BackupResult.Failure("Failed to decode backup payload: ${e.message}", e)
-        }
+        val inspectResult = inspectBackup(providerId, backupId)
+        if (inspectResult is BackupResult.Failure) return inspectResult
+        val payload = (inspectResult as BackupResult.Success).value
 
         val uris = if (payload.encrypted) {
             val normalizedBackupPasskey = backupPasskey?.takeIf(String::isNotBlank)

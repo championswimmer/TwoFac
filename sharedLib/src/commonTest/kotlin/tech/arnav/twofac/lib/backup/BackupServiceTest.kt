@@ -148,6 +148,24 @@ class BackupServiceTest {
     }
 
     @Test
+    fun testInspectBackupReportsEncryptedPayload() = runTest {
+        val lib = buildLib(BACKUP_PASSKEY)
+        lib.unlock(BACKUP_PASSKEY)
+        sampleUris.forEach { lib.addAccount(it) }
+
+        val transport = FakeTransport()
+        val service = BackupService(lib, BackupTransportRegistry(listOf(transport)))
+        val createResult = service.createBackup(transport.id, encrypted = true)
+
+        assertTrue(createResult is BackupResult.Success)
+        val inspectResult = service.inspectBackup(transport.id, createResult.value.id)
+
+        assertTrue(inspectResult is BackupResult.Success)
+        assertTrue(inspectResult.value.encrypted)
+        assertEquals(sampleUris.size, inspectResult.value.encryptedAccounts.size)
+    }
+
+    @Test
     fun testRestoreValidatesPayloadBeforeMutatingVault() = runTest {
         val lib = buildLib()
         lib.unlock("test-passkey")
