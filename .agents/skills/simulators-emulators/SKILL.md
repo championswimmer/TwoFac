@@ -4,6 +4,10 @@ description: How to list, pick, and boot Android emulators and iOS simulators fo
 ---
 # Skill: Simulators and Emulators
 
+> IMPORTANT: 
+> Preferred iOS Simulator Name: `iPhone 16 w Watch` 
+> Preferred Android Emulator Name: `Pixel_9`
+
 Use this skill to discover local Android emulators and iOS simulators, pick a target interactively, and boot it before running the app.
 
 ## Companion scripts
