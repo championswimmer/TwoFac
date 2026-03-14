@@ -2,9 +2,12 @@ public final class tech/arnav/twofac/lib/TwoFacLib {
 	public static final field Companion Ltech/arnav/twofac/lib/TwoFacLib$Companion;
 	public synthetic fun <init> (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun addAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun decryptEncryptedBackupAccount (Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteAllAccountsFromStorage (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun exportAccountURIs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun exportAccountsEncrypted (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun exportAccountsPlaintext (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAllAccountOTPs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAllAccounts ()Ljava/util/List;
 	public final fun getStorage ()Ltech/arnav/twofac/lib/storage/Storage;
@@ -50,16 +53,20 @@ public final class tech/arnav/twofac/lib/backup/BackupDescriptor {
 
 public final class tech/arnav/twofac/lib/backup/BackupPayload {
 	public static final field Companion Ltech/arnav/twofac/lib/backup/BackupPayload$Companion;
-	public fun <init> (IJLjava/util/List;)V
-	public synthetic fun <init> (IJLjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (IJZLjava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (IJZLjava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()I
 	public final fun component2 ()J
-	public final fun component3 ()Ljava/util/List;
-	public final fun copy (IJLjava/util/List;)Ltech/arnav/twofac/lib/backup/BackupPayload;
-	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupPayload;IJLjava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupPayload;
+	public final fun component3 ()Z
+	public final fun component4 ()Ljava/util/List;
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (IJZLjava/util/List;Ljava/util/List;)Ltech/arnav/twofac/lib/backup/BackupPayload;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupPayload;IJZLjava/util/List;Ljava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupPayload;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAccounts ()Ljava/util/List;
 	public final fun getCreatedAt ()J
+	public final fun getEncrypted ()Z
+	public final fun getEncryptedAccounts ()Ljava/util/List;
 	public final fun getSchemaVersion ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -200,10 +207,13 @@ public abstract class tech/arnav/twofac/lib/backup/BackupResult {
 
 public final class tech/arnav/twofac/lib/backup/BackupService {
 	public fun <init> (Ltech/arnav/twofac/lib/TwoFacLib;Ltech/arnav/twofac/lib/backup/BackupTransportRegistry;)V
-	public final fun createBackup (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun createBackup (Ljava/lang/String;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createBackup$default (Ltech/arnav/twofac/lib/backup/BackupService;Ljava/lang/String;ZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun inspectBackup (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun listBackups (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun listProviders (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun restoreBackup (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun restoreBackup (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun restoreBackup$default (Ltech/arnav/twofac/lib/backup/BackupService;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public abstract interface class tech/arnav/twofac/lib/backup/BackupTransport {
@@ -235,6 +245,22 @@ public final class tech/arnav/twofac/lib/backup/BackupTransportRegistry {
 	public final fun all ()Ljava/util/List;
 	public final fun findById (Ljava/lang/String;)Ltech/arnav/twofac/lib/backup/BackupTransport;
 	public final fun providerInfo (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class tech/arnav/twofac/lib/backup/EncryptedAccountEntry {
+	public static final field Companion Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAccountLabel ()Ljava/lang/String;
+	public final fun getEncryptedURI ()Ljava/lang/String;
+	public final fun getSalt ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public abstract interface class tech/arnav/twofac/lib/importer/ImportAdapter {
