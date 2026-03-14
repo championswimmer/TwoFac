@@ -2,10 +2,13 @@ package tech.arnav.twofac.cli.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
+import com.github.ajalt.mordant.terminal.prompt
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.files.Path
 import org.koin.core.component.KoinComponent
@@ -71,7 +74,7 @@ class ExportCommand : CliktCommand(name = "export"), KoinComponent {
                 )
             }
             is BackupResult.Failure -> {
-                fail("Error: Export failed: ${result.message}")
+                throw UsageError("Error: Export failed: ${result.message}")
             }
         }
     }
@@ -107,11 +110,11 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
         val resolvedBackupId = backupFile ?: run {
             val listResult = service.listBackups(LOCAL_PROVIDER_ID)
             if (listResult is BackupResult.Failure) {
-                fail("Error: Failed to list backups: ${listResult.message}")
+                throw UsageError("Error: Failed to list backups: ${listResult.message}")
             }
             val backups = (listResult as BackupResult.Success).value
             if (backups.isEmpty()) {
-                fail("Error: No backup files found in $dir")
+                throw UsageError("Error: No backup files found in $dir")
             }
             backups.maxBy { it.createdAt }.id
         }
@@ -119,18 +122,18 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
         val inspectionResult = service.inspectBackup(LOCAL_PROVIDER_ID, resolvedBackupId)
         val payload = when (inspectionResult) {
             is BackupResult.Success -> inspectionResult.value
-            is BackupResult.Failure -> fail("Error: Import failed: ${inspectionResult.message}")
+            is BackupResult.Failure -> throw UsageError("Error: Import failed: ${inspectionResult.message}")
         }
 
         val resolvedBackupPasskey: String?
         val resolvedCurrentPasskey: String
         if (payload.encrypted) {
-            resolvedBackupPasskey = backupPasskey ?: prompt(
-                text = "This backup contains encrypted accounts.\nEnter the passkey used when this backup was created (to decrypt)",
+            resolvedBackupPasskey = backupPasskey ?: terminal.prompt(
+                "This backup contains encrypted accounts.\nEnter the passkey used when this backup was created (to decrypt)",
                 hideInput = true,
             )
             if (resolvedBackupPasskey.isNullOrBlank()) {
-                fail("Error: Backup passkey is required.")
+                throw UsageError("Error: Backup passkey is required.")
             }
             val isBackupPasskeyValid = payload.encryptedAccounts.firstOrNull()?.let { account ->
                 runCatching {
@@ -138,24 +141,24 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
                 }.isSuccess
             } ?: true
             if (!isBackupPasskeyValid) {
-                fail("Error: Incorrect passkey — could not decrypt the backup accounts.")
+                throw UsageError("Error: Incorrect passkey — could not decrypt the backup accounts.")
             }
-            resolvedCurrentPasskey = currentPasskey ?: prompt(
-                text = "Enter your current app passkey (to save restored accounts to storage)",
+            resolvedCurrentPasskey = currentPasskey ?: terminal.prompt(
+                "Enter your current app passkey (to save restored accounts to storage)",
                 hideInput = true,
-            )
-            if (resolvedCurrentPasskey.isNullOrBlank()) {
-                fail("Error: Current app passkey is required.")
+            ) ?: ""
+            if (resolvedCurrentPasskey.isBlank()) {
+                throw UsageError("Error: Current app passkey is required.")
             }
             twoFacLib.unlock(resolvedCurrentPasskey)
         } else {
             resolvedBackupPasskey = null
-            resolvedCurrentPasskey = currentPasskey ?: prompt(
-                text = "Enter your current app passkey (to save restored accounts to storage)",
+            resolvedCurrentPasskey = currentPasskey ?: terminal.prompt(
+                "Enter your current app passkey (to save restored accounts to storage)",
                 hideInput = true,
-            )
-            if (resolvedCurrentPasskey.isNullOrBlank()) {
-                fail("Error: Current app passkey is required.")
+            ) ?: ""
+            if (resolvedCurrentPasskey.isBlank()) {
+                throw UsageError("Error: Current app passkey is required.")
             }
             twoFacLib.unlock(resolvedCurrentPasskey)
         }
@@ -167,7 +170,7 @@ class ImportCommand : CliktCommand(name = "import"), KoinComponent {
             currentPasskey = resolvedCurrentPasskey,
         )) {
             is BackupResult.Success -> echo("✓ Imported ${result.value} account(s) from $resolvedBackupId")
-            is BackupResult.Failure -> fail("Error: Import failed: ${result.message}")
+            is BackupResult.Failure -> throw UsageError("Error: Import failed: ${result.message}")
         }
     }
 }
