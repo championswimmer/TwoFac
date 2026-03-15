@@ -36,7 +36,7 @@ class AuthyImportAdapterTest {
         val result = adapter.parse(exportJson)
 
         assertTrue(result is ImportResult.Success, "Import should succeed")
-        val uris = (result as ImportResult.Success).otpAuthUris
+        val uris = result.otpAuthUris
         assertEquals(2, uris.size, "Should parse 2 tokens")
 
         // Verify first URI
@@ -64,7 +64,7 @@ class AuthyImportAdapterTest {
         val result = adapter.parse(exportJson)
 
         assertTrue(result is ImportResult.Success, "Import should succeed with defaults")
-        val uris = (result as ImportResult.Success).otpAuthUris
+        val uris = result.otpAuthUris
         assertEquals(1, uris.size, "Should parse 1 token")
 
         // Should use defaults
@@ -94,7 +94,7 @@ class AuthyImportAdapterTest {
         val result = adapter.parse(exportJson)
 
         assertTrue(result is ImportResult.Success, "Import should succeed")
-        val uris = (result as ImportResult.Success).otpAuthUris
+        val uris = result.otpAuthUris
         assertEquals(1, uris.size, "Should parse 1 token")
 
         // Verify custom settings

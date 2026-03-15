@@ -20,7 +20,7 @@ class EnteImportAdapterTest {
         val result = adapter.parse(exportText)
 
         assertTrue(result is ImportResult.Success, "Import should succeed")
-        val uris = (result as ImportResult.Success).otpAuthUris
+        val uris = result.otpAuthUris
         assertEquals(2, uris.size, "Should parse 2 URIs")
 
         // Verify URIs
@@ -43,7 +43,7 @@ class EnteImportAdapterTest {
         val result = adapter.parse(exportText)
 
         assertTrue(result is ImportResult.Success, "Import should succeed with whitespace")
-        val uris = (result as ImportResult.Success).otpAuthUris
+        val uris = result.otpAuthUris
         assertEquals(2, uris.size, "Should parse 2 URIs, ignoring empty lines")
     }
 
@@ -68,7 +68,7 @@ class EnteImportAdapterTest {
 
         assertTrue(result is ImportResult.Failure, "Encrypted import should fail with explanation")
         assertTrue(
-            (result as ImportResult.Failure).message.contains("not yet supported"),
+            result.message.contains("not yet supported"),
             "Error message should explain encrypted exports aren't supported"
         )
     }

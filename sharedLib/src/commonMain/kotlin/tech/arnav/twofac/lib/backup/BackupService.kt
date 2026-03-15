@@ -52,7 +52,7 @@ class BackupService(
                     accounts = uris,
                 )
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             return BackupResult.Failure("Failed to read accounts: ${e.message}", e)
         }
 
@@ -91,7 +91,7 @@ class BackupService(
         val blob = (blobResult as BackupResult.Success).value
         return try {
             BackupResult.Success(BackupPayloadCodec.decode(blob.content))
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             BackupResult.Failure("Failed to decode backup payload: ${e.message}", e)
         }
     }
@@ -116,7 +116,7 @@ class BackupService(
         if (normalizedCurrentPasskey != null) {
             try {
                 twoFacLib.unlock(normalizedCurrentPasskey)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 return BackupResult.Failure("Failed to unlock app storage: ${e.message}", e)
             }
         }
@@ -131,7 +131,7 @@ class BackupService(
                 payload.encryptedAccounts.map { entry ->
                     twoFacLib.decryptEncryptedBackupAccount(entry, normalizedBackupPasskey)
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 return BackupResult.Failure(
                     "Incorrect backup passkey — could not decrypt the backup accounts.",
                     e,
@@ -143,7 +143,7 @@ class BackupService(
         }
         val parsedBackupAccounts = try {
             uris.map(OtpAuthURI::parse)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             val message = if (payload.encrypted) {
                 "Incorrect backup passkey — could not decrypt the backup accounts."
             } else {
@@ -160,7 +160,7 @@ class BackupService(
             twoFacLib.exportAccountsPlaintext()
                 .map(OtpAuthURI::parse)
                 .toMutableList()
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             return BackupResult.Failure("Failed to read existing accounts: ${e.message}", e)
         }
 
