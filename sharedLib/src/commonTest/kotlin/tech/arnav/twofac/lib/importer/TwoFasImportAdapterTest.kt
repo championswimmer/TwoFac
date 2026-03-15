@@ -35,7 +35,7 @@ class TwoFasImportAdapterTest {
         val result = adapter.parse(exportJson)
 
         assertTrue(result is ImportResult.Success, "Import should succeed")
-        val uris = (result as ImportResult.Success).otpAuthUris
+        val uris = result.otpAuthUris
         assertEquals(2, uris.size, "Should parse 2 services")
 
         // Verify first URI
@@ -71,7 +71,7 @@ class TwoFasImportAdapterTest {
         val result = adapter.parse(exportJson)
 
         assertTrue(result is ImportResult.Success, "Import should succeed")
-        val uris = (result as ImportResult.Success).otpAuthUris
+        val uris = result.otpAuthUris
         assertEquals(1, uris.size, "Should parse 1 service")
 
         // Verify URI with otp section values
