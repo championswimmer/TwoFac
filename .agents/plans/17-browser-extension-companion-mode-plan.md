@@ -126,31 +126,70 @@ The desktop app installer must register a **native messaging host manifest** so 
 
 ---
 
+## Web API Findings (Research-backed constraints)
+
+The following constraints from Chrome/Firefox docs drive the UX/state-machine decisions below:
+
+1. Native messaging requires `"nativeMessaging"` permission and host registration with `allowed_origins` (Chrome) / `allowed_extensions` (Firefox), so desktop availability is best checked via explicit `ping` calls and `lastError`/rejected promises.
+   - Chrome docs: https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging
+   - MDN docs: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Native_messaging
+2. `sendNativeMessage()` launches a host per request; `connectNative()` keeps a long-lived port for streaming updates, so startup detection should use ping while live companion sync should use a persistent port.
+   - Chrome docs: https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging
+   - MDN docs: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/sendNativeMessage
+3. Extension service workers cannot rely on `window.localStorage`; companion mode preference should be persisted in extension storage (`chrome.storage.local` / `browser.storage.local`) so popup/sidepanel + background can read the same setting.
+   - Chrome storage docs: https://developer.chrome.com/docs/extensions/reference/api/storage
+   - MDN storage docs: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/local
+4. First-install state can be initialized with `runtime.onInstalled`, but user choice UI should be shown in popup/sidepanel (not in content scripts) and persisted after explicit selection.
+   - Chrome runtime docs: https://developer.chrome.com/docs/extensions/reference/api/runtime
+   - MDN runtime docs: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onInstalled
+
+---
+
 ## Companion Mode Design
 
 ### Operating Modes
 
-The extension operates in one of two modes, determined at startup and re-evaluated periodically:
+The extension operates with a **saved user preference** and a **resolved runtime mode**:
+
+- `modePreference` (persisted setting): `unset` | `standalone` | `companion`
+- `resolvedMode` (runtime): `standalone` | `companion`
+
+This preserves explicit user choice instead of silently auto-switching based only on detection.
+
+### Companion Mode Preference State Machine
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│              Extension Startup / Periodic Check          │
-│                                                          │
-│  1. Try chrome.runtime.sendNativeMessage("tech.arnav.   │
-│     twofac", { type: "ping" })                           │
-│                                                          │
-│  ┌──────────────┐              ┌───────────────────┐     │
-│  │  Response OK  │──────────►  │  COMPANION MODE   │     │
-│  │  (host found) │              │  Read/write via   │     │
-│  └──────────────┘              │  native messaging  │     │
-│                                 └───────────────────┘     │
-│  ┌──────────────┐              ┌───────────────────┐     │
-│  │  Error/timeout│──────────►  │  STANDALONE MODE  │     │
-│  │  (no host)    │              │  Use localStorage  │     │
-│  └──────────────┘              │  (existing behavior)│    │
-│                                 └───────────────────┘     │
-└─────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│ Startup: load modePreference + ping desktop host via sendNativeMessage │
+└────────────────────────────────────────────────────────────────────────┘
+                  │
+      ┌───────────┴───────────┐
+      │                       │
+ desktop available       desktop unavailable
+      │                       │
+      │                       ├─ preference = companion
+      │                       │    → show warning dialog:
+      │                       │      "Desktop app not available. Use standalone fallback?"
+      │                       │      [Use Standalone] [Keep Companion Preference]
+      │                       │
+      │                       └─ otherwise
+      │                            → resolvedMode = standalone
+      │
+ preference = unset
+      → first-run chooser dialog:
+        "Desktop app detected. Use Desktop Companion mode?"
+        [Use Companion] [Use Standalone]
+        save choice to modePreference
+      │
+ preference = companion → resolvedMode = companion
+ preference = standalone → resolvedMode = standalone
 ```
+
+### Desktop Availability Detection Strategy
+
+1. **Cold check**: `sendNativeMessage({ type: "ping" })` with timeout to decide current availability.
+2. **Companion active**: switch to `connectNative()` port for updates (`accounts_changed`) and heartbeat/disconnect handling.
+3. **Disconnect/error while in companion**: mark desktop unavailable and trigger fallback prompt on next UI open (or immediately if UI active).
 
 ### Message Protocol (Extension ↔ Desktop Host)
 
@@ -177,18 +216,20 @@ All messages are JSON objects with a `type` field. The host reads from the deskt
 
 ### Storage Layer Switching
 
-The key architectural change is making the extension's account storage **pluggable** — selecting between localStorage (standalone) and native messaging (companion) based on desktop app availability.
+The key architectural change is making the extension's account storage **pluggable** — selecting between localStorage (standalone) and native messaging (companion) based on **saved mode preference + desktop availability**.
 
 ```
-┌──────────────────────────────────────────────┐
-│           CompanionAwareAccountStore          │
-│                                               │
-│  isCompanionAvailable()                       │
-│    ├─ true  → NativeMessagingAccountStore     │
-│    │           (reads/writes via host)         │
-│    └─ false → LocalStorageAccountStore        │
-│               (existing KStore behavior)       │
-└──────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────┐
+│                   CompanionAwareAccountStore                   │
+│                                                                │
+│  resolveMode(preference, isCompanionAvailable())               │
+│    ├─ preference=companion && available      → NativeMessaging │
+│    ├─ preference=companion && unavailable    → LocalStorage +  │
+│    │                                            fallback prompt │
+│    ├─ preference=standalone                  → LocalStorage     │
+│    └─ preference=unset                       → LocalStorage +   │
+│                                                 first-run prompt │
+└────────────────────────────────────────────────────────────────┘
 ```
 
 ### File Watching for Live Sync
@@ -353,6 +394,24 @@ external object NativeMessagingInterop {
 }
 ```
 
+#### 1.4 Add extension settings interop for persisted mode preference
+
+Create `composeApp/src/wasmJsMain/typescript/src/extension-settings.mts` that wraps `chrome.storage.local`/`browser.storage.local` for:
+
+- `modePreference` (`unset | standalone | companion`)
+- `companionFallbackPending` (`boolean`, set when companion is preferred but host is unavailable)
+- `lastCompanionSeenAtEpochSec` (`number?`, optional diagnostics)
+
+Rationale: companion preference must be readable by popup/sidepanel and service worker contexts, and `window.localStorage` is not suitable for service worker access.
+
+#### 1.5 Bootstrap preference state in service worker
+
+Update `composeApp/extension/background.js` to:
+
+- Initialize companion settings on install/update (`runtime.onInstalled`) without forcing a mode.
+- Run lightweight host availability probe and publish state for UI (popup/sidepanel) consumption.
+- Set/clear `companionFallbackPending` when companion-preferred users lose host connectivity.
+
 ### Phase 2 — Companion-aware Account Storage Switching in Wasm/Kotlin
 
 #### 2.1 Create `DesktopCompanionClient` in wasmJsMain
@@ -377,13 +436,30 @@ A KStore-compatible wrapper that delegates to either native messaging or localSt
 class CompanionAwareAccountStore(
     private val localStore: KStore<List<StoredAccount>>,
     private val companionClient: DesktopCompanionClient,
+    private val modeSettings: CompanionModeSettingsRepository,
 ) {
     enum class Mode { STANDALONE, COMPANION }
+    enum class Preference { UNSET, STANDALONE, COMPANION }
 
     val currentMode: StateFlow<Mode>
+    val modePreference: StateFlow<Preference>
 
-    suspend fun detectMode(): Mode {
-        return if (companionClient.isDesktopAppAvailable()) Mode.COMPANION else Mode.STANDALONE
+    suspend fun resolveModeOnStartup(): Mode {
+        val desktopAvailable = companionClient.isDesktopAppAvailable()
+        val preference = modeSettings.getModePreference()
+
+        return when {
+            preference == Preference.COMPANION && desktopAvailable -> Mode.COMPANION
+            preference == Preference.COMPANION && !desktopAvailable -> {
+                modeSettings.setFallbackPending(true) // UI prompts user
+                Mode.STANDALONE
+            }
+            preference == Preference.UNSET && desktopAvailable -> {
+                modeSettings.setFirstRunPromptPending(true)
+                Mode.STANDALONE // until user decides
+            }
+            else -> Mode.STANDALONE
+        }
     }
 
     // Delegates get/set to appropriate backing store based on mode
@@ -399,7 +475,8 @@ Wire the `CompanionAwareAccountStore` into the existing Koin DI graph so the res
 ```kotlin
 val wasmCompanionModule = module {
     single { DesktopCompanionClient() }
-    single { CompanionAwareAccountStore(get(), get()) }
+    single { CompanionModeSettingsRepository(get()) }
+    single { CompanionAwareAccountStore(get(), get(), get()) }
 }
 ```
 
@@ -423,16 +500,35 @@ Add a small indicator in the extension UI (Settings screen or app bar) showing c
 
 #### 3.2 Manual mode override in Settings
 
-Allow users to force standalone mode even when the desktop app is available (useful for debugging or preference):
+Allow users to switch modes at any time from Settings, with availability checks:
 
-- Toggle: "Use Desktop App Storage" (auto-detected, manually overridable)
-- Info text explaining what companion mode means
+- Radio group:
+  - `Standalone (browser storage)`
+  - `Desktop Companion (desktop app storage)`
+- If user selects `Desktop Companion`, run live availability check first:
+  - Available → save preference as `companion`
+  - Not available → keep current mode and show inline error
+- If user selects `Standalone`, always allow and save preference as `standalone`
+- Info text explains data source and implications of each mode.
 
-#### 3.3 One-time migration prompt
+#### 3.3 First-run companion choice prompt
 
-When the extension first detects a desktop app and has existing localStorage accounts:
-- Show a prompt: "Desktop app detected. Merge your browser accounts into the desktop app, or switch to using desktop accounts only?"
-- Options: "Merge & Switch", "Switch (discard browser accounts)", "Stay Standalone"
+On first extension run (`modePreference = unset`) when desktop app is detected:
+- Show modal/banner prompt before entering companion mode:
+  - "Desktop app detected. Do you want to use Desktop Companion mode?"
+  - Actions: `Use Companion` / `Use Standalone`
+- Persist selection immediately to settings (`modePreference`).
+- If user chooses `Use Companion` and standalone browser accounts already exist, follow with migration choice (`Merge & Switch` / `Switch without merge`) as a second-step prompt.
+- If desktop is not detected, default to standalone and keep preference unset until user explicitly picks from Settings.
+
+#### 3.4 Companion-unavailable fallback prompt
+
+When a user has saved `modePreference = companion` but ping fails on a future open:
+- Show warning: "Desktop app is not available. Switch to standalone mode?"
+- Actions:
+  - `Switch to Standalone` → save `modePreference = standalone`, continue in standalone.
+  - `Keep Companion Preference` → continue in standalone for this session, keep warning badge + retry action for reconnect.
+- Never silently rewrite companion preference without explicit user action.
 
 ### Phase 4 — Desktop App Installer Registers Native Messaging Host
 
@@ -494,22 +590,27 @@ On macOS and Windows, the extension should ideally verify that the native messag
 #### 6.1 Unit tests
 
 - NMH message parsing and serialization (JVM tests in the host module)
-- `CompanionAwareAccountStore` mode detection and delegation
+- `CompanionAwareAccountStore` preference-based mode resolution and delegation
+- Companion preference repository read/write (`unset`/`standalone`/`companion`)
 - Message protocol round-trip tests
 
 #### 6.2 Integration tests
 
 - End-to-end test: extension ↔ NMH ↔ accounts.json file
-- Mode switching test: start standalone, install desktop app, detect transition
+- First-run chooser test: desktop detected on fresh install prompts for mode
+- Companion fallback test: saved companion preference + missing host triggers warning prompt
+- Mode switching test: settings can switch standalone ↔ companion with availability guard
 - File watcher test: modify accounts.json externally, verify extension updates
 
 #### 6.3 Manual testing matrix
 
 | Scenario | Chrome | Firefox | Edge |
 |---|---|---|---|
-| Desktop app installed, extension installed → companion mode | ✅ | ✅ | ✅ |
-| Desktop app NOT installed → standalone mode | ✅ | ✅ | ✅ |
-| Desktop app installed then closed → graceful fallback | ✅ | ✅ | ✅ |
+| Fresh install + desktop detected → user gets first-run mode prompt | ✅ | ✅ | ✅ |
+| Fresh install + desktop not detected → standalone mode (no forced prompt) | ✅ | ✅ | ✅ |
+| Saved companion preference + desktop unavailable → warning + fallback choice | ✅ | ✅ | ✅ |
+| Settings switch to companion while desktop unavailable is blocked | ✅ | ✅ | ✅ |
+| Settings switch standalone ↔ companion when desktop available | ✅ | ✅ | ✅ |
 | Desktop app opened after extension → mode switch | ✅ | ✅ | ✅ |
 | Accounts added on desktop → extension updates | ✅ | ✅ | ✅ |
 | Multiple browser windows open simultaneously | ✅ | ✅ | ✅ |
@@ -534,9 +635,11 @@ On macOS and Windows, the extension should ideally verify that the native messag
 | `nmhApp/src/main/kotlin/.../NmhFileWatcher.kt` | File watcher for accounts.json changes |
 | `nmhApp/src/main/kotlin/.../NmhProtocol.kt` | Message types and serialization |
 | `composeApp/src/wasmJsMain/typescript/src/native-messaging.mts` | TypeScript native messaging client |
+| `composeApp/src/wasmJsMain/typescript/src/extension-settings.mts` | Browser extension settings bridge (`storage.local`) |
 | `composeApp/src/wasmJsMain/kotlin/.../companion/NativeMessagingInterop.kt` | Kotlin external declarations |
 | `composeApp/src/wasmJsMain/kotlin/.../companion/DesktopCompanionClient.kt` | Kotlin companion client |
 | `composeApp/src/wasmJsMain/kotlin/.../companion/CompanionAwareAccountStore.kt` | Mode-switching store wrapper |
+| `composeApp/src/wasmJsMain/kotlin/.../companion/CompanionModeSettingsRepository.kt` | Persisted mode preference repository |
 | `composeApp/extension/tech.arnav.twofac.json` | Template native messaging host manifest |
 
 ### Modified files
@@ -544,7 +647,7 @@ On macOS and Windows, the extension should ideally verify that the native messag
 | File | Change |
 |---|---|
 | `composeApp/extension/manifest.base.json` | Add `nativeMessaging` permission |
-| `composeApp/extension/background.js` | Add companion detection + heartbeat logic |
+| `composeApp/extension/background.js` | Add companion detection + persisted preference bootstrap hooks |
 | `composeApp/src/wasmJsMain/kotlin/.../di/WasmModules.kt` | Wire companion DI |
 | `composeApp/src/wasmJsMain/kotlin/.../screens/PlatformSettings.wasmJs.kt` | Companion status UI |
 | `settings.gradle.kts` | Include `nmhApp` module (if separate module) |
