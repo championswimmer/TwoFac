@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.getKoin
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
@@ -86,9 +88,10 @@ fun SettingsScreen(
     var encryptedImportRequest by remember { mutableStateOf<EncryptedImportRequest?>(null) }
     var showDeleteStorageDialog by remember { mutableStateOf(false) }
     var isDeleteStorageInProgress by remember { mutableStateOf(false) }
-    var isCompanionActive by remember { mutableStateOf(false) }
     var isCompanionSyncInProgress by remember { mutableStateOf(false) }
     var isCompanionDiscoveryInProgress by remember { mutableStateOf(false) }
+    val isCompanionActive by (companionSyncCoordinator?.companionActiveFlow
+        ?: remember { MutableStateFlow(false) }).collectAsState()
     var companionDisplayName by remember {
         mutableStateOf(companionSyncCoordinator?.companionDisplayName ?: "Watch")
     }
@@ -119,9 +122,7 @@ fun SettingsScreen(
 
     LaunchedEffect(companionSyncCoordinator) {
         companionDisplayName = companionSyncCoordinator?.companionDisplayName ?: "Watch"
-        if (companionSyncCoordinator != null) {
-            isCompanionActive = companionSyncCoordinator.isCompanionActive()
-        }
+        companionSyncCoordinator?.isCompanionActive()
     }
 
     suspend fun executeBackupExport(providerId: String, encrypted: Boolean) {
@@ -329,7 +330,7 @@ fun SettingsScreen(
                                     } else {
                                         snackbarHostState.showSnackbar("Unable to sync to $companionDisplayName right now")
                                     }
-                                    isCompanionActive = companionSyncCoordinator.isCompanionActive()
+                                    companionSyncCoordinator.isCompanionActive()
                                 } finally {
                                     isCompanionSyncInProgress = false
                                 }
@@ -340,8 +341,8 @@ fun SettingsScreen(
                         coroutineScope.launch {
                             try {
                                 isCompanionDiscoveryInProgress = true
-                                isCompanionActive = companionSyncCoordinator.forceDiscoverCompanion()
-                                val message = if (isCompanionActive) {
+                                val discovered = companionSyncCoordinator.forceDiscoverCompanion()
+                                val message = if (discovered) {
                                     "$companionDisplayName companion discovered"
                                 } else {
                                     "Unable to discover $companionDisplayName companion"
@@ -514,8 +515,7 @@ fun SettingsScreen(
                                         "Unable to sync to $companionDisplayName right now"
                                     }
                                     snackbarHostState.showSnackbar(message)
-                                    isCompanionActive =
-                                        companionSyncCoordinator.isCompanionActive()
+                                    companionSyncCoordinator.isCompanionActive()
                                 } finally {
                                     isCompanionSyncInProgress = false
                                 }

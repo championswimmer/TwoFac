@@ -4,6 +4,7 @@ import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.MessageEvent
+import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +62,17 @@ class WatchSyncListenerService : WearableListenerService() {
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
         if (messageEvent.path == WatchSyncContract.REQUEST_SYNC_NOW_MESSAGE_PATH) {
+            serviceScope.launch {
+                repository.initialize()
+                runCatching {
+                    Wearable.getMessageClient(this@WatchSyncListenerService)
+                        .sendMessage(
+                            messageEvent.sourceNodeId,
+                            WatchSyncContract.SYNC_ACK_MESSAGE_PATH,
+                            ByteArray(0),
+                        )
+                }
+            }
             return
         }
         super.onMessageReceived(messageEvent)

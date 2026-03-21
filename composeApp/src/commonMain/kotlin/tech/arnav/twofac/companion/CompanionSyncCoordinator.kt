@@ -1,5 +1,6 @@
 package tech.arnav.twofac.companion
 
+import kotlinx.coroutines.flow.StateFlow
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import tech.arnav.twofac.lib.watchsync.WatchSyncAccount
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
@@ -8,6 +9,10 @@ import tech.arnav.twofac.lib.TwoFacLib
 interface CompanionSyncCoordinator {
     val companionDisplayName: String
         get() = "Watch"
+
+    /** Reactive flow of companion availability. Null on platforms without watch support. */
+    val companionActiveFlow: StateFlow<Boolean>?
+        get() = null
 
     suspend fun isCompanionActive(): Boolean
     suspend fun forceDiscoverCompanion(): Boolean = isCompanionActive()

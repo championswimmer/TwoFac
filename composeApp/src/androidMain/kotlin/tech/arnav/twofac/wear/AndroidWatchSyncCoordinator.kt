@@ -5,12 +5,17 @@ import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.CapabilityInfo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.buildCompanionSyncSnapshot
 import tech.arnav.twofac.companion.loadCompanionSyncSourceAccounts
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.watchsync.WatchSyncContract
 import java.util.concurrent.TimeUnit
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -23,12 +28,38 @@ class AndroidWatchSyncCoordinator(
 
     override val companionDisplayName: String = "Wear OS Watch"
 
+    private val _companionActiveFlow = MutableStateFlow(false)
+    override val companionActiveFlow: StateFlow<Boolean> = _companionActiveFlow
+
+    private val capabilityListener =
+        CapabilityClient.OnCapabilityChangedListener { capabilityInfo: CapabilityInfo ->
+            val hasCompanion = capabilityInfo.nodes.isNotEmpty()
+            _companionActiveFlow.value = hasCompanion
+        }
+
+    init {
+        try {
+            if (dataLayerClient.isAvailable) {
+                dataLayerClient.capabilityClient.addListener(
+                    capabilityListener,
+                    WatchSyncContract.WATCH_CAPABILITY,
+                )
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to register capability listener", e)
+        }
+    }
+
     override suspend fun isCompanionActive(): Boolean {
-        return runCatching { dataLayerClient.hasReachableWatchCompanion() }.getOrDefault(false)
+        val active = runCatching { dataLayerClient.hasReachableWatchCompanion() }.getOrDefault(false)
+        _companionActiveFlow.value = active
+        return active
     }
 
     override suspend fun forceDiscoverCompanion(): Boolean {
-        return runCatching { dataLayerClient.forceDiscoverWatchCompanion() }.getOrDefault(false)
+        val active = runCatching { dataLayerClient.forceDiscoverWatchCompanion() }.getOrDefault(false)
+        _companionActiveFlow.value = active
+        return active
     }
 
     @OptIn(ExperimentalTime::class)

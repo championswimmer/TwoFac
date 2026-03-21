@@ -1,10 +1,15 @@
 package tech.arnav.twofac.companion
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSError
 import platform.Foundation.NSLog
 import platform.WatchConnectivity.WCSession
+import platform.WatchConnectivity.WCSessionActivationStateActivated
 import platform.WatchConnectivity.WCSessionDelegateProtocol
 import platform.darwin.NSObject
 import tech.arnav.twofac.lib.TwoFacLib
@@ -19,6 +24,11 @@ class IosCompanionSyncCoordinator(
 
     override val companionDisplayName: String = "Apple Watch"
 
+    private val _companionActiveFlow = MutableStateFlow(false)
+    override val companionActiveFlow: StateFlow<Boolean> = _companionActiveFlow
+
+    private val activationCompleted = CompletableDeferred<Boolean>()
+
     private val session: WCSession? =
         if (WCSession.isSupported()) WCSession.defaultSession() else null
     private val sessionDelegate = object : NSObject(), WCSessionDelegateProtocol {
@@ -29,6 +39,14 @@ class IosCompanionSyncCoordinator(
         ) {
             if (error != null) {
                 NSLog("WCSession activation failed: %@", error.localizedDescription)
+                activationCompleted.complete(false)
+            } else {
+                val activated =
+                    activationDidCompleteWithState == WCSessionActivationStateActivated
+                activationCompleted.complete(activated)
+                if (activated) {
+                    updateCompanionActiveState(session)
+                }
             }
         }
 
@@ -37,6 +55,10 @@ class IosCompanionSyncCoordinator(
         override fun sessionDidDeactivate(session: WCSession) {
             session.activateSession()
         }
+
+        override fun sessionWatchStateDidChange(session: WCSession) {
+            updateCompanionActiveState(session)
+        }
     }
 
     init {
@@ -44,21 +66,36 @@ class IosCompanionSyncCoordinator(
         session?.activateSession()
     }
 
+    private fun updateCompanionActiveState(session: WCSession) {
+        val active = session.isPaired() && session.isWatchAppInstalled()
+        _companionActiveFlow.value = active
+    }
+
+    private suspend fun awaitActivation(): Boolean {
+        return withTimeoutOrNull(ACTIVATION_TIMEOUT_MS) {
+            activationCompleted.await()
+        } ?: false
+    }
+
     override suspend fun isCompanionActive(): Boolean {
         val activeSession = session ?: return false
-        activeSession.activateSession()
-        return activeSession.isPaired() && activeSession.isWatchAppInstalled()
+        if (!awaitActivation()) return false
+        val active = activeSession.isPaired() && activeSession.isWatchAppInstalled()
+        _companionActiveFlow.value = active
+        return active
     }
 
     override suspend fun forceDiscoverCompanion(): Boolean {
         val activeSession = session ?: return false
-        activeSession.activateSession()
-        return activeSession.isPaired() && activeSession.isWatchAppInstalled()
+        if (!awaitActivation()) return false
+        val active = activeSession.isPaired() && activeSession.isWatchAppInstalled()
+        _companionActiveFlow.value = active
+        return active
     }
 
     override suspend fun syncNow(manual: Boolean): Boolean {
         val activeSession = session ?: return false
-        activeSession.activateSession()
+        if (!awaitActivation()) return false
         if (!twoFacLib.isUnlocked()) {
             NSLog("Companion sync aborted: vault is locked.")
             return false
@@ -143,3 +180,4 @@ class IosCompanionSyncCoordinator(
 private const val IOS_PAYLOAD_STRING_KEY = "payloadString"
 private const val IOS_GENERATED_AT_EPOCH_SEC_KEY = "generatedAtEpochSec"
 private const val IOS_MANUAL_SYNC_KEY = "manualSync"
+private const val ACTIVATION_TIMEOUT_MS = 3000L
