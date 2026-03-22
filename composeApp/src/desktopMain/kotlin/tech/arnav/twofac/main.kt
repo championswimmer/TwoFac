@@ -31,6 +31,12 @@ import twofac.composeapp.generated.resources.tray_lock_monochrome_light
 import twofac.composeapp.generated.resources.twofac_icon
 
 fun main() = runBlocking {
+    // On macOS, this enables the system tray icon to be treated as a "template image"
+    // (NSImage.isTemplate = true). Template images are pure black + transparent icons
+    // that macOS automatically tints for dark/light mode AND dims when the mouse moves
+    // to a secondary display. Without this, the icon will not dim on inactive displays.
+    System.setProperty("apple.awt.enableTemplateImages", "true")
+
     val koinApp = initKoin {
         modules(desktopBackupModule, desktopQrModule, desktopSettingsModule)
     }
@@ -74,10 +80,12 @@ fun main() = runBlocking {
             val isMac = os.contains("mac")
             val isLinux = os.contains("linux") || os.contains("nix")
             val isDark = isSystemInDarkTheme()
-            val trayIcon: DrawableResource = if (isMac || isLinux) {
-                if (isDark) Res.drawable.tray_lock_monochrome_dark else Res.drawable.tray_lock_monochrome_light
-            } else {
-                Res.drawable.tray_lock_color
+            val trayIcon: DrawableResource = when {
+                // On macOS, apple.awt.enableTemplateImages makes the icon a template image,
+                // so macOS handles dark/light mode automatically — always use the black icon.
+                isMac -> Res.drawable.tray_lock_monochrome_light
+                isLinux -> if (isDark) Res.drawable.tray_lock_monochrome_dark else Res.drawable.tray_lock_monochrome_light
+                else -> Res.drawable.tray_lock_color
             }
 
             Tray(
