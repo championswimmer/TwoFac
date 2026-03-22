@@ -261,6 +261,10 @@ compose.desktop {
     application {
         mainClass = "tech.arnav.twofac.MainKt"
 
+        buildTypes.release.proguard {
+            configurationFiles.from("proguard-desktop.pro")
+        }
+
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "TwoFac"
