@@ -260,6 +260,9 @@ tasks.register("packageBrowserExtensions") {
 compose.desktop {
     application {
         mainClass = "tech.arnav.twofac.MainKt"
+        // Enable macOS template images for the system tray icon so that macOS can dim
+        // the icon on secondary displays and adapt it to dark/light mode automatically.
+        jvmArgs("-Dapple.awt.enableTemplateImages=true")
 
         buildTypes.release.proguard {
             configurationFiles.from("proguard-desktop.pro")
