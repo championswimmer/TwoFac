@@ -50,6 +50,7 @@ import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.session.WebAuthnSessionManager
 import tech.arnav.twofac.storage.getStoragePath
+import tech.arnav.twofac.viewmodels.AccountsViewModel
 
 private sealed interface BackupAction {
     data class Export(val providerId: String, val encrypted: Boolean) : BackupAction
@@ -78,6 +79,7 @@ fun SettingsScreen(
     val twoFacLib = remember { koin.getOrNull<TwoFacLib>() }
     val companionSyncCoordinator = remember { koin.getOrNull<CompanionSyncCoordinator>() }
     val sessionManager = remember { koin.getOrNull<SessionManager>() }
+    val accountsViewModel = remember { koin.getOrNull<AccountsViewModel>() }
 
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
@@ -168,6 +170,7 @@ fun SettingsScreen(
         snackbarHostState.showSnackbar(message)
         if (result is BackupResult.Success) {
             companionSyncCoordinator?.onAccountsChanged()
+            accountsViewModel?.reloadAccounts()
         }
         backupProviders = service.listProviders()
     }
@@ -604,6 +607,7 @@ fun SettingsScreen(
                                     "Imported ${result.value} account(s) from ${importRequest.backupId}"
                                 )
                                 companionSyncCoordinator?.onAccountsChanged()
+                                accountsViewModel?.reloadAccounts()
                                 backupProviders = service.listProviders()
                                 encryptedImportRequest = null
                             }

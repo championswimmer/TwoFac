@@ -213,6 +213,22 @@ class AccountsViewModel(
         return _accountOtps.value.find { it.first.accountID == accountId }?.second
     }
 
+    /** Re-read accounts (and OTPs if unlocked) from TwoFacLib after external mutations. */
+    fun reloadAccounts() {
+        viewModelScope.launch {
+            try {
+                val accountList = twoFacLib.getAllAccounts()
+                _accounts.value = accountList
+                if (twoFacLibUnlocked) {
+                    val accountOtpList = twoFacLib.getAllAccountOTPs()
+                    _accountOtps.value = accountOtpList
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to reload accounts"
+            }
+        }
+    }
+
     @OptIn(ExperimentalTime::class)
     fun refreshOtps() {
         _refreshTrigger.value = Clock.System.now().toEpochMilliseconds()
