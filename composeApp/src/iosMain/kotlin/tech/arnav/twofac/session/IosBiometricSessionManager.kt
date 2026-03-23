@@ -1,13 +1,56 @@
 package tech.arnav.twofac.session
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.MemScope
+import kotlinx.cinterop.UnsafeNumber
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.allocArrayOf
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.reinterpret
+import kotlinx.cinterop.value
+import platform.CoreFoundation.CFDictionaryCreate
+import platform.CoreFoundation.CFDictionaryRef
+import platform.CoreFoundation.CFRelease
+import platform.CoreFoundation.CFStringRef
+import platform.CoreFoundation.CFTypeRef
+import platform.CoreFoundation.CFTypeRefVar
+import platform.CoreFoundation.kCFAllocatorDefault
+import platform.CoreFoundation.kCFBooleanTrue
+import platform.Foundation.CFBridgingRelease
+import platform.Foundation.CFBridgingRetain
+import platform.Foundation.NSData
+import platform.Foundation.NSString
 import platform.Foundation.NSUserDefaults
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.create
+import platform.Foundation.dataUsingEncoding
 import platform.LocalAuthentication.LAContext
 import platform.LocalAuthentication.LAPolicyDeviceOwnerAuthenticationWithBiometrics
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import platform.Security.SecAccessControlCreateWithFlags
+import platform.Security.SecItemAdd
+import platform.Security.SecItemCopyMatching
+import platform.Security.SecItemDelete
+import platform.Security.errSecDuplicateItem
+import platform.Security.errSecItemNotFound
+import platform.Security.errSecSuccess
+import platform.Security.kSecAttrAccessControl
+import platform.Security.kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly
+import platform.Security.kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+import platform.Security.kSecAttrAccount
+import platform.Security.kSecAttrService
+import platform.Security.kSecAccessControlBiometryCurrentSet
+import platform.Security.kSecClass
+import platform.Security.kSecClassGenericPassword
+import platform.Security.kSecMatchLimit
+import platform.Security.kSecMatchLimitOne
+import platform.Security.kSecReturnData
+import platform.Security.kSecUseOperationPrompt
+import platform.Security.kSecValueData
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, UnsafeNumber::class, BetaInteropApi::class)
 class IosBiometricSessionManager(
     private val userDefaults: NSUserDefaults = NSUserDefaults.standardUserDefaults
 ) : BiometricSessionManager {
@@ -15,7 +58,12 @@ class IosBiometricSessionManager(
     companion object {
         private const val PREFS_BIOMETRIC_ENABLED = "twofac_biometric_enabled"
         private const val PREFS_REMEMBER_ENABLED = "twofac_remember_passkey"
-        private const val PREFS_SAVED_PASSKEY = "twofac_saved_passkey"
+
+        private const val KEYCHAIN_SERVICE = "tech.arnav.twofac"
+        private const val KEYCHAIN_ACCOUNT = "vault_passkey"
+
+        // Legacy key — used only for one-time migration
+        private const val LEGACY_PREFS_SAVED_PASSKEY = "twofac_saved_passkey"
     }
 
     override fun isAvailable(): Boolean = true
@@ -33,7 +81,7 @@ class IosBiometricSessionManager(
     }
 
     override fun isSecureUnlockReady(): Boolean {
-        return isBiometricEnabled() && !readFromKeychain().isNullOrBlank()
+        return isBiometricEnabled() && keychainItemExists()
     }
 
     override fun setBiometricEnabled(enabled: Boolean) {
@@ -56,11 +104,10 @@ class IosBiometricSessionManager(
 
     override suspend fun getSavedPasskey(): String? {
         if (!isRememberPasskeyEnabled()) return null
-        return if (isBiometricEnabled()) {
-            authenticateAndRetrieve()
-        } else {
-            readFromKeychain()
-        }
+        migrateFromUserDefaultsIfNeeded()
+        // SecItemCopyMatching automatically triggers Face ID / Touch ID when the
+        // Keychain item has biometric access control — no separate LAContext needed.
+        return readFromKeychain()
     }
 
     override fun savePasskey(passkey: String) {
@@ -70,6 +117,8 @@ class IosBiometricSessionManager(
 
     override fun clearPasskey() {
         deleteFromKeychain()
+        // Also clean up any legacy NSUserDefaults passkey
+        userDefaults.removeObjectForKey(LEGACY_PREFS_SAVED_PASSKEY)
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean {
@@ -78,36 +127,156 @@ class IosBiometricSessionManager(
         return true
     }
 
+    // ── Keychain helpers ──────────────────────────────────────────────────
+
     private fun saveToKeychain(passkey: String, requireBiometric: Boolean) {
-        userDefaults.setObject(passkey, forKey = PREFS_SAVED_PASSKEY)
-    }
+        // Always delete first — SecAccessControl can't be changed on an existing item
+        deleteFromKeychain()
 
-    private fun deleteFromKeychain() {
-        userDefaults.removeObjectForKey(PREFS_SAVED_PASSKEY)
-    }
+        @Suppress("CAST_NEVER_SUCCEEDS")
+        val passkeyData = (passkey as NSString).dataUsingEncoding(NSUTF8StringEncoding) ?: return
 
-    private suspend fun authenticateAndRetrieve(): String? = suspendCoroutine { continuation ->
-        val context = LAContext()
-        context.localizedFallbackTitle = "Use passkey instead"
+        memScoped {
+            val cfService = CFBridgingRetain(KEYCHAIN_SERVICE)
+            val cfAccount = CFBridgingRetain(KEYCHAIN_ACCOUNT)
+            val cfData = CFBridgingRetain(passkeyData)
 
-        if (!context.canEvaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, error = null)) {
-            continuation.resume(null)
-            return@suspendCoroutine
-        }
+            try {
+                if (requireBiometric) {
+                    val accessControl = SecAccessControlCreateWithFlags(
+                        allocator = kCFAllocatorDefault,
+                        protection = kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+                        flags = kSecAccessControlBiometryCurrentSet,
+                        error = null,
+                    ) ?: return
 
-        context.evaluatePolicy(
-            policy = LAPolicyDeviceOwnerAuthenticationWithBiometrics,
-            localizedReason = "Unlock TwoFac to access your 2FA codes",
-        ) { success, _ ->
-            if (success) {
-                continuation.resume(readFromKeychain(context))
-            } else {
-                continuation.resume(null)
+                    try {
+                        val query = cfDictionaryOf(
+                            kSecClass to kSecClassGenericPassword,
+                            kSecAttrService to cfService,
+                            kSecAttrAccount to cfAccount,
+                            kSecValueData to cfData,
+                            kSecAttrAccessControl to accessControl,
+                        )
+                        SecItemAdd(query, null)
+                        CFBridgingRelease(query)
+                    } finally {
+                        CFRelease(accessControl)
+                    }
+                } else {
+                    val cfProtection = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+                    val query = cfDictionaryOf(
+                        kSecClass to kSecClassGenericPassword,
+                        kSecAttrService to cfService,
+                        kSecAttrAccount to cfAccount,
+                        kSecValueData to cfData,
+                    )
+                    SecItemAdd(query, null)
+                    CFBridgingRelease(query)
+                }
+            } finally {
+                CFBridgingRelease(cfService)
+                CFBridgingRelease(cfAccount)
+                CFBridgingRelease(cfData)
             }
         }
     }
 
-    private fun readFromKeychain(context: LAContext? = null): String? {
-        return userDefaults.stringForKey(PREFS_SAVED_PASSKEY)
+    private fun readFromKeychain(): String? = memScoped {
+        val cfService = CFBridgingRetain(KEYCHAIN_SERVICE)
+        val cfAccount = CFBridgingRetain(KEYCHAIN_ACCOUNT)
+        val cfPrompt = CFBridgingRetain("Unlock TwoFac to access your 2FA codes")
+
+        try {
+            val query = cfDictionaryOf(
+                kSecClass to kSecClassGenericPassword,
+                kSecAttrService to cfService,
+                kSecAttrAccount to cfAccount,
+                kSecReturnData to kCFBooleanTrue,
+                kSecMatchLimit to kSecMatchLimitOne,
+                kSecUseOperationPrompt to cfPrompt,
+            )
+
+            val resultRef = alloc<CFTypeRefVar>()
+            val status = SecItemCopyMatching(query, resultRef.ptr)
+            CFBridgingRelease(query)
+
+            if (status != errSecSuccess) return@memScoped null
+
+            val nsData = CFBridgingRelease(resultRef.value) as? NSData ?: return@memScoped null
+            NSString.create(nsData, NSUTF8StringEncoding)?.toString()
+        } finally {
+            CFBridgingRelease(cfService)
+            CFBridgingRelease(cfAccount)
+            CFBridgingRelease(cfPrompt)
+        }
+    }
+
+    private fun deleteFromKeychain() = memScoped {
+        val cfService = CFBridgingRetain(KEYCHAIN_SERVICE)
+        val cfAccount = CFBridgingRetain(KEYCHAIN_ACCOUNT)
+
+        try {
+            val query = cfDictionaryOf(
+                kSecClass to kSecClassGenericPassword,
+                kSecAttrService to cfService,
+                kSecAttrAccount to cfAccount,
+            )
+            SecItemDelete(query)
+            CFBridgingRelease(query)
+        } finally {
+            CFBridgingRelease(cfService)
+            CFBridgingRelease(cfAccount)
+        }
+    }
+
+    private fun keychainItemExists(): Boolean = memScoped {
+        val cfService = CFBridgingRetain(KEYCHAIN_SERVICE)
+        val cfAccount = CFBridgingRetain(KEYCHAIN_ACCOUNT)
+
+        try {
+            val query = cfDictionaryOf(
+                kSecClass to kSecClassGenericPassword,
+                kSecAttrService to cfService,
+                kSecAttrAccount to cfAccount,
+                kSecMatchLimit to kSecMatchLimitOne,
+            )
+            val status = SecItemCopyMatching(query, null)
+            CFBridgingRelease(query)
+            status == errSecSuccess
+        } finally {
+            CFBridgingRelease(cfService)
+            CFBridgingRelease(cfAccount)
+        }
+    }
+
+    /**
+     * One-time migration: move any plaintext passkey from NSUserDefaults into the
+     * Keychain and delete the legacy entry.
+     */
+    private fun migrateFromUserDefaultsIfNeeded() {
+        val legacy = userDefaults.stringForKey(LEGACY_PREFS_SAVED_PASSKEY) ?: return
+        if (legacy.isBlank()) return
+        if (!keychainItemExists()) {
+            saveToKeychain(legacy, requireBiometric = isBiometricEnabled())
+        }
+        userDefaults.removeObjectForKey(LEGACY_PREFS_SAVED_PASSKEY)
+    }
+
+    // ── CFDictionary construction ─────────────────────────────────────────
+
+    private fun MemScope.cfDictionaryOf(
+        vararg items: Pair<CFStringRef?, CFTypeRef?>
+    ): CFDictionaryRef? {
+        val keys = allocArrayOf(*items.map { it.first }.toTypedArray())
+        val values = allocArrayOf(*items.map { it.second }.toTypedArray())
+        return CFDictionaryCreate(
+            kCFAllocatorDefault,
+            keys.reinterpret(),
+            values.reinterpret(),
+            items.size.convert(),
+            null,
+            null,
+        )
     }
 }

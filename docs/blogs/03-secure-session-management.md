@@ -229,80 +229,57 @@ So on Android, TwoFac is doing the classic pattern correctly:
 
 That is much better than storing the plaintext passkey directly in preferences.
 
-## iOS: Current TwoFac Flow vs Apple’s Recommended Secure Storage Model
+## iOS: Keychain + SecAccessControl + Face ID / Touch ID
 
 The iOS implementation lives in [`IosBiometricSessionManager.kt`](https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/iosMain/kotlin/tech/arnav/twofac/session/IosBiometricSessionManager.kt).
 
-There’s an important nuance here:
+This implementation follows Apple’s recommended pattern for storing secrets with biometric protection:
 
-- the **contract comments** describe a Keychain-style biometric secure-storage model,
-- but the **current implementation** stores the vault passkey in `NSUserDefaults`,
-- and uses `LAContext` only as a gate before reading it back.
+- [Keychain Services](https://developer.apple.com/documentation/security/keychain-services) for encrypted secret storage,
+- [`SecAccessControlCreateWithFlags`](https://developer.apple.com/documentation/security/secaccesscontrolcreatewithflags(_:_:_:_:)) with `kSecAccessControlBiometryCurrentSet` to require the currently enrolled biometrics,
+- `kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly` so the item is device-bound and requires a device passcode,
+- Automatic Face ID / Touch ID prompts via `SecItemCopyMatching` — no separate `LAContext.evaluatePolicy(...)` needed for retrieval.
 
-That means the current iOS implementation is **not equivalent** to the Android Keystore design, and it is **not** what Apple recommends for storing secrets.
-
-### What the Current iOS Code Actually Does
+### How the iOS Implementation Works
 
 1. Checks biometric availability with `LAContext.canEvaluatePolicy(...)`.
-2. Stores booleans like `twofac_biometric_enabled` in `NSUserDefaults`.
-3. Stores the actual vault passkey as `twofac_saved_passkey` in `NSUserDefaults`.
-4. On retrieval, presents biometric auth using `evaluatePolicy(...)`.
-5. If auth succeeds, reads the passkey from `NSUserDefaults`.
+2. Stores preference booleans (`twofac_biometric_enabled`, `twofac_remember_passkey`) in `NSUserDefaults` — these are not secrets.
+3. During enrollment, creates a `SecAccessControl` with `kSecAccessControlBiometryCurrentSet` and stores the vault passkey as a Keychain generic password item protected by that access control.
+4. On retrieval, calls `SecItemCopyMatching` — the Keychain system automatically presents Face ID / Touch ID before releasing the stored passkey.
+5. If biometric auth fails or the user cancels, returns `null` and the app falls back to the manual passkey dialog.
 
-That runtime flow looks like this:
+The runtime flow looks like this:
 
 ```mermaid
 flowchart TD
     Passkey["Vault passkey"]
-    Defaults["NSUserDefaults<br/>twofac_saved_passkey"]
-    LA["LAContext biometric prompt"]
-    Read["Read passkey from NSUserDefaults"]
+    AccessCtrl["SecAccessControl<br/>biometryCurrentSet +<br/>whenPasscodeSetThisDeviceOnly"]
+    Keychain["Keychain item<br/>(encrypted by system)"]
+    FaceID["Face ID / Touch ID<br/>(automatic prompt from Keychain)"]
     Unlock["Return passkey to shared layer"]
 
-    Passkey --> Defaults
-    LA --> Read
-    Defaults --> Read
-    Read --> Unlock
-```
-
-This gives the app a biometric **UX gate**, but not true iOS secure secret storage. If the secret is sitting in `NSUserDefaults`, it is not protected with Keychain access-control flags, not tied to the device passcode policy, and not using the Keychain / Secure Enclave integration Apple expects for sensitive material.
-
-### What Apple Recommends Instead
-
-Apple’s official guidance is:
-
-- use [Keychain Services](https://developer.apple.com/documentation/security/keychain-services) for secrets,
-- combine it with [LocalAuthentication](https://developer.apple.com/documentation/localauthentication/) or Keychain access control flags,
-- and, when appropriate, use [“Accessing Keychain Items with Face ID or Touch ID”](https://developer.apple.com/documentation/localauthentication/accessing-keychain-items-with-face-id-or-touch-id).
-
-In other words, the recommended pattern on iOS is:
-
-```mermaid
-flowchart TD
-    Passkey["Vault passkey"]
-    Keychain["Keychain item"]
-    Access["SecAccessControl<br/>userPresence / biometry"]
-    LA["Face ID / Touch ID / device passcode"]
-    Unlock["Return passkey only after auth"]
-
     Passkey --> Keychain
-    Access --> Keychain
-    LA --> Keychain
+    AccessCtrl --> Keychain
+    FaceID --> Keychain
     Keychain --> Unlock
 ```
 
-The secure-storage difference is the key point:
+### Why This Pattern Is Correct on iOS
 
-| iOS approach | Security properties |
-| --- | --- |
-| `NSUserDefaults` | Preferences storage; not appropriate for secrets |
-| Keychain + access control | Encrypted system secret storage, optionally tied to Face ID / Touch ID / passcode |
+This aligns with Apple’s official guidance from [“Accessing Keychain Items with Face ID or Touch ID”](https://developer.apple.com/documentation/localauthentication/accessing-keychain-items-with-face-id-or-touch-id):
 
-So the honest state of the codebase today is:
+- The vault passkey is stored in the **Keychain**, not in `NSUserDefaults` or any user-accessible preferences file.
+- The `SecAccessControl` flags ensure the passkey can only be retrieved after successful biometric authentication with the **currently enrolled** biometric data.
+- `kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly` makes the item device-bound — it won’t be included in backups or transferred to other devices.
+- If biometric enrollment changes (e.g. a new fingerprint is added), the Keychain item is invalidated, matching the behavior of `setInvalidatedByBiometricEnrollment(true)` on Android.
 
-> TwoFac’s iOS secure-session **API shape** is ready for the Keychain model, but the **current implementation** is still a simpler biometric-gated `NSUserDefaults` approach.
+This design is now equivalent to the Android Keystore pattern:
 
-That’s a valuable distinction for anyone reviewing the security posture of the project.
+> store the **data** in platform-encrypted secure storage, and require biometric authentication before the data is released.
+
+### Migration from the Previous Approach
+
+The implementation includes a one-time migration path: if a passkey is found in the legacy `NSUserDefaults` location (`twofac_saved_passkey`), it is automatically moved into the Keychain with the appropriate access control and the legacy entry is deleted.
 
 ## Web / Wasm: WebAuthn PRF + HKDF + AES-GCM + Encrypted Browser Storage
 
@@ -409,7 +386,7 @@ Here’s the current state of secure-session storage across the codebase:
 | Platform | Implementation | Where the secret lives | What protects it | Notes |
 | --- | --- | --- | --- | --- |
 | Android | `AndroidBiometricSessionManager` | AES-GCM ciphertext in `SharedPreferences` | Android Keystore key + `BiometricPrompt` | Strongest native implementation today |
-| iOS | `IosBiometricSessionManager` | `NSUserDefaults` | `LAContext` prompt before read | Biometric-gated UX, but not true secure secret storage yet |
+| iOS | `IosBiometricSessionManager` | Keychain item with `SecAccessControl` | `kSecAccessControlBiometryCurrentSet` + Keychain automatic Face ID / Touch ID | Matches Android Keystore pattern; device-bound, biometric-protected |
 | Web/Wasm | `BrowserSessionManager` | Encrypted blob in browser storage | WebAuthn PRF-derived AES-GCM key | Plaintext is session-only |
 | Desktop | none | n/a | n/a | manual passkey entry |
 | CLI | none | n/a | n/a | manual passkey entry |
@@ -431,18 +408,16 @@ That means secure session management is not about replacing encryption of the va
 In practice:
 
 - Android does this with a biometric-bound Keystore key.
-- iOS currently does it with a biometric gate around a weaker storage location, though Apple’s proper model is Keychain-based.
+- iOS does this with a Keychain item protected by `SecAccessControl` with biometric flags, matching Apple’s recommended pattern.
 - Web does it with a WebAuthn credential that helps derive the key used to open the encrypted blob.
 
 ## What I’d Improve Next
 
-If I were prioritizing security follow-up work in this area, it would be:
+The iOS implementation now uses Keychain with `SecAccessControl` and Face ID / Touch ID integration, matching the Android Keystore pattern. Remaining follow-up work:
 
-1. **Move iOS from `NSUserDefaults` to Keychain** with `SecAccessControl` and Face ID / Touch ID integration.
+1. Continue treating browser plaintext as session-only memory, not durable storage.
 2. Preserve the current `SessionManager` / `SecureSessionManager` interfaces, because they already model the right responsibilities.
-3. Continue treating browser plaintext as session-only memory, not durable storage.
-
-That would make the iOS path match the intent already captured in the shared interfaces and bring the native mobile implementations into much closer alignment.
+3. Consider adding desktop secure storage (macOS Keychain, Windows Credential Manager) for the JVM desktop target.
 
 ***
 
