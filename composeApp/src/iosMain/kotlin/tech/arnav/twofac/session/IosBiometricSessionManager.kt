@@ -33,10 +33,10 @@ import platform.Security.SecAccessControlCreateWithFlags
 import platform.Security.SecItemAdd
 import platform.Security.SecItemCopyMatching
 import platform.Security.SecItemDelete
-import platform.Security.errSecDuplicateItem
-import platform.Security.errSecItemNotFound
+import platform.Security.errSecInteractionNotAllowed
 import platform.Security.errSecSuccess
 import platform.Security.kSecAttrAccessControl
+import platform.Security.kSecAttrAccessible
 import platform.Security.kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly
 import platform.Security.kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 import platform.Security.kSecAttrAccount
@@ -47,6 +47,8 @@ import platform.Security.kSecClassGenericPassword
 import platform.Security.kSecMatchLimit
 import platform.Security.kSecMatchLimitOne
 import platform.Security.kSecReturnData
+import platform.Security.kSecUseAuthenticationUI
+import platform.Security.kSecUseAuthenticationUIFail
 import platform.Security.kSecUseOperationPrompt
 import platform.Security.kSecValueData
 
@@ -158,12 +160,12 @@ class IosBiometricSessionManager(
                         CFRelease(accessControl)
                     }
                 } else {
-                    val cfProtection = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
                     val query = cfDictionaryOf(
                         kSecClass to kSecClassGenericPassword,
                         kSecAttrService to cfService,
                         kSecAttrAccount to cfAccount,
                         kSecValueData to cfData,
+                        kSecAttrAccessible to kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
                     )
                     SecItemAdd(query, null)
                     CFBridgingRelease(query)
@@ -234,10 +236,13 @@ class IosBiometricSessionManager(
                 kSecAttrService to cfService,
                 kSecAttrAccount to cfAccount,
                 kSecMatchLimit to kSecMatchLimitOne,
+                // Suppress biometric prompt — we only want to check existence
+                kSecUseAuthenticationUI to kSecUseAuthenticationUIFail,
             )
             val status = SecItemCopyMatching(query, null)
             CFBridgingRelease(query)
-            status == errSecSuccess
+            // errSecInteractionNotAllowed means the item exists but requires auth
+            status == errSecSuccess || status == errSecInteractionNotAllowed
         } finally {
             CFBridgingRelease(cfService)
             CFBridgingRelease(cfAccount)
