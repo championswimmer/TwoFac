@@ -277,10 +277,6 @@ This design is now equivalent to the Android Keystore pattern:
 
 > store the **data** in platform-encrypted secure storage, and require biometric authentication before the data is released.
 
-### Migration from the Previous Approach
-
-The implementation includes a one-time migration path: if a passkey is found in the legacy `NSUserDefaults` location (`twofac_saved_passkey`), it is automatically moved into the Keychain with the appropriate access control and the legacy entry is deleted.
-
 ## Web / Wasm: WebAuthn PRF + HKDF + AES-GCM + Encrypted Browser Storage
 
 The browser implementation is the most interesting one architecturally.

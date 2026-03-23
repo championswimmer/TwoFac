@@ -61,9 +61,6 @@ class IosBiometricSessionManager(
 
         private const val KEYCHAIN_SERVICE = "tech.arnav.twofac"
         private const val KEYCHAIN_ACCOUNT = "vault_passkey"
-
-        // Legacy key — used only for one-time migration
-        private const val LEGACY_PREFS_SAVED_PASSKEY = "twofac_saved_passkey"
     }
 
     override fun isAvailable(): Boolean = true
@@ -104,7 +101,6 @@ class IosBiometricSessionManager(
 
     override suspend fun getSavedPasskey(): String? {
         if (!isRememberPasskeyEnabled()) return null
-        migrateFromUserDefaultsIfNeeded()
         // SecItemCopyMatching automatically triggers Face ID / Touch ID when the
         // Keychain item has biometric access control — no separate LAContext needed.
         return readFromKeychain()
@@ -117,8 +113,6 @@ class IosBiometricSessionManager(
 
     override fun clearPasskey() {
         deleteFromKeychain()
-        // Also clean up any legacy NSUserDefaults passkey
-        userDefaults.removeObjectForKey(LEGACY_PREFS_SAVED_PASSKEY)
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean {
@@ -248,19 +242,6 @@ class IosBiometricSessionManager(
             CFBridgingRelease(cfService)
             CFBridgingRelease(cfAccount)
         }
-    }
-
-    /**
-     * One-time migration: move any plaintext passkey from NSUserDefaults into the
-     * Keychain and delete the legacy entry.
-     */
-    private fun migrateFromUserDefaultsIfNeeded() {
-        val legacy = userDefaults.stringForKey(LEGACY_PREFS_SAVED_PASSKEY) ?: return
-        if (legacy.isBlank()) return
-        if (!keychainItemExists()) {
-            saveToKeychain(legacy, requireBiometric = isBiometricEnabled())
-        }
-        userDefaults.removeObjectForKey(LEGACY_PREFS_SAVED_PASSKEY)
     }
 
     // ── CFDictionary construction ─────────────────────────────────────────
