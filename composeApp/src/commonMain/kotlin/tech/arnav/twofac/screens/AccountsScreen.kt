@@ -47,11 +47,11 @@ fun AccountsScreen(
     val error by viewModel.error.collectAsState()
     var showPasskeyDialog by remember { mutableStateOf(false) }
     val requiresUnlock = !viewModel.twoFacLibUnlocked
-    val isWebAuthnReady = remember { viewModel.isWebAuthnUnlockReady() }
+    val isSecureUnlockReady = remember { viewModel.isSecureUnlockReady() }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(requiresUnlock) {
-        if (requiresUnlock && !isWebAuthnReady) {
+        if (requiresUnlock && !isSecureUnlockReady) {
             showPasskeyDialog = true
         } else {
             showPasskeyDialog = false
@@ -94,7 +94,7 @@ fun AccountsScreen(
 
                 requiresUnlock -> {
                     AccountsLockedState(
-                        onUnlockClick = if (isWebAuthnReady) {
+                        onUnlockClick = if (isSecureUnlockReady) {
                             {
                                 coroutineScope.launch {
                                     val savedPasskey = viewModel.getSavedPasskey()

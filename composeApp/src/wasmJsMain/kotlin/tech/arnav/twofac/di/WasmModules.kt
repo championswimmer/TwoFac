@@ -9,12 +9,10 @@ import tech.arnav.twofac.qr.WasmClipboardQRCodeReader
 import tech.arnav.twofac.session.BrowserSessionManager
 import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
-import tech.arnav.twofac.session.WebAuthnSessionManager
 
 val wasmSessionModule = module {
-    single<WebAuthnSessionManager> { BrowserSessionManager() }
-    single<SecureSessionManager> { get<WebAuthnSessionManager>() }
-    single<SessionManager> { get<WebAuthnSessionManager>() }
+    single<SecureSessionManager> { BrowserSessionManager() }
+    single<SessionManager> { get<SecureSessionManager>() }
 }
 
 val wasmQrModule = module {

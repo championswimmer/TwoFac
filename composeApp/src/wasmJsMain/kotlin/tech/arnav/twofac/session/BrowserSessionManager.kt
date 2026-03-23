@@ -76,7 +76,7 @@ data class SecureUnlockAttempt(
 )
 
 /**
- * Browser implementation of [WebAuthnSessionManager] using WebAuthn as the unlock gate.
+ * Browser implementation of [SecureSessionManager] using WebAuthn as the unlock gate.
  *
  * This phase stores only encrypted passkey payloads + metadata in persistent web storage
  * and keeps decrypted passkeys in memory for the current session lifetime.
@@ -89,7 +89,7 @@ internal class BrowserSessionManager(
         storageClient = storageClient,
         storageKey = ENCRYPTED_PASSKEY_BLOB_KEY,
     ),
-) : WebAuthnSessionManager {
+ ) : SecureSessionManager {
 
     private var sessionPasskey: String? = null
     private var enrolledCredentialId: String? = safeStorageGet(ENROLLED_CREDENTIAL_ID_KEY)
@@ -130,10 +130,16 @@ internal class BrowserSessionManager(
         return storageClient.isAvailable() && webAuthnClient.isSupported()
     }
 
-    override fun isPasskeyEnrolled(): Boolean {
+    override fun isSecureUnlockReady(): Boolean {
+        return isSecureUnlockEnabled() && isPasskeyEnrolled()
+    }
+
+    fun isPasskeyEnrolled(): Boolean {
         if (!isRememberPasskeyEnabled()) return false
         val credId = enrolledCredentialId ?: safeStorageGet(ENROLLED_CREDENTIAL_ID_KEY)
-        return !credId.isNullOrBlank()
+        val hasEncryptedBlob = encryptedPasskeyBlob != null ||
+            !safeStorageGet(ENCRYPTED_PASSKEY_BLOB_KEY).isNullOrBlank()
+        return !credId.isNullOrBlank() && hasEncryptedBlob
     }
 
     override fun isSecureUnlockEnabled(): Boolean {

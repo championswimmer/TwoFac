@@ -14,6 +14,8 @@ interface BiometricSessionManager : SecureSessionManager {
 
     override fun isSecureUnlockEnabled(): Boolean = isBiometricEnabled()
 
+    override fun isSecureUnlockReady(): Boolean = isBiometricEnabled() && isBiometricAvailable()
+
     override fun setSecureUnlockEnabled(enabled: Boolean) = setBiometricEnabled(enabled)
 
     /**

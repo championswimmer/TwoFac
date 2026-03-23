@@ -32,6 +32,10 @@ class IosBiometricSessionManager(
         return userDefaults.boolForKey(PREFS_BIOMETRIC_ENABLED) && isBiometricAvailable()
     }
 
+    override fun isSecureUnlockReady(): Boolean {
+        return isBiometricEnabled() && !readFromKeychain().isNullOrBlank()
+    }
+
     override fun setBiometricEnabled(enabled: Boolean) {
         userDefaults.setBool(enabled, forKey = PREFS_BIOMETRIC_ENABLED)
         if (!enabled) {

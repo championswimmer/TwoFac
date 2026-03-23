@@ -18,7 +18,6 @@ import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.ClipboardQRCodeReader
 import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
-import tech.arnav.twofac.session.WebAuthnSessionManager
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -54,12 +53,9 @@ class AccountsViewModel(
     /** Clear any saved passkey from the session manager. */
     fun clearSavedPasskey() { sessionManager?.clearPasskey() }
 
-    /**
-     * Returns true if a WebAuthn credential is enrolled and can be used to unlock
-     * without showing the manual passkey dialog. This is a fast synchronous check.
-     */
-    fun isWebAuthnUnlockReady(): Boolean =
-        (sessionManager as? WebAuthnSessionManager)?.isPasskeyEnrolled() ?: false
+    /** Whether secure unlock can be attempted immediately without manual passkey entry. */
+    fun isSecureUnlockReady(): Boolean =
+        (sessionManager as? SecureSessionManager)?.isSecureUnlockReady() ?: false
 
     private val _refreshTrigger = MutableStateFlow(0L)
 
@@ -125,11 +121,8 @@ class AccountsViewModel(
                 // Persist the passkey for session auto-unlock (if the user opted in)
                 if (passkey != null) {
                     sessionManager?.savePasskey(passkey)
-                    val enrollmentSessionManager =
-                        sessionManagerForPostUnlockEnrollment(sessionManager, fromAutoUnlock)
-                    if (enrollmentSessionManager is WebAuthnSessionManager) {
-                        enrollmentSessionManager.enrollPasskey(passkey)
-                    }
+                    sessionManagerForPostUnlockEnrollment(sessionManager, fromAutoUnlock)
+                        ?.enrollPasskey(passkey)
                 }
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to load accounts with OTPs"
@@ -254,9 +247,7 @@ internal fun sessionManagerForPostUnlockEnrollment(
 ): SecureSessionManager? {
     if (fromAutoUnlock) return null
     val secureSessionManager = sessionManager as? SecureSessionManager ?: return null
-    // Skip re-enrollment if WebAuthn is already enrolled to avoid unexpected prompts.
-    if (sessionManager is WebAuthnSessionManager && sessionManager.isPasskeyEnrolled()) return null
     return secureSessionManager.takeIf {
-        it.isSecureUnlockEnabled() && it.isSecureUnlockAvailable()
+        it.isSecureUnlockEnabled() && it.isSecureUnlockAvailable() && !it.isSecureUnlockReady()
     }
 }

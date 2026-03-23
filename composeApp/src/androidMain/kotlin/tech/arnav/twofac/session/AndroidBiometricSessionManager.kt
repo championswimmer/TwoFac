@@ -52,6 +52,12 @@ class AndroidBiometricSessionManager(
         return prefs.getBoolean(KEY_REMEMBER_ENABLED, false) && isBiometricAvailable()
     }
 
+    override fun isSecureUnlockReady(): Boolean {
+        val hasEncryptedPasskey = !prefs.getString(KEY_ENCRYPTED_PASSKEY, null).isNullOrBlank()
+        val hasIv = !prefs.getString(KEY_PASSKEY_IV, null).isNullOrBlank()
+        return isBiometricEnabled() && hasEncryptedPasskey && hasIv
+    }
+
     override fun setBiometricEnabled(enabled: Boolean) {
         setRememberEnabled(enabled && isBiometricAvailable())
     }

@@ -47,8 +47,8 @@ import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.lib.backup.BackupResult
 import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.session.BiometricSessionManager
+import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
-import tech.arnav.twofac.session.WebAuthnSessionManager
 import tech.arnav.twofac.storage.getStoragePath
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
@@ -100,11 +100,12 @@ fun SettingsScreen(
     var isRememberPasskeyEnabled by remember {
         mutableStateOf(sessionManager?.isRememberPasskeyEnabled() ?: false)
     }
+    val secureSessionManager = sessionManager as? SecureSessionManager
     val biometricSessionManager = sessionManager as? BiometricSessionManager
-    val webAuthnSessionManager = sessionManager as? WebAuthnSessionManager
+    val usesGenericSecureUnlockFlow = secureSessionManager != null && biometricSessionManager == null
     val rememberPasskeyTitle =
-        if (webAuthnSessionManager != null) "Secure Unlock" else "Remember Passkey"
-    val rememberPasskeyDescription = if (webAuthnSessionManager != null) {
+        if (usesGenericSecureUnlockFlow) "Secure Unlock" else "Remember Passkey"
+    val rememberPasskeyDescription = if (usesGenericSecureUnlockFlow) {
         "Require device credential verification before unlock and keep only encrypted passkey data in browser storage."
     } else {
         "Keep the passkey saved so you don't have to enter it every time the extension is opened. Only enable this on devices you trust."
@@ -262,7 +263,7 @@ fun SettingsScreen(
                             secureEnrollmentError = null
                             biometricSessionManager?.setBiometricEnabled(false)
                             isBiometricEnabled = false
-                        } else if (webAuthnSessionManager != null) {
+                        } else if (usesGenericSecureUnlockFlow) {
                             secureEnrollmentError = null
                             showSecureEnrollmentDialog = true
                         } else {
@@ -631,7 +632,8 @@ fun SettingsScreen(
         )
     }
 
-    if (showSecureEnrollmentDialog && webAuthnSessionManager != null) {
+    if (showSecureEnrollmentDialog && usesGenericSecureUnlockFlow) {
+        val manager = checkNotNull(secureSessionManager)
         PasskeyDialog(
             isVisible = true,
             isLoading = isLoading,
@@ -646,20 +648,20 @@ fun SettingsScreen(
                             return@launch
                         }
                         twoFacLib.unlock(passkey)
-                        webAuthnSessionManager.setSecureUnlockEnabled(true)
-                        val enrolled = webAuthnSessionManager.enrollPasskey(passkey)
+                        manager.setSecureUnlockEnabled(true)
+                        val enrolled = manager.enrollPasskey(passkey)
                         if (enrolled) {
                             isRememberPasskeyEnabled =
-                                webAuthnSessionManager.isSecureUnlockEnabled()
+                                manager.isSecureUnlockEnabled()
                             showSecureEnrollmentDialog = false
                             snackbarHostState.showSnackbar("Secure unlock enabled")
                         } else {
-                            webAuthnSessionManager.setSecureUnlockEnabled(false)
+                            manager.setSecureUnlockEnabled(false)
                             isRememberPasskeyEnabled = false
                             secureEnrollmentError = "Secure unlock enrollment cancelled"
                         }
                     } catch (e: Exception) {
-                        webAuthnSessionManager.setSecureUnlockEnabled(false)
+                        manager.setSecureUnlockEnabled(false)
                         isRememberPasskeyEnabled = false
                         secureEnrollmentError = e.message ?: "Failed to verify passkey"
                     } finally {
