@@ -128,14 +128,29 @@ export const createWebAuthnCredential = async () => {
         const credential = await navigator.credentials.create(options);
         const credentialRawId = credential && "rawId" in credential && credential.rawId ? new Uint8Array(credential.rawId) : null;
         const credentialId = credentialRawId ? bytesToBase64Url(credentialRawId) : null;
-        const extensionResults = credential && "getClientExtensionResults" in credential && typeof credential.getClientExtensionResults === "function"
-            ? JSON.stringify(credential.getClientExtensionResults())
+        const extensionResultObject = credential && "getClientExtensionResults" in credential && typeof credential.getClientExtensionResults === "function"
+            ? credential.getClientExtensionResults()
             : null;
+        const extensionResults = extensionResultObject ? JSON.stringify(extensionResultObject) : null;
+        let prfFirstOutputBase64Url = null;
+        try {
+            const prfFirstOutput = extensionResultObject?.prf?.results?.first;
+            if (prfFirstOutput instanceof ArrayBuffer) {
+                prfFirstOutputBase64Url = bytesToBase64Url(new Uint8Array(prfFirstOutput));
+            }
+            else if (typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView(prfFirstOutput)) {
+                const view = prfFirstOutput;
+                prfFirstOutputBase64Url = bytesToBase64Url(new Uint8Array(view.buffer, view.byteOffset, view.byteLength));
+            }
+        }
+        catch {
+            prfFirstOutputBase64Url = null;
+        }
         return {
             status: "SUCCESS",
             credentialId,
             extensionResults,
-            prfFirstOutputBase64Url: null,
+            prfFirstOutputBase64Url,
             message: null,
         };
     }
