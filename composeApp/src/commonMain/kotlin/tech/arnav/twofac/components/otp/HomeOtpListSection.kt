@@ -21,6 +21,7 @@ fun HomeOtpListSection(
     accountsWithOtps: List<Pair<StoredAccount.DisplayAccount, String>>,
     listState: LazyListState,
     onRefreshOtp: () -> Unit,
+    onCopyOtp: (String) -> Unit = {},
     heading: String = "Your Accounts",
     modifier: Modifier = Modifier,
 ) {
@@ -45,6 +46,7 @@ fun HomeOtpListSection(
                 otpCode = otpCode,
                 timeInterval = 30L,
                 onRefreshOTP = onRefreshOtp,
+                onCopyOtp = onCopyOtp,
             )
         }
     }
