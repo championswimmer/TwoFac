@@ -54,6 +54,13 @@ class AccountsViewModel(
     /** Clear any saved passkey from the session manager. */
     fun clearSavedPasskey() { sessionManager?.clearPasskey() }
 
+    /**
+     * Returns true if a WebAuthn credential is enrolled and can be used to unlock
+     * without showing the manual passkey dialog. This is a fast synchronous check.
+     */
+    fun isWebAuthnUnlockReady(): Boolean =
+        (sessionManager as? WebAuthnSessionManager)?.isPasskeyEnrolled() ?: false
+
     private val _refreshTrigger = MutableStateFlow(0L)
 
     @OptIn(FlowPreview::class)
@@ -231,6 +238,8 @@ internal fun sessionManagerForPostUnlockEnrollment(
 ): SecureSessionManager? {
     if (fromAutoUnlock) return null
     val secureSessionManager = sessionManager as? SecureSessionManager ?: return null
+    // Skip re-enrollment if WebAuthn is already enrolled to avoid unexpected prompts.
+    if (sessionManager is WebAuthnSessionManager && sessionManager.isPasskeyEnrolled()) return null
     return secureSessionManager.takeIf {
         it.isSecureUnlockEnabled() && it.isSecureUnlockAvailable()
     }

@@ -75,8 +75,10 @@ class BrowserSessionManagerTest {
         )
 
         manager.setRememberPasskey(true)
+        assertFalse(manager.isPasskeyEnrolled())
         assertTrue(manager.enrollPasskey("pass-123"))
         assertEquals(SecureUnlockOutcome.SUCCESS, manager.lastEnrollOutcome)
+        assertTrue(manager.isPasskeyEnrolled())
         val storedPayload = encryptedStore.value
         assertNotNull(storedPayload)
         assertFalse(storedPayload.contains("pass-123"))
@@ -87,6 +89,109 @@ class BrowserSessionManagerTest {
         assertFalse(storage.snapshot.values.contains("pass-123"))
         assertTrue((cryptoClient.lastEncryptContext ?: "").contains("cred-1"))
         assertTrue((cryptoClient.lastDecryptContext ?: "").contains("cred-1"))
+    }
+
+    @Test
+    fun enrollSkipsAuthenticateWhenCreateReturnsPrf() = runTest {
+        val encryptedStore = FakeEncryptedPasskeyStore()
+        val cryptoClient = FakeWebCryptoClient()
+        val client = FakeWebAuthnClient(
+            supported = true,
+            capabilities = supportedCapabilities(),
+            // Create result already has PRF output
+            createResult = WebAuthnOperationResult(
+                status = WebAuthnOperationStatus.SUCCESS,
+                credentialId = "cred-1",
+                prfFirstOutputBase64Url = "cHJmLWtleS1ieXRlcw",
+            ),
+            authenticateResult = successfulAuthResult(),
+        )
+        val manager = BrowserSessionManager(
+            storageClient = FakeStorageClient(),
+            webAuthnClient = client,
+            webCryptoClient = cryptoClient,
+            encryptedPasskeyStore = encryptedStore,
+        )
+
+        manager.setRememberPasskey(true)
+        assertTrue(manager.enrollPasskey("pass-123"))
+        assertEquals(SecureUnlockOutcome.SUCCESS, manager.lastEnrollOutcome)
+        // authenticate should NOT have been called since PRF came from createCredential
+        assertNull(client.lastAuthenticateCredentialId)
+    }
+
+    @Test
+    fun enrollCallsAuthenticateWhenCreateLacksPrf() = runTest {
+        val encryptedStore = FakeEncryptedPasskeyStore()
+        val client = FakeWebAuthnClient(
+            supported = true,
+            capabilities = supportedCapabilities(),
+            // Create result has no PRF output
+            createResult = WebAuthnOperationResult(
+                status = WebAuthnOperationStatus.SUCCESS,
+                credentialId = "cred-1",
+                prfFirstOutputBase64Url = null,
+            ),
+            authenticateResult = successfulAuthResult(),
+        )
+        val manager = BrowserSessionManager(
+            storageClient = FakeStorageClient(),
+            webAuthnClient = client,
+            webCryptoClient = FakeWebCryptoClient(),
+            encryptedPasskeyStore = encryptedStore,
+        )
+
+        manager.setRememberPasskey(true)
+        assertTrue(manager.enrollPasskey("pass-123"))
+        // authenticate should have been called as a fallback to get PRF
+        assertEquals("cred-1", client.lastAuthenticateCredentialId)
+    }
+
+    @Test
+    fun isPasskeyEnrolledReturnsFalseWhenNotEnrolled() {
+        val manager = BrowserSessionManager(
+            storageClient = FakeStorageClient(),
+            webAuthnClient = FakeWebAuthnClient(
+                supported = true,
+                capabilities = supportedCapabilities(),
+                createResult = WebAuthnOperationResult(
+                    status = WebAuthnOperationStatus.SUCCESS,
+                    credentialId = "cred-1",
+                ),
+                authenticateResult = successfulAuthResult(),
+            ),
+            webCryptoClient = FakeWebCryptoClient(),
+            encryptedPasskeyStore = FakeEncryptedPasskeyStore(),
+        )
+
+        manager.setRememberPasskey(true)
+        assertFalse(manager.isPasskeyEnrolled())
+    }
+
+    @Test
+    fun isPasskeyEnrolledReturnsFalseAfterClear() = runTest {
+        val encryptedStore = FakeEncryptedPasskeyStore()
+        val manager = BrowserSessionManager(
+            storageClient = FakeStorageClient(),
+            webAuthnClient = FakeWebAuthnClient(
+                supported = true,
+                capabilities = supportedCapabilities(),
+                createResult = WebAuthnOperationResult(
+                    status = WebAuthnOperationStatus.SUCCESS,
+                    credentialId = "cred-1",
+                ),
+                authenticateResult = successfulAuthResult(),
+            ),
+            webCryptoClient = FakeWebCryptoClient(),
+            encryptedPasskeyStore = encryptedStore,
+        )
+
+        manager.setRememberPasskey(true)
+        assertTrue(manager.enrollPasskey("pass-123"))
+        assertTrue(manager.isPasskeyEnrolled())
+
+        manager.clearPasskey()
+        assertFalse(manager.isPasskeyEnrolled())
     }
 
     @Test
