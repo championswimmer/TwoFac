@@ -2,7 +2,6 @@ package tech.arnav.twofac.viewmodels
 
 import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
-import tech.arnav.twofac.session.WebAuthnSessionManager
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -44,17 +43,23 @@ class AccountsViewModelSessionManagerTest {
     }
 
     @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsNullWhenWebAuthnAlreadyEnrolled() {
-        // If WebAuthn is already enrolled, do NOT re-enroll on every manual unlock.
-        val manager = FakeWebAuthnSessionManager(enrolled = true)
+    fun sessionManagerForPostUnlockEnrollmentReturnsNullWhenSecureUnlockAlreadyReady() {
+        val manager = FakeSecureSessionManager(
+            secureEnabled = true,
+            secureAvailable = true,
+            secureReady = true,
+        )
         val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
         assertNull(result)
     }
 
     @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsManagerWhenWebAuthnEnabledButNotYetEnrolled() {
-        // If WebAuthn is enabled but enrollment is absent, allow enrollment after manual unlock.
-        val manager = FakeWebAuthnSessionManager(enrolled = false)
+    fun sessionManagerForPostUnlockEnrollmentReturnsManagerWhenSecureUnlockNotReady() {
+        val manager = FakeSecureSessionManager(
+            secureEnabled = true,
+            secureAvailable = true,
+            secureReady = false,
+        )
         val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
         assertNotNull(result)
     }
@@ -74,21 +79,12 @@ private class FakeSessionManager : BaseFakeSessionManager()
 private class FakeSecureSessionManager(
     private val secureEnabled: Boolean,
     private val secureAvailable: Boolean,
+    private val secureReady: Boolean = false,
 ) : BaseFakeSessionManager(), SecureSessionManager {
     override fun isRememberPasskeyEnabled(): Boolean = secureEnabled
     override fun isSecureUnlockAvailable(): Boolean = secureAvailable
     override fun isSecureUnlockEnabled(): Boolean = secureEnabled
+    override fun isSecureUnlockReady(): Boolean = secureReady
     override fun setSecureUnlockEnabled(enabled: Boolean) = Unit
     override suspend fun enrollPasskey(passkey: String): Boolean = true
-}
-
-private class FakeWebAuthnSessionManager(
-    private val enrolled: Boolean,
-) : BaseFakeSessionManager(), WebAuthnSessionManager {
-    override fun isRememberPasskeyEnabled(): Boolean = true
-    override fun isSecureUnlockAvailable(): Boolean = true
-    override fun isSecureUnlockEnabled(): Boolean = true
-    override fun setSecureUnlockEnabled(enabled: Boolean) = Unit
-    override suspend fun enrollPasskey(passkey: String): Boolean = true
-    override fun isPasskeyEnrolled(): Boolean = enrolled
 }

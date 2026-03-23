@@ -70,4 +70,17 @@ class IosBiometricSessionManagerTest {
         manager.setBiometricEnabled(true)
         assertEquals(availability, manager.isBiometricEnabled())
     }
+
+    @Test
+    fun secureUnlockReadinessReflectsStoredPasskey() {
+        runTest {
+            val manager = createManager()
+            manager.setBiometricEnabled(false)
+            manager.setRememberPasskey(true)
+            assertFalse(manager.isSecureUnlockReady())
+
+            manager.savePasskey("test-passkey")
+            assertFalse(manager.isSecureUnlockReady())
+        }
+    }
 }

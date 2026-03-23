@@ -10,6 +10,14 @@ interface SecureSessionManager : SessionManager {
     /** Whether secure unlock is enabled by user preference. */
     fun isSecureUnlockEnabled(): Boolean
 
+    /**
+     * Whether secure unlock is ready to be attempted immediately.
+     *
+     * Readiness is stronger than enabled+available and implies required
+     * secure enrollment material has already been persisted.
+     */
+    fun isSecureUnlockReady(): Boolean
+
     /** Toggle secure unlock. */
     fun setSecureUnlockEnabled(enabled: Boolean)
 

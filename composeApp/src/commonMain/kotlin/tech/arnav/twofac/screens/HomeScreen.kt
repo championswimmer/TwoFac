@@ -37,7 +37,7 @@ fun HomeScreen(
     var hasTriggeredUnlockFlow by remember { mutableStateOf(false) }
     val isUnlocked = viewModel.twoFacLibUnlocked
     // Snapshot at composition time — doesn't change after page load.
-    val isWebAuthnReady = remember { viewModel.isWebAuthnUnlockReady() }
+    val isSecureUnlockReady = remember { viewModel.isSecureUnlockReady() }
 
     LaunchedEffect(Unit) {
         viewModel.loadAccounts()
@@ -46,11 +46,11 @@ fun HomeScreen(
     LaunchedEffect(isLoading, hasTriggeredUnlockFlow, isUnlocked) {
         if (!isLoading && !hasTriggeredUnlockFlow && !isUnlocked) {
             hasTriggeredUnlockFlow = true
-            if (!isWebAuthnReady) {
-                // No WebAuthn enrolled — go straight to manual passkey dialog.
+            if (!isSecureUnlockReady) {
+                // No secure unlock readiness — go straight to manual passkey dialog.
                 showPasskeyDialog = true
             }
-            // When WebAuthn is enrolled the locked state shows a button;
+            // When secure unlock is ready the locked state shows a button;
             // the user must tap it to trigger the biometric prompt.
         }
     }
@@ -71,14 +71,14 @@ fun HomeScreen(
 
             !isUnlocked -> {
                 HomeLockedState(
-                    onWebAuthnUnlock = if (isWebAuthnReady) {
+                    onSecureUnlock = if (isSecureUnlockReady) {
                         {
                             coroutineScope.launch {
                                 val savedPasskey = viewModel.getSavedPasskey()
                                 if (savedPasskey != null) {
                                     viewModel.loadAccountsWithOtps(savedPasskey, fromAutoUnlock = true)
                                 } else {
-                                    // WebAuthn failed or was cancelled — fall back to manual entry.
+                                    // Secure unlock failed or was cancelled — fall back to manual entry.
                                     showPasskeyDialog = true
                                 }
                             }

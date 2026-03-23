@@ -24,7 +24,7 @@ import tech.arnav.twofac.theme.TwoFacTheme
 fun HomeLockedState(
     title: String = "TwoFac",
     subtitle: String = "Two-Factor Authentication Manager",
-    onWebAuthnUnlock: (() -> Unit)? = null,
+    onSecureUnlock: (() -> Unit)? = null,
     onManualUnlock: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -43,9 +43,9 @@ fun HomeLockedState(
             text = subtitle,
             style = MaterialTheme.typography.bodyLarge,
         )
-        if (onWebAuthnUnlock != null) {
+        if (onSecureUnlock != null) {
             Spacer(Modifier.height(8.dp))
-            Button(onClick = onWebAuthnUnlock) {
+            Button(onClick = onSecureUnlock) {
                 Icon(
                     imageVector = Icons.Rounded.Fingerprint,
                     contentDescription = null,
@@ -75,7 +75,7 @@ fun HomeLockedStatePreview() {
 fun HomeLockedStateWithWebAuthnPreview() {
     TwoFacTheme {
         HomeLockedState(
-            onWebAuthnUnlock = {},
+            onSecureUnlock = {},
             onManualUnlock = {},
         )
     }
