@@ -184,11 +184,20 @@ dependencies {
 }
 
 val appVersionName = rootProject.extra["appVersionName"] as String
+val desktopPackageName = "TwoFac"
 val wasmInteropTypescriptDir = file("src/wasmJsMain/typescript")
 val wasmInteropGeneratedResourcesDir = layout.buildDirectory.dir("generated/wasmJs/resources")
 val extensionResourcesDir = layout.projectDirectory.dir("extension")
 val extensionManifestOutputDir = layout.buildDirectory.dir("generated/extensionManifests")
 val extensionBuildDir = layout.buildDirectory.dir("extension")
+val macDmgResourceRootDir = layout.buildDirectory.dir("generated/nativeDistributions/resources")
+
+val prepareMacDmgResources by tasks.registering(Sync::class) {
+    // jpackage uses <packageName>-volume.icns from the macOS resource dir for the mounted DMG icon.
+    from(layout.projectDirectory.file("src/desktopMain/resources/icons/macos.icns"))
+    into(macDmgResourceRootDir.map { it.dir("macos") })
+    rename("macos.icns", "${desktopPackageName}-volume.icns")
+}
 
 val installWasmInteropDependencies by tasks.registering(Exec::class) {
     workingDir = wasmInteropTypescriptDir
@@ -270,8 +279,9 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "TwoFac"
+            packageName = desktopPackageName
             packageVersion = rootProject.extra["appVersionName"] as String
+            appResourcesRootDir.set(macDmgResourceRootDir)
 
             linux {
                 iconFile.set(project.file("src/desktopMain/resources/icons/linux.png"))
@@ -286,3 +296,8 @@ compose.desktop {
         }
     }
 }
+
+tasks.matching { it.name in setOf("packageDmg", "packageReleaseDmg", "notarizeDmg", "notarizeReleaseDmg") }
+    .configureEach {
+        dependsOn(prepareMacDmgResources)
+    }
