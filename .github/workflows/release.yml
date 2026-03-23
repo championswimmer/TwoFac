@@ -108,8 +108,8 @@ jobs:
           distribution: 'temurin'
           architecture: 'x64'
 
-      - name: Install WiX Toolset 3.11.2 (x64)
-        run: choco install wixtoolset --version=3.11.2 --no-progress -y
+      - name: Install WiX Toolset (x64)
+        run: choco install wixtoolset --no-progress -y
 
       - name: Verify Java and WiX architecture
         shell: pwsh
