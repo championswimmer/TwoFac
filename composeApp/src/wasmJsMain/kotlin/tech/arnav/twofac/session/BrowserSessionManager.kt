@@ -130,6 +130,12 @@ internal class BrowserSessionManager(
         return storageClient.isAvailable() && webAuthnClient.isSupported()
     }
 
+    override fun isPasskeyEnrolled(): Boolean {
+        if (!isRememberPasskeyEnabled()) return false
+        val credId = enrolledCredentialId ?: safeStorageGet(ENROLLED_CREDENTIAL_ID_KEY)
+        return !credId.isNullOrBlank()
+    }
+
     override fun isSecureUnlockEnabled(): Boolean {
         if (!isSecureUnlockAvailable()) return false
         return safeStorageGet(SECURE_UNLOCK_ENABLED_KEY) == "true"
@@ -181,14 +187,21 @@ internal class BrowserSessionManager(
             return lastEnrollOutcome
         }
 
-        val authResult = webAuthnClient.authenticate(credentialId)
-        val authOutcome = authResult.status.toSecureUnlockOutcome()
-        if (authOutcome != SecureUnlockOutcome.SUCCESS) {
-            lastEnrollOutcome = authOutcome
-            return lastEnrollOutcome
+        // Use PRF output from creation if available (avoids a second WebAuthn prompt).
+        // Fall back to a separate authenticate call for older browsers/authenticators.
+        val prfFirstOutput: String?
+        if (!enrollResult.prfFirstOutputBase64Url.isNullOrBlank()) {
+            prfFirstOutput = enrollResult.prfFirstOutputBase64Url
+        } else {
+            val authResult = webAuthnClient.authenticate(credentialId)
+            val authOutcome = authResult.status.toSecureUnlockOutcome()
+            if (authOutcome != SecureUnlockOutcome.SUCCESS) {
+                lastEnrollOutcome = authOutcome
+                return lastEnrollOutcome
+            }
+            prfFirstOutput = authResult.prfFirstOutputBase64Url
         }
 
-        val prfFirstOutput = authResult.prfFirstOutputBase64Url
         if (prfFirstOutput.isNullOrBlank()) {
             lastEnrollOutcome = SecureUnlockOutcome.UNAVAILABLE
             return lastEnrollOutcome

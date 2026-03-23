@@ -9,8 +9,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import tech.arnav.twofac.components.home.HomeEmptyState
 import tech.arnav.twofac.components.home.HomeLoadingState
@@ -29,11 +31,13 @@ fun HomeScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val otpListState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     var showPasskeyDialog by remember { mutableStateOf(false) }
     var hasTriggeredUnlockFlow by remember { mutableStateOf(false) }
-    var autoUnlockAttempted by remember { mutableStateOf(false) }
     val isUnlocked = viewModel.twoFacLibUnlocked
+    // Snapshot at composition time — doesn't change after page load.
+    val isWebAuthnReady = remember { viewModel.isWebAuthnUnlockReady() }
 
     LaunchedEffect(Unit) {
         viewModel.loadAccounts()
@@ -42,23 +46,12 @@ fun HomeScreen(
     LaunchedEffect(isLoading, hasTriggeredUnlockFlow, isUnlocked) {
         if (!isLoading && !hasTriggeredUnlockFlow && !isUnlocked) {
             hasTriggeredUnlockFlow = true
-            // Try auto-unlock from saved session passkey first
-            val savedPasskey = viewModel.getSavedPasskey()
-            if (savedPasskey != null) {
-                viewModel.loadAccountsWithOtps(savedPasskey, fromAutoUnlock = true)
-                autoUnlockAttempted = true
-            } else {
+            if (!isWebAuthnReady) {
+                // No WebAuthn enrolled — go straight to manual passkey dialog.
                 showPasskeyDialog = true
             }
-        }
-    }
-
-    // If auto-unlock failed (error set while we tried), clear saved passkey and show the passkey dialog
-    LaunchedEffect(error) {
-        if (autoUnlockAttempted && error != null && !viewModel.twoFacLibUnlocked) {
-            autoUnlockAttempted = false
-            viewModel.clearSavedPasskey()
-            showPasskeyDialog = true
+            // When WebAuthn is enrolled the locked state shows a button;
+            // the user must tap it to trigger the biometric prompt.
         }
     }
 
@@ -81,7 +74,22 @@ fun HomeScreen(
             }
 
             !isUnlocked -> {
-                HomeLockedState()
+                HomeLockedState(
+                    onWebAuthnUnlock = if (isWebAuthnReady) {
+                        {
+                            coroutineScope.launch {
+                                val savedPasskey = viewModel.getSavedPasskey()
+                                if (savedPasskey != null) {
+                                    viewModel.loadAccountsWithOtps(savedPasskey, fromAutoUnlock = true)
+                                } else {
+                                    // WebAuthn failed or was cancelled — fall back to manual entry.
+                                    showPasskeyDialog = true
+                                }
+                            }
+                        }
+                    } else null,
+                    onManualUnlock = { showPasskeyDialog = true },
+                )
             }
 
             else -> {
