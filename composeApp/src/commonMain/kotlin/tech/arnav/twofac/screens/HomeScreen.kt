@@ -69,10 +69,6 @@ fun HomeScreen(
                 HomeLoadingState()
             }
 
-            accounts.isEmpty() -> {
-                HomeEmptyState(onManageAccounts = onNavigateToAccounts)
-            }
-
             !isUnlocked -> {
                 HomeLockedState(
                     onWebAuthnUnlock = if (isWebAuthnReady) {
@@ -90,6 +86,10 @@ fun HomeScreen(
                     } else null,
                     onManualUnlock = { showPasskeyDialog = true },
                 )
+            }
+
+            accounts.isEmpty() -> {
+                HomeEmptyState(onManageAccounts = onNavigateToAccounts)
             }
 
             else -> {
