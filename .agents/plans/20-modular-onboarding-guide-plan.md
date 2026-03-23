@@ -23,94 +23,110 @@ Add a non-blocking onboarding guide for the Compose app that:
 4. uses platform-specific copy for steps such as secure unlock
 5. can be resumed later from the app instead of trapping the user in a mandatory first-run wizard
 
-## Current onboarding-related flow in the app
+## Product direction
 
-The app already has the operational pieces a new user needs, but they are spread across existing screens instead of being presented as a guided flow:
+The onboarding guide should behave like a guided checklist layered onto the existing app, not like a separate first-run app shell.
 
-1. **First app open**
-   - `composeApp/.../App.kt` starts at `Home`.
-   - `HomeScreen` loads accounts and branches into loading, locked, empty, or OTP-list states.
-   - There is no dedicated welcome/onboarding route today.
+Locked defaults for this plan:
 
-2. **Unlock / secure session**
-   - `HomeLockedState` offers secure unlock when `SecureSessionManager.isSecureUnlockReady()` is true.
-   - Manual unlock uses `PasskeyDialog`.
-   - Android and iOS use biometric session managers; web uses secure unlock/WebAuthn-backed browser session handling; desktop currently has no secure unlock path.
-
-3. **Add first account**
-   - `AddAccountScreen` already supports adding by:
-     - QR scan on mobile
-     - pasted QR image where clipboard readers exist
-     - manual/pasted `otpauth://` URI entry
-   - `AccountsViewModel.addAccount(...)` is the shared entry point.
-
-4. **Manage accounts**
-   - `AccountsScreen` lists accounts and routes to `AccountDetailScreen`.
-   - Current management scope is browse/view OTPs/delete.
-   - Rename/reorder/tags/folders are not present today and should not be implied by onboarding copy.
-
-5. **Import / export / backup / restore**
-   - `SettingsScreen` already exposes backup import/export through `BackupService`.
-   - Provider availability is platform-dependent.
-   - The shared library also contains third-party import adapters, but there is no general Compose UI flow for those adapters yet.
-
-6. **Companion / secondary device sync**
-   - Companion sync is surfaced from settings when supported.
-   - This is relevant as an optional onboarding step, not a mandatory first-run blocker.
-
-## Research summary and product implications
-
-Internet research on app onboarding patterns strongly points to the following direction:
-
-1. **Get to first value quickly**
-   - The guide should help users reach the first meaningful win fast.
-   - For this app, that first win is adding the first account and seeing a live OTP.
-
-2. **Prefer progressive disclosure over a hard-blocking tutorial**
-   - A checklist or step-based guide is a better fit than a mandatory carousel.
-   - Secondary setup items should appear as optional next steps after the first account is added.
-
-3. **Separate required vs optional steps clearly**
-   - Required: reach an actually usable vault state.
-   - Optional: secure unlock, backup setup, companion sync, advanced import/export education.
-
-4. **Use contextual help for sensitive or permission-gated features**
-   - Camera, biometric, and WebAuthn flows should be primed with a short explanation before platform prompts.
-   - Guidance should appear near the related action, not only in an up-front wall of text.
-
-5. **Keep cross-platform structure consistent, but let content vary by platform**
-   - Users should recognize the same guide shape across platforms.
-   - The actual copy and step availability should reflect Android/iOS/Web/Desktop capabilities.
-
-## Product direction for this repository
-
-The onboarding guide should follow these locked defaults:
-
-1. Do **not** replace the existing app startup/navigation with a separate mandatory onboarding stack.
-2. Add a dedicated **Getting Started / Onboarding Guide** route that can also be opened from:
-   - `HomeEmptyState`
-   - `SettingsScreen`
-   - optional post-action nudges after the first account is added or after unlock succeeds
-3. Auto-present the guide only when it is useful:
-   - after first successful unlock when the account list is empty
-   - or from the empty-state CTA
-4. Make **Add your first account** the primary required step.
-5. Keep **secure unlock**, **backup/restore**, **import/export education**, and **companion sync** as optional capability-driven steps.
-6. Only show steps that the current platform/runtime can actually support.
-7. Persist both:
-   - a guide-level **has seen initial onboarding** flag
+1. Do **not** replace the existing startup/navigation flow with a mandatory onboarding stack.
+2. Add a dedicated **Getting Started / Onboarding Guide** route that can be entered manually or auto-surfaced when useful.
+3. Make **Add your first account** the primary required step because it is the shortest path to first value.
+4. Keep **secure unlock**, **backup/restore**, **import/export guidance**, and **companion sync** as optional capability-driven steps.
+5. Show only steps that the current runtime and platform can actually support.
+6. Persist both:
+   - a guide-level `hasSeenInitialOnboardingGuide` flag
    - per-step seen/dismissed/completed state keyed by stable step ID
-8. Auto-show behavior should distinguish between:
+7. Distinguish clearly between:
    - a first-time user who should see the full initial guide
-   - a returning user who has already seen the guide
-   - a returning user who has already seen old steps, but now has a newly introduced unseen step
-9. When a new feature adds a new onboarding step with a new stable ID, only that unseen step should be surfaced to existing users instead of replaying the whole guide.
+   - a returning user who has already seen the guide and has no new steps
+   - a returning user who has already seen old steps but now has a newly introduced unseen step
 
-## Proposed architecture
+## Why this needs to be modular
 
-### 1) Shared onboarding domain (`composeApp/src/commonMain/.../onboarding/`)
+The app already contains the operational pieces that a new user needs, but today they are scattered across existing screens:
 
-Add a new common package for onboarding orchestration, for example:
+1. `App.kt` launches into `Home`.
+2. `HomeScreen` branches into loading, locked, empty-vault, or OTP-list states.
+3. `AddAccountScreen` already supports the real first-win path.
+4. `SettingsScreen` already holds backup/import/export entry points.
+5. Secure unlock is platform-specific and not uniformly available.
+6. Companion or secondary-device flows are relevant only on supported platforms.
+
+The onboarding work is therefore mostly about:
+
+1. assembling existing flows into a coherent guide
+2. deciding where the guide is injected into current navigation
+3. persisting progress at the guide and per-step levels
+4. handling new step introduction without replaying old onboarding
+
+## Current app flow and where onboarding is injected
+
+The guide should be inserted into the existing flow at the points where onboarding is naturally useful, rather than becoming a hard prerequisite for opening the app.
+
+```mermaid
+flowchart TD
+    AppStart[App.kt starts] --> HomeRoute[Home route]
+    HomeRoute --> HomeState{HomeScreen state}
+
+    HomeState -->|Locked vault| Locked[HomeLockedState]
+    HomeState -->|Empty vault| Empty[HomeEmptyState]
+    HomeState -->|Has accounts| HomeReady[OTP list / normal home]
+
+    Locked --> Unlock{Unlock succeeds?}
+    Unlock -->|Yes + account count = 0| AutoGuide[Auto-surface onboarding guide]
+    Unlock -->|Yes + account count > 0| HomeReady
+
+    Empty --> EmptyCTA[Primary Getting Started CTA]
+    EmptyCTA --> GuideRoute[OnboardingGuideScreen]
+
+    Settings[SettingsScreen] --> GuideRoute
+    PostAction[Optional success nudges after first account add or secure unlock enrollment] --> GuideRoute
+```
+
+### Injection points to wire during implementation
+
+1. **Route registration**
+   - `NavigationRoutes.kt` adds a typed onboarding destination.
+   - `App.kt` wires the route into the existing navigation tree.
+
+2. **Auto-show injection**
+   - `HomeScreen` decides whether onboarding should be auto-presented after the app reaches a meaningful usable state.
+   - The most important first-run case is: unlock succeeded and the vault is still empty.
+
+3. **Manual re-entry injection**
+   - `HomeEmptyState` gets a clear “Getting Started” entry point.
+   - `SettingsScreen` gets an always-available re-entry path.
+
+4. **Contextual nudge injection**
+   - After the first account is added, or after secure unlock is enabled, the app may surface the guide again only when there are still relevant unseen steps.
+
+## Step resolution and guide assembly
+
+The final guide should not be hardcoded as one giant list. It should be assembled from stable step slots plus common/platform contributors.
+
+```mermaid
+flowchart LR
+    Slots[Common step slots and ordering] --> Registry[OnboardingGuideRegistry]
+    Common[Common contributor] --> Registry
+    Platform[Platform contributor<br/>Android / iOS / Web / Desktop] --> Registry
+    Context[OnboardingGuideContext<br/>accounts, secure unlock, backup providers, companion support] --> Registry
+
+    Registry --> Steps[Resolved ordered steps]
+    Progress[OnboardingProgressStore] --> Decision{Auto-show decision}
+    Steps --> Decision
+
+    Decision -->|First-time user| FullGuide[Show full initial guide]
+    Decision -->|Returning user + unseen step IDs| DeltaGuide[Show only unseen steps]
+    Decision -->|No unseen steps| ManualOnly[Do not auto-show]
+
+    FullGuide --> Screen[OnboardingGuideScreen]
+    DeltaGuide --> Screen
+```
+
+### Shared onboarding domain
+
+Add a new common package under `composeApp/src/commonMain/.../onboarding/`, for example:
 
 - `OnboardingStepSlot.kt`
 - `OnboardingGuideStep.kt`
@@ -122,34 +138,32 @@ Add a new common package for onboarding orchestration, for example:
 
 Recommended responsibilities:
 
-1. **Stable step slots / IDs**
-   - Define canonical slots and order in common code, for example:
+1. **Stable step slots and IDs**
+   - Canonical slots and ordering live in common code.
+   - Example slots:
      - `ADD_FIRST_ACCOUNT`
      - `MANAGE_ACCOUNTS`
      - `SECURE_UNLOCK`
+     - `IMPORT_OR_RESTORE`
      - `BACKUP_AND_RESTORE`
      - `COMPANION_SYNC`
-   - Shared ordering keeps the guide coherent across platforms.
 
 2. **Contributor-based step resolution**
-   - Common code resolves the final guide from registered contributors.
-   - A contributor can:
-     - provide a step for a slot
-     - override the copy/action for a slot
-     - return no step when unsupported
-   - This directly supports the requested behavior where secure unlock text differs on Android/iOS/Web and is absent on Desktop.
+   - Common code provides the default shared steps.
+   - Platform code can replace, enrich, or omit steps for specific slots.
+   - Unsupported steps resolve to no card at all.
 
 3. **Context-driven availability**
-   - `OnboardingGuideContext` should expose the runtime conditions needed to decide whether a step exists or is complete:
+   - `OnboardingGuideContext` should expose the runtime facts needed for step availability and completion:
      - current account count
      - whether secure unlock exists and is ready
      - whether camera QR import exists
-     - whether clipboard QR import exists
+     - whether clipboard/image QR import exists
      - available backup providers
      - companion sync availability
 
 4. **Progress persistence**
-   - Persist guide-level onboarding state plus step-level completion/seen state.
+   - Persist both guide-level and step-level state.
    - Recommended stored shape:
      - `hasSeenInitialOnboardingGuide: Boolean`
      - `stepStates: Map<StepId, StepState>`
@@ -158,78 +172,34 @@ Recommended responsibilities:
      - `dismissedAt`
      - `completedAt`
      - optional `contentRevisionSeen`
-   - The guide-level flag answers “has this user ever gone through the initial onboarding experience?”
-   - The per-step map answers “which specific steps has this user already seen or completed?”
-   - Prefer deriving completion from real app state when possible:
-     - first account step complete when account count > 0
-     - secure unlock step complete when secure unlock is ready/enrolled
-     - backup step can derive from existing backup presence where feasible
-   - For informational-only steps, allow explicit local completion/dismissal flags.
-   - Stable step IDs are required so future features can add a new step `D` and surface only `D` to existing users who already saw `A`, `B`, and `C`.
-   - Optional `contentRevisionSeen` gives us a future escape hatch if we ever intentionally want to re-surface a materially changed existing step without inventing a new step ID.
 
-### 2) UI structure (`screens/` + `components/onboarding/`)
+5. **Prefer derived completion over manual flags**
+   - First account step completes when `accountCount > 0`.
+   - Secure unlock completes when secure unlock is actually ready/enrolled.
+   - Backup-related steps can derive from real configured state where feasible.
+   - Purely informational steps can still be dismissed or explicitly completed.
 
-Following the existing Compose routing structure:
+## Sequence of how the guide is surfaced
 
-1. Add a new route-level screen:
-   - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/OnboardingGuideScreen.kt`
+This is the runtime sequence to keep in mind while implementing entry-point injection and auto-show rules.
 
-2. Add reusable UI components under a new domain:
-   - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/components/onboarding/`
-   - likely components:
-     - `OnboardingGuideHeader`
-     - `OnboardingProgressCard`
-     - `OnboardingStepCard`
-     - `OnboardingChecklistSection`
-     - `OnboardingEmptyGuideState`
+```mermaid
+sequenceDiagram
+    participant App as App.kt / Navigation
+    participant Home as HomeScreen
+    participant Registry as OnboardingGuideRegistry
+    participant Store as OnboardingProgressStore
+    participant Guide as OnboardingGuideScreen
 
-3. Add typed navigation:
-   - `navigation/NavigationRoutes.kt`
-   - `App.kt`
+    App->>Home: Launch Home route
+    Home->>Registry: Resolve current steps from common + platform contributors
+    Home->>Store: Load guide + step progress
+    Home->>Home: Compare current step IDs with persisted state
+    Home-->>Guide: Navigate when initial guide or unseen-step delta should surface
+    Guide->>Store: Mark step seen / dismissed / completed
+```
 
-4. Keep route orchestration in the screen and reusable/presentational pieces in `components/onboarding`.
-
-### 3) DI and platform extension points
-
-Add onboarding contributors through DI so platforms can extend common behavior without polluting `commonMain` UI logic:
-
-1. Add shared contributor bindings in common DI modules.
-2. Extend platform DI modules to register platform-specific contributors:
-   - `androidMain/.../di/AndroidModules.kt`
-   - `iosMain/.../di/IosModules.kt`
-   - `wasmJsMain/.../di/WasmModules.kt`
-   - `desktopMain/.../di/DesktopModules.kt`
-3. Use deterministic resolution rules:
-   - shared contributor provides default steps
-   - platform contributor can replace a known slot
-   - unsupported slot resolves to no card
-
-### 4) Guide surfacing policy
-
-The plan should explicitly support three user states:
-
-1. **Brand-new user**
-   - `hasSeenInitialOnboardingGuide = false`
-   - auto-show the full initial guide when the first meaningful entry point is reached
-
-2. **Returning user with no unseen steps**
-   - `hasSeenInitialOnboardingGuide = true`
-   - all currently available step IDs already have seen/completed state
-   - do not auto-show onboarding; keep it manually accessible
-
-3. **Returning user with newly added unseen steps**
-   - `hasSeenInitialOnboardingGuide = true`
-   - existing steps have state, but at least one newly resolved step ID does not
-   - auto-surface a focused “new setup available” experience containing only unseen steps
-
-This means the auto-show decision should be driven by:
-
-- whether the user has ever seen the initial guide
-- which current step IDs resolve for this runtime
-- which of those step IDs are missing from persisted state
-
-## Proposed onboarding step model
+## Step model
 
 ### Required first-win step
 
@@ -238,65 +208,108 @@ This means the auto-show decision should be driven by:
    - route to `AddAccount`
    - mark complete when at least one account exists
 
-This step should dynamically describe the available ways to add an account:
+Dynamic copy should describe only the real add methods available on the current platform:
 
 - Android/iOS: scan QR, paste/manual URI
 - Web/Desktop: paste QR image where supported, paste/manual URI
-- Fallback: manual/pasted `otpauth://` URI
+- fallback everywhere: manual/pasted `otpauth://` URI
 
 ### Shared optional steps
 
 1. **Manage your accounts**
    - explain current real capabilities only: browse, view OTPs, delete accounts
-   - do not promise rename/reorder/tags
+   - do not promise rename, reorder, folders, or tags
 
 2. **Import or restore existing data**
    - explain current backup import/export entry points in settings
    - keep copy honest about what exists today
-   - do not expand scope to brand-new third-party import UI in v1
+   - do not expand scope to a brand-new third-party import UI in v1
 
 3. **Back up your vault**
    - explain why backups matter
-   - route to settings backup providers
-   - platform copy can reflect actual providers shown at runtime
+   - route to backup providers/settings entry points
+   - platform copy can reflect actual providers available at runtime
 
 ### Platform-specific optional steps
 
 1. **Secure unlock**
-   - Android: biometric unlock copy and expectations
-   - iOS: Face ID / Touch ID style copy
-   - Web: WebAuthn / device credential copy
+   - Android: biometric unlock wording
+   - iOS: Face ID / Touch ID wording
+   - Web: WebAuthn / device credential wording
    - Desktop: omitted entirely for now
 
 2. **Companion sync**
-   - only shown where companion sync is available and relevant
+   - shown only where companion sync is available and relevant
 
-## UX behavior recommendations
+## First-time users, returning users, and newly added steps
+
+The key product rule is that old onboarding should not replay just because a new feature added one more step.
+
+### State buckets
+
+1. **Brand-new user**
+   - `hasSeenInitialOnboardingGuide = false`
+   - guide can auto-show in its full initial form
+
+2. **Returning user with no unseen steps**
+   - `hasSeenInitialOnboardingGuide = true`
+   - every currently resolved step already has seen/completed/dismissed state
+   - no auto-show; manual re-entry only
+
+3. **Returning user with newly added unseen steps**
+   - `hasSeenInitialOnboardingGuide = true`
+   - previously known steps have persisted state
+   - at least one newly resolved stable step ID has no persisted state yet
+   - only the unseen step subset should auto-surface
+
+### Delta flow when a new feature drops
+
+```mermaid
+flowchart TD
+    Persisted[Persisted step state exists for A, B, C] --> Release[New release introduces step D]
+    Release --> Resolve[Registry now resolves A, B, C, D]
+    Resolve --> Compare{Which resolved step IDs are unseen?}
+    Persisted --> Compare
+
+    Compare -->|None| NoShow[No auto-show; guide remains manual]
+    Compare -->|Only D| ShowDelta[Auto-surface only step D]
+    Compare -->|Multiple new steps| ShowSubset[Auto-surface only unseen subset]
+
+    ShowDelta --> Update[Persist seen/dismissed/completed state for D]
+    ShowSubset --> Update
+```
+
+### Why stable step IDs matter
+
+If the app originally shipped with `A`, `B`, and `C`, and a later release adds `D`, then:
+
+1. existing users who already saw `A/B/C` should not be forced through those again
+2. the guide should calculate `resolvedStepIds - knownStepIds`
+3. only the delta should be surfaced automatically
+4. the delta can still be completed, dismissed, or ignored without affecting the earlier step history
+
+Optional `contentRevisionSeen` is a future escape hatch only if a materially changed old step ever needs intentional re-surfacing.
+
+## UX recommendations
 
 1. **Guide shape**
-   - Use a checklist/progress view, not a full-screen slideshow.
-   - Let users enter the app quickly and return to the guide later.
+   - use a checklist/progress view, not a full-screen slideshow
+   - keep it resumable and skippable
 
-2. **Entry points**
-   - `HomeEmptyState`: primary first-time CTA
-   - `SettingsScreen`: always-available re-entry
-   - optional success nudges after first account add or after unlock
+2. **Permission priming**
+   - explain the benefit of camera, biometrics, or WebAuthn before the system prompt appears
 
-3. **Permission priming**
-   - If a step launches QR scan, biometric enrollment, or WebAuthn enrollment, explain the benefit before the system prompt appears.
+3. **Progress visibility**
+   - clearly separate required steps from optional steps
+   - keep the progress model lightweight and derived from real app state where possible
 
-4. **Progress**
-   - Show required vs optional sections distinctly.
-   - Keep the progress model lightweight and state-derived where possible.
+4. **Dismiss and resume**
+   - users must be able to skip onboarding without losing app access
+   - the guide remains discoverable later
 
-5. **Dismiss / resume**
-   - Users should be able to skip the guide without losing access to the app.
-   - The guide should remain discoverable later.
-
-6. **First-time vs returning behavior**
-   - First-time onboarding should be broader and cover the initial getting-started path.
-   - Returning users should only be nudged for genuinely unseen steps.
-   - If a new feature adds step `D`, existing users who already saw `A/B/C` should only get `D`.
+5. **Contextual surfacing**
+   - first-time onboarding can be broader
+   - later nudges should be smaller and only point to unseen steps
 
 ## Implementation roadmap
 
@@ -375,6 +388,7 @@ This step should dynamically describe the available ways to add an account:
 
 1. `HomeScreen`
    - surface onboarding entry after first unlock when the vault is empty
+   - surface unseen-step-only nudges when new stable step IDs appear
 2. `HomeEmptyState`
    - add a direct “Getting Started” / guide CTA
 3. `SettingsScreen`
@@ -428,6 +442,6 @@ This step should dynamically describe the available ways to add an account:
 
 ## Summary
 
-The safest plan is to add a shared, resume-friendly onboarding checklist that sits on top of the current routing structure, with step resolution driven by common slots plus platform contributors.
+The safest implementation path is to add a shared, resume-friendly onboarding checklist that sits on top of the current routing structure, with guide assembly driven by common slots plus platform contributors.
 
-That gives the app a coherent onboarding story without lying about unsupported features, and it cleanly supports the requested secure-unlock example where Android, iOS, and Web each contribute their own version of the same conceptual step while Desktop contributes none.
+That approach keeps the flow honest, lets the app explain platform-specific capabilities without pretending they exist everywhere, and supports the critical delta behavior where existing users only see newly introduced onboarding steps instead of replaying the whole guide.
