@@ -21,10 +21,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import tech.arnav.twofac.components.accounts.AccountsErrorState
 import tech.arnav.twofac.components.accounts.AccountsListContent
@@ -45,9 +47,11 @@ fun AccountsScreen(
     val error by viewModel.error.collectAsState()
     var showPasskeyDialog by remember { mutableStateOf(false) }
     val requiresUnlock = !viewModel.twoFacLibUnlocked
+    val isWebAuthnReady = remember { viewModel.isWebAuthnUnlockReady() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(requiresUnlock) {
-        if (requiresUnlock) {
+        if (requiresUnlock && !isWebAuthnReady) {
             showPasskeyDialog = true
         } else {
             showPasskeyDialog = false
@@ -90,7 +94,20 @@ fun AccountsScreen(
 
                 requiresUnlock -> {
                     AccountsLockedState(
-                        onUnlockClick = { showPasskeyDialog = true }
+                        onUnlockClick = if (isWebAuthnReady) {
+                            {
+                                coroutineScope.launch {
+                                    val savedPasskey = viewModel.getSavedPasskey()
+                                    if (savedPasskey != null) {
+                                        viewModel.loadAccountsWithOtps(savedPasskey, fromAutoUnlock = true)
+                                    } else {
+                                        showPasskeyDialog = true
+                                    }
+                                }
+                            }
+                        } else {
+                            { showPasskeyDialog = true }
+                        },
                     )
                 }
 
