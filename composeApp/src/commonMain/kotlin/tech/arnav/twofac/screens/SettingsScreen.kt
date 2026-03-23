@@ -2,6 +2,7 @@ package tech.arnav.twofac.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,9 +10,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.School
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -51,6 +54,7 @@ import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.storage.getStoragePath
 import tech.arnav.twofac.viewmodels.AccountsViewModel
+import tech.arnav.twofac.viewmodels.OnboardingViewModel
 
 private sealed interface BackupAction {
     data class Export(val providerId: String, val encrypted: Boolean) : BackupAction
@@ -69,6 +73,7 @@ private data class EncryptedImportRequest(
 @Composable
 fun SettingsScreen(
     onNavigateBack: (() -> Unit)? = null,
+    onNavigateToOnboarding: (() -> Unit)? = null,
     onQuit: (() -> Unit)? = null
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -80,6 +85,7 @@ fun SettingsScreen(
     val companionSyncCoordinator = remember { koin.getOrNull<CompanionSyncCoordinator>() }
     val sessionManager = remember { koin.getOrNull<SessionManager>() }
     val accountsViewModel = remember { koin.getOrNull<AccountsViewModel>() }
+    val onboardingViewModel = remember { koin.getOrNull<OnboardingViewModel>() }
 
     var pendingAction by remember { mutableStateOf<BackupAction?>(null) }
     var passkeyError by remember { mutableStateOf<String?>(null) }
@@ -361,6 +367,20 @@ fun SettingsScreen(
             }
 
             PlatformSettingsContent(onQuit = onQuit)
+
+            onNavigateToOnboarding?.let { navigateToOnboarding ->
+                OutlinedButton(
+                    onClick = navigateToOnboarding,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.School,
+                        contentDescription = "Open getting started",
+                        modifier = Modifier.padding(end = 8.dp),
+                    )
+                    Text("Open Getting Started Guide")
+                }
+            }
         }
     }
 
@@ -654,6 +674,7 @@ fun SettingsScreen(
                             isRememberPasskeyEnabled =
                                 manager.isSecureUnlockEnabled()
                             showSecureEnrollmentDialog = false
+                            onboardingViewModel?.refreshAndSyncDerivedCompletion()
                             snackbarHostState.showSnackbar("Secure unlock enabled")
                         } else {
                             manager.setSecureUnlockEnabled(false)
@@ -697,6 +718,7 @@ fun SettingsScreen(
                             isBiometricEnabled = true
                             isRememberPasskeyEnabled = true
                             showBiometricEnrollmentDialog = false
+                            onboardingViewModel?.refreshAndSyncDerivedCompletion()
                             snackbarHostState.showSnackbar("Biometric unlock enabled")
                         } else {
                             biometricSessionManager.setBiometricEnabled(false)

@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import tech.arnav.twofac.onboarding.AndroidOnboardingContributor
+import tech.arnav.twofac.onboarding.PlatformOnboardingStepContributor
 import tech.arnav.twofac.backup.GoogleDriveAppDataBackupTransport
 import tech.arnav.twofac.backup.LocalFileBackupTransport
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
@@ -46,6 +48,10 @@ fun androidBiometricModule(
 
 val androidQrModule = module {
     single<CameraQRCodeReader> { AndroidCameraQRCodeReader() }
+}
+
+val androidOnboardingModule = module {
+    single<PlatformOnboardingStepContributor> { AndroidOnboardingContributor() }
 }
 
 fun androidBackupModule(

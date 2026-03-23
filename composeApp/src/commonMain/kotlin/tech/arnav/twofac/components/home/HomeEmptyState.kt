@@ -22,10 +22,12 @@ import twofac.composeapp.generated.resources.app_logo
 @Composable
 fun HomeEmptyState(
     onManageAccounts: () -> Unit,
+    onOpenGettingStarted: (() -> Unit)? = null,
     title: String = "TwoFac",
     emptyTitle: String = "No accounts added",
     emptySubtitle: String = "Go to manage accounts to add an account",
     manageAccountsLabel: String = "Manage Accounts",
+    gettingStartedLabel: String = "Getting Started",
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -55,6 +57,13 @@ fun HomeEmptyState(
             modifier = Modifier.padding(top = 16.dp),
         ) {
             Text(manageAccountsLabel)
+        }
+        onOpenGettingStarted?.let { openGuide ->
+            Button(
+                onClick = openGuide,
+            ) {
+                Text(gettingStartedLabel)
+            }
         }
     }
 }

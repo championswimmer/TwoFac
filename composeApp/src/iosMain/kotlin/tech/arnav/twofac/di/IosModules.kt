@@ -8,6 +8,8 @@ import tech.arnav.twofac.lib.backup.BackupProviderIds
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.IosCompanionSyncCoordinator
 import tech.arnav.twofac.lib.backup.BackupTransport
+import tech.arnav.twofac.onboarding.IosOnboardingContributor
+import tech.arnav.twofac.onboarding.PlatformOnboardingStepContributor
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.IosCameraQRCodeReader
 import tech.arnav.twofac.session.BiometricSessionManager
@@ -38,4 +40,8 @@ val iosBackupModule = module {
     single<BackupTransport>(named(BackupProviderIds.ICLOUD)) {
         ICloudBackupTransport()
     }
+}
+
+val iosOnboardingModule = module {
+    single<PlatformOnboardingStepContributor> { IosOnboardingContributor() }
 }

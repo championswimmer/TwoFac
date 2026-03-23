@@ -36,12 +36,14 @@ import tech.arnav.twofac.components.accounts.QrImportActions
 import tech.arnav.twofac.qr.ComposableCameraQRCodeReader
 import tech.arnav.twofac.qr.QRCodeReadResult
 import tech.arnav.twofac.viewmodels.AccountsViewModel
+import tech.arnav.twofac.viewmodels.OnboardingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAccountScreen(
     onNavigateBack: () -> Unit,
-    viewModel: AccountsViewModel = koinViewModel()
+    viewModel: AccountsViewModel = koinViewModel(),
+    onboardingViewModel: OnboardingViewModel = koinViewModel(),
 ) {
     var uriText by remember { mutableStateOf("") }
     var passkeyText by remember { mutableStateOf("") }
@@ -195,6 +197,7 @@ fun AddAccountScreen(
                                 passkey = passkeyText.ifBlank { null },
                                 onComplete = { success ->
                                     if (success) {
+                                        onboardingViewModel.refreshAndSyncDerivedCompletion()
                                         onNavigateBack()
                                     }
                                 }

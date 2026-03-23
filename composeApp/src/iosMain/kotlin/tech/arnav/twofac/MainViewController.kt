@@ -4,6 +4,7 @@ import androidx.compose.ui.window.ComposeUIViewController
 import tech.arnav.twofac.di.iosBackupModule
 import tech.arnav.twofac.di.iosBiometricModule
 import tech.arnav.twofac.di.iosCompanionSyncModule
+import tech.arnav.twofac.di.iosOnboardingModule
 import tech.arnav.twofac.di.iosQrModule
 
 fun MainViewController() = ComposeUIViewController {
@@ -12,6 +13,7 @@ fun MainViewController() = ComposeUIViewController {
             iosCompanionSyncModule(),
             iosBiometricModule,
             iosQrModule,
+            iosOnboardingModule,
             iosBackupModule,
         )
     }

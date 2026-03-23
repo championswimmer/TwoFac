@@ -18,6 +18,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.runBlocking
 import tech.arnav.twofac.di.desktopBackupModule
+import tech.arnav.twofac.di.desktopOnboardingModule
 import tech.arnav.twofac.di.desktopQrModule
 import tech.arnav.twofac.di.desktopSettingsModule
 import tech.arnav.twofac.settings.DesktopSettingsManager
@@ -38,7 +39,7 @@ fun main() = runBlocking {
     System.setProperty("apple.awt.enableTemplateImages", "true")
 
     val koinApp = initKoin {
-        modules(desktopBackupModule, desktopQrModule, desktopSettingsModule)
+        modules(desktopBackupModule, desktopQrModule, desktopSettingsModule, desktopOnboardingModule)
     }
     val settingsManager = koinApp.koin.get<DesktopSettingsManager>()
     val initialTrayEnabled = try {

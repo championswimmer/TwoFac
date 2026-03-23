@@ -16,3 +16,8 @@ object Settings
 
 @Serializable
 object AddAccount
+
+@Serializable
+data class OnboardingGuide(
+    val unseenOnly: Boolean = false,
+)

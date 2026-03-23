@@ -28,11 +28,13 @@ import tech.arnav.twofac.navigation.AccountDetail
 import tech.arnav.twofac.navigation.Accounts
 import tech.arnav.twofac.navigation.AddAccount
 import tech.arnav.twofac.navigation.Home
+import tech.arnav.twofac.navigation.OnboardingGuide
 import tech.arnav.twofac.navigation.Settings
 import tech.arnav.twofac.screens.AccountDetailScreen
 import tech.arnav.twofac.screens.AccountsScreen
 import tech.arnav.twofac.screens.AddAccountScreen
 import tech.arnav.twofac.screens.HomeScreen
+import tech.arnav.twofac.screens.OnboardingGuideScreen
 import tech.arnav.twofac.screens.SettingsScreen
 import tech.arnav.twofac.theme.TwoFacTheme
 import kotlin.reflect.KClass
@@ -91,7 +93,10 @@ fun App(onQuit: (() -> Unit)? = null) {
                     HomeScreen(
                         onNavigateToAccounts = {
                             navController.navigateToTopLevel(TopLevelDestination.ACCOUNTS)
-                        }
+                        },
+                        onNavigateToOnboarding = { unseenOnly ->
+                            navController.navigate(OnboardingGuide(unseenOnly = unseenOnly))
+                        },
                     )
                 }
 
@@ -115,6 +120,9 @@ fun App(onQuit: (() -> Unit)? = null) {
                 composable<Settings> {
                     SettingsScreen(
                         onNavigateBack = { navController.popBackStack() },
+                        onNavigateToOnboarding = {
+                            navController.navigate(OnboardingGuide())
+                        },
                         onQuit = onQuit
                     )
                 }
@@ -122,6 +130,21 @@ fun App(onQuit: (() -> Unit)? = null) {
                 composable<AddAccount> {
                     AddAccountScreen(
                         onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable<OnboardingGuide> { backStackEntry ->
+                    val route = backStackEntry.toRoute<OnboardingGuide>()
+                    OnboardingGuideScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToAddAccount = { navController.navigate(AddAccount) },
+                        onNavigateToAccounts = {
+                            navController.navigateToTopLevel(TopLevelDestination.ACCOUNTS)
+                        },
+                        onNavigateToSettings = {
+                            navController.navigateToTopLevel(TopLevelDestination.SETTINGS)
+                        },
+                        unseenOnly = route.unseenOnly,
                     )
                 }
             }
