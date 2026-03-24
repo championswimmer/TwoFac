@@ -286,14 +286,14 @@ class BackupServiceTest {
             lib.exportAccountsPlaintext()
             error("Should have thrown")
         } catch (e: IllegalStateException) {
-            assertTrue(e.message?.contains("not unlocked") == true)
+            assertTrue(e.message?.contains("accounts are locked") == true)
         }
 
         try {
             lib.exportAccountsEncrypted()
             error("Should have thrown")
         } catch (e: IllegalStateException) {
-            assertTrue(e.message?.contains("not unlocked") == true)
+            assertTrue(e.message?.contains("accounts are locked") == true)
         }
     }
 

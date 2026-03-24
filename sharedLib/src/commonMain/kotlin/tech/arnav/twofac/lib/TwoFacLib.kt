@@ -28,6 +28,9 @@ class TwoFacLib private constructor(
     @Volatile private var passKey: String?,
 ) {
 
+    val isStoreInitialized: Boolean
+        get() = accountList != null
+
     companion object {
 
         fun initialise(
@@ -71,14 +74,24 @@ class TwoFacLib private constructor(
     }
 
     fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
-        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        check(isUnlocked()) {
+            if (!isStoreInitialized)
+                "No account store found. Please set up a passkey to get started."
+            else
+                "Your accounts are locked. Enter your passkey to unlock."
+        }
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map(StoredAccount::forDisplay)
     }
 
     @OptIn(ExperimentalTime::class)
     suspend fun getAllAccountOTPs(): List<Pair<StoredAccount.DisplayAccount, String>> {
-        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        check(isUnlocked()) {
+            if (isStoreInitialized)
+                "No account store found. Please set up a passkey to get started."
+            else
+                "Your accounts are locked. Enter your passkey to unlock."
+        }
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
@@ -103,7 +116,12 @@ class TwoFacLib private constructor(
     }
 
     suspend fun addAccount(accountURI: String): Boolean {
-        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        check(isUnlocked()) {
+            if (isStoreInitialized)
+                "No account store found. Please set up a passkey to get started."
+            else
+                "Your accounts are locked. Enter your passkey to unlock."
+        }
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val otp = OtpAuthURI.parse(accountURI)
         val signingKey = cryptoTools.createSigningKey(currentPassKey)
@@ -118,7 +136,12 @@ class TwoFacLib private constructor(
 
     @OptIn(ExperimentalUuidApi::class)
     suspend fun deleteAccount(accountId: String): Boolean {
-        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        check(isUnlocked()) {
+            if (isStoreInitialized)
+                "No account store found. Please set up a passkey to get started."
+            else
+                "Your accounts are locked. Enter your passkey to unlock."
+        }
         val parsedAccountId = Uuid.parse(accountId)
         val success = storage.deleteAccount(parsedAccountId)
         if (success) {
@@ -148,7 +171,12 @@ class TwoFacLib private constructor(
         fileContent: String,
         password: String? = null
     ): ImportResult {
-        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        check(isUnlocked()) {
+            if (isStoreInitialized)
+                "No account store found. Please set up a passkey to get started."
+            else
+                "Your accounts are locked. Enter your passkey to unlock."
+        }
 
         // Parse the export file using the adapter
         val parseResult = adapter.parse(fileContent, password)
@@ -192,7 +220,12 @@ class TwoFacLib private constructor(
      * @return List of plaintext otpauth:// URIs for all accounts
      */
     suspend fun exportAccountsPlaintext(): List<String> {
-        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        check(isUnlocked()) {
+            if (isStoreInitialized)
+                "No account store found. Please set up a passkey to get started."
+            else
+                "Your accounts are locked. Enter your passkey to unlock."
+        }
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
@@ -206,7 +239,12 @@ class TwoFacLib private constructor(
      * Returns encrypted stored accounts exactly as they exist in storage.
      */
     suspend fun exportAccountsEncrypted(): List<StoredAccount> {
-        check(isUnlocked()) { "TwoFacLib is not unlocked. Call unlock() with a valid passkey first." }
+        check(isUnlocked()) {
+            if (isStoreInitialized)
+                "No account store found. Please set up a passkey to get started."
+            else
+                "Your accounts are locked. Enter your passkey to unlock."
+        }
         return accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
     }
 

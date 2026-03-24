@@ -2,7 +2,11 @@ package tech.arnav.twofac.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,12 +16,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import tech.arnav.twofac.components.home.HomeEmptyState
 import tech.arnav.twofac.components.home.HomeLoadingState
 import tech.arnav.twofac.components.home.HomeLockedState
 import tech.arnav.twofac.components.otp.HomeOtpListSection
+import tech.arnav.twofac.components.otp.OTP_COPIED_SNACKBAR_MESSAGE
 import tech.arnav.twofac.components.security.PasskeyDialog
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
@@ -32,6 +39,8 @@ fun HomeScreen(
     val error by viewModel.error.collectAsState()
     val otpListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var showPasskeyDialog by remember { mutableStateOf(false) }
     var hasTriggeredUnlockFlow by remember { mutableStateOf(false) }
@@ -61,45 +70,57 @@ fun HomeScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        when {
-            isLoading -> {
-                HomeLoadingState()
-            }
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            when {
+                isLoading -> {
+                    HomeLoadingState()
+                }
 
-            !isUnlocked -> {
-                HomeLockedState(
-                    onSecureUnlock = if (isSecureUnlockReady) {
-                        {
-                            coroutineScope.launch {
-                                val savedPasskey = viewModel.getSavedPasskey()
-                                if (savedPasskey != null) {
-                                    viewModel.loadAccountsWithOtps(savedPasskey, fromAutoUnlock = true)
-                                } else {
-                                    // Secure unlock failed or was cancelled — fall back to manual entry.
-                                    showPasskeyDialog = true
+                !isUnlocked -> {
+                    HomeLockedState(
+                        onSecureUnlock = if (isSecureUnlockReady) {
+                            {
+                                coroutineScope.launch {
+                                    val savedPasskey = viewModel.getSavedPasskey()
+                                    if (savedPasskey != null) {
+                                        viewModel.loadAccountsWithOtps(savedPasskey, fromAutoUnlock = true)
+                                    } else {
+                                        // Secure unlock failed or was cancelled — fall back to manual entry.
+                                        showPasskeyDialog = true
+                                    }
                                 }
                             }
-                        }
-                    } else null,
-                    onManualUnlock = { showPasskeyDialog = true },
-                )
-            }
+                        } else null,
+                        onManualUnlock = { showPasskeyDialog = true },
+                    )
+                }
 
-            accounts.isEmpty() -> {
-                HomeEmptyState(onManageAccounts = onNavigateToAccounts)
-            }
+                accounts.isEmpty() -> {
+                    HomeEmptyState(onManageAccounts = onNavigateToAccounts)
+                }
 
-            else -> {
-                HomeOtpListSection(
-                    accountsWithOtps = accountOtps,
-                    listState = otpListState,
-                    onRefreshOtp = {
-                        viewModel.refreshOtps()
-                    },
-                )
+                else -> {
+                    HomeOtpListSection(
+                        accountsWithOtps = accountOtps,
+                        listState = otpListState,
+                        onRefreshOtp = {
+                            viewModel.refreshOtps()
+                        },
+                        onCopyOtp = { otp ->
+                            clipboardManager.setText(AnnotatedString(otp))
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(OTP_COPIED_SNACKBAR_MESSAGE)
+                            }
+                        },
+                    )
+                }
             }
         }
     }
