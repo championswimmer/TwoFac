@@ -32,6 +32,7 @@ This plan does **not** remove tests by itself. It records the audit and turns th
 ## Assessment rubric
 
 - **Keep**: protects non-trivial behavior, cross-platform logic, integration boundaries, or edge cases
+- **Keep but fix inactive coverage**: the intent is valid, but part of the suite is currently not executing or is otherwise incomplete
 - **Keep but trim obvious assertions**: useful test coverage, but contains repetitive or low-signal assertions that should be consolidated
 - **Candidate for consolidation**: multiple tests are individually fine but the same intent can be expressed with fewer, stronger cases
 - **Candidate for removal**: placeholder/tautological coverage that does not protect meaningful behavior
@@ -47,7 +48,7 @@ This plan does **not** remove tests by itself. It records the audit and turns th
 | `sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/backup/BackupRestorePolicyTest.kt` | Keep | Good policy-level regression coverage. These rules are not obvious and are easy to break silently. |
 | `sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/backup/BackupServiceTest.kt` | Keep | One of the strongest suites in the repo. It exercises real backup/restore behavior, encrypted and plaintext paths, and duplicate-handling rules. |
 | `sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/backup/BackupTransportRegistryTest.kt` | Keep | Real value: registry lookup, unsupported transport handling, and cancellation/error propagation are the kind of failures users actually feel. |
-| `sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/crypto/CryptoToolsTest.kt` | Candidate for consolidation | The encryption/decryption round-trip test is useful. The second function (`testRoundTripCreateSigningKey`) is currently unannotated and therefore dead weight until fixed or removed. |
+| `sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/crypto/CryptoToolsTest.kt` | Keep but fix inactive coverage | The encryption/decryption round-trip test is useful. The second function (`testRoundTripCreateSigningKey`) is currently unannotated and therefore dead weight until fixed or removed. |
 | `sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/crypto/EncodingTest.kt` | Keep | Encoding/decoding edge cases are worth pinning down. This is not “obvious” coverage because malformed input handling matters. |
 | `sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/importer/AuthyImportAdapterTest.kt` | Keep | Import adapters are format-sensitive and brittle. Good, concrete regression value. |
 | `sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/importer/EnteImportAdapterTest.kt` | Keep | Worth keeping because import/export compatibility is a user-facing promise and this suite covers unsupported encryption too. |
