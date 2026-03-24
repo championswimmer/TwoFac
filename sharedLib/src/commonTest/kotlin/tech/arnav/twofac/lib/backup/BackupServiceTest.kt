@@ -288,7 +288,7 @@ class BackupServiceTest {
         } catch (e: IllegalStateException) {
             val msg = e.message ?: ""
             assertTrue(
-                msg.contains("No account store found") || msg.contains("Secrets store is locked"),
+                msg.contains("No account store found"),
                 "Unexpected message: $msg"
             )
         }
@@ -299,7 +299,7 @@ class BackupServiceTest {
         } catch (e: IllegalStateException) {
             val msg = e.message ?: ""
             assertTrue(
-                msg.contains("No account store found") || msg.contains("Secrets store is locked"),
+                msg.contains("No account store found"),
                 "Unexpected message: $msg"
             )
         }

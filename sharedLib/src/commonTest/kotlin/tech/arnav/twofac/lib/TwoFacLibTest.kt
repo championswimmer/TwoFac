@@ -92,7 +92,7 @@ class TwoFacLibTest {
             block()
         } catch (e: Throwable) {
             if (e is T) return e
-            throw AssertionError("Expected ${T::class.simpleName} but got ${e::class.simpleName}")
+            throw AssertionError("Expected ${T::class.simpleName} but got ${e::class.simpleName}", e)
         }
         throw AssertionError("Expected ${T::class.simpleName} but code completed successfully")
     }
