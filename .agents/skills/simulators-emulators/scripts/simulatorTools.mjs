@@ -295,6 +295,31 @@ export async function startEmulatorAndWait(avdName, options = {}) {
   };
 }
 
+export async function clearAndroidAppData(serial, packageName) {
+  if (!serial) {
+    throw new Error("Android serial is required to clear app data.");
+  }
+  if (!packageName) {
+    throw new Error("Android package name is required to clear app data.");
+  }
+
+  const result = await runCommand("adb", ["-s", serial, "shell", "pm", "clear", packageName], {
+    timeoutMs: 30_000,
+  });
+  const output = `${result.stdout}\n${result.stderr}`.trim();
+  if (!/^Success\b/m.test(output)) {
+    throw new Error(
+      `Could not clear Android app data for ${packageName} on ${serial}.${output ? `\n${output}` : ""}`
+    );
+  }
+
+  return {
+    serial,
+    packageName,
+    output,
+  };
+}
+
 export async function listSimulators(options = {}) {
   const platform = options.platform ?? "iOS";
   const includeUnavailable = options.includeUnavailable ?? false;
@@ -376,3 +401,21 @@ export async function bootSimulator(udid) {
   return { udid };
 }
 
+export async function clearIosSimulatorAppData(udid, bundleId) {
+  if (!udid) {
+    throw new Error("Simulator UDID is required to clear app data.");
+  }
+  if (!bundleId) {
+    throw new Error("iOS bundle identifier is required to clear app data.");
+  }
+
+  await runCommand("xcrun", ["simctl", "uninstall", udid, bundleId], {
+    timeoutMs: 30_000,
+  });
+
+  return {
+    udid,
+    bundleId,
+    clearMethod: "uninstall",
+  };
+}
