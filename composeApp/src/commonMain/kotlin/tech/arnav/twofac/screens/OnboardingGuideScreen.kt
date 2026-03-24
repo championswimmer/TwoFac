@@ -31,7 +31,8 @@ import tech.arnav.twofac.components.onboarding.OnboardingLoadingState
 import tech.arnav.twofac.components.onboarding.OnboardingStepCard
 import tech.arnav.twofac.onboarding.OnboardingCompletionRule
 import tech.arnav.twofac.onboarding.OnboardingGuideAction
-import tech.arnav.twofac.onboarding.OnboardingGuideStep
+import tech.arnav.twofac.onboarding.deriveStepCompletion
+import tech.arnav.twofac.onboarding.isStepUnseen
 import tech.arnav.twofac.viewmodels.OnboardingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,27 +65,39 @@ fun OnboardingGuideScreen(
         state.resolvedSteps
     }
 
-    val completedCount = visibleSteps.count { step -> isStepCompleted(step, state.context.accountCount, state.context.secureUnlockReady, state.progress.stepStates[step.id]?.completedAtEpochMillis != null) }
-    val requiredRemainingCount = visibleSteps.count { step ->
-        step.required && !isStepCompleted(
+    val completedCount = visibleSteps.count { step ->
+        deriveStepCompletion(
             step = step,
-            accountCount = state.context.accountCount,
-            secureUnlockReady = state.context.secureUnlockReady,
+            context = state.context,
             manuallyCompleted = state.progress.stepStates[step.id]?.completedAtEpochMillis != null,
         )
     }
-    val unseenVisibleSteps = visibleSteps.filter { state.progress.stepStates[it.id] == null }
-    visibleSteps.forEach { step ->
-        val isCompleted = isStepCompleted(
+    val requiredRemainingCount = visibleSteps.count { step ->
+        step.required && !deriveStepCompletion(
             step = step,
-            accountCount = state.context.accountCount,
-            secureUnlockReady = state.context.secureUnlockReady,
+            context = state.context,
             manuallyCompleted = state.progress.stepStates[step.id]?.completedAtEpochMillis != null,
         )
-        if (!isCompleted) {
-            expandedCompletedSteps.remove(step.id)
-        } else if (expandedCompletedSteps[step.id] == null) {
-            expandedCompletedSteps[step.id] = false
+    }
+    val unseenVisibleSteps = visibleSteps.filter { isStepUnseen(it, state.progress.stepStates[it.id]) }
+
+    LaunchedEffect(
+        visibleSteps.map { it.id },
+        state.context.accountCount,
+        state.context.secureUnlockReady,
+        state.progress.stepStates.keys,
+    ) {
+        visibleSteps.forEach { step ->
+            val isCompleted = deriveStepCompletion(
+                step = step,
+                context = state.context,
+                manuallyCompleted = state.progress.stepStates[step.id]?.completedAtEpochMillis != null,
+            )
+            if (!isCompleted) {
+                expandedCompletedSteps.remove(step.id)
+            } else if (expandedCompletedSteps[step.id] == null) {
+                expandedCompletedSteps[step.id] = false
+            }
         }
     }
 
@@ -148,10 +161,9 @@ fun OnboardingGuideScreen(
                     )
 
                     visibleSteps.forEach { step ->
-                        val isCompleted = isStepCompleted(
+                        val isCompleted = deriveStepCompletion(
                             step = step,
-                            accountCount = state.context.accountCount,
-                            secureUnlockReady = state.context.secureUnlockReady,
+                            context = state.context,
                             manuallyCompleted = state.progress.stepStates[step.id]?.completedAtEpochMillis != null,
                         )
                         val isExpanded = expandedCompletedSteps[step.id] ?: false
@@ -182,19 +194,5 @@ fun OnboardingGuideScreen(
                 }
             }
         }
-    }
-}
-
-private fun isStepCompleted(
-    step: OnboardingGuideStep,
-    accountCount: Int,
-    secureUnlockReady: Boolean,
-    manuallyCompleted: Boolean,
-): Boolean {
-    if (manuallyCompleted) return true
-    return when (step.completionRule) {
-        OnboardingCompletionRule.MANUAL -> false
-        OnboardingCompletionRule.ACCOUNT_EXISTS -> accountCount > 0
-        OnboardingCompletionRule.SECURE_UNLOCK_READY -> secureUnlockReady
     }
 }

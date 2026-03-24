@@ -39,7 +39,7 @@ fun OnboardingGuideHeader(
             )
             if (requiredRemainingCount > 0) {
                 Text(
-                    text = "$requiredRemainingCount required step remaining",
+                    text = "$requiredRemainingCount required ${if (requiredRemainingCount == 1) "step" else "steps"} remaining",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                 )

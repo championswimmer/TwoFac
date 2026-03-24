@@ -85,7 +85,7 @@ class OnboardingAutoShowResolver {
         }
 
         val unseenSteps = resolvedSteps.filter { step ->
-            progress.stepStates[step.id] == null
+            isStepUnseen(step, progress.stepStates[step.id])
         }
 
         if (unseenSteps.isEmpty()) return OnboardingAutoShowDecision.DoNotAutoShow

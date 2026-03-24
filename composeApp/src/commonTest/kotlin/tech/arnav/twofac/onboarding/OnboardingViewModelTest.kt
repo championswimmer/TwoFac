@@ -65,7 +65,7 @@ class OnboardingViewModelTest {
             snapshot = OnboardingProgressSnapshot(
                 hasSeenInitialOnboardingGuide = true,
                 stepStates = mapOf(
-                    seenStep.id to OnboardingStepProgressState(seenAtEpochMillis = 1L),
+                    seenStep.id to OnboardingStepProgressState(seenAtEpochMillis = 1L, contentRevisionSeen = 1),
                 ),
             ),
         )
