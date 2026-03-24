@@ -94,7 +94,7 @@ class AndroidWatchSyncCoordinator(
         syncNow(manual = false)
     }
 
-    private fun updatePeriodicSyncSchedule() {
+    private suspend fun updatePeriodicSyncSchedule() {
         val workManager = WorkManager.getInstance(appContext)
         val hasAccounts = runCatching { twoFacLib.getAllAccounts().isNotEmpty() }.getOrDefault(false)
         if (!hasAccounts) {

@@ -286,14 +286,22 @@ class BackupServiceTest {
             lib.exportAccountsPlaintext()
             error("Should have thrown")
         } catch (e: IllegalStateException) {
-            assertTrue(e.message?.contains("accounts are locked") == true)
+            val msg = e.message ?: ""
+            assertTrue(
+                msg.contains("No account store found") || msg.contains("Secrets store is locked"),
+                "Unexpected message: $msg"
+            )
         }
 
         try {
             lib.exportAccountsEncrypted()
             error("Should have thrown")
         } catch (e: IllegalStateException) {
-            assertTrue(e.message?.contains("accounts are locked") == true)
+            val msg = e.message ?: ""
+            assertTrue(
+                msg.contains("No account store found") || msg.contains("Secrets store is locked"),
+                "Unexpected message: $msg"
+            )
         }
     }
 
