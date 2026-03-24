@@ -26,12 +26,16 @@ import tech.arnav.twofac.components.home.HomeLockedState
 import tech.arnav.twofac.components.otp.HomeOtpListSection
 import tech.arnav.twofac.components.otp.OTP_COPIED_SNACKBAR_MESSAGE
 import tech.arnav.twofac.components.security.PasskeyDialog
+import tech.arnav.twofac.onboarding.OnboardingAutoShowDecision
+import tech.arnav.twofac.viewmodels.OnboardingViewModel
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
 @Composable
 fun HomeScreen(
     onNavigateToAccounts: () -> Unit,
+    onNavigateToOnboarding: (unseenOnly: Boolean) -> Unit,
     viewModel: AccountsViewModel = koinViewModel(),
+    onboardingViewModel: OnboardingViewModel = koinViewModel(),
 ) {
     val accounts by viewModel.accounts.collectAsState()
     val accountOtps by viewModel.accountOtps.collectAsState()
@@ -44,12 +48,14 @@ fun HomeScreen(
 
     var showPasskeyDialog by remember { mutableStateOf(false) }
     var hasTriggeredUnlockFlow by remember { mutableStateOf(false) }
+    var hasProcessedOnboardingAutoShow by remember { mutableStateOf(false) }
     val isUnlocked = viewModel.twoFacLibUnlocked
     // Snapshot at composition time — doesn't change after page load.
     val isSecureUnlockReady = remember { viewModel.isSecureUnlockReady() }
 
     LaunchedEffect(Unit) {
         viewModel.loadAccounts()
+        onboardingViewModel.refresh()
     }
 
     LaunchedEffect(isLoading, hasTriggeredUnlockFlow, isUnlocked) {
@@ -67,6 +73,23 @@ fun HomeScreen(
     LaunchedEffect(isUnlocked) {
         if (isUnlocked) {
             showPasskeyDialog = false
+        }
+    }
+
+    val onboardingState by onboardingViewModel.uiState.collectAsState()
+    LaunchedEffect(isUnlocked, isLoading, onboardingState.autoShowDecision, hasProcessedOnboardingAutoShow) {
+        if (!isUnlocked || isLoading || hasProcessedOnboardingAutoShow) return@LaunchedEffect
+        when (val decision = onboardingState.autoShowDecision) {
+            is OnboardingAutoShowDecision.ShowGuide -> {
+                val shouldShow = when (decision.mode) {
+                    OnboardingAutoShowDecision.ShowGuide.Mode.FULL_INITIAL -> accounts.isEmpty()
+                    OnboardingAutoShowDecision.ShowGuide.Mode.UNSEEN_DELTA -> true
+                }
+                if (!shouldShow) return@LaunchedEffect
+                hasProcessedOnboardingAutoShow = true
+                onNavigateToOnboarding(decision.mode == OnboardingAutoShowDecision.ShowGuide.Mode.UNSEEN_DELTA)
+            }
+            OnboardingAutoShowDecision.DoNotAutoShow -> Unit
         }
     }
 
@@ -103,7 +126,10 @@ fun HomeScreen(
                 }
 
                 accounts.isEmpty() -> {
-                    HomeEmptyState(onManageAccounts = onNavigateToAccounts)
+                    HomeEmptyState(
+                        onManageAccounts = onNavigateToAccounts,
+                        onOpenGettingStarted = { onNavigateToOnboarding(false) },
+                    )
                 }
 
                 else -> {
