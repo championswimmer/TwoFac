@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import {
+  clearAndroidAppData,
   listEmulators,
   pickEmulator,
   startEmulatorAndWait,
@@ -20,6 +21,8 @@ Options:
   --boot            Boot selected emulator and wait for readiness
   --headless        Boot with -no-window (use with --boot)
   --avd <name>      Select emulator by AVD name (non-interactive)
+  --clear-app-data <package>
+                    Clear app data for package on selected emulator
   --help            Show this help
 `);
 }
@@ -32,6 +35,7 @@ function parseArgs(argv) {
     boot: false,
     headless: false,
     avd: undefined,
+    clearAppData: undefined,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -44,6 +48,10 @@ function parseArgs(argv) {
     else if (arg === "--avd") {
       if (i + 1 >= argv.length) throw new Error("--avd requires a value");
       args.avd = argv[i + 1];
+      i += 1;
+    } else if (arg === "--clear-app-data") {
+      if (i + 1 >= argv.length) throw new Error("--clear-app-data requires a package name");
+      args.clearAppData = argv[i + 1];
       i += 1;
     } else if (arg === "--help" || arg === "-h") {
       args.help = true;
@@ -98,13 +106,21 @@ async function main() {
     running: selected.running,
   };
 
-  if (args.boot) {
+  if (args.boot || args.clearAppData) {
     const booted = await startEmulatorAndWait(selected.avdName, { headless: args.headless });
     result = {
       avdName: booted.avdName,
       serial: booted.serial,
       running: true,
       alreadyRunning: booted.alreadyRunning,
+    };
+  }
+
+  if (args.clearAppData) {
+    await clearAndroidAppData(result.serial, args.clearAppData);
+    result = {
+      ...result,
+      clearedAppDataFor: args.clearAppData,
     };
   }
 
@@ -129,10 +145,12 @@ async function main() {
   } else {
     console.log("No running serial yet. Re-run with --boot to launch and wait.");
   }
+  if (result.clearedAppDataFor) {
+    console.log(`Cleared app data for: ${result.clearedAppDataFor}`);
+  }
 }
 
 main().catch((error) => {
   console.error(error.message);
   process.exit(1);
 });
-
