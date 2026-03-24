@@ -29,6 +29,15 @@ class TwoFacLib private constructor(
     @Volatile private var storeHasAccounts: Boolean?,
 ) {
 
+    /**
+     * Cached best-effort indicator of whether the store contains accounts.
+     *
+     * This value is `false` both when the store is empty **and** when the state has
+     * not yet been determined (i.e. before the first [unlock] or [getAllAccounts] call).
+     * Do not rely on it for authoritative UI decisions before a suspend-context check
+     * has been performed; it will be populated lazily the first time
+     * [checkUnlockedOrThrow] runs.
+     */
     val isStoreInitialized: Boolean
         get() = storeHasAccounts == true
 
