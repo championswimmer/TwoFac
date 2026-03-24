@@ -4,6 +4,7 @@ import {
   listSimulators,
   pickSimulator,
   bootSimulator,
+  clearIosSimulatorAppData,
   toShellExports,
 } from "./simulatorTools.mjs";
 
@@ -19,6 +20,8 @@ Options:
   --shell           Print shell exports (for eval)
   --boot            Boot selected simulator and wait for readiness
   --udid <id>       Select simulator by UDID (non-interactive)
+  --clear-app-data <bundleId>
+                    Clear app data by uninstalling app from selected simulator
   --help            Show this help
 `);
 }
@@ -30,6 +33,7 @@ function parseArgs(argv) {
     shell: false,
     boot: false,
     udid: undefined,
+    clearAppData: undefined,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -41,6 +45,10 @@ function parseArgs(argv) {
     else if (arg === "--udid") {
       if (i + 1 >= argv.length) throw new Error("--udid requires a value");
       args.udid = argv[i + 1];
+      i += 1;
+    } else if (arg === "--clear-app-data") {
+      if (i + 1 >= argv.length) throw new Error("--clear-app-data requires a bundle identifier");
+      args.clearAppData = argv[i + 1];
       i += 1;
     } else if (arg === "--help" || arg === "-h") {
       args.help = true;
@@ -90,13 +98,22 @@ async function main() {
     await bootSimulator(selected.udid);
   }
 
-  const result = {
+  let result = {
     udid: selected.udid,
     name: selected.name,
     runtimeName: selected.runtimeName,
     state: args.boot ? "Booted" : selected.state,
     destination: `platform=iOS Simulator,id=${selected.udid}`,
   };
+
+  if (args.clearAppData) {
+    const cleared = await clearIosSimulatorAppData(selected.udid, args.clearAppData);
+    result = {
+      ...result,
+      clearedAppDataFor: cleared.bundleId,
+      clearMethod: cleared.clearMethod,
+    };
+  }
 
   if (args.shell) {
     console.log(
@@ -116,10 +133,12 @@ async function main() {
   console.log(`Selected simulator: ${result.name} (${result.runtimeName})`);
   console.log(`UDID: ${result.udid}`);
   console.log(`Destination: ${result.destination}`);
+  if (result.clearedAppDataFor) {
+    console.log(`Cleared app data for: ${result.clearedAppDataFor} (${result.clearMethod})`);
+  }
 }
 
 main().catch((error) => {
   console.error(error.message);
   process.exit(1);
 });
-
