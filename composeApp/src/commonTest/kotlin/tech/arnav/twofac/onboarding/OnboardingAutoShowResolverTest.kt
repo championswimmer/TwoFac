@@ -26,8 +26,8 @@ class OnboardingAutoShowResolverTest {
             progress = OnboardingProgressSnapshot(
                 hasSeenInitialOnboardingGuide = true,
                 stepStates = mapOf(
-                    OnboardingStepIds.ADD_FIRST_ACCOUNT to OnboardingStepProgressState(seenAtEpochMillis = 1L),
-                    OnboardingStepIds.MANAGE_ACCOUNTS to OnboardingStepProgressState(seenAtEpochMillis = 1L),
+                    OnboardingStepIds.ADD_FIRST_ACCOUNT to OnboardingStepProgressState(seenAtEpochMillis = 1L, contentRevisionSeen = 1),
+                    OnboardingStepIds.MANAGE_ACCOUNTS to OnboardingStepProgressState(seenAtEpochMillis = 1L, contentRevisionSeen = 1),
                 ),
             ),
             resolvedSteps = steps,
@@ -44,8 +44,8 @@ class OnboardingAutoShowResolverTest {
             progress = OnboardingProgressSnapshot(
                 hasSeenInitialOnboardingGuide = true,
                 stepStates = mapOf(
-                    stepA.id to OnboardingStepProgressState(seenAtEpochMillis = 1L),
-                    stepB.id to OnboardingStepProgressState(seenAtEpochMillis = 1L),
+                    stepA.id to OnboardingStepProgressState(seenAtEpochMillis = 1L, contentRevisionSeen = 1),
+                    stepB.id to OnboardingStepProgressState(seenAtEpochMillis = 1L, contentRevisionSeen = 1),
                 ),
             ),
             resolvedSteps = listOf(stepA, stepB, stepD),
@@ -55,9 +55,29 @@ class OnboardingAutoShowResolverTest {
         assertEquals(listOf(stepD), show.steps)
     }
 
+    @Test
+    fun returningUserWithUpdatedStepContentSeesRevisionDelta() {
+        val stepA = step(OnboardingStepIds.ADD_FIRST_ACCOUNT, contentRevision = 2)
+        val stepB = step(OnboardingStepIds.MANAGE_ACCOUNTS)
+        val decision = resolver.resolve(
+            progress = OnboardingProgressSnapshot(
+                hasSeenInitialOnboardingGuide = true,
+                stepStates = mapOf(
+                    stepA.id to OnboardingStepProgressState(seenAtEpochMillis = 1L, contentRevisionSeen = 1),
+                    stepB.id to OnboardingStepProgressState(seenAtEpochMillis = 1L, contentRevisionSeen = 1),
+                ),
+            ),
+            resolvedSteps = listOf(stepA, stepB),
+        )
+        val show = assertIs<OnboardingAutoShowDecision.ShowGuide>(decision)
+        assertEquals(OnboardingAutoShowDecision.ShowGuide.Mode.UNSEEN_DELTA, show.mode)
+        assertEquals(listOf(stepA), show.steps)
+    }
+
     private fun step(
         id: String,
         slot: OnboardingStepSlot = OnboardingStepSlot.ADD_FIRST_ACCOUNT,
+        contentRevision: Int = 1,
     ) = OnboardingGuideStep(
         id = id,
         slot = slot,
@@ -67,5 +87,6 @@ class OnboardingAutoShowResolverTest {
         icon = OnboardingStepIcon.ACCOUNT,
         action = OnboardingGuideAction.None,
         completionRule = OnboardingCompletionRule.MANUAL,
+        contentRevision = contentRevision,
     )
 }

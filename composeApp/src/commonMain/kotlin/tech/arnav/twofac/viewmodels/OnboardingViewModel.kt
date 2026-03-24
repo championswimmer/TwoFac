@@ -2,19 +2,21 @@ package tech.arnav.twofac.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import tech.arnav.twofac.onboarding.OnboardingAutoShowDecision
 import tech.arnav.twofac.onboarding.OnboardingAutoShowResolver
-import tech.arnav.twofac.onboarding.OnboardingCompletionRule
 import tech.arnav.twofac.onboarding.OnboardingGuideContext
 import tech.arnav.twofac.onboarding.OnboardingGuideContextProvider
 import tech.arnav.twofac.onboarding.OnboardingGuideRegistry
 import tech.arnav.twofac.onboarding.OnboardingGuideStep
 import tech.arnav.twofac.onboarding.OnboardingProgressSnapshot
 import tech.arnav.twofac.onboarding.OnboardingProgressRepository
+import tech.arnav.twofac.onboarding.deriveStepCompletion
+import tech.arnav.twofac.onboarding.isStepUnseen
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -77,6 +79,8 @@ class OnboardingViewModel(
                 resolvedSteps = resolvedSteps,
                 autoShowDecision = autoShowDecision,
             )
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
@@ -101,7 +105,7 @@ class OnboardingViewModel(
             val progress = progressStore.load()
             var updated = false
             steps.forEach { step ->
-                if (progress.stepStates[step.id] == null) {
+                if (isStepUnseen(step, progress.stepStates[step.id])) {
                     progressStore.markStepSeen(step.id, step.contentRevision, now)
                     updated = true
                 }
@@ -156,11 +160,7 @@ class OnboardingViewModel(
     ) {
         val now = Clock.System.now().toEpochMilliseconds()
         steps.forEach { step ->
-            val complete = when (step.completionRule) {
-                OnboardingCompletionRule.MANUAL -> false
-                OnboardingCompletionRule.ACCOUNT_EXISTS -> context.accountCount > 0
-                OnboardingCompletionRule.SECURE_UNLOCK_READY -> context.secureUnlockReady
-            }
+            val complete = deriveStepCompletion(step = step, context = context)
             if (complete) {
                 progressStore.markStepCompleted(step.id, step.contentRevision, now)
             }
