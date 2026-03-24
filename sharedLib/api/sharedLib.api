@@ -1,6 +1,6 @@
 public final class tech/arnav/twofac/lib/TwoFacLib {
 	public static final field Companion Ltech/arnav/twofac/lib/TwoFacLib$Companion;
-	public synthetic fun <init> (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Ljava/lang/Boolean;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun addAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun decryptEncryptedBackupAccount (Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -9,7 +9,7 @@ public final class tech/arnav/twofac/lib/TwoFacLib {
 	public final fun exportAccountsEncrypted (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun exportAccountsPlaintext (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAllAccountOTPs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getAllAccounts ()Ljava/util/List;
+	public final fun getAllAccounts (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getStorage ()Ltech/arnav/twofac/lib/storage/Storage;
 	public final fun importAccounts (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun importAccounts$default (Ltech/arnav/twofac/lib/TwoFacLib;Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;

@@ -35,11 +35,11 @@ class TwoFacLibTest {
     fun testUnlockWithBlankPasskey() = runTest {
         val lib = TwoFacLib.initialise()
 
-        assertFailsWith<IllegalArgumentException> {
+        assertFailsWithSuspend<IllegalArgumentException> {
             lib.unlock("")
         }
 
-        assertFailsWith<IllegalArgumentException> {
+        assertFailsWithSuspend<IllegalArgumentException> {
             lib.unlock("   ")
         }
     }
@@ -48,7 +48,7 @@ class TwoFacLibTest {
     fun testGetAllAccountOTPsWhenLocked() = runTest {
         val lib = TwoFacLib.initialise()
 
-        val ex = assertFailsWith<IllegalStateException> {
+        val ex = assertFailsWithSuspend<IllegalStateException> {
             lib.getAllAccountOTPs()
         }
         assertTrue(
@@ -68,7 +68,7 @@ class TwoFacLibTest {
         )
 
         val lockedLib = TwoFacLib.initialise(storage = sharedStorage)
-        val ex = assertFailsWith<IllegalStateException> {
+        val ex = assertFailsWithSuspend<IllegalStateException> {
             lockedLib.getAllAccountOTPs()
         }
         assertTrue(
@@ -80,9 +80,21 @@ class TwoFacLibTest {
     fun testAddAccountWhenLocked() = runTest {
         val lib = TwoFacLib.initialise()
 
-        assertFailsWith<IllegalStateException> {
+        assertFailsWithSuspend<IllegalStateException> {
             lib.addAccount("otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example")
         }
+    }
+
+    private suspend inline fun <reified T : Throwable> assertFailsWithSuspend(
+        block: suspend () -> Unit
+    ): T {
+        try {
+            block()
+        } catch (e: Throwable) {
+            if (e is T) return e
+            throw AssertionError("Expected ${T::class.simpleName} but got ${e::class.simpleName}")
+        }
+        throw AssertionError("Expected ${T::class.simpleName} but code completed successfully")
     }
 
     @Test

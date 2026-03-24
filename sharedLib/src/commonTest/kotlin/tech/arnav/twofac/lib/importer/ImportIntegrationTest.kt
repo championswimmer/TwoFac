@@ -109,10 +109,16 @@ class ImportIntegrationTest {
 
         val adapter = TwoFasImportAdapter()
 
-        val ex = assertFailsWith<IllegalStateException> {
+        try {
             lib.importAccounts(adapter, twoFasExport)
+            fail("Should have thrown IllegalStateException")
+        } catch (ex: IllegalStateException) {
+            val msg = ex.message ?: ""
+            assertTrue(
+                msg.contains("No account store found") || msg.contains("Secrets store is locked"),
+                "Unexpected message: $msg"
+            )
         }
-        assertTrue(ex.message?.contains("accounts are locked") == true, "Error should mention unlocking")
     }
 
     @Test

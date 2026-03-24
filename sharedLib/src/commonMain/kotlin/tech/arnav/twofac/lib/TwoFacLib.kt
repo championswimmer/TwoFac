@@ -1,7 +1,6 @@
 package tech.arnav.twofac.lib
 
 import dev.whyoleg.cryptography.CryptographyProvider
-import kotlinx.coroutines.runBlocking
 import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
 import tech.arnav.twofac.lib.crypto.Encoding.toByteString
 import tech.arnav.twofac.lib.importer.ImportAdapter
@@ -27,11 +26,11 @@ import kotlin.uuid.Uuid
 class TwoFacLib private constructor(
     val storage: Storage,
     @Volatile private var passKey: String?,
-    @Volatile private var storeHasAccounts: Boolean,
+    @Volatile private var storeHasAccounts: Boolean?,
 ) {
 
     val isStoreInitialized: Boolean
-        get() = storeHasAccounts
+        get() = storeHasAccounts == true
 
     companion object {
         private const val MISSING_STORE_MESSAGE =
@@ -53,8 +52,7 @@ class TwoFacLib private constructor(
                 """.trimIndent()
                 )
             }
-            val hasExistingAccounts = runBlocking { storage.getAccountList().isNotEmpty() }
-            return TwoFacLib(storage, passKey, hasExistingAccounts)
+            return TwoFacLib(storage, passKey, null)
         }
     }
 
@@ -62,6 +60,16 @@ class TwoFacLib private constructor(
 
     @Volatile
     private var accountList: List<StoredAccount>? = null
+
+    private suspend fun checkUnlockedOrThrow() {
+        if (!isUnlocked()) {
+            if (storeHasAccounts == null) {
+                storeHasAccounts = storage.getAccountList().isNotEmpty()
+            }
+            // Now we know the state, so lockedStateMessage() will be correct
+            error(lockedStateMessage())
+        }
+    }
 
     /**
      * Unlocks the library with the provided passkey and loads accounts into memory
@@ -82,15 +90,15 @@ class TwoFacLib private constructor(
         return passKey != null
     }
 
-    fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
-        check(isUnlocked()) { lockedStateMessage() }
+    suspend fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
+        checkUnlockedOrThrow()
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map(StoredAccount::forDisplay)
     }
 
     @OptIn(ExperimentalTime::class)
     suspend fun getAllAccountOTPs(): List<Pair<StoredAccount.DisplayAccount, String>> {
-        check(isUnlocked()) { lockedStateMessage() }
+        checkUnlockedOrThrow()
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
@@ -115,7 +123,7 @@ class TwoFacLib private constructor(
     }
 
     suspend fun addAccount(accountURI: String): Boolean {
-        check(isUnlocked()) { lockedStateMessage() }
+        checkUnlockedOrThrow()
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val otp = OtpAuthURI.parse(accountURI)
         val signingKey = cryptoTools.createSigningKey(currentPassKey)
@@ -131,7 +139,7 @@ class TwoFacLib private constructor(
 
     @OptIn(ExperimentalUuidApi::class)
     suspend fun deleteAccount(accountId: String): Boolean {
-        check(isUnlocked()) { lockedStateMessage() }
+        checkUnlockedOrThrow()
         val parsedAccountId = Uuid.parse(accountId)
         val success = storage.deleteAccount(parsedAccountId)
         if (success) {
@@ -163,7 +171,7 @@ class TwoFacLib private constructor(
         fileContent: String,
         password: String? = null
     ): ImportResult {
-        check(isUnlocked()) { lockedStateMessage() }
+        checkUnlockedOrThrow()
 
         // Parse the export file using the adapter
         val parseResult = adapter.parse(fileContent, password)
@@ -207,7 +215,7 @@ class TwoFacLib private constructor(
      * @return List of plaintext otpauth:// URIs for all accounts
      */
     suspend fun exportAccountsPlaintext(): List<String> {
-        check(isUnlocked()) { lockedStateMessage() }
+        checkUnlockedOrThrow()
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
@@ -221,7 +229,7 @@ class TwoFacLib private constructor(
      * Returns encrypted stored accounts exactly as they exist in storage.
      */
     suspend fun exportAccountsEncrypted(): List<StoredAccount> {
-        check(isUnlocked()) { lockedStateMessage() }
+        checkUnlockedOrThrow()
         return accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
     }
 
