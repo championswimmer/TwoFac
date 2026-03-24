@@ -272,6 +272,10 @@ fun SettingsScreen(
                         } else if (usesGenericSecureUnlockFlow) {
                             secureEnrollmentError = null
                             showSecureEnrollmentDialog = true
+                        } else if (biometricSessionManager != null) {
+                            // On iOS, remember-passkey requires biometric enrollment
+                            // since the Keychain protects the passkey with Face ID / Touch ID
+                            showBiometricEnrollmentDialog = true
                         } else {
                             sessionManager.setRememberPasskey(true)
                             isRememberPasskeyEnabled = true
