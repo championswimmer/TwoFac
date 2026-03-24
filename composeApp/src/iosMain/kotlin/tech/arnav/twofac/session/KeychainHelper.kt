@@ -8,6 +8,7 @@ import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
 import platform.CoreFoundation.CFDictionaryAddValue
 import platform.CoreFoundation.CFDictionaryCreateMutable
+import platform.CoreFoundation.CFRelease
 import platform.CoreFoundation.CFTypeRefVar
 import platform.CoreFoundation.kCFBooleanTrue
 import platform.Foundation.CFBridgingRelease
@@ -35,6 +36,8 @@ import platform.Security.kSecMatchLimitOne
 import platform.Security.kSecMatchLimit
 import platform.Security.kSecReturnData
 import platform.Security.kSecUseAuthenticationContext
+import platform.Security.kSecUseAuthenticationUI
+import platform.Security.kSecUseAuthenticationUIFail
 import platform.Security.kSecValueData
 import platform.LocalAuthentication.LAContext
 
@@ -77,32 +80,43 @@ object KeychainHelper {
         }
 
         val query = CFDictionaryCreateMutable(null, 6, null, null)
-        CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
-        CFDictionaryAddValue(query, kSecAttrService, CFBridgingRetain(service))
-        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(account))
-        CFDictionaryAddValue(query, kSecValueData, CFBridgingRetain(data))
+        val retainedService = CFBridgingRetain(service)
+        val retainedAccount = CFBridgingRetain(account)
+        val retainedData = CFBridgingRetain(data)
+        try {
+            CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
+            CFDictionaryAddValue(query, kSecAttrService, retainedService)
+            CFDictionaryAddValue(query, kSecAttrAccount, retainedAccount)
+            CFDictionaryAddValue(query, kSecValueData, retainedData)
 
-        if (requireBiometric) {
-            val accessControl = SecAccessControlCreateWithFlags(
-                null,
-                kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                kSecAccessControlBiometryCurrentSet,
-                null,
-            )
-            if (accessControl != null) {
-                CFDictionaryAddValue(query, kSecAttrAccessControl, accessControl)
+            if (requireBiometric) {
+                val accessControl = SecAccessControlCreateWithFlags(
+                    null,
+                    kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+                    kSecAccessControlBiometryCurrentSet,
+                    null,
+                )
+                if (accessControl != null) {
+                    CFDictionaryAddValue(query, kSecAttrAccessControl, accessControl)
+                } else {
+                    println("KeychainHelper: SecAccessControlCreateWithFlags returned null")
+                    return false
+                }
             } else {
-                println("KeychainHelper: SecAccessControlCreateWithFlags returned null")
+                CFDictionaryAddValue(query, kSecAttrAccessible, kSecAttrAccessibleWhenUnlockedThisDeviceOnly)
             }
-        } else {
-            CFDictionaryAddValue(query, kSecAttrAccessible, kSecAttrAccessibleWhenUnlockedThisDeviceOnly)
-        }
 
-        val status = SecItemAdd(query, null)
-        if (status != errSecSuccess) {
-            println("KeychainHelper: SecItemAdd failed with OSStatus $status")
+            val status = SecItemAdd(query, null)
+            if (status != errSecSuccess) {
+                println("KeychainHelper: SecItemAdd failed with OSStatus $status")
+            }
+            status == errSecSuccess
+        } finally {
+            CFRelease(query)
+            CFRelease(retainedService)
+            CFRelease(retainedAccount)
+            CFRelease(retainedData)
         }
-        status == errSecSuccess
     }
 
     /**
@@ -122,43 +136,66 @@ object KeychainHelper {
         context: LAContext? = null,
     ): String? = memScoped {
         val query = CFDictionaryCreateMutable(null, 6, null, null)
-        CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
-        CFDictionaryAddValue(query, kSecAttrService, CFBridgingRetain(service))
-        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(account))
-        CFDictionaryAddValue(query, kSecReturnData, kCFBooleanTrue)
-        CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne)
+        val retainedService = CFBridgingRetain(service)
+        val retainedAccount = CFBridgingRetain(account)
+        val retainedContext = if (context != null) CFBridgingRetain(context) else null
+        try {
+            CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
+            CFDictionaryAddValue(query, kSecAttrService, retainedService)
+            CFDictionaryAddValue(query, kSecAttrAccount, retainedAccount)
+            CFDictionaryAddValue(query, kSecReturnData, kCFBooleanTrue)
+            CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne)
 
-        if (context != null) {
-            CFDictionaryAddValue(query, kSecUseAuthenticationContext, CFBridgingRetain(context))
+            if (retainedContext != null) {
+                CFDictionaryAddValue(query, kSecUseAuthenticationContext, retainedContext)
+            }
+
+            val result = alloc<CFTypeRefVar>()
+            val status = SecItemCopyMatching(query, result.ptr)
+
+            if (status != errSecSuccess) {
+                println("KeychainHelper: SecItemCopyMatching failed with OSStatus $status")
+                return null
+            }
+
+            val data = CFBridgingRelease(result.value) as? NSData ?: return null
+            NSString.create(data = data, encoding = NSUTF8StringEncoding)?.toString()
+        } finally {
+            CFRelease(query)
+            CFRelease(retainedService)
+            CFRelease(retainedAccount)
+            if (retainedContext != null) CFRelease(retainedContext)
         }
-
-        val result = alloc<CFTypeRefVar>()
-        val status = SecItemCopyMatching(query, result.ptr)
-
-        if (status != errSecSuccess) {
-            println("KeychainHelper: SecItemCopyMatching failed with OSStatus $status")
-            return null
-        }
-
-        val data = CFBridgingRelease(result.value) as? NSData ?: return null
-        NSString.create(data = data, encoding = NSUTF8StringEncoding)?.toString()
     }
 
     /**
      * Check whether a Keychain item exists (without retrieving its data).
-     * Does NOT trigger biometric prompts.
+     * Uses [kSecUseAuthenticationUIFail] to guarantee no biometric prompt is shown;
+     * the call returns `errSecInteractionNotAllowed` for biometric-protected items
+     * instead of presenting Face ID / Touch ID.
      *
      * @return true if an item with matching service+account exists
      */
     fun exists(service: String, account: String): Boolean = memScoped {
-        val query = CFDictionaryCreateMutable(null, 4, null, null)
-        CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
-        CFDictionaryAddValue(query, kSecAttrService, CFBridgingRetain(service))
-        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(account))
-        CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne)
+        val query = CFDictionaryCreateMutable(null, 5, null, null)
+        val retainedService = CFBridgingRetain(service)
+        val retainedAccount = CFBridgingRetain(account)
+        try {
+            CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
+            CFDictionaryAddValue(query, kSecAttrService, retainedService)
+            CFDictionaryAddValue(query, kSecAttrAccount, retainedAccount)
+            CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne)
+            // Prevent biometric prompt — fail immediately if auth is required
+            CFDictionaryAddValue(query, kSecUseAuthenticationUI, kSecUseAuthenticationUIFail)
 
-        val status = SecItemCopyMatching(query, null)
-        status == errSecSuccess
+            val status = SecItemCopyMatching(query, null)
+            // errSecInteractionNotAllowed means the item exists but requires biometric
+            status == errSecSuccess || status == ERR_SEC_INTERACTION_NOT_ALLOWED
+        } finally {
+            CFRelease(query)
+            CFRelease(retainedService)
+            CFRelease(retainedAccount)
+        }
     }
 
     /**
@@ -169,11 +206,22 @@ object KeychainHelper {
      */
     fun delete(service: String, account: String): Boolean {
         val query = CFDictionaryCreateMutable(null, 3, null, null)
-        CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
-        CFDictionaryAddValue(query, kSecAttrService, CFBridgingRetain(service))
-        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(account))
+        val retainedService = CFBridgingRetain(service)
+        val retainedAccount = CFBridgingRetain(account)
+        try {
+            CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
+            CFDictionaryAddValue(query, kSecAttrService, retainedService)
+            CFDictionaryAddValue(query, kSecAttrAccount, retainedAccount)
 
-        val status = SecItemDelete(query)
-        return status == errSecSuccess || status == errSecItemNotFound
+            val status = SecItemDelete(query)
+            return status == errSecSuccess || status == errSecItemNotFound
+        } finally {
+            CFRelease(query)
+            CFRelease(retainedService)
+            CFRelease(retainedAccount)
+        }
     }
 }
+
+// errSecInteractionNotAllowed = -25308
+private const val ERR_SEC_INTERACTION_NOT_ALLOWED: Int = -25308
