@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,6 +45,7 @@ fun OTPCard(
     otpCode: String,
     timeInterval: Long = 30L,
     onRefreshOTP: () -> Unit,
+    onCopyOtp: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     fun currentTimeMillis() = Clock.System.now().epochSeconds
@@ -88,7 +90,9 @@ fun OTPCard(
     }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onCopyOtp(otpCode) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -144,6 +148,8 @@ fun OTPCard(
         }
     }
 }
+
+internal const val OTP_COPIED_SNACKBAR_MESSAGE = "📋 OTP copied"
 
 @Preview
 @Composable
