@@ -15,7 +15,8 @@ class IosBiometricSessionManager(
     companion object {
         private const val PREFS_BIOMETRIC_ENABLED = "twofac_biometric_enabled"
         private const val PREFS_REMEMBER_ENABLED = "twofac_remember_passkey"
-        private const val PREFS_SAVED_PASSKEY = "twofac_saved_passkey"
+        private const val KEYCHAIN_SERVICE = "tech.arnav.twofac"
+        private const val KEYCHAIN_ACCOUNT = "vault_passkey"
     }
 
     override fun isAvailable(): Boolean = true
@@ -33,7 +34,7 @@ class IosBiometricSessionManager(
     }
 
     override fun isSecureUnlockReady(): Boolean {
-        return isBiometricEnabled() && !readFromKeychain().isNullOrBlank()
+        return isBiometricEnabled() && KeychainHelper.exists(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT)
     }
 
     override fun setBiometricEnabled(enabled: Boolean) {
@@ -59,33 +60,51 @@ class IosBiometricSessionManager(
         return if (isBiometricEnabled()) {
             authenticateAndRetrieve()
         } else {
-            readFromKeychain()
+            KeychainHelper.read(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT)
         }
     }
 
     override fun savePasskey(passkey: String) {
         if (!isRememberPasskeyEnabled()) return
-        saveToKeychain(passkey, requireBiometric = isBiometricEnabled())
+        KeychainHelper.save(
+            service = KEYCHAIN_SERVICE,
+            account = KEYCHAIN_ACCOUNT,
+            value = passkey,
+            requireBiometric = isBiometricEnabled(),
+        )
     }
 
     override fun clearPasskey() {
-        deleteFromKeychain()
+        KeychainHelper.delete(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT)
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean {
-        if (!isBiometricAvailable()) return false
-        saveToKeychain(passkey, requireBiometric = true)
-        return true
+        if (!isBiometricAvailable()) {
+            println("IosBiometricSessionManager: biometric not available, cannot enroll")
+            return false
+        }
+        val saved = KeychainHelper.save(
+            service = KEYCHAIN_SERVICE,
+            account = KEYCHAIN_ACCOUNT,
+            value = passkey,
+            requireBiometric = true,
+        )
+        println("IosBiometricSessionManager: enrollPasskey save result=$saved")
+        return saved
     }
 
-    private fun saveToKeychain(passkey: String, requireBiometric: Boolean) {
-        userDefaults.setObject(passkey, forKey = PREFS_SAVED_PASSKEY)
-    }
-
-    private fun deleteFromKeychain() {
-        userDefaults.removeObjectForKey(PREFS_SAVED_PASSKEY)
-    }
-
+    /**
+     * Authenticate with Face ID / Touch ID, then read the passkey from Keychain.
+     *
+     * We explicitly evaluate LAContext before reading from the Keychain because
+     * the iOS Simulator does not enforce biometric access control on Keychain
+     * items (known Apple bug r. 82890873). On a real device the Keychain would
+     * prompt Face ID automatically, but the explicit LAContext gate ensures
+     * consistent behavior on both simulator and device.
+     *
+     * The authenticated LAContext is passed to KeychainHelper.read() via
+     * kSecUseAuthenticationContext so that real devices do not double-prompt.
+     */
     private suspend fun authenticateAndRetrieve(): String? = suspendCoroutine { continuation ->
         val context = LAContext()
         context.localizedFallbackTitle = "Use passkey instead"
@@ -100,14 +119,11 @@ class IosBiometricSessionManager(
             localizedReason = "Unlock TwoFac to access your 2FA codes",
         ) { success, _ ->
             if (success) {
-                continuation.resume(readFromKeychain(context))
+                // Pass the pre-authenticated LAContext to avoid double Face ID prompt on real devices
+                continuation.resume(KeychainHelper.read(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT, context))
             } else {
                 continuation.resume(null)
             }
         }
-    }
-
-    private fun readFromKeychain(context: LAContext? = null): String? {
-        return userDefaults.stringForKey(PREFS_SAVED_PASSKEY)
     }
 }

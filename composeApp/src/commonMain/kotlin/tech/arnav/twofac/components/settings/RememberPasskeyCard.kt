@@ -66,7 +66,7 @@ fun RememberPasskeyCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(modifier = Modifier.padding(end = 16.dp)) {
+                    Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
                         Text(
                             text = biometricTitle,
                             style = MaterialTheme.typography.titleMedium,
