@@ -76,12 +76,17 @@ class IosBiometricSessionManager(
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean {
-        if (!isBiometricAvailable()) return false
-        return KeychainHelper.save(
+        if (!isBiometricAvailable()) {
+            println("IosBiometricSessionManager: biometric not available, cannot enroll")
+            return false
+        }
+        val saved = KeychainHelper.save(
             service = KEYCHAIN_SERVICE,
             account = KEYCHAIN_ACCOUNT,
             value = passkey,
             requireBiometric = true,
         )
+        println("IosBiometricSessionManager: enrollPasskey save result=$saved")
+        return saved
     }
 }
