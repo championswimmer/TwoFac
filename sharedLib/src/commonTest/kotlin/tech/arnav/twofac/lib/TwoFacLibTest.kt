@@ -48,9 +48,32 @@ class TwoFacLibTest {
     fun testGetAllAccountOTPsWhenLocked() = runTest {
         val lib = TwoFacLib.initialise()
 
-        assertFailsWith<IllegalStateException> {
+        val ex = assertFailsWith<IllegalStateException> {
             lib.getAllAccountOTPs()
         }
+        assertTrue(
+            ex.message?.contains("No account store found. Enter password to create a new store.") == true
+        )
+    }
+
+    @Test
+    fun testGetAllAccountOTPsWhenLockedWithExistingStoreShowsUnlockMessage() = runTest {
+        val sharedStorage = MemoryStorage()
+        val unlockedLib = TwoFacLib.initialise(storage = sharedStorage)
+        unlockedLib.unlock("testpasskey")
+        assertTrue(
+            unlockedLib.addAccount(
+                "otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example"
+            )
+        )
+
+        val lockedLib = TwoFacLib.initialise(storage = sharedStorage)
+        val ex = assertFailsWith<IllegalStateException> {
+            lockedLib.getAllAccountOTPs()
+        }
+        assertTrue(
+            ex.message?.contains("Secrets store is locked. Enter password to unlock it.") == true
+        )
     }
 
     @Test
