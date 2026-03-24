@@ -22,22 +22,22 @@ The primary implementation target should be the Compose Multiplatform app surfac
 ### Relevant code and build facts
 
 - `composeApp` already depends on the official Compose resources library:
-  - `/home/runner/work/TwoFac/TwoFac/composeApp/build.gradle.kts`
+  - `composeApp/build.gradle.kts`
 - `composeApp` already has a shared resources directory, but it currently contains only drawables:
-  - `/home/runner/work/TwoFac/TwoFac/composeApp/src/commonMain/composeResources/drawable/...`
+  - `composeApp/src/commonMain/composeResources/drawable/...`
 - There is currently no usage of `stringResource(...)` anywhere in the repository.
 - Many user-facing strings are still hardcoded directly in shared Compose code, for example:
-  - `/home/runner/work/TwoFac/TwoFac/composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/AddAccountScreen.kt`
-  - `/home/runner/work/TwoFac/TwoFac/composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/SettingsScreen.kt`
-  - `/home/runner/work/TwoFac/TwoFac/composeApp/src/commonMain/kotlin/tech/arnav/twofac/components/onboarding/OnboardingStepCard.kt`
+  - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/AddAccountScreen.kt`
+  - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/SettingsScreen.kt`
+  - `composeApp/src/commonMain/kotlin/tech/arnav/twofac/components/onboarding/OnboardingStepCard.kt`
 - There are also platform-specific hardcoded user strings in:
-  - Android biometric prompts: `/home/runner/work/TwoFac/TwoFac/composeApp/src/androidMain/kotlin/tech/arnav/twofac/session/AndroidBiometricSessionManager.kt`
-  - Desktop-only settings UI: `/home/runner/work/TwoFac/TwoFac/composeApp/src/desktopMain/kotlin/tech/arnav/twofac/screens/PlatformSettings.jvm.kt`
-  - Watch UI: `/home/runner/work/TwoFac/TwoFac/watchApp/src/main/java/tech/arnav/twofac/watch/ui/EmptyState.kt`
-  - CLI prompts/help text: `/home/runner/work/TwoFac/TwoFac/cliApp/src/commonMain/kotlin/tech/arnav/twofac/cli/commands/*.kt`
+  - Android biometric prompts: `composeApp/src/androidMain/kotlin/tech/arnav/twofac/session/AndroidBiometricSessionManager.kt`
+  - Desktop-only settings UI: `composeApp/src/desktopMain/kotlin/tech/arnav/twofac/screens/PlatformSettings.jvm.kt`
+  - Watch UI: `watchApp/src/main/java/tech/arnav/twofac/watch/ui/EmptyState.kt`
+  - CLI prompts/help text: `cliApp/src/commonMain/kotlin/tech/arnav/twofac/cli/commands/*.kt`
 - Android and watch app wrappers already have traditional Android `strings.xml` files, but only for thin wrapper text today:
-  - `/home/runner/work/TwoFac/TwoFac/androidApp/src/main/res/values/strings.xml`
-  - `/home/runner/work/TwoFac/TwoFac/watchApp/src/main/res/values/strings.xml`
+  - `androidApp/src/main/res/values/strings.xml`
+  - `watchApp/src/main/res/values/strings.xml`
 
 ### Baseline verification status
 
