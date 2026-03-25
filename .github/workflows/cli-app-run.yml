@@ -3,16 +3,14 @@ name: CLI App Run
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - '.agents/**'
+    paths:
+      - 'cliApp/**'
+      - 'sharedLib/**'
   pull_request:
     branches: [main]
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - '.agents/**'
+    paths:
+      - 'cliApp/**'
+      - 'sharedLib/**'
   workflow_dispatch: # For manual triggering
 
 jobs:
