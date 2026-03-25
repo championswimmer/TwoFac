@@ -40,6 +40,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.WEB_DEPLOY_TOKEN }}
+          external_repository: championswimmer/web.twofac.app
           publish_dir: composeApp/build/dist/wasmJs/productionExecutable/
           cname: web.twofac.app
