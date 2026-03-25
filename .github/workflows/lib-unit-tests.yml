@@ -3,16 +3,12 @@ name: Library Unit Tests
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - '.agents/**'
+    paths:
+      - 'sharedLib/src/**'
   pull_request:
     branches: [ main ]
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - '.agents/**'
+    paths:
+      - 'sharedLib/src/**'
   workflow_dispatch: # For manual triggering
 
 jobs:
