@@ -1,0 +1,42 @@
+<resources>
+    <!-- Backup providers card -->
+    <string name="backup_title">Backups</string>
+    <string name="backup_description">Create or restore account snapshots from available backup providers.</string>
+    <string name="backup_empty_state">No backup providers are currently available on this platform.</string>
+
+    <!-- Backup provider row -->
+    <string name="backup_export">Export</string>
+    <string name="backup_import">Import</string>
+    <string name="backup_available">Available</string>
+    <string name="backup_unavailable">Unavailable</string>
+    <string name="backup_sign_in_required">Sign-in required</string>
+
+    <!-- Backup export mode dialog -->
+    <string name="backup_export_dialog_title">Choose Backup Type</string>
+    <string name="backup_export_dialog_body">Plaintext backups are easier to restore. Encrypted backups keep account secrets encrypted and require the backup passkey when restoring.</string>
+    <string name="backup_export_encrypted">Encrypted Backup</string>
+    <string name="backup_export_plaintext">Plaintext Backup</string>
+
+    <!-- Backup snackbars -->
+    <string name="backup_unavailable_message">Backup is unavailable</string>
+    <string name="backup_export_encrypted_success">Backup exported (encrypted): %1$s</string>
+    <string name="backup_export_plaintext_success">Backup exported (plaintext): %1$s</string>
+    <string name="backup_export_failed">Export failed: %1$s</string>
+    <string name="backup_import_failed">Import failed: %1$s</string>
+    <string name="backup_import_success">Imported %1$s account(s) from %2$s</string>
+    <string name="backup_no_backups_found">No backups found: %1$s</string>
+    <string name="backup_no_files_found">No backup files found</string>
+    <string name="backup_import_exception">Import failed: %1$s</string>
+
+    <!-- Passkey dialogs for backup operations -->
+    <string name="backup_passkey_unlock_title">Unlock Accounts</string>
+    <string name="backup_passkey_encrypted_export_description">Enter your current app passkey to create an encrypted backup.</string>
+    <string name="backup_passkey_plaintext_export_description">Enter your current app passkey to create a plaintext backup.</string>
+    <string name="backup_passkey_import_title">Save to Device</string>
+    <string name="backup_passkey_import_description">Enter your current app passkey to save the restored accounts to your device.</string>
+    <string name="backup_passkey_sync_description">Enter your passkey to decrypt and view your accounts</string>
+    <string name="backup_passkey_required_title">Backup Passkey Required</string>
+    <string name="backup_passkey_required_description">This backup contains encrypted accounts. Enter the passkey that was used when this backup was created.</string>
+    <string name="backup_passkey_incorrect">Incorrect passkey — could not decrypt the backup accounts. Please try again.</string>
+    <string name="backup_restore_unavailable">Backup restore is unavailable</string>
+</resources>
