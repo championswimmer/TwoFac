@@ -4,6 +4,7 @@ status: Planned
 progress:
   - "[x] Phase 0 - Research platform APIs, constraints, and candidate libraries"
   - "[x] Phase 0.5 - Validate research assumptions with independent verification"
+  - "[x] Phase 0.6 - Cross-platform library landscape audit (March 2026)"
   - "[ ] Phase 1 - Finalize desktop secure-unlock product contract and UX copy"
   - "[ ] Phase 2 - Build macOS native helper + biometric backend"
   - "[ ] Phase 3 - Build Windows secure-storage backend and Hello consent/helper spike"
@@ -332,6 +333,118 @@ Reasons:
 
 **Implement Secret Service support first, add polkit auth gate as an experimental enhancement, and keep direct PAM/fprintd as research-only.**
 
+## Cross-platform library landscape audit (March 2026)
+
+### Comprehensive library survey
+
+An exhaustive search of GitHub, Maven Central, and the Kotlin Multiplatform ecosystem was conducted in March 2026 to identify any cross-platform JVM/Kotlin library that handles secure storage via keychain/keyring on multiple desktop platforms. The results are documented below.
+
+#### 1. `java-keyring` ([javakeyring/java-keyring](https://github.com/javakeyring/java-keyring))
+
+- **Coordinates:** `com.github.javakeyring:java-keyring:1.0.4`
+- **Stars:** ~44
+- **Last release:** 1.0.4 (2021), no releases in 2024 or 2025
+- **License:** BSD-3-Clause
+- **Platforms:** macOS, Windows (Credential Manager), Linux (GNOME Keyring, KDE KWallet)
+- **macOS implementation — verified from source:**
+  - `OsxKeychainBackend` uses JNA bindings to **legacy** `SecKeychainAddGenericPassword` / `SecKeychainFindGenericPassword` / `SecKeychainItemModifyContent` (see `SecurityLibrary.java`)
+  - `ModernOsxKeychainBackend` delegates to `pt.davidafsilva.apple.OSXKeychain` (jkeychain), which also uses **legacy** SecKeychain APIs despite its misleading name
+  - **Neither backend supports `SecAccessControl`, biometric flags, or the modern Data Protection Keychain**
+- **Windows implementation:** Uses Windows Credential Manager via JNA (`CredWrite`/`CredRead`)
+- **Linux implementation:** Uses GNOME Keyring or KDE KWallet via D-Bus
+- **Excellent security README** documenting that keychain protection on macOS requires signed bundled apps (not shared JVM), and on Windows requires MSIX packaging (not MSI/jpackage). Recommends [Conveyor](https://hydraulic.dev/) as the packaging tool for both.
+- **Assessment:** Good for basic secure storage (Tier B/C), but **cannot support macOS biometric-gated Tier A** due to legacy API usage. Low maintenance activity is a risk.
+
+#### 2. `java-keytar` ([starxg/java-keytar](https://github.com/starxg/java-keytar))
+
+- **Coordinates:** `com.starxg:java-keytar:1.0.7`
+- **Stars:** Low
+- **Last release:** 1.0.7 (October 2023), no releases in 2024 or 2025
+- **License:** MIT
+- **Platforms:** macOS (Keychain), Windows (Credential Vault), Linux (libsecret/Secret Service)
+- **macOS implementation — verified from source (`keytar_mac.cc`):**
+  - Uses **legacy** `SecKeychainAddGenericPassword` / `SecKeychainFindGenericPassword` / `SecKeychainItemModifyAttributesAndData` / `SecKeychainItemDelete` for all primary operations (add, set, get, delete)
+  - Uses `SecItemCopyMatching` ONLY for the multi-item `FindCredentials` query (because the legacy API lacks a multi-result equivalent)
+  - **No `SecAccessControl`, no biometric support, no Data Protection Keychain targeting**
+- **Architecture:** Ships prebuilt native JNI binaries per platform — simpler deployment than pure JNA but harder to customize
+- **Assessment:** Marginally more recent than java-keyring, but same legacy API limitation on macOS. JNI approach means we can't extend the native code without forking and rebuilding. **Not suitable for Tier A biometric.**
+
+#### 3. `jkeychain` ([davidafsilva/jkeychain](https://github.com/davidafsilva/jkeychain))
+
+- **Coordinates:** `pt.davidafsilva.apple:osx-keychain-java`
+- **Platforms:** macOS only
+- **macOS implementation:** Uses **legacy** `SecKeychainAddGenericPassword` / `SecKeychainFindGenericPassword` via JNI native helper
+- **Already evaluated and rejected in original plan** — confirming: NOT suitable for biometric access control
+
+#### 4. Kissme (Netguru)
+
+- **Platforms:** Android (Keystore/BinaryPrefs), iOS (Keychain via C-interop)
+- **Desktop support:** None as of March 2026
+- **Assessment:** Mobile-only. **Not relevant for desktop secure unlock.**
+
+#### 5. Multiplatform Settings ([russhwolf/multiplatform-settings](https://github.com/russhwolf/multiplatform-settings))
+
+- **Coordinates:** `com.russhwolf:multiplatform-settings:1.3.0`
+- **Platforms:** Android, iOS, macOS, JVM, JS
+- **JVM desktop implementations:** `PreferencesSettings` (java.util.prefs), `PropertiesSettings` (Java .properties files) — **NOT encrypted, NOT keyring-backed**
+- **Apple native:** Has `KeychainSettings` for iOS/macOS but only for Kotlin/Native targets, not JVM desktop
+- **Assessment:** Excellent for non-sensitive settings. **Not a secure storage solution for JVM desktop passkeys.**
+
+#### 6. IntelliJ PasswordSafe (`com.jetbrains.intellij.platform:credential-store`)
+
+- **Platforms:** macOS (Keychain), Windows (KeePass-format file), Linux (Secret Service)
+- **Architecture:** Deeply coupled to IntelliJ Platform service locator, application lifecycle, and classloader wiring
+- **Standalone use:** Not officially supported. Attempting to use outside IntelliJ requires mocking/emulating significant platform infrastructure. API stability not guaranteed.
+- **Assessment:** Excellent reference for how JetBrains solved this problem, but **NOT usable as a standalone library.** Not viable for TwoFac.
+
+#### 7. `de.swiesend:secret-service` ([swiesend/secret-service](https://github.com/swiesend/secret-service))
+
+- **Coordinates:** `de.swiesend:secret-service:2.0.1-alpha`
+- **Last release:** January 2024 (v2.0.1-alpha) — corrected from original estimate
+- **Platforms:** Linux only (Secret Service API via D-Bus)
+- **Assessment:** Still somewhat maintained. Good convenience wrapper for Linux Secret Service. Monitor for abandonment.
+
+#### 8. `dbus-java` ([hypfvieh/dbus-java](https://github.com/hypfvieh/dbus-java))
+
+- **Platforms:** Linux (D-Bus)
+- **Actively maintained**, covers both Secret Service and polkit D-Bus APIs
+- **Assessment:** Best long-term option for Linux backend.
+
+### Landscape summary table
+
+| Library | macOS | Windows | Linux | Biometric? | Last Release | Status |
+|---------|-------|---------|-------|-----------|-------------|--------|
+| java-keyring | ✅ (legacy APIs) | ✅ (Cred Mgr) | ✅ (GNOME/KDE) | ❌ | 2021 | Low activity |
+| java-keytar | ✅ (legacy APIs) | ✅ (Cred Vault) | ✅ (libsecret) | ❌ | Oct 2023 | Low activity |
+| jkeychain | ✅ (legacy APIs) | ❌ | ❌ | ❌ | Old | Stale |
+| Kissme | ❌ | ❌ | ❌ | N/A (mobile) | 2023 | Active (mobile) |
+| multiplatform-settings | ❌ (not secure) | ❌ (not secure) | ❌ (not secure) | ❌ | 2024 | Active |
+| IntelliJ PasswordSafe | ✅ | ✅ (KeePass file) | ✅ | ❌ | N/A | Not standalone |
+| secret-service | ❌ | ❌ | ✅ | ❌ | Jan 2024 | Moderate |
+| dbus-java | ❌ | ❌ | ✅ | ❌ | Active | Active |
+
+### Key finding
+
+**No existing cross-platform JVM/Kotlin library supports macOS biometric-gated secret retrieval (Tier A).** Every library that touches the macOS Keychain uses the **legacy** `SecKeychainAddGenericPassword` / `SecKeychainFindGenericPassword` family of APIs, which operate on the file-based keychain and do NOT support `SecAccessControl` biometric flags or the modern Data Protection Keychain.
+
+This is not a gap that can be closed by using a different library — it requires calling the **modern `SecItem*` APIs** (`SecItemAdd`, `SecItemCopyMatching`, `SecItemDelete`) with `SecAccessControlCreateWithFlags`, which none of these libraries wrap.
+
+### Re-evaluation conclusion
+
+The original plan's per-platform approach remains the correct architecture:
+
+1. **macOS (Tier A):** Custom native helper (.dylib) wrapping modern `SecItem*` + `SecAccessControl` biometric APIs, called via JNA — **no existing library can do this**
+2. **Windows (Tier B):** JNA + DPAPI (`Crypt32Util`) for at-rest encryption — this is well-supported by JNA out of the box, no cross-platform library needed
+3. **Linux (Tier C):** `dbus-java` or `de.swiesend:secret-service` for Secret Service — dedicated Linux libraries are better maintained than cross-platform wrappers
+
+The generic cross-platform libraries (`java-keyring`, `java-keytar`) could theoretically serve as a Windows+Linux convenience layer for basic credential storage, but:
+- They don't add value over direct JNA/dbus-java for our specific needs
+- They introduce dependency risk (low maintenance activity)
+- They hide platform differences we explicitly need to control (security tiers, capability detection)
+- On macOS they would need to be bypassed entirely for the biometric path
+
+**Recommendation unchanged: build per-platform backends using direct OS API access, not cross-platform abstractions.**
+
 ## Library/tooling recommendations
 
 ### Strong candidates
@@ -349,18 +462,24 @@ Reasons:
 
 1. **`de.swiesend:secret-service`** ([swiesend/secret-service](https://github.com/swiesend/secret-service))
    - Higher-level Secret Service client for Linux
-   - ⚠️ Last release Nov 2023 (v2.0.1-alpha), maintenance status uncertain
-   - Good for a quick start but may need replacement with direct `dbus-java` if abandoned
+   - ⚠️ Last release Jan 2024 (v2.0.1-alpha), moderate maintenance
+   - Good for a quick start but may need replacement with direct `dbus-java` if maintenance lapses
 2. **Java 21 FFM (Foreign Function & Memory API)**
    - Alternative to JNA for new native bindings
    - Available since JDK 21 (which this project uses)
    - Worth evaluating for the macOS native helper interop if we want to avoid bundling a separate .dylib
+3. **java-keyring** ([javakeyring/java-keyring](https://github.com/javakeyring/java-keyring))
+   - Worth referencing for its excellent [security documentation on packaging requirements](https://github.com/javakeyring/java-keyring/blob/master/README.md) (macOS signing, Windows MSIX)
+   - NOT recommended as a runtime dependency due to legacy macOS APIs and low maintenance
+   - Its [Conveyor](https://hydraulic.dev/) recommendation for secure app packaging is worth investigating independently
 
-### Important non-recommendation
+### Important non-recommendations
 
-Do **not** rely on generic cross-platform keyring wrappers (e.g., `java-keyring`) as the primary abstraction if they hide platform differences we explicitly care about. Most cross-platform keyring libraries are good at storage, but not at exposing macOS biometric access-control flags or a nuanced Windows/Linux support matrix.
+Do **not** rely on generic cross-platform keyring wrappers (`java-keyring`, `java-keytar`) as the primary abstraction. Source code verification confirms they ALL use legacy macOS `SecKeychainAddGenericPassword` APIs which cannot support biometric access control. They also hide platform differences we explicitly need to model in our security tiers.
 
-Do **not** use `jkeychain` (`pt.davidafsilva.apple:jkeychain`) — it wraps the legacy `SecKeychainAddGenericPassword` APIs which do NOT support biometric access control.
+Do **not** use `jkeychain` (`pt.davidafsilva.apple:jkeychain`) — it wraps the legacy `SecKeychainAddGenericPassword` APIs which do NOT support biometric access control. (Note: `java-keyring`'s "ModernOsxKeychainBackend" misleadingly delegates to jkeychain, which also uses legacy APIs.)
+
+Do **not** attempt to use IntelliJ PasswordSafe outside the IntelliJ Platform — it is deeply coupled to the IDE runtime and not supported as a standalone library.
 
 ## Rollout order
 
@@ -491,6 +610,20 @@ This gives us a desktop secure-unlock feature that is genuinely secure, aligned 
 5. https://java-native-access.github.io/jna/4.2.1/com/sun/jna/platform/win32/Crypt32Util.html
 6. https://github.com/java-native-access/jna/issues/1362 (DPAPI memory cleanup concern)
 7. https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/mac/CoreFoundation.java
+
+### Cross-platform library audit references (March 2026)
+
+1. https://github.com/javakeyring/java-keyring — source-verified: both macOS backends use legacy SecKeychain APIs; excellent security README on packaging requirements
+2. https://github.com/javakeyring/java-keyring/blob/master/java-keyring/src/main/java/com/github/javakeyring/internal/osx/SecurityLibrary.java — JNA bindings to legacy SecKeychainFindGenericPassword
+3. https://github.com/javakeyring/java-keyring/blob/master/java-keyring/src/main/java/com/github/javakeyring/internal/osx/ModernOsxKeychainBackend.java — delegates to jkeychain (also legacy)
+4. https://github.com/starxg/java-keytar — source-verified: keytar_mac.cc uses legacy SecKeychainAddGenericPassword
+5. https://github.com/starxg/java-keytar/blob/main/lib/keytar/keytar-core/keytar_mac.cc — native macOS source using legacy APIs
+6. https://mvnrepository.com/artifact/com.github.javakeyring/java-keyring — last release 1.0.4
+7. https://mvnrepository.com/artifact/com.starxg/java-keytar — last release 1.0.7 (Oct 2023)
+8. https://github.com/russhwolf/multiplatform-settings — JVM desktop: PreferencesSettings/PropertiesSettings only (not encrypted)
+9. https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html — IntelliJ PasswordSafe (not standalone-usable)
+10. https://developer.apple.com/documentation/technotes/tn3137-on-mac-keychains — Apple TN3137 on legacy vs modern Keychain APIs
+11. https://issues.chromium.org/issues/395659797 — Chromium migration off SecKeychainAddGenericPassword
 
 ### Security references
 
