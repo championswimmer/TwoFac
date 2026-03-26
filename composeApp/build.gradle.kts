@@ -168,6 +168,8 @@ kotlin {
             implementation(libs.kstore.file)
             implementation(libs.kotlin.multiplatform.appdirs)
             implementation(libs.zxing.javase)
+            implementation(libs.jna)
+            implementation(libs.jna.platform)
             implementation(project(":sharedLib"))
         }
         wasmJsMain.resources.srcDir(layout.buildDirectory.dir("generated/wasmJs/resources"))

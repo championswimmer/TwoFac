@@ -114,6 +114,7 @@ kscan = "0.7.0"
 filekit = "0.10.0"
 jsqr = "1.4.0"
 zxing = "3.5.3"
+jna = "5.15.0"
 composeMaterial = "1.5.6"
 ##           ⬆ = "1.6.0-alpha01"
 ##           ⬆ = "1.6.0-alpha02"
@@ -213,3 +214,5 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
