@@ -1,13 +1,13 @@
 ---
 name: Unit Test Value Audit Plan
-status: Planned
+status: Complete
 progress:
   - "[x] Inventory all Kotlin `*Test.kt` files and separate unit tests from instrumented tests"
   - "[x] Run a baseline `./gradlew --no-daemon check` and capture the current failing-test baseline"
   - "[x] Assess each unit test file for business value vs obvious or redundant coverage"
-  - "[ ] Remove the placeholder `composeApp` common test that only checks `1 + 2 == 3`"
-  - "[ ] Decide whether to annotate or delete the dormant `CryptoToolsTest.testRoundTripCreateSigningKey` case"
-  - "[ ] Consolidate low-signal repetition in the small set of CLI/UI helper tests called out below"
+  - "[x] Remove the placeholder `composeApp` common test that only checks `1 + 2 == 3`"
+  - "[x] Decide whether to annotate or delete the dormant `CryptoToolsTest.testRoundTripCreateSigningKey` case"
+  - "[x] Consolidate low-signal repetition in the small set of CLI/UI helper tests called out below"
 ---
 
 # Unit Test Value Audit Plan

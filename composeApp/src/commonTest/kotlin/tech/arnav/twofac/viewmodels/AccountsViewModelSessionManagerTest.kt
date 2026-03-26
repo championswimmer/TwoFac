@@ -8,53 +8,33 @@ import kotlin.test.assertNull
 
 class AccountsViewModelSessionManagerTest {
     @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsNullForNonSecureManager() {
+    fun returnsNullForNonSecureManager() {
         val manager = FakeSessionManager()
         val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
         assertNull(result)
     }
 
     @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsNullForAutoUnlock() {
+    fun returnsNullWhenAutoUnlock() {
         val manager = FakeSecureSessionManager(secureEnabled = true, secureAvailable = true)
         val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = true)
         assertNull(result)
     }
 
     @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsNullWhenSecureUnlockDisabled() {
-        val manager = FakeSecureSessionManager(secureEnabled = false, secureAvailable = true)
-        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
-        assertNull(result)
-    }
-
-    @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsNullWhenSecureUnlockUnavailable() {
-        val manager = FakeSecureSessionManager(secureEnabled = true, secureAvailable = false)
-        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
-        assertNull(result)
-    }
-
-    @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsSecureManagerWhenManualUnlockAndEnabled() {
-        val manager = FakeSecureSessionManager(secureEnabled = true, secureAvailable = true)
-        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
-        assertNotNull(result)
-    }
-
-    @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsNullWhenSecureUnlockAlreadyReady() {
-        val manager = FakeSecureSessionManager(
-            secureEnabled = true,
-            secureAvailable = true,
-            secureReady = true,
+    fun returnsNullWhenAnySecureConditionNotMet() {
+        val cases = listOf(
+            FakeSecureSessionManager(secureEnabled = false, secureAvailable = true),
+            FakeSecureSessionManager(secureEnabled = true, secureAvailable = false),
+            FakeSecureSessionManager(secureEnabled = true, secureAvailable = true, secureReady = true),
         )
-        val result = sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false)
-        assertNull(result)
+        cases.forEach { manager ->
+            assertNull(sessionManagerForPostUnlockEnrollment(manager, fromAutoUnlock = false))
+        }
     }
 
     @Test
-    fun sessionManagerForPostUnlockEnrollmentReturnsManagerWhenSecureUnlockNotReady() {
+    fun returnsSecureManagerWhenAllConditionsMet() {
         val manager = FakeSecureSessionManager(
             secureEnabled = true,
             secureAvailable = true,

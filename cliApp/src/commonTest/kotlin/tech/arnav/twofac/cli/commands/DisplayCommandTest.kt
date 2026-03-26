@@ -36,8 +36,8 @@ class DisplayCommandTest {
             inputInteractive = false,
         )
 
-        assertContains(result.output, "Account")
-        assertContains(result.output, "OTP")
-        assertContains(result.output, "Validity")
+        for (header in listOf("Account", "OTP", "Validity")) {
+            assertContains(result.output, header)
+        }
     }
 }
