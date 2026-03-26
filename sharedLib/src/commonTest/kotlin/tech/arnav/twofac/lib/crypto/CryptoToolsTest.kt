@@ -29,6 +29,7 @@ class CryptoToolsTest {
         assertEquals(data, decryptedData)
     }
 
+    @Test
     fun testRoundTripCreateSigningKey() = runTest {
         val tools = DefaultCryptoTools(CryptographyProvider.Default)
 
