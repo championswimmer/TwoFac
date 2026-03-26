@@ -16,6 +16,14 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import org.jetbrains.compose.resources.getString
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.biometric_enrollment_title
+import twofac.composeapp.generated.resources.biometric_enrollment_subtitle
+import twofac.composeapp.generated.resources.biometric_unlock_title
+import twofac.composeapp.generated.resources.biometric_unlock_subtitle
+import twofac.composeapp.generated.resources.biometric_use_passkey_instead
+import twofac.composeapp.generated.resources.action_cancel
 
 class AndroidBiometricSessionManager(
     private val context: Context,
@@ -126,8 +134,9 @@ class AndroidBiometricSessionManager(
 
             // Prompt biometric to authenticate the time-based key
             val authenticated = promptBiometric(
-                title = "Enable Biometric Unlock",
-                subtitle = "Authenticate to securely save your passkey",
+                title = getString(Res.string.biometric_enrollment_title),
+                subtitle = getString(Res.string.biometric_enrollment_subtitle),
+                negativeButtonText = getString(Res.string.action_cancel),
             )
             if (!authenticated) return false
 
@@ -155,6 +164,7 @@ class AndroidBiometricSessionManager(
     private suspend fun promptBiometric(
         title: String,
         subtitle: String,
+        negativeButtonText: String,
     ): Boolean = suspendCoroutine { continuation ->
         try {
             val activity = activityProvider()
@@ -172,7 +182,7 @@ class AndroidBiometricSessionManager(
             val promptInfo = BiometricPrompt.PromptInfo.Builder()
                 .setTitle(title)
                 .setSubtitle(subtitle)
-                .setNegativeButtonText("Cancel")
+                .setNegativeButtonText(negativeButtonText)
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
                 .build()
 
@@ -186,49 +196,55 @@ class AndroidBiometricSessionManager(
     private suspend fun authenticateAndDecrypt(
         encryptedBase64: String,
         ivBase64: String,
-    ): String? = suspendCoroutine { continuation ->
-        try {
-            val key = getOrCreateKey()
-            val iv = Base64.decode(ivBase64, Base64.NO_WRAP)
-            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(128, iv))
+    ): String? {
+        val unlockTitle = getString(Res.string.biometric_unlock_title)
+        val unlockSubtitle = getString(Res.string.biometric_unlock_subtitle)
+        val usePasskeyText = getString(Res.string.biometric_use_passkey_instead)
 
-            val callback = object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    try {
-                        val resultCipher = result.cryptoObject?.cipher ?: cipher
-                        val encrypted = Base64.decode(encryptedBase64, Base64.NO_WRAP)
-                        val decrypted = resultCipher.doFinal(encrypted)
-                        continuation.resume(String(decrypted))
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Failed to decrypt passkey after biometric auth", e)
-                        clearPasskey()
+        return suspendCoroutine { continuation ->
+            try {
+                val key = getOrCreateKey()
+                val iv = Base64.decode(ivBase64, Base64.NO_WRAP)
+                val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+                cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(128, iv))
+
+                val callback = object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                        try {
+                            val resultCipher = result.cryptoObject?.cipher ?: cipher
+                            val encrypted = Base64.decode(encryptedBase64, Base64.NO_WRAP)
+                            val decrypted = resultCipher.doFinal(encrypted)
+                            continuation.resume(String(decrypted))
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Failed to decrypt passkey after biometric auth", e)
+                            clearPasskey()
+                            continuation.resume(null)
+                        }
+                    }
+
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                         continuation.resume(null)
                     }
                 }
 
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    continuation.resume(null)
-                }
+                val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                    .setTitle(unlockTitle)
+                    .setSubtitle(unlockSubtitle)
+                    .setNegativeButtonText(usePasskeyText)
+                    .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                    .build()
+
+                val biometricPrompt = BiometricPrompt(
+                    activityProvider(),
+                    ContextCompat.getMainExecutor(context),
+                    callback,
+                )
+                biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
+            } catch (e: Exception) {
+                Log.w(TAG, "Biometric prompt/decrypt setup failed", e)
+                clearPasskey()
+                continuation.resume(null)
             }
-
-            val promptInfo = BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Unlock TwoFac")
-                .setSubtitle("Authenticate to access your 2FA codes")
-                .setNegativeButtonText("Use passkey instead")
-                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-                .build()
-
-            val biometricPrompt = BiometricPrompt(
-                activityProvider(),
-                ContextCompat.getMainExecutor(context),
-                callback,
-            )
-            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
-        } catch (e: Exception) {
-            Log.w(TAG, "Biometric prompt/decrypt setup failed", e)
-            clearPasskey()
-            continuation.resume(null)
         }
     }
 

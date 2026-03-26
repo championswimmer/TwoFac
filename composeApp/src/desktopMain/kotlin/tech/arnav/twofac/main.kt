@@ -25,11 +25,17 @@ import tech.arnav.twofac.settings.DesktopSettingsManager
 import androidx.compose.foundation.isSystemInDarkTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.tray_lock_color
 import twofac.composeapp.generated.resources.tray_lock_monochrome_dark
 import twofac.composeapp.generated.resources.tray_lock_monochrome_light
 import twofac.composeapp.generated.resources.twofac_icon
+import twofac.composeapp.generated.resources.desktop_window_title
+import twofac.composeapp.generated.resources.desktop_tray_tooltip
+import twofac.composeapp.generated.resources.desktop_tray_open
+import twofac.composeapp.generated.resources.desktop_tray_quit
+import twofac.composeapp.generated.resources.desktop_tray_popup_title
 
 fun main() = runBlocking {
     // On macOS, this enables the system tray icon to be treated as a "template image"
@@ -53,6 +59,12 @@ fun main() = runBlocking {
         val isTrayEnabled by settingsManager.isTrayIconEnabledFlow.collectAsState(initial = initialTrayEnabled)
         var isMainWindowOpen by remember { mutableStateOf(true) }
         var isTrayPopupVisible by remember { mutableStateOf(false) }
+
+        val windowTitle = stringResource(Res.string.desktop_window_title)
+        val trayTooltip = stringResource(Res.string.desktop_tray_tooltip)
+        val trayOpenText = stringResource(Res.string.desktop_tray_open)
+        val trayQuitText = stringResource(Res.string.desktop_tray_quit)
+        val trayPopupTitle = stringResource(Res.string.desktop_tray_popup_title)
         
         val trayWindowState = rememberWindowState(
             width = 360.dp,
@@ -67,7 +79,7 @@ fun main() = runBlocking {
                         exitApplication()
                     }
                 },
-                title = "TwoFac",
+                title = windowTitle,
                 icon = painterResource(Res.drawable.twofac_icon),
             ) {
                 App(onQuit = { exitApplication() })
@@ -91,7 +103,7 @@ fun main() = runBlocking {
 
             Tray(
                 icon = painterResource(trayIcon),
-                tooltip = "TwoFac",
+                tooltip = trayTooltip,
                 onAction = {
                     if (!isTrayPopupVisible) {
                         trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
@@ -100,14 +112,14 @@ fun main() = runBlocking {
                 },
                 menu = {
                     Item(
-                        text = "Open TwoFac",
+                        text = trayOpenText,
                         onClick = {
                             isMainWindowOpen = true
                             isTrayPopupVisible = false
                         }
                     )
                     Item(
-                        text = "Quit TwoFac",
+                        text = trayQuitText,
                         onClick = ::exitApplication
                     )
                 }
@@ -121,7 +133,7 @@ fun main() = runBlocking {
                 transparent = true,
                 resizable = false,
                 alwaysOnTop = true,
-                title = "TwoFac Tray",
+                title = trayPopupTitle,
             ) {
                 val window = this.window
                 DisposableEffect(window) {

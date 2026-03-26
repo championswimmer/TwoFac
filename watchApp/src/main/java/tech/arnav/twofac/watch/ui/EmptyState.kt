@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
@@ -22,6 +23,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import kotlinx.coroutines.launch
+import tech.arnav.twofac.watch.R
 import tech.arnav.twofac.watch.datalayer.WatchCompanionInitResult
 import tech.arnav.twofac.watch.datalayer.WatchCompanionRegistrar
 
@@ -30,6 +32,12 @@ fun EmptyState(registrar: WatchCompanionRegistrar) {
     val scope = rememberCoroutineScope()
     var isInitializing by remember { mutableStateOf(false) }
     var initMessage by remember { mutableStateOf<String?>(null) }
+
+    val syncRequestSent = stringResource(R.string.watch_sync_request_sent)
+    val syncCompanionMissing = stringResource(R.string.watch_sync_companion_missing)
+    val syncCompanionUnreachable = stringResource(R.string.watch_sync_companion_unreachable)
+    val syncButtonLabel = stringResource(R.string.watch_sync_button)
+    val syncRequestingLabel = stringResource(R.string.watch_sync_requesting)
 
     Box(
         modifier = Modifier
@@ -49,16 +57,16 @@ fun EmptyState(registrar: WatchCompanionRegistrar) {
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.primary,
-                text = "No accounts synced yet.\nOpen phone app to sync.",
+                text = stringResource(R.string.watch_empty_message),
             )
             Button(
                 onClick = {
                     scope.launch {
                         isInitializing = true
                         initMessage = when (registrar.requestInitialization()) {
-                            WatchCompanionInitResult.RequestSent -> "Sync requested. Open phone app."
-                            WatchCompanionInitResult.CompanionAppMissing -> "Companion app not found."
-                            WatchCompanionInitResult.CompanionNotReachable -> "Phone not reachable."
+                            WatchCompanionInitResult.RequestSent -> syncRequestSent
+                            WatchCompanionInitResult.CompanionAppMissing -> syncCompanionMissing
+                            WatchCompanionInitResult.CompanionNotReachable -> syncCompanionUnreachable
                         }
                         isInitializing = false
                     }
@@ -68,7 +76,7 @@ fun EmptyState(registrar: WatchCompanionRegistrar) {
                     .fillMaxWidth()
                     .padding(top = 8.dp),
             ) {
-                Text(if (isInitializing) "Requesting..." else "Sync now")
+                Text(if (isInitializing) syncRequestingLabel else syncButtonLabel)
             }
             if (initMessage != null) {
                 Text(
