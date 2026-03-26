@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,6 +28,7 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import tech.arnav.twofac.lib.theme.colorForState
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.lib.theme.timerStateByRemainingProgress
+import tech.arnav.twofac.watch.R
 import tech.arnav.twofac.watch.otp.WatchOtpEntry
 import tech.arnav.twofac.watch.presentation.theme.TwofacTheme
 import tech.arnav.twofac.watch.presentation.theme.toComposeColor
@@ -99,7 +101,7 @@ fun OtpAccountScreen(
 
                 is WatchOtpEntry.Invalid -> {
                     Text(
-                        text = "Error",
+                        text = stringResource(R.string.watch_otp_error),
                         fontSize = 18.sp,
                         color = TwofacTheme.tokens.danger.toComposeColor(),
                         textAlign = TextAlign.Center,
