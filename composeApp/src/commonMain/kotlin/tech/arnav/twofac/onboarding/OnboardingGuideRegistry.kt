@@ -19,7 +19,7 @@ fun OnboardingGuideStep.provide(): OnboardingStepContribution = OnboardingStepCo
 fun omit(slot: OnboardingStepSlot): OnboardingStepContribution = OnboardingStepContribution.Omit(slot)
 
 interface OnboardingStepContributor {
-    fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution>
+    suspend fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution>
 }
 
 interface CommonOnboardingStepContributor : OnboardingStepContributor
@@ -32,26 +32,26 @@ class OnboardingGuideRegistry(
 ) {
     private val slotOrder = OnboardingPolicy.initialStepOrdering
 
-    fun resolveSteps(context: OnboardingGuideContext): List<OnboardingGuideStep> {
+    suspend fun resolveSteps(context: OnboardingGuideContext): List<OnboardingGuideStep> {
         val merged = LinkedHashMap<OnboardingStepSlot, OnboardingGuideStep>()
 
-        commonContributors
-            .flatMap { it.contribute(context) }
-            .forEach { contribution ->
+        for (contributor in commonContributors) {
+            for (contribution in contributor.contribute(context)) {
                 when (contribution) {
                     is OnboardingStepContribution.Provide -> merged[contribution.slot] = contribution.step
                     is OnboardingStepContribution.Omit -> merged.remove(contribution.slot)
                 }
             }
+        }
 
-        platformContributors
-            .flatMap { it.contribute(context) }
-            .forEach { contribution ->
+        for (contributor in platformContributors) {
+            for (contribution in contributor.contribute(context)) {
                 when (contribution) {
                     is OnboardingStepContribution.Provide -> merged[contribution.slot] = contribution.step
                     is OnboardingStepContribution.Omit -> merged.remove(contribution.slot)
                 }
             }
+        }
 
         return slotOrder.mapNotNull { slot -> merged[slot] }
     }

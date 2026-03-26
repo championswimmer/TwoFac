@@ -26,6 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.accounts_title
+import twofac.composeapp.generated.resources.action_back
+import twofac.composeapp.generated.resources.accounts_add_account
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import tech.arnav.twofac.components.accounts.AccountsErrorState
@@ -61,12 +66,12 @@ fun AccountsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Accounts") },
+                title = { Text(stringResource(Res.string.accounts_title)) },
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 navigationIcon = {
                     onNavigateBack?.let { navigateBack ->
                         IconButton(onClick = navigateBack) {
-                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(Res.string.action_back))
                         }
                     }
                 }
@@ -74,7 +79,7 @@ fun AccountsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToAddAccount) {
-                Icon(Icons.Rounded.Add, contentDescription = "Add Account")
+                Icon(Icons.Rounded.Add, contentDescription = stringResource(Res.string.accounts_add_account))
             }
         }
     ) { paddingValues ->

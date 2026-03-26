@@ -28,6 +28,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.account_detail_title
+import twofac.composeapp.generated.resources.action_back
+import twofac.composeapp.generated.resources.account_detail_loading
+import twofac.composeapp.generated.resources.account_detail_account_label
+import twofac.composeapp.generated.resources.label_passkey
+import twofac.composeapp.generated.resources.label_passkey_placeholder
+import twofac.composeapp.generated.resources.account_detail_generate_otp
+import twofac.composeapp.generated.resources.account_detail_otp_display
+import twofac.composeapp.generated.resources.account_detail_delete
+import twofac.composeapp.generated.resources.error_prefix
+import twofac.composeapp.generated.resources.account_detail_not_found
+import twofac.composeapp.generated.resources.account_detail_delete_dialog_title
+import twofac.composeapp.generated.resources.account_detail_delete_dialog_message
+import twofac.composeapp.generated.resources.action_delete
+import twofac.composeapp.generated.resources.action_cancel
 import org.koin.compose.viewmodel.koinViewModel
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
@@ -53,10 +70,10 @@ fun AccountDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Account Details") },
+                title = { Text(stringResource(Res.string.account_detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(Res.string.action_back))
                     }
                 }
             )
@@ -73,7 +90,7 @@ fun AccountDetailScreen(
 
             if (isLoading) {
                 Text(
-                    text = "Loading account details...",
+                    text = stringResource(Res.string.account_detail_loading),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 return@Column
@@ -81,7 +98,7 @@ fun AccountDetailScreen(
 
             if (account != null) {
                 Text(
-                    text = "Account: ${account.accountLabel}",
+                    text = stringResource(Res.string.account_detail_account_label, account.accountLabel),
                     style = MaterialTheme.typography.bodyLarge
                 )
 
@@ -89,8 +106,8 @@ fun AccountDetailScreen(
                     OutlinedTextField(
                         value = passkeyText,
                         onValueChange = { passkeyText = it },
-                        label = { Text("Passkey") },
-                        placeholder = { Text("Enter your passkey") },
+                        label = { Text(stringResource(Res.string.label_passkey)) },
+                        placeholder = { Text(stringResource(Res.string.label_passkey_placeholder)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -101,12 +118,12 @@ fun AccountDetailScreen(
                     },
                     enabled = isLibUnlocked || passkeyText.isNotBlank()
                 ) {
-                    Text("Generate OTP")
+                    Text(stringResource(Res.string.account_detail_generate_otp))
                 }
 
                 currentOtp?.let { otp ->
                     Text(
-                        text = "OTP: $otp",
+                        text = stringResource(Res.string.account_detail_otp_display, otp),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
@@ -119,19 +136,19 @@ fun AccountDetailScreen(
                         contentColor = MaterialTheme.colorScheme.onError
                     )
                 ) {
-                    Text("Delete Account")
+                    Text(stringResource(Res.string.account_detail_delete))
                 }
 
                 error?.let { errorMessage ->
                     Text(
-                        text = "Error: $errorMessage",
+                        text = stringResource(Res.string.error_prefix, errorMessage),
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(8.dp)
                     )
                 }
             } else {
                 Text(
-                    text = "Account not found",
+                    text = stringResource(Res.string.account_detail_not_found),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -146,9 +163,9 @@ fun AccountDetailScreen(
                     showDeleteDialog = false
                 }
             },
-            title = { Text("Delete account?") },
+            title = { Text(stringResource(Res.string.account_detail_delete_dialog_title)) },
             text = {
-                Text("This will permanently remove ${account.accountLabel} from your vault.")
+                Text(stringResource(Res.string.account_detail_delete_dialog_message, account.accountLabel))
             },
             confirmButton = {
                 TextButton(
@@ -164,7 +181,7 @@ fun AccountDetailScreen(
                     },
                     enabled = !isDeleteInProgress
                 ) {
-                    Text("Delete")
+                    Text(stringResource(Res.string.action_delete))
                 }
             },
             dismissButton = {
@@ -172,7 +189,7 @@ fun AccountDetailScreen(
                     onClick = { showDeleteDialog = false },
                     enabled = !isDeleteInProgress
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.action_cancel))
                 }
             }
         )

@@ -18,12 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
 fun HomeLockedState(
-    title: String = "TwoFac",
-    subtitle: String = "Two-Factor Authentication Manager",
+    title: String = stringResource(Res.string.app_name),
+    subtitle: String = stringResource(Res.string.app_tagline),
     onSecureUnlock: (() -> Unit)? = null,
     onManualUnlock: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
@@ -51,11 +53,11 @@ fun HomeLockedState(
                     contentDescription = null,
                     modifier = Modifier.padding(end = 8.dp),
                 )
-                Text("Unlock with Passkey")
+                Text(stringResource(Res.string.home_locked_unlock_passkey))
             }
             if (onManualUnlock != null) {
                 TextButton(onClick = onManualUnlock) {
-                    Text("Enter passkey manually")
+                    Text(stringResource(Res.string.home_locked_enter_manually))
                 }
             }
         }

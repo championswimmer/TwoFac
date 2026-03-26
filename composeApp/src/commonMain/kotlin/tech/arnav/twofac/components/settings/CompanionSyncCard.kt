@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -24,7 +26,7 @@ fun CompanionSyncCard(
     onSyncClick: () -> Unit,
     onDiscoverClick: () -> Unit,
     modifier: Modifier = Modifier,
-    title: String = "Companion Sync",
+    title: String = stringResource(Res.string.settings_companion_sync_title),
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -40,9 +42,9 @@ fun CompanionSyncCard(
             )
             Text(
                 text = if (isCompanionActive) {
-                    "$companionDisplayName companion is active."
+                    stringResource(Res.string.settings_companion_active, companionDisplayName)
                 } else {
-                    "$companionDisplayName companion is not active."
+                    stringResource(Res.string.settings_companion_inactive, companionDisplayName)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -53,7 +55,7 @@ fun CompanionSyncCard(
                 enabled = isSyncEnabled,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Sync to $companionDisplayName")
+                Text(stringResource(Res.string.settings_companion_sync_button, companionDisplayName))
             }
             OutlinedButton(
                 onClick = onDiscoverClick,
@@ -62,7 +64,7 @@ fun CompanionSyncCard(
                     .fillMaxWidth()
                     .padding(top = 8.dp),
             ) {
-                Text("Force Discover Companion")
+                Text(stringResource(Res.string.settings_companion_discover))
             }
         }
     }

@@ -12,12 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
 fun HomeLoadingState(
-    title: String = "TwoFac",
-    subtitle: String = "Two-Factor Authentication Manager",
+    title: String = stringResource(Res.string.app_name),
+    subtitle: String = stringResource(Res.string.app_tagline),
     modifier: Modifier = Modifier,
 ) {
     Column(

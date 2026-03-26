@@ -32,6 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.getString
+import twofac.composeapp.generated.resources.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.getKoin
@@ -101,7 +104,7 @@ fun SettingsScreen(
     val isCompanionActive by (companionSyncCoordinator?.companionActiveFlow
         ?: remember { MutableStateFlow(false) }).collectAsState()
     var companionDisplayName by remember {
-        mutableStateOf(companionSyncCoordinator?.companionDisplayName ?: "Watch")
+        mutableStateOf(companionSyncCoordinator?.companionDisplayName ?: "")
     }
     var isRememberPasskeyEnabled by remember {
         mutableStateOf(sessionManager?.isRememberPasskeyEnabled() ?: false)
@@ -110,11 +113,11 @@ fun SettingsScreen(
     val biometricSessionManager = sessionManager as? BiometricSessionManager
     val usesGenericSecureUnlockFlow = secureSessionManager != null && biometricSessionManager == null
     val rememberPasskeyTitle =
-        if (usesGenericSecureUnlockFlow) "Secure Unlock" else "Remember Passkey"
+        if (usesGenericSecureUnlockFlow) stringResource(Res.string.settings_secure_unlock_title) else stringResource(Res.string.settings_remember_passkey_title)
     val rememberPasskeyDescription = if (usesGenericSecureUnlockFlow) {
-        "Require device credential verification before unlock and keep only encrypted passkey data in browser storage."
+        stringResource(Res.string.settings_secure_unlock_description)
     } else {
-        "Keep the passkey saved so you don't have to enter it every time the extension is opened. Only enable this on devices you trust."
+        stringResource(Res.string.settings_remember_passkey_description)
     }
     var isBiometricEnabled by remember {
         mutableStateOf(biometricSessionManager?.isBiometricEnabled() ?: false)
@@ -125,27 +128,62 @@ fun SettingsScreen(
     var secureEnrollmentError by remember { mutableStateOf<String?>(null) }
     var backupProviders by remember { mutableStateOf<List<BackupProvider>>(emptyList()) }
 
+    // Pre-resolve simple localizable strings for use in coroutine lambdas
+    val msgBackupUnavailable = stringResource(Res.string.backup_unavailable_message)
+    val msgNoFilesFound = stringResource(Res.string.backup_no_files_found)
+    val msgCompanionSyncUnavailable = stringResource(Res.string.settings_companion_sync_unavailable)
+    val msgDeletionUnavailable = stringResource(Res.string.settings_account_deletion_unavailable)
+    val msgDeleteFailed = stringResource(Res.string.settings_account_delete_failed)
+    val msgAllDeleted = stringResource(Res.string.settings_account_all_deleted)
+    val msgOperationFailed = stringResource(Res.string.error_operation_failed)
+    val msgSecureUnavailable = stringResource(Res.string.settings_secure_unlock_unavailable)
+    val msgSecureEnabled = stringResource(Res.string.settings_secure_unlock_enabled)
+    val msgSecureCancelled = stringResource(Res.string.settings_secure_enrollment_cancelled)
+    val msgVerifyFailed = stringResource(Res.string.settings_verify_passkey_failed)
+    val msgBiometricEnabled = stringResource(Res.string.settings_biometric_unlock_enabled)
+    val msgBiometricCancelled = stringResource(Res.string.settings_biometric_enrollment_cancelled)
+    val msgRestoreUnavailable = stringResource(Res.string.backup_restore_unavailable)
+    val msgIncorrectPasskey = stringResource(Res.string.backup_passkey_incorrect)
+    val msgErrorUnknown = stringResource(Res.string.error_unknown)
+
+    // Pre-resolve backup passkey dialog strings
+    val msgUnlockTitle = stringResource(Res.string.backup_passkey_unlock_title)
+    val msgEncryptedExportDesc = stringResource(Res.string.backup_passkey_encrypted_export_description)
+    val msgPlaintextExportDesc = stringResource(Res.string.backup_passkey_plaintext_export_description)
+    val msgSaveToDeviceTitle = stringResource(Res.string.backup_passkey_import_title)
+    val msgSaveToDeviceDesc = stringResource(Res.string.backup_passkey_import_description)
+    val msgSyncDesc = stringResource(Res.string.backup_passkey_sync_description)
+    val msgContinue = stringResource(Res.string.action_continue)
+    val msgSave = stringResource(Res.string.action_save)
+    val msgUnlock = stringResource(Res.string.action_unlock)
+    val msgBackupPasskeyTitle = stringResource(Res.string.backup_passkey_required_title)
+    val msgBackupPasskeyDesc = stringResource(Res.string.backup_passkey_required_description)
+
     LaunchedEffect(backupService) {
         backupProviders = backupService?.listProviders().orEmpty()
     }
 
+    val defaultCompanionName = stringResource(Res.string.settings_companion_default_name)
     LaunchedEffect(companionSyncCoordinator) {
-        companionDisplayName = companionSyncCoordinator?.companionDisplayName ?: "Watch"
+        companionDisplayName = companionSyncCoordinator?.companionDisplayName ?: defaultCompanionName
         companionSyncCoordinator?.isCompanionActive()
     }
 
     suspend fun executeBackupExport(providerId: String, encrypted: Boolean) {
         val service = backupService
         if (service == null) {
-            snackbarHostState.showSnackbar("Backup is unavailable")
+            snackbarHostState.showSnackbar(msgBackupUnavailable)
             return
         }
         val result = service.createBackup(providerId, encrypted = encrypted)
         val message = when (result) {
             is BackupResult.Success ->
-                "Backup exported (${if (encrypted) "encrypted" else "plaintext"}): ${result.value.id}"
+                if (encrypted)
+                    getString(Res.string.backup_export_encrypted_success, result.value.id)
+                else
+                    getString(Res.string.backup_export_plaintext_success, result.value.id)
             is BackupResult.Failure ->
-                "Export failed: ${result.message}"
+                getString(Res.string.backup_export_failed, result.message)
         }
         snackbarHostState.showSnackbar(message)
         backupProviders = service.listProviders()
@@ -159,7 +197,7 @@ fun SettingsScreen(
     ) {
         val service = backupService
         if (service == null) {
-            snackbarHostState.showSnackbar("Backup is unavailable")
+            snackbarHostState.showSnackbar(msgBackupUnavailable)
             return
         }
         val result = service.restoreBackup(
@@ -170,9 +208,9 @@ fun SettingsScreen(
         )
         val message = when (result) {
             is BackupResult.Success ->
-                "Imported ${result.value} account(s) from $backupId"
+                getString(Res.string.backup_import_success, result.value.toString(), backupId)
             is BackupResult.Failure ->
-                "Import failed: ${result.message}"
+                getString(Res.string.backup_import_failed, result.message)
         }
         snackbarHostState.showSnackbar(message)
         if (result is BackupResult.Success) {
@@ -185,17 +223,17 @@ fun SettingsScreen(
     suspend fun prepareBackupImport(providerId: String) {
         val service = backupService
         if (service == null) {
-            snackbarHostState.showSnackbar("Backup is unavailable")
+            snackbarHostState.showSnackbar(msgBackupUnavailable)
             return
         }
         val listResult = service.listBackups(providerId)
         if (listResult is BackupResult.Failure) {
-            snackbarHostState.showSnackbar("No backups found: ${listResult.message}")
+            snackbarHostState.showSnackbar(getString(Res.string.backup_no_backups_found, listResult.message))
             return
         }
         val backups = (listResult as BackupResult.Success).value
         if (backups.isEmpty()) {
-            snackbarHostState.showSnackbar("No backup files found")
+            snackbarHostState.showSnackbar(msgNoFilesFound)
             return
         }
         val latest = backups.maxBy { it.createdAt }
@@ -203,7 +241,7 @@ fun SettingsScreen(
         val payload = when (inspectionResult) {
             is BackupResult.Success -> inspectionResult.value
             is BackupResult.Failure -> {
-                snackbarHostState.showSnackbar("Import failed: ${inspectionResult.message}")
+                snackbarHostState.showSnackbar(getString(Res.string.backup_import_failed, inspectionResult.message))
                 return
             }
         }
@@ -228,12 +266,12 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(Res.string.settings_title)) },
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 navigationIcon = {
                     onNavigateBack?.let { navigateBack ->
                         IconButton(onClick = navigateBack) {
-                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(Res.string.action_back))
                         }
                     }
                 }
@@ -308,7 +346,7 @@ fun SettingsScreen(
                                 prepareBackupImport(provider.id)
                             } catch (e: Exception) {
                                 snackbarHostState.showSnackbar(
-                                    "Import failed: ${e.message ?: "unknown error"}"
+                                    getString(Res.string.backup_import_exception, e.message ?: msgErrorUnknown)
                                 )
                             } finally {
                                 isLoading = false
@@ -335,14 +373,14 @@ fun SettingsScreen(
                                 try {
                                     isCompanionSyncInProgress = true
                                     if (twoFacLib != null && twoFacLib.getAllAccounts().isEmpty()) {
-                                        snackbarHostState.showSnackbar("No accounts to sync to $companionDisplayName")
+                                        snackbarHostState.showSnackbar(getString(Res.string.settings_companion_no_accounts, companionDisplayName))
                                         return@launch
                                     }
                                     val synced = companionSyncCoordinator.syncNow(manual = true)
                                     if (synced) {
-                                        snackbarHostState.showSnackbar("Sync sent to $companionDisplayName")
+                                        snackbarHostState.showSnackbar(getString(Res.string.settings_companion_sync_sent, companionDisplayName))
                                     } else {
-                                        snackbarHostState.showSnackbar("Unable to sync to $companionDisplayName right now")
+                                        snackbarHostState.showSnackbar(getString(Res.string.settings_companion_sync_failed, companionDisplayName))
                                     }
                                     companionSyncCoordinator.isCompanionActive()
                                 } finally {
@@ -357,9 +395,9 @@ fun SettingsScreen(
                                 isCompanionDiscoveryInProgress = true
                                 val discovered = companionSyncCoordinator.forceDiscoverCompanion()
                                 val message = if (discovered) {
-                                    "$companionDisplayName companion discovered"
+                                    getString(Res.string.settings_companion_discovered, companionDisplayName)
                                 } else {
-                                    "Unable to discover $companionDisplayName companion"
+                                    getString(Res.string.settings_companion_not_discovered, companionDisplayName)
                                 }
                                 snackbarHostState.showSnackbar(message)
                             } finally {
@@ -379,10 +417,10 @@ fun SettingsScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.School,
-                        contentDescription = "Open getting started",
+                        contentDescription = stringResource(Res.string.settings_onboarding_content_description),
                         modifier = Modifier.padding(end = 8.dp),
                     )
-                    Text("Open Getting Started Guide")
+                    Text(stringResource(Res.string.settings_onboarding_button))
                 }
             }
         }
@@ -398,7 +436,7 @@ fun SettingsScreen(
             onConfirm = {
                 if (twoFacLib == null) {
                     coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Account deletion is unavailable")
+                        snackbarHostState.showSnackbar(msgDeletionUnavailable)
                     }
                     showDeleteStorageDialog = false
                 } else {
@@ -407,21 +445,21 @@ fun SettingsScreen(
                         try {
                             val deleted = twoFacLib.deleteAllAccountsFromStorage()
                             if (!deleted) {
-                                snackbarHostState.showSnackbar("Failed to delete accounts from storage")
+                                snackbarHostState.showSnackbar(msgDeleteFailed)
                                 return@launch
                             }
                             try {
                                 companionSyncCoordinator?.onAccountsChanged()
-                                snackbarHostState.showSnackbar("All accounts deleted from storage")
+                                snackbarHostState.showSnackbar(msgAllDeleted)
                             } catch (e: Exception) {
                                 snackbarHostState.showSnackbar(
-                                    "Accounts deleted, but companion sync failed: ${e.message ?: "unknown error"}"
+                                    getString(Res.string.settings_account_deleted_sync_error, e.message ?: msgErrorUnknown)
                                 )
                             }
                             showDeleteStorageDialog = false
                         } catch (e: Exception) {
                             snackbarHostState.showSnackbar(
-                                "Delete failed: ${e.message ?: "unknown error"}"
+                                getString(Res.string.settings_account_delete_exception, e.message ?: msgErrorUnknown)
                             )
                         } finally {
                             isDeleteStorageInProgress = false
@@ -480,19 +518,19 @@ fun SettingsScreen(
     pendingAction?.let { action ->
         val (dialogTitle, dialogDescription, confirmLabel) = when (action) {
             is BackupAction.Export -> Triple(
-                "Unlock Accounts",
-                "Enter your current app passkey to ${if (action.encrypted) "create an encrypted backup" else "create a plaintext backup"}.",
-                "Continue",
+                msgUnlockTitle,
+                if (action.encrypted) msgEncryptedExportDesc else msgPlaintextExportDesc,
+                msgContinue,
             )
             is BackupAction.Import -> Triple(
-                "Save to Device",
-                "Enter your current app passkey to save the restored accounts to your device.",
-                "Save",
+                msgSaveToDeviceTitle,
+                msgSaveToDeviceDesc,
+                msgSave,
             )
             BackupAction.SyncCompanion -> Triple(
-                "Unlock Accounts",
-                "Enter your passkey to decrypt and view your accounts",
-                "Unlock",
+                msgUnlockTitle,
+                msgSyncDesc,
+                msgUnlock,
             )
         }
         PasskeyDialog(
@@ -524,13 +562,13 @@ fun SettingsScreen(
 
                             BackupAction.SyncCompanion -> {
                                 if (companionSyncCoordinator == null || twoFacLib == null) {
-                                    snackbarHostState.showSnackbar("Companion sync is unavailable")
+                                    snackbarHostState.showSnackbar(msgCompanionSyncUnavailable)
                                     pendingAction = null
                                     return@launch
                                 }
                                 val hasAccounts = twoFacLib.getAllAccounts().isNotEmpty()
                                 if (!hasAccounts) {
-                                    snackbarHostState.showSnackbar("No accounts to sync to $companionDisplayName")
+                                    snackbarHostState.showSnackbar(getString(Res.string.settings_companion_no_accounts, companionDisplayName))
                                     pendingAction = null
                                     return@launch
                                 }
@@ -538,9 +576,9 @@ fun SettingsScreen(
                                     isCompanionSyncInProgress = true
                                     val synced = companionSyncCoordinator.syncNow(manual = true)
                                     val message = if (synced) {
-                                        "Sync sent to $companionDisplayName"
+                                        getString(Res.string.settings_companion_sync_sent, companionDisplayName)
                                     } else {
-                                        "Unable to sync to $companionDisplayName right now"
+                                        getString(Res.string.settings_companion_sync_failed, companionDisplayName)
                                     }
                                     snackbarHostState.showSnackbar(message)
                                     companionSyncCoordinator.isCompanionActive()
@@ -551,7 +589,7 @@ fun SettingsScreen(
                             }
                         }
                     } catch (e: Exception) {
-                        passkeyError = e.message ?: "Operation failed"
+                        passkeyError = e.message ?: msgOperationFailed
                     } finally {
                         isLoading = false
                     }
@@ -570,16 +608,16 @@ fun SettingsScreen(
             isVisible = true,
             isLoading = isLoading,
             error = backupRestorePasskeyError,
-            title = "Backup Passkey Required",
-            description = "This backup contains encrypted accounts. Enter the passkey that was used when this backup was created.",
-            confirmLabel = "Continue",
+            title = msgBackupPasskeyTitle,
+            description = msgBackupPasskeyDesc,
+            confirmLabel = msgContinue,
             onPasskeySubmit = { passkey ->
                 backupRestorePasskeyError = null
                 isLoading = true
                 coroutineScope.launch {
                     try {
                         if (twoFacLib == null) {
-                            backupRestorePasskeyError = "Backup restore is unavailable"
+                            backupRestorePasskeyError = msgRestoreUnavailable
                             return@launch
                         }
                         importRequest.encryptedAccounts.forEach { account ->
@@ -587,8 +625,7 @@ fun SettingsScreen(
                         }
                         encryptedImportRequest = importRequest.copy(backupPasskey = passkey)
                     } catch (_: Exception) {
-                        backupRestorePasskeyError =
-                            "Incorrect passkey — could not decrypt the backup accounts. Please try again."
+                        backupRestorePasskeyError = msgIncorrectPasskey
                     } finally {
                         isLoading = false
                     }
@@ -607,9 +644,9 @@ fun SettingsScreen(
             isVisible = true,
             isLoading = isLoading,
             error = currentRestorePasskeyError,
-            title = "Save to Device",
-            description = "Enter your current app passkey to save the restored accounts to your device.",
-            confirmLabel = "Save",
+            title = msgSaveToDeviceTitle,
+            description = msgSaveToDeviceDesc,
+            confirmLabel = msgSave,
             onPasskeySubmit = { currentPasskey ->
                 currentRestorePasskeyError = null
                 isLoading = true
@@ -617,7 +654,7 @@ fun SettingsScreen(
                     try {
                         val service = backupService
                         if (service == null) {
-                            currentRestorePasskeyError = "Backup restore is unavailable"
+                            currentRestorePasskeyError = msgRestoreUnavailable
                             return@launch
                         }
                         val result = service.restoreBackup(
@@ -629,7 +666,7 @@ fun SettingsScreen(
                         when (result) {
                             is BackupResult.Success -> {
                                 snackbarHostState.showSnackbar(
-                                    "Imported ${result.value} account(s) from ${importRequest.backupId}"
+                                    getString(Res.string.backup_import_success, result.value.toString(), importRequest.backupId)
                                 )
                                 companionSyncCoordinator?.onAccountsChanged()
                                 accountsViewModel?.reloadAccounts()
@@ -642,7 +679,7 @@ fun SettingsScreen(
                             }
                         }
                     } catch (e: Exception) {
-                        currentRestorePasskeyError = e.message ?: "Failed to verify passkey"
+                        currentRestorePasskeyError = e.message ?: msgVerifyFailed
                     } finally {
                         isLoading = false
                     }
@@ -668,7 +705,7 @@ fun SettingsScreen(
                 coroutineScope.launch {
                     try {
                         if (twoFacLib == null) {
-                            secureEnrollmentError = "Secure unlock is unavailable"
+                            secureEnrollmentError = msgSecureUnavailable
                             return@launch
                         }
                         twoFacLib.unlock(passkey)
@@ -679,16 +716,16 @@ fun SettingsScreen(
                                 manager.isSecureUnlockEnabled()
                             showSecureEnrollmentDialog = false
                             onboardingViewModel?.refreshAndSyncDerivedCompletion()
-                            snackbarHostState.showSnackbar("Secure unlock enabled")
+                            snackbarHostState.showSnackbar(msgSecureEnabled)
                         } else {
                             manager.setSecureUnlockEnabled(false)
                             isRememberPasskeyEnabled = false
-                            secureEnrollmentError = "Secure unlock enrollment cancelled"
+                            secureEnrollmentError = msgSecureCancelled
                         }
                     } catch (e: Exception) {
                         manager.setSecureUnlockEnabled(false)
                         isRememberPasskeyEnabled = false
-                        secureEnrollmentError = e.message ?: "Failed to verify passkey"
+                        secureEnrollmentError = e.message ?: msgVerifyFailed
                     } finally {
                         isLoading = false
                     }
@@ -723,13 +760,13 @@ fun SettingsScreen(
                             isRememberPasskeyEnabled = true
                             showBiometricEnrollmentDialog = false
                             onboardingViewModel?.refreshAndSyncDerivedCompletion()
-                            snackbarHostState.showSnackbar("Biometric unlock enabled")
+                            snackbarHostState.showSnackbar(msgBiometricEnabled)
                         } else {
                             biometricSessionManager.setBiometricEnabled(false)
-                            biometricEnrollmentError = "Biometric enrollment cancelled"
+                            biometricEnrollmentError = msgBiometricCancelled
                         }
                     } catch (e: Exception) {
-                        biometricEnrollmentError = e.message ?: "Failed to verify passkey"
+                        biometricEnrollmentError = e.message ?: msgVerifyFailed
                     } finally {
                         isLoading = false
                     }

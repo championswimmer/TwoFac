@@ -29,6 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.onboarding.OnboardingGuideStep
 import tech.arnav.twofac.onboarding.OnboardingStepIcon
 
@@ -88,7 +90,7 @@ fun OnboardingStepCard(
                     }
                     Icon(
                         imageVector = Icons.Rounded.ExpandMore,
-                        contentDescription = "Expand step",
+                        contentDescription = stringResource(Res.string.onboarding_expand_step),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -118,7 +120,7 @@ fun OnboardingStepCard(
                 if (isCompleted) {
                     Icon(
                         imageVector = Icons.Rounded.ExpandLess,
-                        contentDescription = "Collapse step",
+                        contentDescription = stringResource(Res.string.onboarding_collapse_step),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -128,7 +130,7 @@ fun OnboardingStepCard(
                 AssistChip(
                     onClick = {},
                     enabled = false,
-                    label = { Text("Required") },
+                    label = { Text(stringResource(Res.string.onboarding_required)) },
                 )
             }
 
@@ -145,11 +147,11 @@ fun OnboardingStepCard(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.CheckCircle,
-                        contentDescription = "Completed",
+                        contentDescription = stringResource(Res.string.onboarding_completed),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                     Text(
-                        text = "Completed",
+                        text = stringResource(Res.string.onboarding_completed),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -166,7 +168,7 @@ fun OnboardingStepCard(
                 }
                 if (!isCompleted) {
                     OutlinedButton(onClick = onDoneClick) {
-                        Text("Done")
+                        Text(stringResource(Res.string.onboarding_done_button))
                     }
                 }
             }

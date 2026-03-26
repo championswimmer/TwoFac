@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -27,8 +29,8 @@ fun StorageLocationCard(
     onDeleteClick: () -> Unit,
     isDeleteEnabled: Boolean,
     modifier: Modifier = Modifier,
-    title: String = "Storage Location",
-    description: String = "Accounts are saved at:",
+    title: String = stringResource(Res.string.settings_storage_title),
+    description: String = stringResource(Res.string.settings_storage_description),
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -53,7 +55,7 @@ fun StorageLocationCard(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
-                        contentDescription = "Delete all accounts",
+                        contentDescription = stringResource(Res.string.settings_storage_delete_content_description),
                         tint = MaterialTheme.colorScheme.error,
                     )
                 }
