@@ -1,0 +1,51 @@
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onboarding_title">Getting Started</string>
+
+    <!-- Onboarding step card -->
+    <string name="onboarding_expand_step">Expand step</string>
+    <string name="onboarding_collapse_step">Collapse step</string>
+    <string name="onboarding_required">Required</string>
+    <string name="onboarding_completed">Completed</string>
+    <string name="onboarding_done_button">Done</string>
+
+    <!-- Onboarding states -->
+    <string name="onboarding_loading">Loading onboarding guide…</string>
+    <string name="onboarding_empty">No onboarding steps are available right now.</string>
+    <string name="onboarding_all_complete_headline">You\'re all set.</string>
+    <string name="onboarding_all_complete_body">You can reopen this guide any time from Settings.</string>
+
+    <!-- Onboarding guide header -->
+    <string name="onboarding_progress">%1$s of %2$s steps complete</string>
+    <string name="onboarding_required_remaining_singular">%1$s required step remaining</string>
+    <string name="onboarding_required_remaining_plural">%1$s required steps remaining</string>
+
+    <!-- Common onboarding steps -->
+    <string name="onboarding_step_add_account_title">Add your first account</string>
+    <string name="onboarding_step_add_account_action">Add account</string>
+    <string name="onboarding_step_manage_accounts_title">Manage your accounts</string>
+    <string name="onboarding_step_manage_accounts_description">Browse your accounts, view OTP codes, and remove entries you no longer need.</string>
+    <string name="onboarding_step_manage_accounts_action">Open accounts</string>
+    <string name="onboarding_step_import_title">Import or restore existing data</string>
+    <string name="onboarding_step_import_description">Use Settings to import from your backup providers and restore existing accounts.</string>
+    <string name="onboarding_step_import_action">Open settings</string>
+    <string name="onboarding_step_backup_title">Back up your vault</string>
+    <string name="onboarding_step_backup_description">Create encrypted backups from Settings. Available providers: %1$s.</string>
+    <string name="onboarding_step_backup_action">Open backup settings</string>
+    <string name="onboarding_step_companion_title">Set up companion sync</string>
+    <string name="onboarding_step_companion_description">Send your accounts to your companion device from Settings when it is connected.</string>
+    <string name="onboarding_step_companion_action">Open companion settings</string>
+
+    <!-- Dynamic add-account description fragments -->
+    <string name="onboarding_method_scan_qr">scan a QR code</string>
+    <string name="onboarding_method_paste_qr">paste a QR image from clipboard</string>
+    <string name="onboarding_method_enter_uri">paste or enter an otpauth:// URI manually</string>
+    <string name="onboarding_step_add_account_description">Add your first account by %1$s.</string>
+
+    <!-- Platform-specific onboarding steps -->
+    <string name="onboarding_step_secure_unlock_title">Enable secure unlock</string>
+    <string name="onboarding_step_secure_unlock_action">Open security settings</string>
+    <string name="onboarding_step_secure_unlock_android_description">Enable biometric unlock in Settings to unlock quickly with your fingerprint or face.</string>
+    <string name="onboarding_step_secure_unlock_ios_description">Enable secure unlock in Settings to use Face ID or Touch ID for faster unlock.</string>
+    <string name="onboarding_step_secure_unlock_wasm_description">Enable secure unlock in Settings to verify with WebAuthn or device credentials.</string>
+</resources>

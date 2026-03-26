@@ -1,0 +1,68 @@
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+
+    <!-- Storage location card -->
+    <string name="settings_storage_title">Storage Location</string>
+    <string name="settings_storage_description">Accounts are saved at:</string>
+    <string name="settings_storage_delete_content_description">Delete all accounts</string>
+
+    <!-- Delete storage dialog -->
+    <string name="settings_delete_dialog_title">Delete all accounts?</string>
+    <string name="settings_delete_dialog_message">This deletes all existing accounts and cannot be undone unless you have a backup.\n\nA fresh storage file will be created on next run/use.</string>
+    <string name="settings_delete_dialog_deleting">Deleting...</string>
+
+    <!-- Remember passkey / biometric / secure unlock -->
+    <string name="settings_secure_unlock_title">Secure Unlock</string>
+    <string name="settings_remember_passkey_title">Remember Passkey</string>
+    <string name="settings_secure_unlock_description">Require device credential verification before unlock and keep only encrypted passkey data in browser storage.</string>
+    <string name="settings_remember_passkey_description">Keep the passkey saved so you don\'t have to enter it every time the extension is opened. Only enable this on devices you trust.</string>
+    <string name="settings_biometric_title">Biometric Unlock</string>
+    <string name="settings_biometric_description">Use fingerprint or face recognition to unlock your vault</string>
+
+    <!-- Secure/biometric unlock snackbars -->
+    <string name="settings_secure_unlock_unavailable">Secure unlock is unavailable</string>
+    <string name="settings_secure_unlock_enabled">Secure unlock enabled</string>
+    <string name="settings_secure_enrollment_cancelled">Secure unlock enrollment cancelled</string>
+    <string name="settings_biometric_unlock_enabled">Biometric unlock enabled</string>
+    <string name="settings_biometric_enrollment_cancelled">Biometric enrollment cancelled</string>
+    <string name="settings_verify_passkey_failed">Failed to verify passkey</string>
+
+    <!-- Companion sync card -->
+    <string name="settings_companion_sync_title">Companion Sync</string>
+    <string name="settings_companion_active">%1$s companion is active.</string>
+    <string name="settings_companion_inactive">%1$s companion is not active.</string>
+    <string name="settings_companion_sync_button">Sync to %1$s</string>
+    <string name="settings_companion_discover">Force Discover Companion</string>
+    <string name="settings_companion_sync_unavailable">Companion sync is unavailable</string>
+    <string name="settings_companion_no_accounts">No accounts to sync to %1$s</string>
+    <string name="settings_companion_sync_sent">Sync sent to %1$s</string>
+    <string name="settings_companion_sync_failed">Unable to sync to %1$s right now</string>
+    <string name="settings_companion_discovered">%1$s companion discovered</string>
+    <string name="settings_companion_not_discovered">Unable to discover %1$s companion</string>
+    <string name="settings_companion_default_name">Watch</string>
+
+    <!-- Account deletion snackbars -->
+    <string name="settings_account_deletion_unavailable">Account deletion is unavailable</string>
+    <string name="settings_account_delete_failed">Failed to delete accounts from storage</string>
+    <string name="settings_account_all_deleted">All accounts deleted from storage</string>
+    <string name="settings_account_deleted_sync_error">Accounts deleted, but companion sync failed: %1$s</string>
+    <string name="settings_account_delete_exception">Delete failed: %1$s</string>
+
+    <!-- Onboarding button on settings -->
+    <string name="settings_onboarding_content_description">Open getting started</string>
+    <string name="settings_onboarding_button">Open Getting Started Guide</string>
+
+    <!-- Desktop platform settings -->
+    <string name="settings_tray_macos">Show Menu Bar icon</string>
+    <string name="settings_tray_windows">Show System Tray icon</string>
+    <string name="settings_tray_linux">Show System Tray / AppIndicator icon</string>
+    <string name="settings_quit_app">Quit TwoFac</string>
+
+    <!-- Desktop main window / tray -->
+    <string name="desktop_window_title">TwoFac</string>
+    <string name="desktop_tray_tooltip">TwoFac</string>
+    <string name="desktop_tray_open">Open TwoFac</string>
+    <string name="desktop_tray_quit">Quit TwoFac</string>
+    <string name="desktop_tray_popup_title">TwoFac Tray</string>
+</resources>
