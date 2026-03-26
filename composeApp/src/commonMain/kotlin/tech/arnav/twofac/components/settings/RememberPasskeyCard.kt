@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -27,8 +29,8 @@ fun RememberPasskeyCard(
     isBiometricEnabled: Boolean,
     onBiometricChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    biometricTitle: String = "Biometric Unlock",
-    biometricDescription: String = "Use fingerprint or face recognition to unlock your vault",
+    biometricTitle: String = stringResource(Res.string.settings_biometric_title),
+    biometricDescription: String = stringResource(Res.string.settings_biometric_description),
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),

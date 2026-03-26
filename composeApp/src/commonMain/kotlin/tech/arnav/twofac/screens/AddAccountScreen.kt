@@ -26,6 +26,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.action_back
+import twofac.composeapp.generated.resources.add_account_title
+import twofac.composeapp.generated.resources.add_account_adding
+import twofac.composeapp.generated.resources.accounts_add_account
+import twofac.composeapp.generated.resources.add_account_error_clipboard_permission
+import twofac.composeapp.generated.resources.add_account_error_clipboard_unsupported
+import twofac.composeapp.generated.resources.add_account_error_clipboard_failed
+import twofac.composeapp.generated.resources.add_account_error_camera_permission
+import twofac.composeapp.generated.resources.add_account_error_camera_unsupported
+import twofac.composeapp.generated.resources.add_account_error_camera_failed
+import twofac.composeapp.generated.resources.add_account_error_qr_prefix
+import twofac.composeapp.generated.resources.error_prefix
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -60,6 +74,14 @@ fun AddAccountScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
+    // Pre-resolve localizable error strings for use in coroutine lambdas
+    val errorClipboardPermission = stringResource(Res.string.add_account_error_clipboard_permission)
+    val errorClipboardUnsupported = stringResource(Res.string.add_account_error_clipboard_unsupported)
+    val errorClipboardFailed = stringResource(Res.string.add_account_error_clipboard_failed)
+    val errorCameraPermission = stringResource(Res.string.add_account_error_camera_permission)
+    val errorCameraUnsupported = stringResource(Res.string.add_account_error_camera_unsupported)
+    val errorCameraFailed = stringResource(Res.string.add_account_error_camera_failed)
+
     fun triggerClipboardRead(suppressNoImageFailure: Boolean = false) {
         if (clipboardReader == null || isScanning || isPasting) return
         isPasting = true
@@ -76,17 +98,17 @@ fun AddAccountScreen(
                         }
                     }
                     QRCodeReadResult.PermissionDenied -> {
-                        scanError = "Clipboard permission denied"
+                        scanError = errorClipboardPermission
                     }
                     QRCodeReadResult.Unsupported -> {
-                        scanError = "Clipboard QR reading is not supported on this platform"
+                        scanError = errorClipboardUnsupported
                     }
                     QRCodeReadResult.Canceled -> Unit
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                scanError = e.message ?: "Failed to read QR code from clipboard"
+                scanError = e.message ?: errorClipboardFailed
             } finally {
                 isPasting = false
             }
@@ -97,11 +119,11 @@ fun AddAccountScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Add Account") },
+                    title = { Text(stringResource(Res.string.add_account_title)) },
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {
-                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(Res.string.action_back))
                         }
                     }
                 )
@@ -147,17 +169,17 @@ fun AddAccountScreen(
                                         scanError = scanResult.reason
                                     }
                                     QRCodeReadResult.PermissionDenied -> {
-                                        scanError = "Camera permission denied"
+                                        scanError = errorCameraPermission
                                     }
                                     QRCodeReadResult.Unsupported -> {
-                                        scanError = "Camera QR scanning is not supported on this platform"
+                                        scanError = errorCameraUnsupported
                                     }
                                     QRCodeReadResult.Canceled -> Unit
                                 }
                             } catch (e: CancellationException) {
                                 throw e
                             } catch (e: Exception) {
-                                scanError = e.message ?: "Failed to scan QR code"
+                                scanError = e.message ?: errorCameraFailed
                             } finally {
                                 isScanning = false
                             }
@@ -179,13 +201,13 @@ fun AddAccountScreen(
 
                 scanError?.let { scanErrorMessage ->
                     InlineErrorMessage(
-                        message = "QR error: $scanErrorMessage",
+                        message = stringResource(Res.string.add_account_error_qr_prefix, scanErrorMessage),
                     )
                 }
 
                 error?.let { errorMessage ->
                     InlineErrorMessage(
-                        message = "Error: $errorMessage",
+                        message = stringResource(Res.string.error_prefix, errorMessage),
                     )
                 }
 
@@ -206,7 +228,7 @@ fun AddAccountScreen(
                     },
                     enabled = !isLoading && uriText.isNotBlank() && (!requiresUnlock || passkeyText.isNotBlank())
                 ) {
-                    Text(if (isLoading) "Adding..." else "Add Account")
+                    Text(if (isLoading) stringResource(Res.string.add_account_adding) else stringResource(Res.string.accounts_add_account))
                 }
             }
         }

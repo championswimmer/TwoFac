@@ -1,13 +1,14 @@
 package tech.arnav.twofac.onboarding
 
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class OnboardingGuideRegistryTest {
     @Test
-    fun registryOrdersBySlotAndAllowsPlatformOverride() {
+    fun registryOrdersBySlotAndAllowsPlatformOverride() = runTest {
         val common = object : CommonOnboardingStepContributor {
-            override fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
+            override suspend fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
                 return listOf(
                     step(OnboardingStepSlot.ADD_FIRST_ACCOUNT, "a").provide(),
                     step(OnboardingStepSlot.MANAGE_ACCOUNTS, "b").provide(),
@@ -16,7 +17,7 @@ class OnboardingGuideRegistryTest {
             }
         }
         val platform = object : PlatformOnboardingStepContributor {
-            override fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
+            override suspend fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
                 return listOf(
                     step(OnboardingStepSlot.SECURE_UNLOCK, "platform-secure").provide(),
                 )
@@ -33,14 +34,14 @@ class OnboardingGuideRegistryTest {
     }
 
     @Test
-    fun registryOmitsUnsupportedSlotWhenPlatformOmits() {
+    fun registryOmitsUnsupportedSlotWhenPlatformOmits() = runTest {
         val common = object : CommonOnboardingStepContributor {
-            override fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
+            override suspend fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
                 return listOf(step(OnboardingStepSlot.SECURE_UNLOCK, "common-secure").provide())
             }
         }
         val platform = object : PlatformOnboardingStepContributor {
-            override fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
+            override suspend fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
                 return listOf(omit(OnboardingStepSlot.SECURE_UNLOCK))
             }
         }

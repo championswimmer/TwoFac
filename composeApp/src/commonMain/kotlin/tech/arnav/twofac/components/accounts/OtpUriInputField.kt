@@ -13,6 +13,8 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -27,8 +29,8 @@ fun OtpUriInputField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("2FA URI") },
-        placeholder = { Text("otpauth://totp/...") },
+        label = { Text(stringResource(Res.string.add_account_uri_label)) },
+        placeholder = { Text(stringResource(Res.string.add_account_uri_placeholder)) },
         modifier = modifier
             .onFocusChanged { onFocusChanged(it.isFocused) }
             .onPreviewKeyEvent { keyEvent ->

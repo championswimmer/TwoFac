@@ -18,13 +18,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.otp_copied
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import tech.arnav.twofac.components.home.HomeEmptyState
 import tech.arnav.twofac.components.home.HomeLoadingState
 import tech.arnav.twofac.components.home.HomeLockedState
 import tech.arnav.twofac.components.otp.HomeOtpListSection
-import tech.arnav.twofac.components.otp.OTP_COPIED_SNACKBAR_MESSAGE
 import tech.arnav.twofac.components.security.PasskeyDialog
 import tech.arnav.twofac.onboarding.OnboardingAutoShowDecision
 import tech.arnav.twofac.viewmodels.OnboardingViewModel
@@ -45,6 +47,7 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val otpCopiedMessage = stringResource(Res.string.otp_copied)
 
     var showPasskeyDialog by remember { mutableStateOf(false) }
     var hasTriggeredUnlockFlow by remember { mutableStateOf(false) }
@@ -142,7 +145,7 @@ fun HomeScreen(
                         onCopyOtp = { otp ->
                             clipboardManager.setText(AnnotatedString(otp))
                             coroutineScope.launch {
-                                snackbarHostState.showSnackbar(OTP_COPIED_SNACKBAR_MESSAGE)
+                                snackbarHostState.showSnackbar(otpCopiedMessage)
                             }
                         },
                     )

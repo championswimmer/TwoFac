@@ -17,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.theme.TwoFacTheme
 
@@ -46,6 +48,8 @@ fun BackupProviderRow(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            val exportLabel = stringResource(Res.string.backup_export)
+            val importLabel = stringResource(Res.string.backup_import)
             Button(
                 onClick = onExportClick,
                 enabled = !isLoading && provider.isAvailable && provider.supportsManualBackup,
@@ -55,7 +59,7 @@ fun BackupProviderRow(
                     contentDescription = null,
                 )
                 Text(
-                    text = "Export",
+                    text = exportLabel,
                     modifier = Modifier.padding(start = 6.dp),
                 )
             }
@@ -68,7 +72,7 @@ fun BackupProviderRow(
                     contentDescription = null,
                 )
                 Text(
-                    text = "Import",
+                    text = importLabel,
                     modifier = Modifier.padding(start = 6.dp),
                 )
             }
@@ -76,12 +80,14 @@ fun BackupProviderRow(
     }
 }
 
+@Composable
 private fun BackupProvider.availabilitySummary(): String = buildString {
-    append(if (isAvailable) "Available" else "Unavailable")
+    append(if (isAvailable) stringResource(Res.string.backup_available) else stringResource(Res.string.backup_unavailable))
     append(" • ")
     append(id)
     if (requiresAuthentication && !isAvailable) {
-        append(" • Sign-in required")
+        append(" • ")
+        append(stringResource(Res.string.backup_sign_in_required))
     }
 }
 

@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.lib.backup.BackupProvider
 import tech.arnav.twofac.theme.TwoFacTheme
 
@@ -21,9 +23,9 @@ fun BackupProvidersCard(
     onExportClick: (BackupProvider) -> Unit,
     onImportClick: (BackupProvider) -> Unit,
     modifier: Modifier = Modifier,
-    title: String = "Backups",
-    description: String = "Create or restore account snapshots from available backup providers.",
-    emptyStateMessage: String = "No backup providers are currently available on this platform.",
+    title: String = stringResource(Res.string.backup_title),
+    description: String = stringResource(Res.string.backup_description),
+    emptyStateMessage: String = stringResource(Res.string.backup_empty_state),
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
