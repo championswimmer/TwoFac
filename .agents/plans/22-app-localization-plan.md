@@ -1,12 +1,12 @@
 ---
 name: App Localization Plan
-status: Planned
+status: Done
 progress:
-  - "[ ] Phase 0 - Audit all user-facing strings and confirm first-pass scope"
-  - "[ ] Phase 1 - Add a shared Compose localization structure and string access helpers"
-  - "[ ] Phase 2 - Migrate common Compose UI strings from hardcoded Kotlin into resources"
-  - "[ ] Phase 3 - Migrate platform-specific prompts and non-Compose app surfaces"
-  - "[ ] Phase 4 - Add localization validation, translation workflow, and optional language override support"
+  - "[x] Phase 0 - Audit all user-facing strings and confirm first-pass scope"
+  - "[x] Phase 1 - Add a shared Compose localization structure and string access helpers"
+  - "[x] Phase 2 - Migrate common Compose UI strings from hardcoded Kotlin into resources"
+  - "[x] Phase 3 - Migrate platform-specific prompts and non-Compose app surfaces"
+  - "[x] Phase 4 - Add localization validation, translation workflow, and optional language override support"
 ---
 
 # App Localization Plan
