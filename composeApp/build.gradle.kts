@@ -313,9 +313,11 @@ tasks.matching { it.name == "prepareAppResources" }
         dependsOn(prepareMacDmgResources, prepareMacNativeLibraries)
     }
 
-// Re-sign the .app bundle with the local Apple Development certificate so that
-// the Data Protection Keychain APIs (SecItemAdd/SecItemCopyMatching with
-// SecAccessControl) work during local development and testing.
+// Re-sign the .app bundle with the local Apple Development certificate.
+// Required for distribution builds (DMG/notarization) but NOT for ./gradlew run,
+// since the biometric unlock implementation uses LAContext.evaluatePolicy() rather
+// than SecAccessControl-gated keychain items and therefore does not need the
+// keychain-access-groups entitlement at runtime.
 // This is separate from the distribution signing path (Developer ID Application),
 // which is used for DMG/notarization releases.
 val macSigningIdentity = "Apple Development: Arnav Gupta (NR7UC33DNY)"
@@ -347,5 +349,5 @@ tasks.matching { it.name in setOf("packageDmg", "packageReleaseDmg") }
 
 tasks.matching { it.name == "run" }
     .configureEach {
-        dependsOn(prepareMacNativeLibraries, signMacAppBundle)
+        dependsOn(prepareMacNativeLibraries)
     }
