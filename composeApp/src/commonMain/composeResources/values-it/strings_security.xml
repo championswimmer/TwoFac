@@ -1,0 +1,12 @@
+<resources>
+    <!-- Passkey dialog (shared component) -->
+    <string name="security_passkey_dialog_title">Inserisci passkey</string>
+    <string name="security_passkey_dialog_description">Inserisci la tua passkey per decrittografare e visualizzare i tuoi account</string>
+
+    <!-- Biometric prompts (Android) -->
+    <string name="biometric_enrollment_title">Attiva sblocco biometrico</string>
+    <string name="biometric_enrollment_subtitle">Autenticati per salvare in modo sicuro la tua passkey</string>
+    <string name="biometric_unlock_title">Sblocca TwoFac</string>
+    <string name="biometric_unlock_subtitle">Autenticati per accedere ai tuoi codici 2FA</string>
+    <string name="biometric_use_passkey_instead">Usa invece passkey</string>
+</resources>

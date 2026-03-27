@@ -1,0 +1,12 @@
+<resources>
+    <!-- Passkey dialog (shared component) -->
+    <string name="security_passkey_dialog_title">输入密钥口令</string>
+    <string name="security_passkey_dialog_description">输入您的密钥口令以解密并查看账户</string>
+
+    <!-- Biometric prompts (Android) -->
+    <string name="biometric_enrollment_title">启用生物识别解锁</string>
+    <string name="biometric_enrollment_subtitle">验证身份以安全保存您的密钥口令</string>
+    <string name="biometric_unlock_title">解锁 TwoFac</string>
+    <string name="biometric_unlock_subtitle">验证身份以访问您的 2FA 代码</string>
+    <string name="biometric_use_passkey_instead">改用密钥口令</string>
+</resources>

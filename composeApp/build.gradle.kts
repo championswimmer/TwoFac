@@ -6,6 +6,81 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import java.io.File
+
+abstract class ValidateLocalizationResourcesTask : DefaultTask() {
+    @get:InputDirectory
+    abstract val resourcesRoot: DirectoryProperty
+
+    @TaskAction
+    fun validate() {
+        val root = resourcesRoot.asFile.get()
+        val sourceDir = root.resolve("values")
+        require(sourceDir.isDirectory) { "Missing source locale directory: ${sourceDir.absolutePath}" }
+
+        val localeDirs = listOf(
+            "values-es",
+            "values-fr",
+            "values-it",
+            "values-de",
+            "values-ru",
+            "values-zh-rCN",
+            "values-ja",
+        ).map { root.resolve(it) }
+
+        val sourceFiles = sourceDir
+            .listFiles()
+            ?.filter { it.isFile && it.name.startsWith("strings_") && it.name.endsWith(".xml") }
+            ?.sortedBy { it.name }
+            ?: emptyList()
+        require(sourceFiles.isNotEmpty()) { "No strings_*.xml files found in ${sourceDir.absolutePath}" }
+
+        localeDirs.forEach { localeDir ->
+            require(localeDir.isDirectory) { "Missing locale directory: ${localeDir.absolutePath}" }
+
+            sourceFiles.forEach { sourceFile ->
+                val localeFile = localeDir.resolve(sourceFile.name)
+                require(localeFile.isFile) {
+                    "Missing localized file ${sourceFile.name} in ${localeDir.name}"
+                }
+
+                val sourceEntries = parseStringEntries(sourceFile)
+                val localeEntries = parseStringEntries(localeFile)
+
+                val sourceKeys = sourceEntries.keys.toList()
+                val localeKeys = localeEntries.keys.toList()
+                require(sourceKeys == localeKeys) {
+                    "Key mismatch in ${localeFile.absolutePath}. Expected keys from ${sourceFile.name} to match exactly."
+                }
+
+                sourceEntries.forEach { (key, sourceValue) ->
+                    val localeValue = localeEntries.getValue(key)
+                    val sourcePlaceholders = parsePlaceholders(sourceValue)
+                    val localePlaceholders = parsePlaceholders(localeValue)
+                    require(sourcePlaceholders == localePlaceholders) {
+                        "Placeholder mismatch for key '$key' in ${localeFile.absolutePath}. " +
+                            "Expected $sourcePlaceholders but found $localePlaceholders"
+                    }
+                }
+            }
+        }
+    }
+
+    private fun parseStringEntries(file: File): LinkedHashMap<String, String> {
+        val stringRegex = Regex("""<string\\s+name=\"([^\"]+)\">(.*?)</string>""", setOf(RegexOption.DOT_MATCHES_ALL))
+        val text = file.readText()
+        val entries = LinkedHashMap<String, String>()
+        stringRegex.findAll(text).forEach { match ->
+            entries[match.groupValues[1]] = match.groupValues[2]
+        }
+        return entries
+    }
+
+    private fun parsePlaceholders(value: String): List<String> {
+        val placeholderRegex = Regex("""%\\d+\\$[sd]""")
+        return placeholderRegex.findAll(value).map { it.value }.toList().sorted()
+    }
+}
 
 abstract class GenerateBrowserExtensionManifestsTask : DefaultTask() {
     @get:InputFile
@@ -191,6 +266,15 @@ val extensionResourcesDir = layout.projectDirectory.dir("extension")
 val extensionManifestOutputDir = layout.buildDirectory.dir("generated/extensionManifests")
 val extensionBuildDir = layout.buildDirectory.dir("extension")
 val macDmgResourceRootDir = layout.buildDirectory.dir("generated/nativeDistributions/resources")
+val composeResourceRootDir = layout.projectDirectory.dir("src/commonMain/composeResources")
+
+val validateLocalizationResources by tasks.registering(ValidateLocalizationResourcesTask::class) {
+    resourcesRoot.set(composeResourceRootDir)
+}
+
+tasks.named("check") {
+    dependsOn(validateLocalizationResources)
+}
 
 val prepareMacDmgResources by tasks.registering(Sync::class) {
     // jpackage uses <packageName>-volume.icns from the macOS resource dir for the mounted DMG icon.

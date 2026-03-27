@@ -1,0 +1,42 @@
+<resources>
+    <!-- Backup providers card -->
+    <string name="backup_title">Backups</string>
+    <string name="backup_description">Erstelle oder stelle Konto-Snapshots über verfügbare Backup-Anbieter wieder her.</string>
+    <string name="backup_empty_state">Auf dieser Plattform sind derzeit keine Backup-Anbieter verfügbar.</string>
+
+    <!-- Backup provider row -->
+    <string name="backup_export">Exportieren</string>
+    <string name="backup_import">Importieren</string>
+    <string name="backup_available">Verfügbar</string>
+    <string name="backup_unavailable">Nicht verfügbar</string>
+    <string name="backup_sign_in_required">Anmeldung erforderlich</string>
+
+    <!-- Backup export mode dialog -->
+    <string name="backup_export_dialog_title">Backup-Typ auswählen</string>
+    <string name="backup_export_dialog_body">Klartext-Backups lassen sich leichter wiederherstellen. Bei verschlüsselten Backups bleiben Kontogeheimnisse verschlüsselt und zum Wiederherstellen ist der Backup-Passkey erforderlich.</string>
+    <string name="backup_export_encrypted">Verschlüsseltes Backup</string>
+    <string name="backup_export_plaintext">Klartext-Backup</string>
+
+    <!-- Backup snackbars -->
+    <string name="backup_unavailable_message">Backup ist nicht verfügbar</string>
+    <string name="backup_export_encrypted_success">Backup exportiert (verschlüsselt): %1$s</string>
+    <string name="backup_export_plaintext_success">Backup exportiert (Klartext): %1$s</string>
+    <string name="backup_export_failed">Export fehlgeschlagen: %1$s</string>
+    <string name="backup_import_failed">Import fehlgeschlagen: %1$s</string>
+    <string name="backup_import_success">%1$s Konto/Konten aus %2$s importiert</string>
+    <string name="backup_no_backups_found">Keine Backups gefunden: %1$s</string>
+    <string name="backup_no_files_found">Keine Backup-Dateien gefunden</string>
+    <string name="backup_import_exception">Import fehlgeschlagen: %1$s</string>
+
+    <!-- Passkey dialogs for backup operations -->
+    <string name="backup_passkey_unlock_title">Konten entsperren</string>
+    <string name="backup_passkey_encrypted_export_description">Gib deinen aktuellen App-Passkey ein, um ein verschlüsseltes Backup zu erstellen.</string>
+    <string name="backup_passkey_plaintext_export_description">Gib deinen aktuellen App-Passkey ein, um ein Klartext-Backup zu erstellen.</string>
+    <string name="backup_passkey_import_title">Auf Gerät speichern</string>
+    <string name="backup_passkey_import_description">Gib deinen aktuellen App-Passkey ein, um die wiederhergestellten Konten auf deinem Gerät zu speichern.</string>
+    <string name="backup_passkey_sync_description">Gib deinen Passkey ein, um deine Konten zu entschlüsseln und anzuzeigen</string>
+    <string name="backup_passkey_required_title">Backup-Passkey erforderlich</string>
+    <string name="backup_passkey_required_description">Dieses Backup enthält verschlüsselte Konten. Gib den Passkey ein, der beim Erstellen dieses Backups verwendet wurde.</string>
+    <string name="backup_passkey_incorrect">Falscher Passkey - die Backup-Konten konnten nicht entschlüsselt werden. Bitte versuche es erneut.</string>
+    <string name="backup_restore_unavailable">Backup-Wiederherstellung ist nicht verfügbar</string>
+</resources>

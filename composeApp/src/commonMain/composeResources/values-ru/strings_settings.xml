@@ -1,0 +1,68 @@
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">Настройки</string>
+
+    <!-- Storage location card -->
+    <string name="settings_storage_title">Расположение хранилища</string>
+    <string name="settings_storage_description">Аккаунты сохраняются по адресу:</string>
+    <string name="settings_storage_delete_content_description">Удалить все аккаунты</string>
+
+    <!-- Delete storage dialog -->
+    <string name="settings_delete_dialog_title">Удалить все аккаунты?</string>
+    <string name="settings_delete_dialog_message">Это удалит все существующие аккаунты. Отменить действие нельзя, если у вас нет резервной копии.\n\nПри следующем запуске/использовании будет создан новый файл хранилища.</string>
+    <string name="settings_delete_dialog_deleting">Удаление...</string>
+
+    <!-- Remember passkey / biometric / secure unlock -->
+    <string name="settings_secure_unlock_title">Безопасная разблокировка</string>
+    <string name="settings_remember_passkey_title">Запомнить ключ доступа</string>
+    <string name="settings_secure_unlock_description">Требовать подтверждение учетными данными устройства перед разблокировкой и хранить в хранилище браузера только зашифрованные данные ключа доступа.</string>
+    <string name="settings_remember_passkey_description">Сохранять ключ доступа, чтобы не вводить его каждый раз при открытии расширения. Включайте это только на устройствах, которым доверяете.</string>
+    <string name="settings_biometric_title">Биометрическая разблокировка</string>
+    <string name="settings_biometric_description">Используйте отпечаток пальца или распознавание лица для разблокировки хранилища</string>
+
+    <!-- Secure/biometric unlock snackbars -->
+    <string name="settings_secure_unlock_unavailable">Безопасная разблокировка недоступна</string>
+    <string name="settings_secure_unlock_enabled">Безопасная разблокировка включена</string>
+    <string name="settings_secure_enrollment_cancelled">Настройка безопасной разблокировки отменена</string>
+    <string name="settings_biometric_unlock_enabled">Биометрическая разблокировка включена</string>
+    <string name="settings_biometric_enrollment_cancelled">Настройка биометрии отменена</string>
+    <string name="settings_verify_passkey_failed">Не удалось проверить ключ доступа</string>
+
+    <!-- Companion sync card -->
+    <string name="settings_companion_sync_title">Синхронизация с компаньоном</string>
+    <string name="settings_companion_active">%1$s-компаньон активен.</string>
+    <string name="settings_companion_inactive">%1$s-компаньон не активен.</string>
+    <string name="settings_companion_sync_button">Синхронизировать с %1$s</string>
+    <string name="settings_companion_discover">Принудительно найти компаньон</string>
+    <string name="settings_companion_sync_unavailable">Синхронизация с компаньоном недоступна</string>
+    <string name="settings_companion_no_accounts">Нет аккаунтов для синхронизации с %1$s</string>
+    <string name="settings_companion_sync_sent">Синхронизация отправлена на %1$s</string>
+    <string name="settings_companion_sync_failed">Сейчас не удается синхронизировать с %1$s</string>
+    <string name="settings_companion_discovered">Обнаружен %1$s-компаньон</string>
+    <string name="settings_companion_not_discovered">Не удалось обнаружить %1$s-компаньон</string>
+    <string name="settings_companion_default_name">Часы</string>
+
+    <!-- Account deletion snackbars -->
+    <string name="settings_account_deletion_unavailable">Удаление аккаунтов недоступно</string>
+    <string name="settings_account_delete_failed">Не удалось удалить аккаунты из хранилища</string>
+    <string name="settings_account_all_deleted">Все аккаунты удалены из хранилища</string>
+    <string name="settings_account_deleted_sync_error">Аккаунты удалены, но синхронизация с компаньоном не удалась: %1$s</string>
+    <string name="settings_account_delete_exception">Не удалось удалить: %1$s</string>
+
+    <!-- Onboarding button on settings -->
+    <string name="settings_onboarding_content_description">Открыть руководство по началу работы</string>
+    <string name="settings_onboarding_button">Открыть руководство по началу работы</string>
+
+    <!-- Desktop platform settings -->
+    <string name="settings_tray_macos">Показывать значок в строке меню</string>
+    <string name="settings_tray_windows">Показывать значок в системном трее</string>
+    <string name="settings_tray_linux">Показывать значок в системном трее / AppIndicator</string>
+    <string name="settings_quit_app">Выйти из TwoFac</string>
+
+    <!-- Desktop main window / tray -->
+    <string name="desktop_window_title">TwoFac</string>
+    <string name="desktop_tray_tooltip">TwoFac</string>
+    <string name="desktop_tray_open">Открыть TwoFac</string>
+    <string name="desktop_tray_quit">Выйти из TwoFac</string>
+    <string name="desktop_tray_popup_title">Трей TwoFac</string>
+</resources>

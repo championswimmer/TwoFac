@@ -1,0 +1,14 @@
+<resources>
+    <!-- Home empty state -->
+    <string name="home_empty_title">Aucun compte ajoute</string>
+    <string name="home_empty_subtitle">Allez dans la gestion des comptes pour ajouter un compte</string>
+    <string name="home_empty_manage_accounts">Gerer les comptes</string>
+    <string name="home_empty_getting_started">Bien demarrer</string>
+
+    <!-- Home locked state -->
+    <string name="home_locked_unlock_passkey">Deverrouiller avec la cle d'acces</string>
+    <string name="home_locked_enter_manually">Saisir la cle d'acces manuellement</string>
+
+    <!-- Home OTP list section -->
+    <string name="home_otp_heading">Vos comptes</string>
+</resources>

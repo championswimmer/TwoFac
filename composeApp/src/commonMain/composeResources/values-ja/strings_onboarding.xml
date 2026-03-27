@@ -1,0 +1,51 @@
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onboarding_title">はじめに</string>
+
+    <!-- Onboarding step card -->
+    <string name="onboarding_expand_step">手順を展開</string>
+    <string name="onboarding_collapse_step">手順を折りたたむ</string>
+    <string name="onboarding_required">必須</string>
+    <string name="onboarding_completed">完了</string>
+    <string name="onboarding_done_button">完了</string>
+
+    <!-- Onboarding states -->
+    <string name="onboarding_loading">オンボーディングガイドを読み込み中…</string>
+    <string name="onboarding_empty">現在利用できるオンボーディング手順はありません。</string>
+    <string name="onboarding_all_complete_headline">準備が整いました。</string>
+    <string name="onboarding_all_complete_body">このガイドは設定からいつでも再表示できます。</string>
+
+    <!-- Onboarding guide header -->
+    <string name="onboarding_progress">%2$s 手順中 %1$s 手順が完了</string>
+    <string name="onboarding_required_remaining_singular">必須の手順が残り %1$s 件</string>
+    <string name="onboarding_required_remaining_plural">必須の手順が残り %1$s 件</string>
+
+    <!-- Common onboarding steps -->
+    <string name="onboarding_step_add_account_title">最初のアカウントを追加</string>
+    <string name="onboarding_step_add_account_action">アカウントを追加</string>
+    <string name="onboarding_step_manage_accounts_title">アカウントを管理</string>
+    <string name="onboarding_step_manage_accounts_description">アカウントを確認し、OTPコードを表示し、不要な項目を削除できます。</string>
+    <string name="onboarding_step_manage_accounts_action">アカウントを開く</string>
+    <string name="onboarding_step_import_title">既存データをインポートまたは復元</string>
+    <string name="onboarding_step_import_description">設定でバックアッププロバイダーからインポートして、既存のアカウントを復元します。</string>
+    <string name="onboarding_step_import_action">設定を開く</string>
+    <string name="onboarding_step_backup_title">保管庫をバックアップ</string>
+    <string name="onboarding_step_backup_description">設定から暗号化バックアップを作成できます。利用可能なプロバイダー: %1$s。</string>
+    <string name="onboarding_step_backup_action">バックアップ設定を開く</string>
+    <string name="onboarding_step_companion_title">コンパニオン同期を設定</string>
+    <string name="onboarding_step_companion_description">接続されている場合は、設定からコンパニオンデバイスにアカウントを送信できます。</string>
+    <string name="onboarding_step_companion_action">コンパニオン設定を開く</string>
+
+    <!-- Dynamic add-account description fragments -->
+    <string name="onboarding_method_scan_qr">QRコードをスキャン</string>
+    <string name="onboarding_method_paste_qr">クリップボードからQR画像を貼り付け</string>
+    <string name="onboarding_method_enter_uri">otpauth:// URI を貼り付けるか手動で入力</string>
+    <string name="onboarding_step_add_account_description">%1$s して最初のアカウントを追加します。</string>
+
+    <!-- Platform-specific onboarding steps -->
+    <string name="onboarding_step_secure_unlock_title">セキュアロック解除を有効化</string>
+    <string name="onboarding_step_secure_unlock_action">セキュリティ設定を開く</string>
+    <string name="onboarding_step_secure_unlock_android_description">設定で生体認証によるロック解除を有効にすると、指紋や顔認証ですばやくロック解除できます。</string>
+    <string name="onboarding_step_secure_unlock_ios_description">設定でセキュアロック解除を有効にすると、Face ID または Touch ID ですばやくロック解除できます。</string>
+    <string name="onboarding_step_secure_unlock_wasm_description">設定でセキュアロック解除を有効にすると、WebAuthn またはデバイス認証で本人確認できます。</string>
+</resources>

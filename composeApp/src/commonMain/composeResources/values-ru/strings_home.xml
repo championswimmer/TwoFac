@@ -1,0 +1,14 @@
+<resources>
+    <!-- Home empty state -->
+    <string name="home_empty_title">Аккаунты не добавлены</string>
+    <string name="home_empty_subtitle">Перейдите в управление аккаунтами, чтобы добавить аккаунт</string>
+    <string name="home_empty_manage_accounts">Управление аккаунтами</string>
+    <string name="home_empty_getting_started">Начало работы</string>
+
+    <!-- Home locked state -->
+    <string name="home_locked_unlock_passkey">Разблокировать ключом доступа</string>
+    <string name="home_locked_enter_manually">Ввести ключ доступа вручную</string>
+
+    <!-- Home OTP list section -->
+    <string name="home_otp_heading">Ваши аккаунты</string>
+</resources>

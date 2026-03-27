@@ -1,0 +1,42 @@
+<resources>
+    <!-- Backup providers card -->
+    <string name="backup_title">Copias de seguridad</string>
+    <string name="backup_description">Crea o restaura instantaneas de cuentas desde los proveedores de copia de seguridad disponibles.</string>
+    <string name="backup_empty_state">No hay proveedores de copia de seguridad disponibles actualmente en esta plataforma.</string>
+
+    <!-- Backup provider row -->
+    <string name="backup_export">Exportar</string>
+    <string name="backup_import">Importar</string>
+    <string name="backup_available">Disponible</string>
+    <string name="backup_unavailable">No disponible</string>
+    <string name="backup_sign_in_required">Inicio de sesion requerido</string>
+
+    <!-- Backup export mode dialog -->
+    <string name="backup_export_dialog_title">Elegir tipo de copia de seguridad</string>
+    <string name="backup_export_dialog_body">Las copias de seguridad en texto plano son mas faciles de restaurar. Las copias de seguridad cifradas mantienen los secretos de las cuentas cifrados y requieren la clave de acceso de la copia al restaurar.</string>
+    <string name="backup_export_encrypted">Copia de seguridad cifrada</string>
+    <string name="backup_export_plaintext">Copia de seguridad en texto plano</string>
+
+    <!-- Backup snackbars -->
+    <string name="backup_unavailable_message">La copia de seguridad no esta disponible</string>
+    <string name="backup_export_encrypted_success">Copia de seguridad exportada (cifrada): %1$s</string>
+    <string name="backup_export_plaintext_success">Copia de seguridad exportada (texto plano): %1$s</string>
+    <string name="backup_export_failed">Error al exportar: %1$s</string>
+    <string name="backup_import_failed">Error al importar: %1$s</string>
+    <string name="backup_import_success">Se importaron %1$s cuenta(s) desde %2$s</string>
+    <string name="backup_no_backups_found">No se encontraron copias de seguridad: %1$s</string>
+    <string name="backup_no_files_found">No se encontraron archivos de copia de seguridad</string>
+    <string name="backup_import_exception">Error al importar: %1$s</string>
+
+    <!-- Passkey dialogs for backup operations -->
+    <string name="backup_passkey_unlock_title">Desbloquear cuentas</string>
+    <string name="backup_passkey_encrypted_export_description">Introduce la clave de acceso actual de la app para crear una copia de seguridad cifrada.</string>
+    <string name="backup_passkey_plaintext_export_description">Introduce la clave de acceso actual de la app para crear una copia de seguridad en texto plano.</string>
+    <string name="backup_passkey_import_title">Guardar en el dispositivo</string>
+    <string name="backup_passkey_import_description">Introduce la clave de acceso actual de la app para guardar las cuentas restauradas en tu dispositivo.</string>
+    <string name="backup_passkey_sync_description">Introduce tu clave de acceso para descifrar y ver tus cuentas</string>
+    <string name="backup_passkey_required_title">Se requiere clave de acceso de la copia de seguridad</string>
+    <string name="backup_passkey_required_description">Esta copia de seguridad contiene cuentas cifradas. Introduce la clave de acceso que se uso cuando se creo esta copia de seguridad.</string>
+    <string name="backup_passkey_incorrect">Clave de acceso incorrecta: no se pudieron descifrar las cuentas de la copia de seguridad. Intentalo de nuevo.</string>
+    <string name="backup_restore_unavailable">La restauracion de copia de seguridad no esta disponible</string>
+</resources>

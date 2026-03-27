@@ -1,0 +1,51 @@
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onboarding_title">Primeros pasos</string>
+
+    <!-- Onboarding step card -->
+    <string name="onboarding_expand_step">Expandir paso</string>
+    <string name="onboarding_collapse_step">Contraer paso</string>
+    <string name="onboarding_required">Obligatorio</string>
+    <string name="onboarding_completed">Completado</string>
+    <string name="onboarding_done_button">Hecho</string>
+
+    <!-- Onboarding states -->
+    <string name="onboarding_loading">Cargando guia de primeros pasos...</string>
+    <string name="onboarding_empty">No hay pasos de inicio disponibles en este momento.</string>
+    <string name="onboarding_all_complete_headline">Todo listo.</string>
+    <string name="onboarding_all_complete_body">Puedes volver a abrir esta guia en cualquier momento desde Configuracion.</string>
+
+    <!-- Onboarding guide header -->
+    <string name="onboarding_progress">%1$s de %2$s pasos completados</string>
+    <string name="onboarding_required_remaining_singular">%1$s paso obligatorio restante</string>
+    <string name="onboarding_required_remaining_plural">%1$s pasos obligatorios restantes</string>
+
+    <!-- Common onboarding steps -->
+    <string name="onboarding_step_add_account_title">Anade tu primera cuenta</string>
+    <string name="onboarding_step_add_account_action">Anadir cuenta</string>
+    <string name="onboarding_step_manage_accounts_title">Gestiona tus cuentas</string>
+    <string name="onboarding_step_manage_accounts_description">Explora tus cuentas, consulta codigos OTP y elimina entradas que ya no necesites.</string>
+    <string name="onboarding_step_manage_accounts_action">Abrir cuentas</string>
+    <string name="onboarding_step_import_title">Importa o restaura datos existentes</string>
+    <string name="onboarding_step_import_description">Usa Configuracion para importar desde tus proveedores de copia de seguridad y restaurar cuentas existentes.</string>
+    <string name="onboarding_step_import_action">Abrir configuracion</string>
+    <string name="onboarding_step_backup_title">Haz una copia de seguridad de tu boveda</string>
+    <string name="onboarding_step_backup_description">Crea copias de seguridad cifradas desde Configuracion. Proveedores disponibles: %1$s.</string>
+    <string name="onboarding_step_backup_action">Abrir configuracion de copias de seguridad</string>
+    <string name="onboarding_step_companion_title">Configura la sincronizacion con dispositivo complementario</string>
+    <string name="onboarding_step_companion_description">Envia tus cuentas a tu dispositivo complementario desde Configuracion cuando este conectado.</string>
+    <string name="onboarding_step_companion_action">Abrir configuracion del dispositivo complementario</string>
+
+    <!-- Dynamic add-account description fragments -->
+    <string name="onboarding_method_scan_qr">escanear un codigo QR</string>
+    <string name="onboarding_method_paste_qr">pegar una imagen QR desde el portapapeles</string>
+    <string name="onboarding_method_enter_uri">pegar o introducir manualmente un URI otpauth://</string>
+    <string name="onboarding_step_add_account_description">Anade tu primera cuenta mediante %1$s.</string>
+
+    <!-- Platform-specific onboarding steps -->
+    <string name="onboarding_step_secure_unlock_title">Activar desbloqueo seguro</string>
+    <string name="onboarding_step_secure_unlock_action">Abrir configuracion de seguridad</string>
+    <string name="onboarding_step_secure_unlock_android_description">Activa el desbloqueo biometrico en Configuracion para desbloquear rapido con tu huella o rostro.</string>
+    <string name="onboarding_step_secure_unlock_ios_description">Activa el desbloqueo seguro en Configuracion para usar Face ID o Touch ID y desbloquear mas rapido.</string>
+    <string name="onboarding_step_secure_unlock_wasm_description">Activa el desbloqueo seguro en Configuracion para verificar con WebAuthn o credenciales del dispositivo.</string>
+</resources>

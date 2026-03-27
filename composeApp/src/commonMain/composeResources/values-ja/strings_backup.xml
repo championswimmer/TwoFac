@@ -1,0 +1,42 @@
+<resources>
+    <!-- Backup providers card -->
+    <string name="backup_title">バックアップ</string>
+    <string name="backup_description">利用可能なバックアッププロバイダーからアカウントのスナップショットを作成または復元します。</string>
+    <string name="backup_empty_state">このプラットフォームでは現在利用できるバックアッププロバイダーがありません。</string>
+
+    <!-- Backup provider row -->
+    <string name="backup_export">エクスポート</string>
+    <string name="backup_import">インポート</string>
+    <string name="backup_available">利用可能</string>
+    <string name="backup_unavailable">利用不可</string>
+    <string name="backup_sign_in_required">サインインが必要</string>
+
+    <!-- Backup export mode dialog -->
+    <string name="backup_export_dialog_title">バックアップの種類を選択</string>
+    <string name="backup_export_dialog_body">平文バックアップは復元が簡単です。暗号化バックアップではアカウントの秘密情報が暗号化されたまま保持され、復元時にバックアップパスキーが必要です。</string>
+    <string name="backup_export_encrypted">暗号化バックアップ</string>
+    <string name="backup_export_plaintext">平文バックアップ</string>
+
+    <!-- Backup snackbars -->
+    <string name="backup_unavailable_message">バックアップは利用できません</string>
+    <string name="backup_export_encrypted_success">バックアップをエクスポートしました（暗号化）: %1$s</string>
+    <string name="backup_export_plaintext_success">バックアップをエクスポートしました（平文）: %1$s</string>
+    <string name="backup_export_failed">エクスポートに失敗しました: %1$s</string>
+    <string name="backup_import_failed">インポートに失敗しました: %1$s</string>
+    <string name="backup_import_success">%2$s から %1$s 件のアカウントをインポートしました</string>
+    <string name="backup_no_backups_found">バックアップが見つかりません: %1$s</string>
+    <string name="backup_no_files_found">バックアップファイルが見つかりません</string>
+    <string name="backup_import_exception">インポートに失敗しました: %1$s</string>
+
+    <!-- Passkey dialogs for backup operations -->
+    <string name="backup_passkey_unlock_title">アカウントのロックを解除</string>
+    <string name="backup_passkey_encrypted_export_description">暗号化バックアップを作成するには、現在のアプリのパスキーを入力してください。</string>
+    <string name="backup_passkey_plaintext_export_description">平文バックアップを作成するには、現在のアプリのパスキーを入力してください。</string>
+    <string name="backup_passkey_import_title">デバイスに保存</string>
+    <string name="backup_passkey_import_description">復元したアカウントをデバイスに保存するには、現在のアプリのパスキーを入力してください。</string>
+    <string name="backup_passkey_sync_description">パスキーを入力してアカウントを復号・表示します</string>
+    <string name="backup_passkey_required_title">バックアップパスキーが必要です</string>
+    <string name="backup_passkey_required_description">このバックアップには暗号化されたアカウントが含まれています。このバックアップ作成時に使用したパスキーを入力してください。</string>
+    <string name="backup_passkey_incorrect">パスキーが正しくないため、バックアップ内のアカウントを復号できませんでした。もう一度お試しください。</string>
+    <string name="backup_restore_unavailable">バックアップの復元は利用できません</string>
+</resources>

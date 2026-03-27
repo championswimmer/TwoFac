@@ -1,0 +1,42 @@
+<resources>
+    <!-- Backup providers card -->
+    <string name="backup_title">Резервные копии</string>
+    <string name="backup_description">Создавайте или восстанавливайте снимки аккаунтов через доступные провайдеры резервного копирования.</string>
+    <string name="backup_empty_state">На этой платформе сейчас нет доступных провайдеров резервного копирования.</string>
+
+    <!-- Backup provider row -->
+    <string name="backup_export">Экспорт</string>
+    <string name="backup_import">Импорт</string>
+    <string name="backup_available">Доступен</string>
+    <string name="backup_unavailable">Недоступен</string>
+    <string name="backup_sign_in_required">Требуется вход</string>
+
+    <!-- Backup export mode dialog -->
+    <string name="backup_export_dialog_title">Выберите тип резервной копии</string>
+    <string name="backup_export_dialog_body">Незашифрованные резервные копии проще восстановить. Зашифрованные резервные копии сохраняют секреты аккаунтов в зашифрованном виде и при восстановлении требуют ключ резервной копии.</string>
+    <string name="backup_export_encrypted">Зашифрованная резервная копия</string>
+    <string name="backup_export_plaintext">Незашифрованная резервная копия</string>
+
+    <!-- Backup snackbars -->
+    <string name="backup_unavailable_message">Резервное копирование недоступно</string>
+    <string name="backup_export_encrypted_success">Резервная копия экспортирована (зашифровано): %1$s</string>
+    <string name="backup_export_plaintext_success">Резервная копия экспортирована (незашифровано): %1$s</string>
+    <string name="backup_export_failed">Ошибка экспорта: %1$s</string>
+    <string name="backup_import_failed">Ошибка импорта: %1$s</string>
+    <string name="backup_import_success">Импортировано %1$s аккаунт(ов) из %2$s</string>
+    <string name="backup_no_backups_found">Резервные копии не найдены: %1$s</string>
+    <string name="backup_no_files_found">Файлы резервных копий не найдены</string>
+    <string name="backup_import_exception">Ошибка импорта: %1$s</string>
+
+    <!-- Passkey dialogs for backup operations -->
+    <string name="backup_passkey_unlock_title">Разблокировать аккаунты</string>
+    <string name="backup_passkey_encrypted_export_description">Введите текущий ключ доступа приложения, чтобы создать зашифрованную резервную копию.</string>
+    <string name="backup_passkey_plaintext_export_description">Введите текущий ключ доступа приложения, чтобы создать незашифрованную резервную копию.</string>
+    <string name="backup_passkey_import_title">Сохранить на устройство</string>
+    <string name="backup_passkey_import_description">Введите текущий ключ доступа приложения, чтобы сохранить восстановленные аккаунты на устройстве.</string>
+    <string name="backup_passkey_sync_description">Введите ключ доступа, чтобы расшифровать и просмотреть аккаунты</string>
+    <string name="backup_passkey_required_title">Требуется ключ резервной копии</string>
+    <string name="backup_passkey_required_description">Эта резервная копия содержит зашифрованные аккаунты. Введите ключ доступа, который использовался при создании этой резервной копии.</string>
+    <string name="backup_passkey_incorrect">Неверный ключ доступа — не удалось расшифровать аккаунты из резервной копии. Попробуйте еще раз.</string>
+    <string name="backup_restore_unavailable">Восстановление из резервной копии недоступно</string>
+</resources>

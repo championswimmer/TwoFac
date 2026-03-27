@@ -1,0 +1,14 @@
+<resources>
+    <!-- Home empty state -->
+    <string name="home_empty_title">アカウントが追加されていません</string>
+    <string name="home_empty_subtitle">アカウントを追加するには、アカウント管理へ移動してください</string>
+    <string name="home_empty_manage_accounts">アカウントを管理</string>
+    <string name="home_empty_getting_started">はじめに</string>
+
+    <!-- Home locked state -->
+    <string name="home_locked_unlock_passkey">パスキーでロック解除</string>
+    <string name="home_locked_enter_manually">パスキーを手動で入力</string>
+
+    <!-- Home OTP list section -->
+    <string name="home_otp_heading">アカウント一覧</string>
+</resources>
