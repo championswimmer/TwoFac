@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+        Allow the app to use the Data Protection Keychain with SecAccessControl
+        (required for biometric-gated Keychain items via SecItemAdd/SecItemCopyMatching).
+        The keychain-access-groups entitlement is needed for non-sandboxed apps
+        using the modern Data Protection Keychain APIs with access-control flags.
+    -->
+    <key>keychain-access-groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix)tech.arnav.twofac</string>
+    </array>
+</dict>
+</plist>
