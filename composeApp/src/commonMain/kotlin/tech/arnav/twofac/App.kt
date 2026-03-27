@@ -19,6 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.nav_home
+import twofac.composeapp.generated.resources.nav_accounts
+import twofac.composeapp.generated.resources.nav_settings
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,13 +45,11 @@ import tech.arnav.twofac.theme.TwoFacTheme
 import kotlin.reflect.KClass
 
 private enum class TopLevelDestination(
-    val label: String,
     val icon: ImageVector,
-    val contentDescription: String,
 ) {
-    HOME("Home", Icons.Rounded.Home, "Home"),
-    ACCOUNTS("Accounts", Icons.Rounded.ManageAccounts, "Accounts"),
-    SETTINGS("Settings", Icons.Rounded.Settings, "Settings"),
+    HOME(Icons.Rounded.Home),
+    ACCOUNTS(Icons.Rounded.ManageAccounts),
+    SETTINGS(Icons.Rounded.Settings),
 }
 
 @Composable
@@ -68,16 +71,21 @@ fun App(onQuit: (() -> Unit)? = null) {
                         tonalElevation = 0.dp,
                     ) {
                         TopLevelDestination.entries.forEach { destination ->
+                            val label = when (destination) {
+                                TopLevelDestination.HOME -> stringResource(Res.string.nav_home)
+                                TopLevelDestination.ACCOUNTS -> stringResource(Res.string.nav_accounts)
+                                TopLevelDestination.SETTINGS -> stringResource(Res.string.nav_settings)
+                            }
                             NavigationBarItem(
                                 selected = currentDestination.isSelected(destination),
                                 onClick = { navController.navigateToTopLevel(destination) },
                                 icon = {
                                     Icon(
                                         imageVector = destination.icon,
-                                        contentDescription = destination.contentDescription
+                                        contentDescription = label
                                     )
                                 },
-                                label = { Text(destination.label) }
+                                label = { Text(label) }
                             )
                         }
                     }

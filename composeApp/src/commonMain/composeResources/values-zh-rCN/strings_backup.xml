@@ -1,0 +1,42 @@
+<resources>
+    <!-- Backup providers card -->
+    <string name="backup_title">备份</string>
+    <string name="backup_description">通过可用的备份提供方创建或恢复账户快照。</string>
+    <string name="backup_empty_state">当前平台暂无可用的备份提供方。</string>
+
+    <!-- Backup provider row -->
+    <string name="backup_export">导出</string>
+    <string name="backup_import">导入</string>
+    <string name="backup_available">可用</string>
+    <string name="backup_unavailable">不可用</string>
+    <string name="backup_sign_in_required">需要登录</string>
+
+    <!-- Backup export mode dialog -->
+    <string name="backup_export_dialog_title">选择备份类型</string>
+    <string name="backup_export_dialog_body">明文备份更易恢复。加密备份会对账户密钥进行加密，恢复时需要备份口令。</string>
+    <string name="backup_export_encrypted">加密备份</string>
+    <string name="backup_export_plaintext">明文备份</string>
+
+    <!-- Backup snackbars -->
+    <string name="backup_unavailable_message">备份不可用</string>
+    <string name="backup_export_encrypted_success">备份已导出（加密）：%1$s</string>
+    <string name="backup_export_plaintext_success">备份已导出（明文）：%1$s</string>
+    <string name="backup_export_failed">导出失败：%1$s</string>
+    <string name="backup_import_failed">导入失败：%1$s</string>
+    <string name="backup_import_success">已从 %2$s 导入 %1$s 个账户</string>
+    <string name="backup_no_backups_found">未找到备份：%1$s</string>
+    <string name="backup_no_files_found">未找到备份文件</string>
+    <string name="backup_import_exception">导入失败：%1$s</string>
+
+    <!-- Passkey dialogs for backup operations -->
+    <string name="backup_passkey_unlock_title">解锁账户</string>
+    <string name="backup_passkey_encrypted_export_description">输入您当前的应用密钥口令以创建加密备份。</string>
+    <string name="backup_passkey_plaintext_export_description">输入您当前的应用密钥口令以创建明文备份。</string>
+    <string name="backup_passkey_import_title">保存到设备</string>
+    <string name="backup_passkey_import_description">输入您当前的应用密钥口令，将恢复的账户保存到您的设备。</string>
+    <string name="backup_passkey_sync_description">输入您的密钥口令以解密并查看账户</string>
+    <string name="backup_passkey_required_title">需要备份口令</string>
+    <string name="backup_passkey_required_description">此备份包含加密账户。请输入创建该备份时使用的口令。</string>
+    <string name="backup_passkey_incorrect">口令错误，无法解密备份账户。请重试。</string>
+    <string name="backup_restore_unavailable">备份恢复不可用</string>
+</resources>

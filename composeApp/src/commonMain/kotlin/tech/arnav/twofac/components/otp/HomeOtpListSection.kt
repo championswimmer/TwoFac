@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.theme.TwoFacTheme
 
@@ -22,7 +24,7 @@ fun HomeOtpListSection(
     listState: LazyListState,
     onRefreshOtp: () -> Unit,
     onCopyOtp: (String) -> Unit = {},
-    heading: String = "Your Accounts",
+    heading: String = stringResource(Res.string.home_otp_heading),
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(

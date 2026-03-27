@@ -5,6 +5,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -19,21 +21,19 @@ fun BackupExportModeDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Choose Backup Type")
+            Text(stringResource(Res.string.backup_export_dialog_title))
         },
         text = {
-            Text(
-                "Plaintext backups are easier to restore. Encrypted backups keep account secrets encrypted and require the backup passkey when restoring."
-            )
+            Text(stringResource(Res.string.backup_export_dialog_body))
         },
         confirmButton = {
             TextButton(onClick = onEncryptedSelected) {
-                Text("Encrypted Backup")
+                Text(stringResource(Res.string.backup_export_encrypted))
             }
         },
         dismissButton = {
             TextButton(onClick = onPlaintextSelected) {
-                Text("Plaintext Backup")
+                Text(stringResource(Res.string.backup_export_plaintext))
             }
         },
     )

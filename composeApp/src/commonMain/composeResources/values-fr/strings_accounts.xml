@@ -1,0 +1,41 @@
+<resources>
+    <!-- Accounts screen -->
+    <string name="accounts_title">Comptes</string>
+    <string name="accounts_add_account">Ajouter un compte</string>
+
+    <!-- Account detail screen -->
+    <string name="account_detail_title">Details du compte</string>
+    <string name="account_detail_loading">Chargement des details du compte...</string>
+    <string name="account_detail_account_label">Compte : %1$s</string>
+    <string name="account_detail_generate_otp">Generer OTP</string>
+    <string name="account_detail_otp_display">OTP : %1$s</string>
+    <string name="account_detail_delete">Supprimer le compte</string>
+    <string name="account_detail_not_found">Compte introuvable</string>
+    <string name="account_detail_delete_dialog_title">Supprimer le compte ?</string>
+    <string name="account_detail_delete_dialog_message">Cela supprimera definitivement %1$s de votre coffre.</string>
+
+    <!-- Add account screen -->
+    <string name="add_account_title">Ajouter un compte</string>
+    <string name="add_account_adding">Ajout en cours...</string>
+    <string name="add_account_uri_label">URI 2FA</string>
+    <string name="add_account_uri_placeholder">otpauth://totp/...</string>
+
+    <!-- QR import actions -->
+    <string name="add_account_scan_qr">Scanner un QR avec l'appareil photo</string>
+    <string name="add_account_scanning">Analyse en cours...</string>
+    <string name="add_account_paste_qr">Coller un QR depuis le presse-papiers</string>
+    <string name="add_account_pasting">Lecture du presse-papiers...</string>
+
+    <!-- Add account errors -->
+    <string name="add_account_error_clipboard_permission">Permission du presse-papiers refusee</string>
+    <string name="add_account_error_clipboard_unsupported">La lecture de QR depuis le presse-papiers n'est pas prise en charge sur cette plateforme</string>
+    <string name="add_account_error_clipboard_failed">Echec de la lecture du code QR depuis le presse-papiers</string>
+    <string name="add_account_error_camera_permission">Permission de l'appareil photo refusee</string>
+    <string name="add_account_error_camera_unsupported">Le scan de QR par appareil photo n'est pas pris en charge sur cette plateforme</string>
+    <string name="add_account_error_camera_failed">Echec du scan du code QR</string>
+    <string name="add_account_error_qr_prefix">Erreur QR : %1$s</string>
+
+    <!-- Accounts locked state -->
+    <string name="accounts_locked_message">Le coffre est verrouille. Deverrouillez-le pour gerer les comptes.</string>
+    <string name="accounts_locked_unlock">Deverrouiller le coffre</string>
+</resources>

@@ -1,0 +1,14 @@
+<resources>
+    <!-- Home empty state -->
+    <string name="home_empty_title">No hay cuentas anadidas</string>
+    <string name="home_empty_subtitle">Ve a gestionar cuentas para anadir una cuenta</string>
+    <string name="home_empty_manage_accounts">Gestionar cuentas</string>
+    <string name="home_empty_getting_started">Primeros pasos</string>
+
+    <!-- Home locked state -->
+    <string name="home_locked_unlock_passkey">Desbloquear con clave de acceso</string>
+    <string name="home_locked_enter_manually">Introducir clave de acceso manualmente</string>
+
+    <!-- Home OTP list section -->
+    <string name="home_otp_heading">Tus cuentas</string>
+</resources>

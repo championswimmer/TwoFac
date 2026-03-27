@@ -1,43 +1,46 @@
 package tech.arnav.twofac.onboarding
 
+import org.jetbrains.compose.resources.getString
+import twofac.composeapp.generated.resources.*
+
 class BaseCommonOnboardingStepContributor : CommonOnboardingStepContributor {
-    override fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
+    override suspend fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
         val addAccountDescription = buildAddAccountDescription(context)
         val steps = mutableListOf<OnboardingStepContribution>()
 
         steps += OnboardingGuideStep(
             id = OnboardingStepIds.ADD_FIRST_ACCOUNT,
             slot = OnboardingStepSlot.ADD_FIRST_ACCOUNT,
-            title = "Add your first account",
+            title = getString(Res.string.onboarding_step_add_account_title),
             description = addAccountDescription,
             required = true,
             icon = OnboardingStepIcon.ACCOUNT,
             action = OnboardingGuideAction.OpenAddAccount,
-            actionLabel = "Add account",
+            actionLabel = getString(Res.string.onboarding_step_add_account_action),
             completionRule = OnboardingCompletionRule.ACCOUNT_EXISTS,
         ).provide()
 
         steps += OnboardingGuideStep(
             id = OnboardingStepIds.MANAGE_ACCOUNTS,
             slot = OnboardingStepSlot.MANAGE_ACCOUNTS,
-            title = "Manage your accounts",
-            description = "Browse your accounts, view OTP codes, and remove entries you no longer need.",
+            title = getString(Res.string.onboarding_step_manage_accounts_title),
+            description = getString(Res.string.onboarding_step_manage_accounts_description),
             required = false,
             icon = OnboardingStepIcon.MANAGE_ACCOUNTS,
             action = OnboardingGuideAction.OpenAccounts,
-            actionLabel = "Open accounts",
+            actionLabel = getString(Res.string.onboarding_step_manage_accounts_action),
             completionRule = OnboardingCompletionRule.MANUAL,
         ).provide()
 
         steps += OnboardingGuideStep(
             id = OnboardingStepIds.IMPORT_OR_RESTORE,
             slot = OnboardingStepSlot.IMPORT_OR_RESTORE,
-            title = "Import or restore existing data",
-            description = "Use Settings to import from your backup providers and restore existing accounts.",
+            title = getString(Res.string.onboarding_step_import_title),
+            description = getString(Res.string.onboarding_step_import_description),
             required = false,
             icon = OnboardingStepIcon.IMPORT_OR_RESTORE,
             action = OnboardingGuideAction.OpenSettings,
-            actionLabel = "Open settings",
+            actionLabel = getString(Res.string.onboarding_step_import_action),
             completionRule = OnboardingCompletionRule.MANUAL,
         ).provide()
 
@@ -46,12 +49,12 @@ class BaseCommonOnboardingStepContributor : CommonOnboardingStepContributor {
             steps += OnboardingGuideStep(
                 id = OnboardingStepIds.BACKUP_AND_RESTORE,
                 slot = OnboardingStepSlot.BACKUP_AND_RESTORE,
-                title = "Back up your vault",
-                description = "Create encrypted backups from Settings. Available providers: $providerText.",
+                title = getString(Res.string.onboarding_step_backup_title),
+                description = getString(Res.string.onboarding_step_backup_description, providerText),
                 required = false,
                 icon = OnboardingStepIcon.BACKUP,
                 action = OnboardingGuideAction.OpenSettings,
-                actionLabel = "Open backup settings",
+                actionLabel = getString(Res.string.onboarding_step_backup_action),
                 completionRule = OnboardingCompletionRule.MANUAL,
             ).provide()
         } else {
@@ -62,12 +65,12 @@ class BaseCommonOnboardingStepContributor : CommonOnboardingStepContributor {
             steps += OnboardingGuideStep(
                 id = OnboardingStepIds.COMPANION_SYNC,
                 slot = OnboardingStepSlot.COMPANION_SYNC,
-                title = "Set up companion sync",
-                description = "Send your accounts to your companion device from Settings when it is connected.",
+                title = getString(Res.string.onboarding_step_companion_title),
+                description = getString(Res.string.onboarding_step_companion_description),
                 required = false,
                 icon = OnboardingStepIcon.COMPANION_SYNC,
                 action = OnboardingGuideAction.OpenSettings,
-                actionLabel = "Open companion settings",
+                actionLabel = getString(Res.string.onboarding_step_companion_action),
                 completionRule = OnboardingCompletionRule.MANUAL,
             ).provide()
         } else {
@@ -78,12 +81,12 @@ class BaseCommonOnboardingStepContributor : CommonOnboardingStepContributor {
     }
 }
 
-private fun buildAddAccountDescription(context: OnboardingGuideContext): String {
+private suspend fun buildAddAccountDescription(context: OnboardingGuideContext): String {
     val methods = buildList {
-        if (context.cameraQrImportAvailable) add("scan a QR code")
-        if (context.clipboardQrImportAvailable) add("paste a QR image from clipboard")
-        add("paste or enter an otpauth:// URI manually")
+        if (context.cameraQrImportAvailable) add(getString(Res.string.onboarding_method_scan_qr))
+        if (context.clipboardQrImportAvailable) add(getString(Res.string.onboarding_method_paste_qr))
+        add(getString(Res.string.onboarding_method_enter_uri))
     }
-    return "Add your first account by ${methods.joinToString()}."
+    return getString(Res.string.onboarding_step_add_account_description, methods.joinToString())
 }
 

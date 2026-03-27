@@ -10,6 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -23,11 +25,11 @@ fun AccountsLockedState(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = "Vault is locked. Unlock to manage accounts.",
+            text = stringResource(Res.string.accounts_locked_message),
             modifier = Modifier.padding(16.dp),
         )
         Button(onClick = onUnlockClick) {
-            Text("Unlock Vault")
+            Text(stringResource(Res.string.accounts_locked_unlock))
         }
     }
 }

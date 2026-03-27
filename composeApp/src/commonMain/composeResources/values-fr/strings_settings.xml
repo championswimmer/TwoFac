@@ -1,0 +1,70 @@
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">Paramètres</string>
+
+    <!-- Storage location card -->
+    <string name="settings_storage_title">Emplacement de stockage</string>
+    <string name="settings_storage_description">Les comptes sont enregistrés à :</string>
+    <string name="settings_storage_delete_content_description">Supprimer tous les comptes</string>
+
+    <!-- Delete storage dialog -->
+    <string name="settings_delete_dialog_title">Supprimer tous les comptes ?</string>
+    <string name="settings_delete_dialog_message">Cela supprime tous les comptes existants et ne peut pas être annulé, sauf si vous avez une sauvegarde.
+
+Un nouveau fichier de stockage sera créé lors de la prochaine exécution/utilisation.</string>
+    <string name="settings_delete_dialog_deleting">Suppression en cours...</string>
+
+    <!-- Remember passkey / biometric / secure unlock -->
+    <string name="settings_secure_unlock_title">Déverrouillage sécurisé</string>
+    <string name="settings_remember_passkey_title">Mémoriser la clé d'accès</string>
+    <string name="settings_secure_unlock_description">Exiger la vérification des identifiants de l'appareil avant le déverrouillage et conserver uniquement des données de clé d'accès chiffrées dans le stockage du navigateur.</string>
+    <string name="settings_remember_passkey_description">Conserver la clé d'accès enregistrée pour ne pas avoir à la saisir à chaque ouverture de l'extension. Activez cette option uniquement sur des appareils de confiance.</string>
+    <string name="settings_biometric_title">Déverrouillage biométrique</string>
+    <string name="settings_biometric_description">Utilisez l'empreinte digitale ou la reconnaissance faciale pour déverrouiller votre coffre</string>
+
+    <!-- Secure/biometric unlock snackbars -->
+    <string name="settings_secure_unlock_unavailable">Le déverrouillage sécurisé n'est pas disponible</string>
+    <string name="settings_secure_unlock_enabled">Déverrouillage sécurisé activé</string>
+    <string name="settings_secure_enrollment_cancelled">Inscription au déverrouillage sécurisé annulée</string>
+    <string name="settings_biometric_unlock_enabled">Déverrouillage biométrique activé</string>
+    <string name="settings_biometric_enrollment_cancelled">Inscription biométrique annulée</string>
+    <string name="settings_verify_passkey_failed">Échec de la vérification de la clé d'accès</string>
+
+    <!-- Companion sync card -->
+    <string name="settings_companion_sync_title">Synchronisation compagnon</string>
+    <string name="settings_companion_active">Le compagnon %1$s est actif.</string>
+    <string name="settings_companion_inactive">Le compagnon %1$s n'est pas actif.</string>
+    <string name="settings_companion_sync_button">Synchroniser vers %1$s</string>
+    <string name="settings_companion_discover">Forcer la découverte du compagnon</string>
+    <string name="settings_companion_sync_unavailable">La synchronisation compagnon n'est pas disponible</string>
+    <string name="settings_companion_no_accounts">Aucun compte à synchroniser vers %1$s</string>
+    <string name="settings_companion_sync_sent">Synchronisation envoyée vers %1$s</string>
+    <string name="settings_companion_sync_failed">Impossible de synchroniser vers %1$s pour le moment</string>
+    <string name="settings_companion_discovered">Compagnon %1$s découvert</string>
+    <string name="settings_companion_not_discovered">Impossible de découvrir le compagnon %1$s</string>
+    <string name="settings_companion_default_name">Montre</string>
+
+    <!-- Account deletion snackbars -->
+    <string name="settings_account_deletion_unavailable">La suppression des comptes n'est pas disponible</string>
+    <string name="settings_account_delete_failed">Échec de la suppression des comptes du stockage</string>
+    <string name="settings_account_all_deleted">Tous les comptes ont été supprimés du stockage</string>
+    <string name="settings_account_deleted_sync_error">Comptes supprimés, mais échec de la synchronisation compagnon : %1$s</string>
+    <string name="settings_account_delete_exception">Échec de la suppression : %1$s</string>
+
+    <!-- Onboarding button on settings -->
+    <string name="settings_onboarding_content_description">Ouvrir la prise en main</string>
+    <string name="settings_onboarding_button">Ouvrir le guide de prise en main</string>
+
+    <!-- Desktop platform settings -->
+    <string name="settings_tray_macos">Afficher l'icône de barre de menu</string>
+    <string name="settings_tray_windows">Afficher l'icône de zone de notification</string>
+    <string name="settings_tray_linux">Afficher l'icône de zone de notification / AppIndicator</string>
+    <string name="settings_quit_app">Quitter TwoFac</string>
+
+    <!-- Desktop main window / tray -->
+    <string name="desktop_window_title">TwoFac</string>
+    <string name="desktop_tray_tooltip">TwoFac</string>
+    <string name="desktop_tray_open">Ouvrir TwoFac</string>
+    <string name="desktop_tray_quit">Quitter TwoFac</string>
+    <string name="desktop_tray_popup_title">Zone de notification TwoFac</string>
+</resources>

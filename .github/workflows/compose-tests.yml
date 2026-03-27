@@ -1,0 +1,108 @@
+name: Compose Tests
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'composeApp/**'
+      - 'sharedLib/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'composeApp/**'
+      - 'sharedLib/**'
+  workflow_dispatch: # For manual triggering
+
+jobs:
+  detect-apple-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      apple_changed: ${{ steps.filter.outputs.apple }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Detect Apple-specific changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            apple:
+              - 'iosApp/**'
+              - '**/src/iosMain/**'
+              - '**/src/iosTest/**'
+              - '**/src/macosMain/**'
+              - '**/src/macosTest/**'
+              - '**/src/watchosMain/**'
+              - '**/src/watchosTest/**'
+              - '**/*.xcodeproj/**'
+              - '**/*.xcworkspace/**'
+              - '**/*.xcconfig'
+              - '**/*.swift'
+              - '**/*.plist'
+              - '**/*.entitlements'
+              - 'sharedLib/build.gradle.kts'
+              - 'composeApp/build.gradle.kts'
+              - '.github/workflows/compose-tests.yml'
+
+  test-ubuntu:
+    name: "Run [desktop, web] tests on Ubuntu"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Run Desktop and Web Tests
+        run: |
+          ./gradlew :composeApp:desktopTest
+          ./gradlew :composeApp:wasmJsBrowserTest
+
+  test-windows:
+    name: "Run [desktop] tests on Windows"
+    runs-on: windows-latest
+    needs: test-ubuntu # Windows tests are costly. Run them only if Linux tests pass.
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Run Desktop Tests
+        run: ./gradlew :composeApp:desktopTest
+
+  test-macos:
+    name: "Run [ios] tests on macOS"
+    runs-on: macos-latest
+    needs: [test-ubuntu, detect-apple-changes] # MacOS tests are costly. Run them only if Linux tests pass and Apple-specific files changed.
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.detect-apple-changes.outputs.apple_changed == 'true' }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Run iOS Simulator Tests
+        run: ./gradlew :composeApp:iosSimulatorArm64Test

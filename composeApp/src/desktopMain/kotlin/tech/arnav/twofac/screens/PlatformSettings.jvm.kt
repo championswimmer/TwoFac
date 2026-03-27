@@ -21,8 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import tech.arnav.twofac.settings.DesktopSettingsManager
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.settings_tray_macos
+import twofac.composeapp.generated.resources.settings_tray_windows
+import twofac.composeapp.generated.resources.settings_tray_linux
+import twofac.composeapp.generated.resources.settings_quit_app
 
 @Composable
 actual fun PlatformSettingsContent(onQuit: (() -> Unit)?) {
@@ -33,9 +39,9 @@ actual fun PlatformSettingsContent(onQuit: (() -> Unit)?) {
 
     val osName = System.getProperty("os.name").lowercase()
     val trayLabel = when {
-        osName.contains("mac") -> "Show Menu Bar icon"
-        osName.contains("win") -> "Show System Tray icon"
-        else -> "Show System Tray / AppIndicator icon"
+        osName.contains("mac") -> stringResource(Res.string.settings_tray_macos)
+        osName.contains("win") -> stringResource(Res.string.settings_tray_windows)
+        else -> stringResource(Res.string.settings_tray_linux)
     }
 
     Card(
@@ -74,7 +80,7 @@ actual fun PlatformSettingsContent(onQuit: (() -> Unit)?) {
                     contentColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text("Quit TwoFac")
+                Text(stringResource(Res.string.settings_quit_app))
             }
         }
     }

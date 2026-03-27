@@ -31,6 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.lib.theme.TimerState
 import tech.arnav.twofac.lib.theme.timerStateByElapsedProgress
 import tech.arnav.twofac.lib.storage.StoredAccount
@@ -126,7 +128,7 @@ fun OTPCard(
                 // Time remaining
                 val timeRemaining = timeInterval - (currentTime % timeInterval)
                 Text(
-                    text = "${timeRemaining}s",
+                    text = stringResource(Res.string.otp_time_remaining, timeRemaining.toString()),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

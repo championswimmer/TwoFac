@@ -1,0 +1,68 @@
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">設定</string>
+
+    <!-- Storage location card -->
+    <string name="settings_storage_title">保存場所</string>
+    <string name="settings_storage_description">アカウントの保存先:</string>
+    <string name="settings_storage_delete_content_description">すべてのアカウントを削除</string>
+
+    <!-- Delete storage dialog -->
+    <string name="settings_delete_dialog_title">すべてのアカウントを削除しますか？</string>
+    <string name="settings_delete_dialog_message">これは既存のすべてのアカウントを削除し、バックアップがない限り元に戻せません。\n\n次回の実行または利用時に新しい保存ファイルが作成されます。</string>
+    <string name="settings_delete_dialog_deleting">削除中...</string>
+
+    <!-- Remember passkey / biometric / secure unlock -->
+    <string name="settings_secure_unlock_title">セキュアロック解除</string>
+    <string name="settings_remember_passkey_title">パスキーを記憶</string>
+    <string name="settings_secure_unlock_description">ロック解除の前にデバイス認証を必須にし、暗号化されたパスキーデータのみをブラウザストレージに保存します。</string>
+    <string name="settings_remember_passkey_description">拡張機能を開くたびに入力しなくて済むようにパスキーを保存します。信頼できるデバイスでのみ有効にしてください。</string>
+    <string name="settings_biometric_title">生体認証でロック解除</string>
+    <string name="settings_biometric_description">指紋または顔認証で保管庫のロックを解除します</string>
+
+    <!-- Secure/biometric unlock snackbars -->
+    <string name="settings_secure_unlock_unavailable">セキュアロック解除は利用できません</string>
+    <string name="settings_secure_unlock_enabled">セキュアロック解除を有効にしました</string>
+    <string name="settings_secure_enrollment_cancelled">セキュアロック解除の登録をキャンセルしました</string>
+    <string name="settings_biometric_unlock_enabled">生体認証でのロック解除を有効にしました</string>
+    <string name="settings_biometric_enrollment_cancelled">生体認証の登録をキャンセルしました</string>
+    <string name="settings_verify_passkey_failed">パスキーの確認に失敗しました</string>
+
+    <!-- Companion sync card -->
+    <string name="settings_companion_sync_title">コンパニオン同期</string>
+    <string name="settings_companion_active">%1$s コンパニオンは有効です。</string>
+    <string name="settings_companion_inactive">%1$s コンパニオンは有効ではありません。</string>
+    <string name="settings_companion_sync_button">%1$s に同期</string>
+    <string name="settings_companion_discover">コンパニオンを強制検出</string>
+    <string name="settings_companion_sync_unavailable">コンパニオン同期は利用できません</string>
+    <string name="settings_companion_no_accounts">%1$s に同期するアカウントがありません</string>
+    <string name="settings_companion_sync_sent">%1$s へ同期を送信しました</string>
+    <string name="settings_companion_sync_failed">現在 %1$s に同期できません</string>
+    <string name="settings_companion_discovered">%1$s コンパニオンを検出しました</string>
+    <string name="settings_companion_not_discovered">%1$s コンパニオンを検出できませんでした</string>
+    <string name="settings_companion_default_name">ウォッチ</string>
+
+    <!-- Account deletion snackbars -->
+    <string name="settings_account_deletion_unavailable">アカウント削除は利用できません</string>
+    <string name="settings_account_delete_failed">保存領域からのアカウント削除に失敗しました</string>
+    <string name="settings_account_all_deleted">保存領域からすべてのアカウントを削除しました</string>
+    <string name="settings_account_deleted_sync_error">アカウントを削除しましたが、コンパニオン同期に失敗しました: %1$s</string>
+    <string name="settings_account_delete_exception">削除に失敗しました: %1$s</string>
+
+    <!-- Onboarding button on settings -->
+    <string name="settings_onboarding_content_description">はじめにを開く</string>
+    <string name="settings_onboarding_button">はじめにガイドを開く</string>
+
+    <!-- Desktop platform settings -->
+    <string name="settings_tray_macos">メニューバーアイコンを表示</string>
+    <string name="settings_tray_windows">システムトレイアイコンを表示</string>
+    <string name="settings_tray_linux">システムトレイ / AppIndicator アイコンを表示</string>
+    <string name="settings_quit_app">TwoFacを終了</string>
+
+    <!-- Desktop main window / tray -->
+    <string name="desktop_window_title">TwoFac</string>
+    <string name="desktop_tray_tooltip">TwoFac</string>
+    <string name="desktop_tray_open">TwoFacを開く</string>
+    <string name="desktop_tray_quit">TwoFacを終了</string>
+    <string name="desktop_tray_popup_title">TwoFac トレイ</string>
+</resources>

@@ -1,0 +1,68 @@
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">Configuracion</string>
+
+    <!-- Storage location card -->
+    <string name="settings_storage_title">Ubicacion de almacenamiento</string>
+    <string name="settings_storage_description">Las cuentas se guardan en:</string>
+    <string name="settings_storage_delete_content_description">Eliminar todas las cuentas</string>
+
+    <!-- Delete storage dialog -->
+    <string name="settings_delete_dialog_title">Eliminar todas las cuentas?</string>
+    <string name="settings_delete_dialog_message">Esto elimina todas las cuentas existentes y no se puede deshacer a menos que tengas una copia de seguridad.\n\nSe creara un archivo de almacenamiento nuevo en el proximo inicio/uso.</string>
+    <string name="settings_delete_dialog_deleting">Eliminando...</string>
+
+    <!-- Remember passkey / biometric / secure unlock -->
+    <string name="settings_secure_unlock_title">Desbloqueo seguro</string>
+    <string name="settings_remember_passkey_title">Recordar clave de acceso</string>
+    <string name="settings_secure_unlock_description">Requiere verificacion de credenciales del dispositivo antes de desbloquear y conserva solo datos de clave de acceso cifrados en el almacenamiento del navegador.</string>
+    <string name="settings_remember_passkey_description">Guarda la clave de acceso para que no tengas que introducirla cada vez que abras la extension. Activalo solo en dispositivos de confianza.</string>
+    <string name="settings_biometric_title">Desbloqueo biometrico</string>
+    <string name="settings_biometric_description">Usa huella digital o reconocimiento facial para desbloquear tu boveda</string>
+
+    <!-- Secure/biometric unlock snackbars -->
+    <string name="settings_secure_unlock_unavailable">El desbloqueo seguro no esta disponible</string>
+    <string name="settings_secure_unlock_enabled">Desbloqueo seguro activado</string>
+    <string name="settings_secure_enrollment_cancelled">Registro de desbloqueo seguro cancelado</string>
+    <string name="settings_biometric_unlock_enabled">Desbloqueo biometrico activado</string>
+    <string name="settings_biometric_enrollment_cancelled">Registro biometrico cancelado</string>
+    <string name="settings_verify_passkey_failed">No se pudo verificar la clave de acceso</string>
+
+    <!-- Companion sync card -->
+    <string name="settings_companion_sync_title">Sincronizacion con dispositivo complementario</string>
+    <string name="settings_companion_active">%1$s esta activo como dispositivo complementario.</string>
+    <string name="settings_companion_inactive">%1$s no esta activo como dispositivo complementario.</string>
+    <string name="settings_companion_sync_button">Sincronizar con %1$s</string>
+    <string name="settings_companion_discover">Forzar deteccion del dispositivo complementario</string>
+    <string name="settings_companion_sync_unavailable">La sincronizacion con dispositivo complementario no esta disponible</string>
+    <string name="settings_companion_no_accounts">No hay cuentas para sincronizar con %1$s</string>
+    <string name="settings_companion_sync_sent">Sincronizacion enviada a %1$s</string>
+    <string name="settings_companion_sync_failed">No se puede sincronizar con %1$s en este momento</string>
+    <string name="settings_companion_discovered">%1$s detectado como dispositivo complementario</string>
+    <string name="settings_companion_not_discovered">No se pudo detectar el dispositivo complementario %1$s</string>
+    <string name="settings_companion_default_name">Reloj</string>
+
+    <!-- Account deletion snackbars -->
+    <string name="settings_account_deletion_unavailable">El borrado de cuentas no esta disponible</string>
+    <string name="settings_account_delete_failed">No se pudieron eliminar las cuentas del almacenamiento</string>
+    <string name="settings_account_all_deleted">Todas las cuentas se eliminaron del almacenamiento</string>
+    <string name="settings_account_deleted_sync_error">Cuentas eliminadas, pero la sincronizacion con el dispositivo complementario fallo: %1$s</string>
+    <string name="settings_account_delete_exception">Error al eliminar: %1$s</string>
+
+    <!-- Onboarding button on settings -->
+    <string name="settings_onboarding_content_description">Abrir primeros pasos</string>
+    <string name="settings_onboarding_button">Abrir guia de primeros pasos</string>
+
+    <!-- Desktop platform settings -->
+    <string name="settings_tray_macos">Mostrar icono en la barra de menus</string>
+    <string name="settings_tray_windows">Mostrar icono en la bandeja del sistema</string>
+    <string name="settings_tray_linux">Mostrar icono en la bandeja del sistema / AppIndicator</string>
+    <string name="settings_quit_app">Salir de TwoFac</string>
+
+    <!-- Desktop main window / tray -->
+    <string name="desktop_window_title">TwoFac</string>
+    <string name="desktop_tray_tooltip">TwoFac</string>
+    <string name="desktop_tray_open">Abrir TwoFac</string>
+    <string name="desktop_tray_quit">Salir de TwoFac</string>
+    <string name="desktop_tray_popup_title">Bandeja de TwoFac</string>
+</resources>

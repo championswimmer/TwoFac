@@ -29,15 +29,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 
 @Composable
 fun PasskeyDialog(
     isVisible: Boolean,
     isLoading: Boolean,
     error: String?,
-    title: String = "Enter Passkey",
-    description: String = "Enter your passkey to decrypt and view your accounts",
-    confirmLabel: String = "Unlock",
+    title: String = stringResource(Res.string.security_passkey_dialog_title),
+    description: String = stringResource(Res.string.security_passkey_dialog_description),
+    confirmLabel: String = stringResource(Res.string.action_unlock),
     onPasskeySubmit: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -66,7 +68,7 @@ fun PasskeyDialog(
                     OutlinedTextField(
                         value = passkey,
                         onValueChange = { passkey = it },
-                        label = { Text("Passkey") },
+                        label = { Text(stringResource(Res.string.label_passkey)) },
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password,
@@ -123,7 +125,7 @@ fun PasskeyDialog(
                     onClick = onDismiss,
                     enabled = !isLoading
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.action_cancel))
                 }
             }
         )

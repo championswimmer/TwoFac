@@ -91,7 +91,7 @@ class OnboardingViewModelTest {
             override suspend fun currentContext(): OnboardingGuideContext = context
         }
         val commonContributor = object : CommonOnboardingStepContributor {
-            override fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
+            override suspend fun contribute(context: OnboardingGuideContext): List<OnboardingStepContribution> {
                 return steps.map { it.provide() }
             }
         }

@@ -1,0 +1,31 @@
+<resources>
+    <!-- App identity -->
+    <string name="app_name">TwoFac</string>
+    <string name="app_tagline">二要素認証マネージャー</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">ホーム</string>
+    <string name="nav_accounts">アカウント</string>
+    <string name="nav_settings">設定</string>
+
+    <!-- Common actions -->
+    <string name="action_back">戻る</string>
+    <string name="action_cancel">キャンセル</string>
+    <string name="action_delete">削除</string>
+    <string name="action_unlock">ロック解除</string>
+    <string name="action_continue">続行</string>
+    <string name="action_save">保存</string>
+
+    <!-- Common labels -->
+    <string name="label_passkey">パスキー</string>
+    <string name="label_passkey_placeholder">パスキーを入力</string>
+
+    <!-- OTP -->
+    <string name="otp_copied">OTPをコピーしました</string>
+    <string name="otp_time_remaining">%1$s秒</string>
+
+    <!-- Common errors -->
+    <string name="error_prefix">エラー: %1$s</string>
+    <string name="error_operation_failed">操作に失敗しました</string>
+    <string name="error_unknown">不明なエラー</string>
+</resources>

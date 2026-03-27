@@ -5,6 +5,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -16,8 +18,8 @@ fun AddAccountPasskeyField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("Passkey") },
-        placeholder = { Text("Enter your passkey") },
+        label = { Text(stringResource(Res.string.label_passkey)) },
+        placeholder = { Text(stringResource(Res.string.label_passkey_placeholder)) },
         modifier = modifier,
     )
 }

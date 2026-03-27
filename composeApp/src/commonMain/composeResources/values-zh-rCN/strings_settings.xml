@@ -1,0 +1,68 @@
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">设置</string>
+
+    <!-- Storage location card -->
+    <string name="settings_storage_title">存储位置</string>
+    <string name="settings_storage_description">账户保存在：</string>
+    <string name="settings_storage_delete_content_description">删除所有账户</string>
+
+    <!-- Delete storage dialog -->
+    <string name="settings_delete_dialog_title">删除所有账户？</string>
+    <string name="settings_delete_dialog_message">这将删除所有现有账户，且无法撤销，除非您有备份。\n\n下次运行/使用时将创建新的存储文件。</string>
+    <string name="settings_delete_dialog_deleting">正在删除...</string>
+
+    <!-- Remember passkey / biometric / secure unlock -->
+    <string name="settings_secure_unlock_title">安全解锁</string>
+    <string name="settings_remember_passkey_title">记住密钥口令</string>
+    <string name="settings_secure_unlock_description">解锁前需要进行设备凭证验证，并仅在浏览器存储中保留加密后的密钥口令数据。</string>
+    <string name="settings_remember_passkey_description">保存密钥口令，这样每次打开扩展时无需重复输入。仅在您信任的设备上启用此项。</string>
+    <string name="settings_biometric_title">生物识别解锁</string>
+    <string name="settings_biometric_description">使用指纹或面部识别解锁您的保管库</string>
+
+    <!-- Secure/biometric unlock snackbars -->
+    <string name="settings_secure_unlock_unavailable">安全解锁不可用</string>
+    <string name="settings_secure_unlock_enabled">已启用安全解锁</string>
+    <string name="settings_secure_enrollment_cancelled">已取消安全解锁注册</string>
+    <string name="settings_biometric_unlock_enabled">已启用生物识别解锁</string>
+    <string name="settings_biometric_enrollment_cancelled">已取消生物识别注册</string>
+    <string name="settings_verify_passkey_failed">验证密钥口令失败</string>
+
+    <!-- Companion sync card -->
+    <string name="settings_companion_sync_title">伴侣设备同步</string>
+    <string name="settings_companion_active">%1$s 伴侣设备已激活。</string>
+    <string name="settings_companion_inactive">%1$s 伴侣设备未激活。</string>
+    <string name="settings_companion_sync_button">同步到 %1$s</string>
+    <string name="settings_companion_discover">强制发现伴侣设备</string>
+    <string name="settings_companion_sync_unavailable">伴侣设备同步不可用</string>
+    <string name="settings_companion_no_accounts">没有可同步到 %1$s 的账户</string>
+    <string name="settings_companion_sync_sent">已发送同步到 %1$s</string>
+    <string name="settings_companion_sync_failed">当前无法同步到 %1$s</string>
+    <string name="settings_companion_discovered">已发现 %1$s 伴侣设备</string>
+    <string name="settings_companion_not_discovered">无法发现 %1$s 伴侣设备</string>
+    <string name="settings_companion_default_name">手表</string>
+
+    <!-- Account deletion snackbars -->
+    <string name="settings_account_deletion_unavailable">账户删除不可用</string>
+    <string name="settings_account_delete_failed">从存储中删除账户失败</string>
+    <string name="settings_account_all_deleted">已从存储中删除所有账户</string>
+    <string name="settings_account_deleted_sync_error">账户已删除，但伴侣设备同步失败：%1$s</string>
+    <string name="settings_account_delete_exception">删除失败：%1$s</string>
+
+    <!-- Onboarding button on settings -->
+    <string name="settings_onboarding_content_description">打开快速开始</string>
+    <string name="settings_onboarding_button">打开快速开始指南</string>
+
+    <!-- Desktop platform settings -->
+    <string name="settings_tray_macos">显示菜单栏图标</string>
+    <string name="settings_tray_windows">显示系统托盘图标</string>
+    <string name="settings_tray_linux">显示系统托盘 / AppIndicator 图标</string>
+    <string name="settings_quit_app">退出 TwoFac</string>
+
+    <!-- Desktop main window / tray -->
+    <string name="desktop_window_title">TwoFac</string>
+    <string name="desktop_tray_tooltip">TwoFac</string>
+    <string name="desktop_tray_open">打开 TwoFac</string>
+    <string name="desktop_tray_quit">退出 TwoFac</string>
+    <string name="desktop_tray_popup_title">TwoFac 托盘</string>
+</resources>

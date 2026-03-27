@@ -1,0 +1,31 @@
+<resources>
+    <!-- App identity -->
+    <string name="app_name">TwoFac</string>
+    <string name="app_tagline">Zwei-Faktor-Authentifizierungsmanager</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Start</string>
+    <string name="nav_accounts">Konten</string>
+    <string name="nav_settings">Einstellungen</string>
+
+    <!-- Common actions -->
+    <string name="action_back">Zurück</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_unlock">Entsperren</string>
+    <string name="action_continue">Weiter</string>
+    <string name="action_save">Speichern</string>
+
+    <!-- Common labels -->
+    <string name="label_passkey">Passkey</string>
+    <string name="label_passkey_placeholder">Passkey eingeben</string>
+
+    <!-- OTP -->
+    <string name="otp_copied">OTP kopiert</string>
+    <string name="otp_time_remaining">%1$ss</string>
+
+    <!-- Common errors -->
+    <string name="error_prefix">Fehler: %1$s</string>
+    <string name="error_operation_failed">Vorgang fehlgeschlagen</string>
+    <string name="error_unknown">unbekannter Fehler</string>
+</resources>

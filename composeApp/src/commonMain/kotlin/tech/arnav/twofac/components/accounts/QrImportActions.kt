@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -41,7 +43,7 @@ fun QrImportActions(
                 ) {
                     Icon(Icons.Rounded.PhotoCamera, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(if (isScanning) "Scanning..." else "Scan QR with Camera")
+                    Text(if (isScanning) stringResource(Res.string.add_account_scanning) else stringResource(Res.string.add_account_scan_qr))
                 }
             }
 
@@ -53,7 +55,7 @@ fun QrImportActions(
                 ) {
                     Icon(Icons.Rounded.ContentPaste, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(if (isPasting) "Reading Clipboard..." else "Paste QR from Clipboard")
+                    Text(if (isPasting) stringResource(Res.string.add_account_pasting) else stringResource(Res.string.add_account_paste_qr))
                 }
             }
         }

@@ -23,6 +23,10 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.onboarding_title
+import twofac.composeapp.generated.resources.action_back
 import org.koin.compose.viewmodel.koinViewModel
 import tech.arnav.twofac.components.onboarding.OnboardingCompletedState
 import tech.arnav.twofac.components.onboarding.OnboardingEmptyState
@@ -110,11 +114,11 @@ fun OnboardingGuideScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Getting Started") },
+                title = { Text(stringResource(Res.string.onboarding_title)) },
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(Res.string.action_back))
                     }
                 },
             )

@@ -1,0 +1,68 @@
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">Einstellungen</string>
+
+    <!-- Storage location card -->
+    <string name="settings_storage_title">Speicherort</string>
+    <string name="settings_storage_description">Konten werden gespeichert unter:</string>
+    <string name="settings_storage_delete_content_description">Alle Konten löschen</string>
+
+    <!-- Delete storage dialog -->
+    <string name="settings_delete_dialog_title">Alle Konten löschen?</string>
+    <string name="settings_delete_dialog_message">Dadurch werden alle vorhandenen Konten gelöscht und der Vorgang kann nicht rückgängig gemacht werden, sofern kein Backup vorhanden ist.\n\nBeim nächsten Start bzw. bei der nächsten Nutzung wird eine neue Speicherdatei erstellt.</string>
+    <string name="settings_delete_dialog_deleting">Lösche...</string>
+
+    <!-- Remember passkey / biometric / secure unlock -->
+    <string name="settings_secure_unlock_title">Sicheres Entsperren</string>
+    <string name="settings_remember_passkey_title">Passkey merken</string>
+    <string name="settings_secure_unlock_description">Vor dem Entsperren Geräteanmeldedaten zur Verifizierung verlangen und nur verschlüsselte Passkey-Daten im Browser-Speicher ablegen.</string>
+    <string name="settings_remember_passkey_description">Passkey gespeichert lassen, damit er nicht bei jedem Öffnen der Erweiterung eingegeben werden muss. Aktiviere dies nur auf vertrauenswürdigen Geräten.</string>
+    <string name="settings_biometric_title">Biometrisches Entsperren</string>
+    <string name="settings_biometric_description">Zum Entsperren des Tresors Fingerabdruck oder Gesichtserkennung verwenden</string>
+
+    <!-- Secure/biometric unlock snackbars -->
+    <string name="settings_secure_unlock_unavailable">Sicheres Entsperren ist nicht verfügbar</string>
+    <string name="settings_secure_unlock_enabled">Sicheres Entsperren aktiviert</string>
+    <string name="settings_secure_enrollment_cancelled">Einrichtung für sicheres Entsperren abgebrochen</string>
+    <string name="settings_biometric_unlock_enabled">Biometrisches Entsperren aktiviert</string>
+    <string name="settings_biometric_enrollment_cancelled">Biometrische Einrichtung abgebrochen</string>
+    <string name="settings_verify_passkey_failed">Passkey konnte nicht verifiziert werden</string>
+
+    <!-- Companion sync card -->
+    <string name="settings_companion_sync_title">Companion-Synchronisierung</string>
+    <string name="settings_companion_active">%1$s-Companion ist aktiv.</string>
+    <string name="settings_companion_inactive">%1$s-Companion ist nicht aktiv.</string>
+    <string name="settings_companion_sync_button">Mit %1$s synchronisieren</string>
+    <string name="settings_companion_discover">Companion-Suche erzwingen</string>
+    <string name="settings_companion_sync_unavailable">Companion-Synchronisierung ist nicht verfügbar</string>
+    <string name="settings_companion_no_accounts">Keine Konten zum Synchronisieren mit %1$s</string>
+    <string name="settings_companion_sync_sent">Synchronisierung an %1$s gesendet</string>
+    <string name="settings_companion_sync_failed">Synchronisierung mit %1$s ist derzeit nicht möglich</string>
+    <string name="settings_companion_discovered">%1$s-Companion gefunden</string>
+    <string name="settings_companion_not_discovered">%1$s-Companion konnte nicht gefunden werden</string>
+    <string name="settings_companion_default_name">Watch</string>
+
+    <!-- Account deletion snackbars -->
+    <string name="settings_account_deletion_unavailable">Kontolöschung ist nicht verfügbar</string>
+    <string name="settings_account_delete_failed">Konten konnten nicht aus dem Speicher gelöscht werden</string>
+    <string name="settings_account_all_deleted">Alle Konten aus dem Speicher gelöscht</string>
+    <string name="settings_account_deleted_sync_error">Konten gelöscht, aber Companion-Synchronisierung fehlgeschlagen: %1$s</string>
+    <string name="settings_account_delete_exception">Löschen fehlgeschlagen: %1$s</string>
+
+    <!-- Onboarding button on settings -->
+    <string name="settings_onboarding_content_description">Erste Schritte öffnen</string>
+    <string name="settings_onboarding_button">Leitfaden Erste Schritte öffnen</string>
+
+    <!-- Desktop platform settings -->
+    <string name="settings_tray_macos">Menüleistensymbol anzeigen</string>
+    <string name="settings_tray_windows">System-Tray-Symbol anzeigen</string>
+    <string name="settings_tray_linux">System-Tray-/AppIndicator-Symbol anzeigen</string>
+    <string name="settings_quit_app">TwoFac beenden</string>
+
+    <!-- Desktop main window / tray -->
+    <string name="desktop_window_title">TwoFac</string>
+    <string name="desktop_tray_tooltip">TwoFac</string>
+    <string name="desktop_tray_open">TwoFac öffnen</string>
+    <string name="desktop_tray_quit">TwoFac beenden</string>
+    <string name="desktop_tray_popup_title">TwoFac Tray</string>
+</resources>

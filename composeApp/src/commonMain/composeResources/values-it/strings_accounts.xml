@@ -1,0 +1,41 @@
+<resources>
+    <!-- Accounts screen -->
+    <string name="accounts_title">Account</string>
+    <string name="accounts_add_account">Aggiungi account</string>
+
+    <!-- Account detail screen -->
+    <string name="account_detail_title">Dettagli account</string>
+    <string name="account_detail_loading">Caricamento dettagli account...</string>
+    <string name="account_detail_account_label">Account: %1$s</string>
+    <string name="account_detail_generate_otp">Genera OTP</string>
+    <string name="account_detail_otp_display">OTP: %1$s</string>
+    <string name="account_detail_delete">Elimina account</string>
+    <string name="account_detail_not_found">Account non trovato</string>
+    <string name="account_detail_delete_dialog_title">Eliminare l'account?</string>
+    <string name="account_detail_delete_dialog_message">Questa operazione rimuovera in modo permanente %1$s dal tuo vault.</string>
+
+    <!-- Add account screen -->
+    <string name="add_account_title">Aggiungi account</string>
+    <string name="add_account_adding">Aggiunta in corso...</string>
+    <string name="add_account_uri_label">URI 2FA</string>
+    <string name="add_account_uri_placeholder">otpauth://totp/...</string>
+
+    <!-- QR import actions -->
+    <string name="add_account_scan_qr">Scansiona QR con la fotocamera</string>
+    <string name="add_account_scanning">Scansione in corso...</string>
+    <string name="add_account_paste_qr">Incolla QR dagli appunti</string>
+    <string name="add_account_pasting">Lettura degli appunti...</string>
+
+    <!-- Add account errors -->
+    <string name="add_account_error_clipboard_permission">Permesso appunti negato</string>
+    <string name="add_account_error_clipboard_unsupported">La lettura QR dagli appunti non e supportata su questa piattaforma</string>
+    <string name="add_account_error_clipboard_failed">Impossibile leggere il codice QR dagli appunti</string>
+    <string name="add_account_error_camera_permission">Permesso fotocamera negato</string>
+    <string name="add_account_error_camera_unsupported">La scansione QR con fotocamera non e supportata su questa piattaforma</string>
+    <string name="add_account_error_camera_failed">Impossibile scansionare il codice QR</string>
+    <string name="add_account_error_qr_prefix">Errore QR: %1$s</string>
+
+    <!-- Accounts locked state -->
+    <string name="accounts_locked_message">Il vault e bloccato. Sbloccalo per gestire gli account.</string>
+    <string name="accounts_locked_unlock">Sblocca vault</string>
+</resources>

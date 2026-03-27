@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import twofac.composeapp.generated.resources.*
 
 @Composable
 fun OnboardingLoadingState(modifier: Modifier = Modifier) {
@@ -23,7 +25,7 @@ fun OnboardingLoadingState(modifier: Modifier = Modifier) {
     ) {
         CircularProgressIndicator()
         Text(
-            text = "Loading onboarding guide…",
+            text = stringResource(Res.string.onboarding_loading),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -40,7 +42,7 @@ fun OnboardingEmptyState(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
     ) {
         Text(
-            text = "No onboarding steps are available right now.",
+            text = stringResource(Res.string.onboarding_empty),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -57,12 +59,12 @@ fun OnboardingCompletedState(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
     ) {
         Text(
-            text = "You're all set.",
+            text = stringResource(Res.string.onboarding_all_complete_headline),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = "You can reopen this guide any time from Settings.",
+            text = stringResource(Res.string.onboarding_all_complete_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

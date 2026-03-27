@@ -1,0 +1,41 @@
+<resources>
+    <!-- Accounts screen -->
+    <string name="accounts_title">アカウント</string>
+    <string name="accounts_add_account">アカウントを追加</string>
+
+    <!-- Account detail screen -->
+    <string name="account_detail_title">アカウント詳細</string>
+    <string name="account_detail_loading">アカウント詳細を読み込み中...</string>
+    <string name="account_detail_account_label">アカウント: %1$s</string>
+    <string name="account_detail_generate_otp">OTPを生成</string>
+    <string name="account_detail_otp_display">OTP: %1$s</string>
+    <string name="account_detail_delete">アカウントを削除</string>
+    <string name="account_detail_not_found">アカウントが見つかりません</string>
+    <string name="account_detail_delete_dialog_title">アカウントを削除しますか？</string>
+    <string name="account_detail_delete_dialog_message">%1$s を保管庫から完全に削除します。</string>
+
+    <!-- Add account screen -->
+    <string name="add_account_title">アカウントを追加</string>
+    <string name="add_account_adding">追加中...</string>
+    <string name="add_account_uri_label">2FA URI</string>
+    <string name="add_account_uri_placeholder">otpauth://totp/...</string>
+
+    <!-- QR import actions -->
+    <string name="add_account_scan_qr">カメラでQRをスキャン</string>
+    <string name="add_account_scanning">スキャン中...</string>
+    <string name="add_account_paste_qr">クリップボードからQRを貼り付け</string>
+    <string name="add_account_pasting">クリップボードを読み取り中...</string>
+
+    <!-- Add account errors -->
+    <string name="add_account_error_clipboard_permission">クリップボードの権限が拒否されました</string>
+    <string name="add_account_error_clipboard_unsupported">このプラットフォームではクリップボードからのQR読み取りはサポートされていません</string>
+    <string name="add_account_error_clipboard_failed">クリップボードからQRコードを読み取れませんでした</string>
+    <string name="add_account_error_camera_permission">カメラの権限が拒否されました</string>
+    <string name="add_account_error_camera_unsupported">このプラットフォームではカメラでのQRスキャンはサポートされていません</string>
+    <string name="add_account_error_camera_failed">QRコードのスキャンに失敗しました</string>
+    <string name="add_account_error_qr_prefix">QRエラー: %1$s</string>
+
+    <!-- Accounts locked state -->
+    <string name="accounts_locked_message">保管庫はロックされています。アカウントを管理するにはロックを解除してください。</string>
+    <string name="accounts_locked_unlock">保管庫のロックを解除</string>
+</resources>
