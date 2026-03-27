@@ -195,10 +195,14 @@ val extensionBuildDir = layout.buildDirectory.dir("extension")
 val macDmgResourceRootDir = layout.buildDirectory.dir("generated/nativeDistributions/resources")
 
 val prepareMacDmgResources by tasks.registering(Sync::class) {
-    // jpackage uses <packageName>-volume.icns from the macOS resource dir for the mounted DMG icon.
     from(layout.projectDirectory.file("src/desktopMain/resources/icons/macos.icns"))
-    into(macDmgResourceRootDir.map { it.dir("macos") })
+    into(macDmgResourceRootDir.map { it.dir("macOS") })
     rename("macos.icns", "${desktopPackageName}-volume.icns")
+}
+
+val prepareMacNativeLibraries by tasks.registering(Sync::class) {
+    from(layout.projectDirectory.file("src/desktopMain/native/macos/TwoFacKeychain/libtwofac_keychain.dylib"))
+    into(macDmgResourceRootDir.map { it.dir("macOS") })
 }
 
 val installWasmInteropDependencies by tasks.registering(Exec::class) {
@@ -271,8 +275,6 @@ tasks.register("packageBrowserExtensions") {
 compose.desktop {
     application {
         mainClass = "tech.arnav.twofac.MainKt"
-        // Enable macOS template images for the system tray icon so that macOS can dim
-        // the icon on secondary displays and adapt it to dark/light mode automatically.
         jvmArgs("-Dapple.awt.enableTemplateImages=true")
 
         buildTypes.release.proguard {
@@ -294,6 +296,8 @@ compose.desktop {
             }
             macOS {
                 iconFile.set(project.file("src/desktopMain/resources/icons/macos.icns"))
+                bundleID = "tech.arnav.twofac"
+                entitlementsFile.set(project.file("macos.entitlements"))
             }
         }
     }
@@ -301,5 +305,47 @@ compose.desktop {
 
 tasks.matching { it.name in setOf("packageDmg", "packageReleaseDmg", "notarizeDmg", "notarizeReleaseDmg") }
     .configureEach {
-        dependsOn(prepareMacDmgResources)
+        dependsOn(prepareMacDmgResources, prepareMacNativeLibraries)
+    }
+
+tasks.matching { it.name == "prepareAppResources" }
+    .configureEach {
+        dependsOn(prepareMacDmgResources, prepareMacNativeLibraries)
+    }
+
+// Re-sign the .app bundle with the local Apple Development certificate so that
+// the Data Protection Keychain APIs (SecItemAdd/SecItemCopyMatching with
+// SecAccessControl) work during local development and testing.
+// This is separate from the distribution signing path (Developer ID Application),
+// which is used for DMG/notarization releases.
+val macSigningIdentity = "Apple Development: Arnav Gupta (NR7UC33DNY)"
+val macAppBundlePath = layout.buildDirectory
+    .dir("compose/binaries/main/app/TwoFac.app")
+    .get().asFile.absolutePath
+
+val signMacAppBundle by tasks.registering(Exec::class) {
+    onlyIf { org.gradle.internal.os.OperatingSystem.current().isMacOsX }
+    dependsOn("createDistributable")
+    description = "Re-signs the .app bundle with the local Apple Development cert for Keychain access."
+
+    val entitlementsPath = project.file("macos.entitlements").absolutePath
+    commandLine(
+        "codesign", "--force", "--deep", "--sign", macSigningIdentity,
+        "--entitlements", entitlementsPath,
+        "--options", "runtime",
+        "--timestamp",
+        macAppBundlePath,
+    )
+}
+
+// packageDmg packages whatever is in the distributable directory, so signing
+// must happen before it runs (and after createDistributable).
+tasks.matching { it.name in setOf("packageDmg", "packageReleaseDmg") }
+    .configureEach {
+        dependsOn(signMacAppBundle)
+    }
+
+tasks.matching { it.name == "run" }
+    .configureEach {
+        dependsOn(prepareMacNativeLibraries, signMacAppBundle)
     }

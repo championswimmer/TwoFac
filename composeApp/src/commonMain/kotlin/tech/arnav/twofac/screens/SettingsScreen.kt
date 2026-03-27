@@ -712,12 +712,16 @@ fun SettingsScreen(
                 isLoading = true
                 coroutineScope.launch {
                     try {
+                        println("[SettingsScreen] Starting biometric enrollment flow")
                         // Verify passkey is correct
                         twoFacLib?.unlock(passkey)
+                        println("[SettingsScreen] Passkey verified successfully")
                         // Enable biometric and enroll the passkey
                         biometricSessionManager.setBiometricEnabled(true)
                         sessionManager.setRememberPasskey(true)
+                        println("[SettingsScreen] Calling enrollPasskey")
                         val enrolled = biometricSessionManager.enrollPasskey(passkey)
+                        println("[SettingsScreen] enrollPasskey returned: $enrolled")
                         if (enrolled) {
                             isBiometricEnabled = true
                             isRememberPasskeyEnabled = true
@@ -729,6 +733,8 @@ fun SettingsScreen(
                             biometricEnrollmentError = "Biometric enrollment cancelled"
                         }
                     } catch (e: Exception) {
+                        println("[SettingsScreen] Exception during enrollment: ${e.message}")
+                        e.printStackTrace()
                         biometricEnrollmentError = e.message ?: "Failed to verify passkey"
                     } finally {
                         isLoading = false

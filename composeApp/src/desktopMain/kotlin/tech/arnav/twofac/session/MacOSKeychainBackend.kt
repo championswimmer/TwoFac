@@ -16,10 +16,15 @@ class MacOSKeychainBackend(
     private val native: MacOSKeychainNative?
 ) : DesktopSecureUnlockBackend {
 
-    constructor() : this(MacOSKeychainNative.load())
+    constructor() : this(loadNativeWithLogging())
 
     override fun isAvailable(): Boolean {
-        return native != null && native.twofac_keychain_is_available() == 1
+        val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
+        val nativeNotNull = native != null
+        val availableResult = if (nativeNotNull) native!!.twofac_keychain_is_available() else -1
+        val result = nativeNotNull && availableResult == 1
+        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.isAvailable(): native=$nativeNotNull, availableResult=$availableResult, result=$result\n")
+        return result
     }
 
     override fun supportsStrongUserPresence(): Boolean {
@@ -74,14 +79,32 @@ class MacOSKeychainBackend(
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean {
-        if (!isAvailable()) return false
+        val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
+        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): starting\n")
+        
+        if (!isAvailable()) {
+            logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): isAvailable=false, aborting\n")
+            return false
+        }
 
+        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): calling clearPasskey()\n")
         clearPasskey()
 
         val bytes = passkey.toByteArray(Charsets.UTF_8)
+        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): calling twofac_keychain_store with ${bytes.size} bytes\n")
         val result = native!!.twofac_keychain_store(bytes, bytes.size)
 
-        println("MacOSKeychainBackend: enrollPasskey result=$result")
+        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): result=$result\n")
         return result == 0
+    }
+
+    companion object {
+        private fun loadNativeWithLogging(): MacOSKeychainNative? {
+            val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
+            logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend: About to call MacOSKeychainNative.load()\n")
+            return MacOSKeychainNative.load().also {
+                logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend: MacOSKeychainNative.load() returned: $it\n")
+            }
+        }
     }
 }

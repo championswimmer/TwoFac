@@ -129,16 +129,20 @@ class DesktopBiometricSessionManager(
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean {
+        val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
+        logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): starting\n")
+        
         if (!isBiometricAvailable()) {
-            println("DesktopBiometricSessionManager: enrollPasskey - biometric not available")
+            logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): biometric not available (isBiometricAvailable=${isBiometricAvailable()}, backend.isAvailable=${backend.isAvailable()})\n")
             return false
         }
         return try {
+            logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): calling backend.enrollPasskey()\n")
             val result = backend.enrollPasskey(passkey)
-            println("DesktopBiometricSessionManager: enrollPasskey - result=$result")
+            logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): result=$result\n")
             result
         } catch (e: Exception) {
-            println("DesktopBiometricSessionManager: Failed to enroll passkey: ${e.message}")
+            logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): exception: ${e.message}\n")
             false
         }
     }
