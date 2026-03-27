@@ -1,0 +1,42 @@
+<resources>
+    <!-- Backup providers card -->
+    <string name="backup_title">Sauvegardes</string>
+    <string name="backup_description">Créez ou restaurez des instantanés de comptes à partir des fournisseurs de sauvegarde disponibles.</string>
+    <string name="backup_empty_state">Aucun fournisseur de sauvegarde n'est actuellement disponible sur cette plateforme.</string>
+
+    <!-- Backup provider row -->
+    <string name="backup_export">Exporter</string>
+    <string name="backup_import">Importer</string>
+    <string name="backup_available">Disponible</string>
+    <string name="backup_unavailable">Indisponible</string>
+    <string name="backup_sign_in_required">Connexion requise</string>
+
+    <!-- Backup export mode dialog -->
+    <string name="backup_export_dialog_title">Choisir le type de sauvegarde</string>
+    <string name="backup_export_dialog_body">Les sauvegardes en clair sont plus faciles à restaurer. Les sauvegardes chiffrées conservent les secrets de compte chiffrés et nécessitent la clé d'accès de sauvegarde lors de la restauration.</string>
+    <string name="backup_export_encrypted">Sauvegarde chiffrée</string>
+    <string name="backup_export_plaintext">Sauvegarde en clair</string>
+
+    <!-- Backup snackbars -->
+    <string name="backup_unavailable_message">La sauvegarde n'est pas disponible</string>
+    <string name="backup_export_encrypted_success">Sauvegarde exportée (chiffrée) : %1$s</string>
+    <string name="backup_export_plaintext_success">Sauvegarde exportée (en clair) : %1$s</string>
+    <string name="backup_export_failed">Échec de l'export : %1$s</string>
+    <string name="backup_import_failed">Échec de l'import : %1$s</string>
+    <string name="backup_import_success">%1$s compte(s) importé(s) depuis %2$s</string>
+    <string name="backup_no_backups_found">Aucune sauvegarde trouvée : %1$s</string>
+    <string name="backup_no_files_found">Aucun fichier de sauvegarde trouvé</string>
+    <string name="backup_import_exception">Échec de l'import : %1$s</string>
+
+    <!-- Passkey dialogs for backup operations -->
+    <string name="backup_passkey_unlock_title">Déverrouiller les comptes</string>
+    <string name="backup_passkey_encrypted_export_description">Saisissez votre clé d'accès actuelle de l'application pour créer une sauvegarde chiffrée.</string>
+    <string name="backup_passkey_plaintext_export_description">Saisissez votre clé d'accès actuelle de l'application pour créer une sauvegarde en clair.</string>
+    <string name="backup_passkey_import_title">Enregistrer sur l'appareil</string>
+    <string name="backup_passkey_import_description">Saisissez votre clé d'accès actuelle de l'application pour enregistrer les comptes restaurés sur votre appareil.</string>
+    <string name="backup_passkey_sync_description">Saisissez votre clé d'accès pour déchiffrer et afficher vos comptes</string>
+    <string name="backup_passkey_required_title">Clé d'accès de sauvegarde requise</string>
+    <string name="backup_passkey_required_description">Cette sauvegarde contient des comptes chiffrés. Saisissez la clé d'accès utilisée lors de la création de cette sauvegarde.</string>
+    <string name="backup_passkey_incorrect">Clé d'accès incorrecte — impossible de déchiffrer les comptes de sauvegarde. Veuillez réessayer.</string>
+    <string name="backup_restore_unavailable">La restauration de sauvegarde n'est pas disponible</string>
+</resources>

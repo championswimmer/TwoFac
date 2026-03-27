@@ -1,0 +1,14 @@
+<resources>
+    <!-- Home empty state -->
+    <string name="home_empty_title">尚未添加账户</string>
+    <string name="home_empty_subtitle">前往账户管理以添加账户</string>
+    <string name="home_empty_manage_accounts">管理账户</string>
+    <string name="home_empty_getting_started">快速开始</string>
+
+    <!-- Home locked state -->
+    <string name="home_locked_unlock_passkey">使用密钥口令解锁</string>
+    <string name="home_locked_enter_manually">手动输入密钥口令</string>
+
+    <!-- Home OTP list section -->
+    <string name="home_otp_heading">您的账户</string>
+</resources>

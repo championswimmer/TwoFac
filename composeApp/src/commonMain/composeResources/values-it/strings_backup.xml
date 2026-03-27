@@ -1,0 +1,42 @@
+<resources>
+    <!-- Backup providers card -->
+    <string name="backup_title">Backup</string>
+    <string name="backup_description">Crea o ripristina istantanee degli account dai provider di backup disponibili.</string>
+    <string name="backup_empty_state">Al momento non sono disponibili provider di backup su questa piattaforma.</string>
+
+    <!-- Backup provider row -->
+    <string name="backup_export">Esporta</string>
+    <string name="backup_import">Importa</string>
+    <string name="backup_available">Disponibile</string>
+    <string name="backup_unavailable">Non disponibile</string>
+    <string name="backup_sign_in_required">Accesso richiesto</string>
+
+    <!-- Backup export mode dialog -->
+    <string name="backup_export_dialog_title">Scegli tipo di backup</string>
+    <string name="backup_export_dialog_body">I backup in testo semplice sono piu facili da ripristinare. I backup crittografati mantengono i segreti degli account crittografati e richiedono la passkey del backup durante il ripristino.</string>
+    <string name="backup_export_encrypted">Backup crittografato</string>
+    <string name="backup_export_plaintext">Backup in testo semplice</string>
+
+    <!-- Backup snackbars -->
+    <string name="backup_unavailable_message">Backup non disponibile</string>
+    <string name="backup_export_encrypted_success">Backup esportato (crittografato): %1$s</string>
+    <string name="backup_export_plaintext_success">Backup esportato (testo semplice): %1$s</string>
+    <string name="backup_export_failed">Esportazione non riuscita: %1$s</string>
+    <string name="backup_import_failed">Importazione non riuscita: %1$s</string>
+    <string name="backup_import_success">Importati %1$s account da %2$s</string>
+    <string name="backup_no_backups_found">Nessun backup trovato: %1$s</string>
+    <string name="backup_no_files_found">Nessun file di backup trovato</string>
+    <string name="backup_import_exception">Importazione non riuscita: %1$s</string>
+
+    <!-- Passkey dialogs for backup operations -->
+    <string name="backup_passkey_unlock_title">Sblocca account</string>
+    <string name="backup_passkey_encrypted_export_description">Inserisci la passkey attuale dell'app per creare un backup crittografato.</string>
+    <string name="backup_passkey_plaintext_export_description">Inserisci la passkey attuale dell'app per creare un backup in testo semplice.</string>
+    <string name="backup_passkey_import_title">Salva sul dispositivo</string>
+    <string name="backup_passkey_import_description">Inserisci la passkey attuale dell'app per salvare sul dispositivo gli account ripristinati.</string>
+    <string name="backup_passkey_sync_description">Inserisci la tua passkey per decrittografare e visualizzare i tuoi account</string>
+    <string name="backup_passkey_required_title">Passkey backup richiesta</string>
+    <string name="backup_passkey_required_description">Questo backup contiene account crittografati. Inserisci la passkey usata quando e stato creato questo backup.</string>
+    <string name="backup_passkey_incorrect">Passkey non corretta: impossibile decrittografare gli account del backup. Riprova.</string>
+    <string name="backup_restore_unavailable">Ripristino backup non disponibile</string>
+</resources>

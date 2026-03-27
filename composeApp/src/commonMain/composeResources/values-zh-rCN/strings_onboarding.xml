@@ -1,0 +1,51 @@
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onboarding_title">快速开始</string>
+
+    <!-- Onboarding step card -->
+    <string name="onboarding_expand_step">展开步骤</string>
+    <string name="onboarding_collapse_step">收起步骤</string>
+    <string name="onboarding_required">必需</string>
+    <string name="onboarding_completed">已完成</string>
+    <string name="onboarding_done_button">完成</string>
+
+    <!-- Onboarding states -->
+    <string name="onboarding_loading">正在加载新手指南…</string>
+    <string name="onboarding_empty">当前暂无可用的新手步骤。</string>
+    <string name="onboarding_all_complete_headline">已全部就绪。</string>
+    <string name="onboarding_all_complete_body">您可以随时在设置中重新打开此指南。</string>
+
+    <!-- Onboarding guide header -->
+    <string name="onboarding_progress">已完成 %1$s / %2$s 个步骤</string>
+    <string name="onboarding_required_remaining_singular">还剩 %1$s 个必需步骤</string>
+    <string name="onboarding_required_remaining_plural">还剩 %1$s 个必需步骤</string>
+
+    <!-- Common onboarding steps -->
+    <string name="onboarding_step_add_account_title">添加您的第一个账户</string>
+    <string name="onboarding_step_add_account_action">添加账户</string>
+    <string name="onboarding_step_manage_accounts_title">管理您的账户</string>
+    <string name="onboarding_step_manage_accounts_description">浏览您的账户、查看 OTP 代码，并移除不再需要的条目。</string>
+    <string name="onboarding_step_manage_accounts_action">打开账户</string>
+    <string name="onboarding_step_import_title">导入或恢复已有数据</string>
+    <string name="onboarding_step_import_description">在设置中通过备份提供方导入并恢复已有账户。</string>
+    <string name="onboarding_step_import_action">打开设置</string>
+    <string name="onboarding_step_backup_title">备份您的保管库</string>
+    <string name="onboarding_step_backup_description">在设置中创建加密备份。可用提供方：%1$s。</string>
+    <string name="onboarding_step_backup_action">打开备份设置</string>
+    <string name="onboarding_step_companion_title">设置伴侣设备同步</string>
+    <string name="onboarding_step_companion_description">设备连接后，可在设置中将您的账户发送到伴侣设备。</string>
+    <string name="onboarding_step_companion_action">打开伴侣设备设置</string>
+
+    <!-- Dynamic add-account description fragments -->
+    <string name="onboarding_method_scan_qr">扫描二维码</string>
+    <string name="onboarding_method_paste_qr">从剪贴板粘贴二维码图片</string>
+    <string name="onboarding_method_enter_uri">手动粘贴或输入 otpauth:// URI</string>
+    <string name="onboarding_step_add_account_description">通过%1$s添加您的第一个账户。</string>
+
+    <!-- Platform-specific onboarding steps -->
+    <string name="onboarding_step_secure_unlock_title">启用安全解锁</string>
+    <string name="onboarding_step_secure_unlock_action">打开安全设置</string>
+    <string name="onboarding_step_secure_unlock_android_description">在设置中启用生物识别解锁，以便通过指纹或面部快速解锁。</string>
+    <string name="onboarding_step_secure_unlock_ios_description">在设置中启用安全解锁，以使用 Face ID 或 Touch ID 更快速解锁。</string>
+    <string name="onboarding_step_secure_unlock_wasm_description">在设置中启用安全解锁，以通过 WebAuthn 或设备凭证进行验证。</string>
+</resources>

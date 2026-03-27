@@ -79,8 +79,20 @@ Keys follow the pattern `{domain}_{feature}_{element}`:
 
 1. Create `src/commonMain/composeResources/values-{lang}/` (e.g. `values-fr/`, `values-ja/`).
 2. Copy each `strings_*.xml` file and translate the values.
-3. The framework automatically selects the correct locale at runtime based on the system language.
-4. Keep translations complete per locale before advertising support.
+3. Run `./gradlew --no-daemon :composeApp:validateLocalizationResources` to verify key and placeholder parity against `values/`.
+4. The framework automatically selects the correct locale at runtime based on the system language.
+5. Keep translations complete per locale before advertising support.
+
+### Currently supported app locales
+
+- `values/` (English fallback)
+- `values-es/` (Spanish)
+- `values-fr/` (French)
+- `values-it/` (Italian)
+- `values-de/` (German)
+- `values-ru/` (Russian)
+- `values-zh-rCN/` (Simplified Chinese)
+- `values-ja/` (Japanese)
 
 ### Language selection policy
 

@@ -1,0 +1,51 @@
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onboarding_title">Prise en main</string>
+
+    <!-- Onboarding step card -->
+    <string name="onboarding_expand_step">Développer l'étape</string>
+    <string name="onboarding_collapse_step">Réduire l'étape</string>
+    <string name="onboarding_required">Requis</string>
+    <string name="onboarding_completed">Terminé</string>
+    <string name="onboarding_done_button">Terminé</string>
+
+    <!-- Onboarding states -->
+    <string name="onboarding_loading">Chargement du guide de prise en main…</string>
+    <string name="onboarding_empty">Aucune étape de prise en main n'est disponible pour le moment.</string>
+    <string name="onboarding_all_complete_headline">Tout est prêt.</string>
+    <string name="onboarding_all_complete_body">Vous pouvez rouvrir ce guide à tout moment depuis les Paramètres.</string>
+
+    <!-- Onboarding guide header -->
+    <string name="onboarding_progress">%1$s étapes terminées sur %2$s</string>
+    <string name="onboarding_required_remaining_singular">%1$s étape requise restante</string>
+    <string name="onboarding_required_remaining_plural">%1$s étapes requises restantes</string>
+
+    <!-- Common onboarding steps -->
+    <string name="onboarding_step_add_account_title">Ajoutez votre premier compte</string>
+    <string name="onboarding_step_add_account_action">Ajouter un compte</string>
+    <string name="onboarding_step_manage_accounts_title">Gérez vos comptes</string>
+    <string name="onboarding_step_manage_accounts_description">Parcourez vos comptes, affichez les codes OTP et supprimez les entrées dont vous n'avez plus besoin.</string>
+    <string name="onboarding_step_manage_accounts_action">Ouvrir les comptes</string>
+    <string name="onboarding_step_import_title">Importer ou restaurer des données existantes</string>
+    <string name="onboarding_step_import_description">Utilisez les Paramètres pour importer depuis vos fournisseurs de sauvegarde et restaurer des comptes existants.</string>
+    <string name="onboarding_step_import_action">Ouvrir les paramètres</string>
+    <string name="onboarding_step_backup_title">Sauvegardez votre coffre</string>
+    <string name="onboarding_step_backup_description">Créez des sauvegardes chiffrées depuis les Paramètres. Fournisseurs disponibles : %1$s.</string>
+    <string name="onboarding_step_backup_action">Ouvrir les paramètres de sauvegarde</string>
+    <string name="onboarding_step_companion_title">Configurer la synchronisation compagnon</string>
+    <string name="onboarding_step_companion_description">Envoyez vos comptes vers votre appareil compagnon depuis les Paramètres lorsqu'il est connecté.</string>
+    <string name="onboarding_step_companion_action">Ouvrir les paramètres compagnon</string>
+
+    <!-- Dynamic add-account description fragments -->
+    <string name="onboarding_method_scan_qr">scannant un code QR</string>
+    <string name="onboarding_method_paste_qr">collant une image QR depuis le presse-papiers</string>
+    <string name="onboarding_method_enter_uri">collant ou saisissant manuellement une URI otpauth://</string>
+    <string name="onboarding_step_add_account_description">Ajoutez votre premier compte en %1$s.</string>
+
+    <!-- Platform-specific onboarding steps -->
+    <string name="onboarding_step_secure_unlock_title">Activer le déverrouillage sécurisé</string>
+    <string name="onboarding_step_secure_unlock_action">Ouvrir les paramètres de sécurité</string>
+    <string name="onboarding_step_secure_unlock_android_description">Activez le déverrouillage biométrique dans les Paramètres pour déverrouiller rapidement avec votre empreinte digitale ou votre visage.</string>
+    <string name="onboarding_step_secure_unlock_ios_description">Activez le déverrouillage sécurisé dans les Paramètres pour utiliser Face ID ou Touch ID et déverrouiller plus rapidement.</string>
+    <string name="onboarding_step_secure_unlock_wasm_description">Activez le déverrouillage sécurisé dans les Paramètres pour vérifier avec WebAuthn ou les identifiants de l'appareil.</string>
+</resources>

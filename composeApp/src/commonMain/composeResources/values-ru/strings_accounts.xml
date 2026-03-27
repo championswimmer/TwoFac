@@ -1,0 +1,41 @@
+<resources>
+    <!-- Accounts screen -->
+    <string name="accounts_title">Аккаунты</string>
+    <string name="accounts_add_account">Добавить аккаунт</string>
+
+    <!-- Account detail screen -->
+    <string name="account_detail_title">Данные аккаунта</string>
+    <string name="account_detail_loading">Загрузка данных аккаунта...</string>
+    <string name="account_detail_account_label">Аккаунт: %1$s</string>
+    <string name="account_detail_generate_otp">Сгенерировать OTP-код</string>
+    <string name="account_detail_otp_display">OTP: %1$s</string>
+    <string name="account_detail_delete">Удалить аккаунт</string>
+    <string name="account_detail_not_found">Аккаунт не найден</string>
+    <string name="account_detail_delete_dialog_title">Удалить аккаунт?</string>
+    <string name="account_detail_delete_dialog_message">Аккаунт %1$s будет безвозвратно удален из хранилища.</string>
+
+    <!-- Add account screen -->
+    <string name="add_account_title">Добавить аккаунт</string>
+    <string name="add_account_adding">Добавление...</string>
+    <string name="add_account_uri_label">URI 2FA</string>
+    <string name="add_account_uri_placeholder">otpauth://totp/...</string>
+
+    <!-- QR import actions -->
+    <string name="add_account_scan_qr">Сканировать QR камерой</string>
+    <string name="add_account_scanning">Сканирование...</string>
+    <string name="add_account_paste_qr">Вставить QR из буфера обмена</string>
+    <string name="add_account_pasting">Чтение буфера обмена...</string>
+
+    <!-- Add account errors -->
+    <string name="add_account_error_clipboard_permission">Доступ к буферу обмена запрещен</string>
+    <string name="add_account_error_clipboard_unsupported">Чтение QR из буфера обмена не поддерживается на этой платформе</string>
+    <string name="add_account_error_clipboard_failed">Не удалось прочитать QR-код из буфера обмена</string>
+    <string name="add_account_error_camera_permission">Доступ к камере запрещен</string>
+    <string name="add_account_error_camera_unsupported">Сканирование QR камерой не поддерживается на этой платформе</string>
+    <string name="add_account_error_camera_failed">Не удалось отсканировать QR-код</string>
+    <string name="add_account_error_qr_prefix">Ошибка QR: %1$s</string>
+
+    <!-- Accounts locked state -->
+    <string name="accounts_locked_message">Хранилище заблокировано. Разблокируйте его, чтобы управлять аккаунтами.</string>
+    <string name="accounts_locked_unlock">Разблокировать хранилище</string>
+</resources>

@@ -1,0 +1,31 @@
+<resources>
+    <!-- App identity -->
+    <string name="app_name">TwoFac</string>
+    <string name="app_tagline">双重身份验证管理器</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">首页</string>
+    <string name="nav_accounts">账户</string>
+    <string name="nav_settings">设置</string>
+
+    <!-- Common actions -->
+    <string name="action_back">返回</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_delete">删除</string>
+    <string name="action_unlock">解锁</string>
+    <string name="action_continue">继续</string>
+    <string name="action_save">保存</string>
+
+    <!-- Common labels -->
+    <string name="label_passkey">密钥口令</string>
+    <string name="label_passkey_placeholder">输入您的密钥口令</string>
+
+    <!-- OTP -->
+    <string name="otp_copied">OTP 已复制</string>
+    <string name="otp_time_remaining">%1$s秒</string>
+
+    <!-- Common errors -->
+    <string name="error_prefix">错误：%1$s</string>
+    <string name="error_operation_failed">操作失败</string>
+    <string name="error_unknown">未知错误</string>
+</resources>

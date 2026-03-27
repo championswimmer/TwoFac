@@ -1,0 +1,51 @@
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onboarding_title">Erste Schritte</string>
+
+    <!-- Onboarding step card -->
+    <string name="onboarding_expand_step">Schritt ausklappen</string>
+    <string name="onboarding_collapse_step">Schritt einklappen</string>
+    <string name="onboarding_required">Erforderlich</string>
+    <string name="onboarding_completed">Abgeschlossen</string>
+    <string name="onboarding_done_button">Fertig</string>
+
+    <!-- Onboarding states -->
+    <string name="onboarding_loading">Einführungsleitfaden wird geladen...</string>
+    <string name="onboarding_empty">Derzeit sind keine Einführungs-Schritte verfügbar.</string>
+    <string name="onboarding_all_complete_headline">Alles bereit.</string>
+    <string name="onboarding_all_complete_body">Du kannst diesen Leitfaden jederzeit in den Einstellungen erneut öffnen.</string>
+
+    <!-- Onboarding guide header -->
+    <string name="onboarding_progress">%1$s von %2$s Schritten abgeschlossen</string>
+    <string name="onboarding_required_remaining_singular">Noch %1$s erforderlicher Schritt</string>
+    <string name="onboarding_required_remaining_plural">Noch %1$s erforderliche Schritte</string>
+
+    <!-- Common onboarding steps -->
+    <string name="onboarding_step_add_account_title">Erstes Konto hinzufügen</string>
+    <string name="onboarding_step_add_account_action">Konto hinzufügen</string>
+    <string name="onboarding_step_manage_accounts_title">Konten verwalten</string>
+    <string name="onboarding_step_manage_accounts_description">Durchsuche deine Konten, zeige OTP-Codes an und entferne Einträge, die du nicht mehr benötigst.</string>
+    <string name="onboarding_step_manage_accounts_action">Konten öffnen</string>
+    <string name="onboarding_step_import_title">Bestehende Daten importieren oder wiederherstellen</string>
+    <string name="onboarding_step_import_description">Nutze die Einstellungen, um von deinen Backup-Anbietern zu importieren und bestehende Konten wiederherzustellen.</string>
+    <string name="onboarding_step_import_action">Einstellungen öffnen</string>
+    <string name="onboarding_step_backup_title">Tresor sichern</string>
+    <string name="onboarding_step_backup_description">Erstelle verschlüsselte Backups in den Einstellungen. Verfügbare Anbieter: %1$s.</string>
+    <string name="onboarding_step_backup_action">Backup-Einstellungen öffnen</string>
+    <string name="onboarding_step_companion_title">Companion-Synchronisierung einrichten</string>
+    <string name="onboarding_step_companion_description">Sende deine Konten aus den Einstellungen an dein Companion-Gerät, wenn es verbunden ist.</string>
+    <string name="onboarding_step_companion_action">Companion-Einstellungen öffnen</string>
+
+    <!-- Dynamic add-account description fragments -->
+    <string name="onboarding_method_scan_qr">einen QR-Code zu scannen</string>
+    <string name="onboarding_method_paste_qr">ein QR-Bild aus der Zwischenablage einzufügen</string>
+    <string name="onboarding_method_enter_uri">eine otpauth://-URI manuell einzufügen oder einzugeben</string>
+    <string name="onboarding_step_add_account_description">Füge dein erstes Konto hinzu, indem du %1$s.</string>
+
+    <!-- Platform-specific onboarding steps -->
+    <string name="onboarding_step_secure_unlock_title">Sicheres Entsperren aktivieren</string>
+    <string name="onboarding_step_secure_unlock_action">Sicherheitseinstellungen öffnen</string>
+    <string name="onboarding_step_secure_unlock_android_description">Aktiviere in den Einstellungen das biometrische Entsperren, um schnell per Fingerabdruck oder Gesicht zu entsperren.</string>
+    <string name="onboarding_step_secure_unlock_ios_description">Aktiviere in den Einstellungen sicheres Entsperren, um Face ID oder Touch ID für schnelleres Entsperren zu nutzen.</string>
+    <string name="onboarding_step_secure_unlock_wasm_description">Aktiviere in den Einstellungen sicheres Entsperren, um mit WebAuthn oder Geräteanmeldedaten zu verifizieren.</string>
+</resources>

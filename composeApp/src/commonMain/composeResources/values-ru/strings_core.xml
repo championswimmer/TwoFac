@@ -1,0 +1,31 @@
+<resources>
+    <!-- App identity -->
+    <string name="app_name">TwoFac</string>
+    <string name="app_tagline">Менеджер двухфакторной аутентификации</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_accounts">Аккаунты</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- Common actions -->
+    <string name="action_back">Назад</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_unlock">Разблокировать</string>
+    <string name="action_continue">Продолжить</string>
+    <string name="action_save">Сохранить</string>
+
+    <!-- Common labels -->
+    <string name="label_passkey">Ключ доступа</string>
+    <string name="label_passkey_placeholder">Введите ключ доступа</string>
+
+    <!-- OTP -->
+    <string name="otp_copied">Код OTP скопирован</string>
+    <string name="otp_time_remaining">%1$sс</string>
+
+    <!-- Common errors -->
+    <string name="error_prefix">Ошибка: %1$s</string>
+    <string name="error_operation_failed">Не удалось выполнить операцию</string>
+    <string name="error_unknown">неизвестная ошибка</string>
+</resources>

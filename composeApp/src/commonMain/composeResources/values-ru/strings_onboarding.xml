@@ -1,0 +1,51 @@
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onboarding_title">Начало работы</string>
+
+    <!-- Onboarding step card -->
+    <string name="onboarding_expand_step">Развернуть шаг</string>
+    <string name="onboarding_collapse_step">Свернуть шаг</string>
+    <string name="onboarding_required">Обязательно</string>
+    <string name="onboarding_completed">Выполнено</string>
+    <string name="onboarding_done_button">Готово</string>
+
+    <!-- Onboarding states -->
+    <string name="onboarding_loading">Загрузка руководства по началу работы...</string>
+    <string name="onboarding_empty">Сейчас нет доступных шагов начальной настройки.</string>
+    <string name="onboarding_all_complete_headline">Все готово.</string>
+    <string name="onboarding_all_complete_body">Вы можете открыть это руководство в любой момент из Настроек.</string>
+
+    <!-- Onboarding guide header -->
+    <string name="onboarding_progress">%1$s из %2$s шагов выполнено</string>
+    <string name="onboarding_required_remaining_singular">Остался %1$s обязательный шаг</string>
+    <string name="onboarding_required_remaining_plural">Осталось %1$s обязательных шагов</string>
+
+    <!-- Common onboarding steps -->
+    <string name="onboarding_step_add_account_title">Добавьте первый аккаунт</string>
+    <string name="onboarding_step_add_account_action">Добавить аккаунт</string>
+    <string name="onboarding_step_manage_accounts_title">Управляйте аккаунтами</string>
+    <string name="onboarding_step_manage_accounts_description">Просматривайте аккаунты, смотрите OTP-коды и удаляйте записи, которые больше не нужны.</string>
+    <string name="onboarding_step_manage_accounts_action">Открыть аккаунты</string>
+    <string name="onboarding_step_import_title">Импортируйте или восстановите существующие данные</string>
+    <string name="onboarding_step_import_description">Используйте Настройки, чтобы импортировать данные от провайдеров резервного копирования и восстановить существующие аккаунты.</string>
+    <string name="onboarding_step_import_action">Открыть настройки</string>
+    <string name="onboarding_step_backup_title">Сделайте резервную копию хранилища</string>
+    <string name="onboarding_step_backup_description">Создавайте зашифрованные резервные копии в Настройках. Доступные провайдеры: %1$s.</string>
+    <string name="onboarding_step_backup_action">Открыть настройки резервного копирования</string>
+    <string name="onboarding_step_companion_title">Настройте синхронизацию с компаньоном</string>
+    <string name="onboarding_step_companion_description">Отправляйте аккаунты на устройство-компаньон из Настроек, когда оно подключено.</string>
+    <string name="onboarding_step_companion_action">Открыть настройки компаньона</string>
+
+    <!-- Dynamic add-account description fragments -->
+    <string name="onboarding_method_scan_qr">отсканировав QR-код</string>
+    <string name="onboarding_method_paste_qr">вставив изображение QR из буфера обмена</string>
+    <string name="onboarding_method_enter_uri">вставив или введя URI otpauth:// вручную</string>
+    <string name="onboarding_step_add_account_description">Добавьте первый аккаунт, %1$s.</string>
+
+    <!-- Platform-specific onboarding steps -->
+    <string name="onboarding_step_secure_unlock_title">Включите безопасную разблокировку</string>
+    <string name="onboarding_step_secure_unlock_action">Открыть настройки безопасности</string>
+    <string name="onboarding_step_secure_unlock_android_description">Включите биометрическую разблокировку в Настройках, чтобы быстро разблокировать хранилище отпечатком пальца или лицом.</string>
+    <string name="onboarding_step_secure_unlock_ios_description">Включите безопасную разблокировку в Настройках, чтобы использовать Face ID или Touch ID для более быстрой разблокировки.</string>
+    <string name="onboarding_step_secure_unlock_wasm_description">Включите безопасную разблокировку в Настройках для подтверждения через WebAuthn или учетные данные устройства.</string>
+</resources>

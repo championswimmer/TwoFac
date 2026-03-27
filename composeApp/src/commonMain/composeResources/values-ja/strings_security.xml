@@ -1,0 +1,12 @@
+<resources>
+    <!-- Passkey dialog (shared component) -->
+    <string name="security_passkey_dialog_title">パスキーを入力</string>
+    <string name="security_passkey_dialog_description">パスキーを入力してアカウントを復号・表示します</string>
+
+    <!-- Biometric prompts (Android) -->
+    <string name="biometric_enrollment_title">生体認証でのロック解除を有効化</string>
+    <string name="biometric_enrollment_subtitle">パスキーを安全に保存するために認証してください</string>
+    <string name="biometric_unlock_title">TwoFacのロックを解除</string>
+    <string name="biometric_unlock_subtitle">2FAコードにアクセスするために認証してください</string>
+    <string name="biometric_use_passkey_instead">代わりにパスキーを使用</string>
+</resources>
