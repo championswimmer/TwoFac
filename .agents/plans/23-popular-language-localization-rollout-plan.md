@@ -1,12 +1,12 @@
 ---
 name: Popular Language Localization Rollout
-status: In Progress
+status: Done
 progress:
   - "[x] Phase 0 - Lock locale codes, translation scope, and completion criteria"
   - "[x] Phase 1 - Add locale resource directories and file skeletons for all target languages"
   - "[x] Phase 2 - Translate all Compose app string domains for each locale"
   - "[x] Phase 3 - Add localization quality checks and fallback-safety validation"
-  - "[ ] Phase 4 - Smoke test language resolution on Android, iOS, Desktop, and Web"
+  - "[x] Phase 4 - Smoke test language resolution on Android, iOS, Desktop, and Web"
   - "[x] Phase 5 - Document contributor workflow for adding and maintaining translations"
 ---
 
