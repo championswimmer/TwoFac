@@ -21,7 +21,7 @@ interface MacOSKeychainNative : Library {
     fun twofac_keychain_is_available(): Int
 
     /**
-     * Store a passkey in the Keychain with biometric protection.
+     * Store a passkey in the Keychain, prompting Touch ID first.
      * @param passkey The passkey bytes (UTF-8 encoded)
      * @param passkeyLen Length of the passkey
      * @return 0 on success, non-zero error code on failure
@@ -29,8 +29,7 @@ interface MacOSKeychainNative : Library {
     fun twofac_keychain_store(passkey: ByteArray, passkeyLen: Int): Int
 
     /**
-     * Retrieve a passkey from the Keychain.
-     * This will trigger a Touch ID prompt if the item is biometric-protected.
+     * Retrieve a passkey from the Keychain, prompting Touch ID first.
      * @param buffer Buffer to receive the passkey
      * @param bufferLen Size of the buffer
      * @param outLen Pointer to receive the actual length of the passkey
@@ -53,12 +52,6 @@ interface MacOSKeychainNative : Library {
     companion object {
         private const val LIBRARY_NAME = "twofac_keychain"
 
-        private fun debugLog(message: String) {
-            val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
-            val timestamp = java.time.Instant.now().toString()
-            logFile.appendText("[$timestamp] $message\n")
-        }
-
         /**
          * Load the native library.
          *
@@ -69,54 +62,35 @@ interface MacOSKeychainNative : Library {
          * 4. jpackage app bundle locations (Contents/Resources, Contents/app)
          */
         fun load(): MacOSKeychainNative? {
-            debugLog("=== Starting native library load ===")
-            debugLog("os.name: ${System.getProperty("os.name")}")
-            debugLog("os.arch: ${System.getProperty("os.arch")}")
-            debugLog("java.library.path: ${System.getProperty("java.library.path")}")
-            debugLog("user.dir: ${System.getProperty("user.dir")}")
-            
             // First try default JNA behavior (system paths, java.library.path, etc.)
             try {
-                debugLog("Trying default JNA load...")
                 return Native.load(LIBRARY_NAME, MacOSKeychainNative::class.java)
             } catch (e: UnsatisfiedLinkError) {
-                debugLog("Default load failed: ${e.message}")
+                // fall through to manual search
             }
 
-            // Try to find the library in app bundle resources
             val possiblePaths = mutableListOf<String>()
 
             // 1. Check java.library.path
-            System.getProperty("java.library.path")?.split(File.pathSeparator)?.forEach { 
-                possiblePaths.add(it) 
+            System.getProperty("java.library.path")?.split(File.pathSeparator)?.forEach {
+                possiblePaths.add(it)
             }
 
             // 2. For jpackage apps, check relative to the app location
             try {
                 val codeSourceLocation = MacOSKeychainNative::class.java.protectionDomain.codeSource?.location
-                debugLog("codeSourceLocation: $codeSourceLocation")
                 if (codeSourceLocation != null) {
                     val appDir = File(codeSourceLocation.toURI()).parentFile
-                    debugLog("appDir: ${appDir?.absolutePath}")
                     possiblePaths.add(appDir.absolutePath)
-                    // Check Resources directory in app bundle (TwoFac.app/Contents/Resources)
-                    appDir.parentFile?.resolve("Resources")?.let { 
-                        debugLog("Adding path: ${it.absolutePath}")
-                        possiblePaths.add(it.absolutePath) 
-                    }
-                    // Also check app directory (TwoFac.app/Contents/app)
-                    appDir.parentFile?.resolve("app")?.let { 
-                        debugLog("Adding path: ${it.absolutePath}")
-                        possiblePaths.add(it.absolutePath) 
-                    }
-                    // Check resources subdirectory within app (TwoFac.app/Contents/app/resources)
-                    appDir.resolve("resources")?.let { 
-                        debugLog("Adding path: ${it.absolutePath}")
-                        possiblePaths.add(it.absolutePath) 
-                    }
+                    // TwoFac.app/Contents/Resources
+                    appDir.parentFile?.resolve("Resources")?.let { possiblePaths.add(it.absolutePath) }
+                    // TwoFac.app/Contents/app
+                    appDir.parentFile?.resolve("app")?.let { possiblePaths.add(it.absolutePath) }
+                    // TwoFac.app/Contents/app/resources
+                    appDir.resolve("resources")?.let { possiblePaths.add(it.absolutePath) }
                 }
             } catch (e: Exception) {
-                debugLog("Failed to determine code source location: ${e.message}")
+                // ignore
             }
 
             // 3. Check user.dir (current working directory)
@@ -126,41 +100,24 @@ interface MacOSKeychainNative : Library {
             try {
                 val userDir = System.getProperty("user.dir")
                 if (userDir != null) {
-                    // Check if we're running from a project directory (IDE/gradle run)
                     val buildDir = File(userDir, "build/generated/nativeDistributions/resources/macOS")
-                    if (buildDir.exists()) {
-                        debugLog("Adding build dir path: ${buildDir.absolutePath}")
-                        possiblePaths.add(buildDir.absolutePath)
-                    }
-                    // Also check relative to composeApp if running from project root
+                    if (buildDir.exists()) possiblePaths.add(buildDir.absolutePath)
+
                     val composeAppBuildDir = File(userDir, "composeApp/build/generated/nativeDistributions/resources/macOS")
-                    if (composeAppBuildDir.exists()) {
-                        debugLog("Adding composeApp build dir path: ${composeAppBuildDir.absolutePath}")
-                        possiblePaths.add(composeAppBuildDir.absolutePath)
-                    }
+                    if (composeAppBuildDir.exists()) possiblePaths.add(composeAppBuildDir.absolutePath)
                 }
             } catch (e: Exception) {
-                debugLog("Failed to check build directories: ${e.message}")
-            }
-
-            debugLog("Possible paths to search: ${possiblePaths.size}")
-            possiblePaths.forEachIndexed { index, path -> 
-                debugLog("  [$index] $path")
+                // ignore
             }
 
             // Try each path
             val originalJnaPath = System.getProperty("jna.library.path")
             for (path in possiblePaths) {
-                val dylibFile = File(path, "libtwofac_keychain.dylib")
-                debugLog("Checking path: $path (dylib exists: ${dylibFile.exists()})")
+                if (!File(path, "libtwofac_keychain.dylib").exists()) continue
                 try {
                     System.setProperty("jna.library.path", path)
-                    debugLog("Set jna.library.path to: $path")
-                    val result = Native.load(LIBRARY_NAME, MacOSKeychainNative::class.java)
-                    debugLog("SUCCESS! Loaded library from $path")
-                    return result
+                    return Native.load(LIBRARY_NAME, MacOSKeychainNative::class.java)
                 } catch (e: UnsatisfiedLinkError) {
-                    debugLog("Failed to load from $path: ${e.message}")
                     continue
                 }
             }
@@ -172,7 +129,6 @@ interface MacOSKeychainNative : Library {
                 System.clearProperty("jna.library.path")
             }
 
-            debugLog("Failed to load native library from all locations")
             return null
         }
     }

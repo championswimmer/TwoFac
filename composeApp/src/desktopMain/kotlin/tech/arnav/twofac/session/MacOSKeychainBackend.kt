@@ -16,15 +16,10 @@ class MacOSKeychainBackend(
     private val native: MacOSKeychainNative?
 ) : DesktopSecureUnlockBackend {
 
-    constructor() : this(loadNativeWithLogging())
+    constructor() : this(MacOSKeychainNative.load())
 
     override fun isAvailable(): Boolean {
-        val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
-        val nativeNotNull = native != null
-        val availableResult = if (nativeNotNull) native!!.twofac_keychain_is_available() else -1
-        val result = nativeNotNull && availableResult == 1
-        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.isAvailable(): native=$nativeNotNull, availableResult=$availableResult, result=$result\n")
-        return result
+        return native != null && native.twofac_keychain_is_available() == 1
     }
 
     override fun supportsStrongUserPresence(): Boolean {
@@ -46,31 +41,20 @@ class MacOSKeychainBackend(
         val outLen = IntByReference()
 
         val result = native!!.twofac_keychain_retrieve(buffer, buffer.size, outLen)
-        if (result != 0) {
-            println("MacOSKeychainBackend: Failed to retrieve passkey, error code: $result")
-            return null
-        }
+        if (result != 0) return null
 
         return String(buffer, 0, outLen.value, Charsets.UTF_8)
     }
 
     override fun savePasskey(passkey: String) {
         if (!isAvailable()) return
-
         val bytes = passkey.toByteArray(Charsets.UTF_8)
-        val result = native!!.twofac_keychain_store(bytes, bytes.size)
-        if (result != 0) {
-            println("MacOSKeychainBackend: Failed to save passkey, error code: $result")
-        }
+        native!!.twofac_keychain_store(bytes, bytes.size)
     }
 
     override fun clearPasskey() {
         if (!isAvailable()) return
-
-        val result = native!!.twofac_keychain_delete()
-        if (result != 0) {
-            println("MacOSKeychainBackend: Failed to delete passkey, error code: $result")
-        }
+        native!!.twofac_keychain_delete()
     }
 
     override fun hasStoredPasskey(): Boolean {
@@ -79,32 +63,9 @@ class MacOSKeychainBackend(
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean {
-        val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
-        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): starting\n")
-        
-        if (!isAvailable()) {
-            logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): isAvailable=false, aborting\n")
-            return false
-        }
-
-        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): calling clearPasskey()\n")
+        if (!isAvailable()) return false
         clearPasskey()
-
         val bytes = passkey.toByteArray(Charsets.UTF_8)
-        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): calling twofac_keychain_store with ${bytes.size} bytes\n")
-        val result = native!!.twofac_keychain_store(bytes, bytes.size)
-
-        logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend.enrollPasskey(): result=$result\n")
-        return result == 0
-    }
-
-    companion object {
-        private fun loadNativeWithLogging(): MacOSKeychainNative? {
-            val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
-            logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend: About to call MacOSKeychainNative.load()\n")
-            return MacOSKeychainNative.load().also {
-                logFile.appendText("[${java.time.Instant.now()}] MacOSKeychainBackend: MacOSKeychainNative.load() returned: $it\n")
-            }
-        }
+        return native!!.twofac_keychain_store(bytes, bytes.size) == 0
     }
 }

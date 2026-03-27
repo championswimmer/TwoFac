@@ -33,7 +33,6 @@ class DesktopBiometricSessionManager(
                 default = BiometricPreferences(),
             )
         } catch (e: Exception) {
-            println("DesktopBiometricSessionManager: Failed to initialize preferences store: ${e.message}")
             null
         }
     }
@@ -42,7 +41,6 @@ class DesktopBiometricSessionManager(
         return try {
             runBlocking { store?.get() } ?: BiometricPreferences()
         } catch (e: Exception) {
-            println("DesktopBiometricSessionManager: Failed to read preferences: ${e.message}")
             BiometricPreferences()
         }
     }
@@ -52,7 +50,7 @@ class DesktopBiometricSessionManager(
             val current = getPreferences()
             runBlocking { store?.set(update(current)) }
         } catch (e: Exception) {
-            println("DesktopBiometricSessionManager: Failed to update preferences: ${e.message}")
+            // ignore
         }
     }
 
@@ -76,7 +74,6 @@ class DesktopBiometricSessionManager(
         if (!enabled) {
             clearPasskey()
         }
-        println("DesktopBiometricSessionManager: setBiometricEnabled($enabled)")
     }
 
     override fun isRememberPasskeyEnabled(): Boolean {
@@ -90,59 +87,39 @@ class DesktopBiometricSessionManager(
         if (!enabled) {
             clearPasskey()
         }
-        println("DesktopBiometricSessionManager: setRememberPasskey($enabled)")
     }
 
     override suspend fun getSavedPasskey(): String? {
-        if (!isRememberPasskeyEnabled()) {
-            println("DesktopBiometricSessionManager: getSavedPasskey - remember passkey not enabled")
-            return null
-        }
+        if (!isRememberPasskeyEnabled()) return null
         return try {
             backend.getSavedPasskey()
         } catch (e: Exception) {
-            println("DesktopBiometricSessionManager: Failed to get saved passkey: ${e.message}")
             null
         }
     }
 
     override fun savePasskey(passkey: String) {
-        if (!isRememberPasskeyEnabled()) {
-            println("DesktopBiometricSessionManager: savePasskey - remember passkey not enabled, skipping")
-            return
-        }
+        if (!isRememberPasskeyEnabled()) return
         try {
             backend.savePasskey(passkey)
-            println("DesktopBiometricSessionManager: savePasskey - saved successfully")
         } catch (e: Exception) {
-            println("DesktopBiometricSessionManager: Failed to save passkey: ${e.message}")
+            // ignore
         }
     }
 
     override fun clearPasskey() {
         try {
             backend.clearPasskey()
-            println("DesktopBiometricSessionManager: clearPasskey - cleared successfully")
         } catch (e: Exception) {
-            println("DesktopBiometricSessionManager: Failed to clear passkey: ${e.message}")
+            // ignore
         }
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean {
-        val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
-        logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): starting\n")
-        
-        if (!isBiometricAvailable()) {
-            logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): biometric not available (isBiometricAvailable=${isBiometricAvailable()}, backend.isAvailable=${backend.isAvailable()})\n")
-            return false
-        }
+        if (!isBiometricAvailable()) return false
         return try {
-            logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): calling backend.enrollPasskey()\n")
-            val result = backend.enrollPasskey(passkey)
-            logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): result=$result\n")
-            result
+            backend.enrollPasskey(passkey)
         } catch (e: Exception) {
-            logFile.appendText("[${java.time.Instant.now()}] DesktopBiometricSessionManager.enrollPasskey(): exception: ${e.message}\n")
             false
         }
     }
