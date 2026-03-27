@@ -102,4 +102,4 @@ website/
 1. **SEO Optimization**: Ensure every page has unique meta titles, descriptions, canonical URLs, and OpenGraph tags.
 2. **Performance**: Audit with Lighthouse. Ensure images are optimized (WebP) and lazy-loaded. Tailwind purges unused CSS.
 3. **Responsive Design**: Test extensively on mobile (critical for an authenticator app landing page).
-4. **CI/CD Integration**: Add a GitHub Action to automatically build and deploy the `./website` folder to GitHub Pages, Cloudflare Pages, or Vercel on push to the `main` branch.
+4. **CI/CD Integration**: Add a GitHub Action to automatically build and deploy the `./website` folder to GitHub Pages and deploy to `gh-pages` branch
