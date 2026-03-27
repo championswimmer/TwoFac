@@ -15,22 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
-import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
 fun RememberPasskeyCard(
     title: String,
     description: String,
-    isRememberPasskeyEnabled: Boolean,
-    onRememberPasskeyChanged: (Boolean) -> Unit,
-    showBiometricToggle: Boolean,
-    isBiometricEnabled: Boolean,
-    onBiometricChanged: (Boolean) -> Unit,
+    isEnabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    biometricTitle: String = stringResource(Res.string.settings_biometric_title),
-    biometricDescription: String = stringResource(Res.string.settings_biometric_description),
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -49,8 +42,8 @@ fun RememberPasskeyCard(
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Switch(
-                    checked = isRememberPasskeyEnabled,
-                    onCheckedChange = onRememberPasskeyChanged,
+                    checked = isEnabled,
+                    onCheckedChange = onEnabledChanged,
                 )
             }
             Text(
@@ -59,32 +52,6 @@ fun RememberPasskeyCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp),
             )
-
-            if (showBiometricToggle) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
-                        Text(
-                            text = biometricTitle,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Text(
-                            text = biometricDescription,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Switch(
-                        checked = isBiometricEnabled,
-                        onCheckedChange = onBiometricChanged,
-                    )
-                }
-            }
         }
     }
 }
@@ -94,13 +61,10 @@ fun RememberPasskeyCard(
 private fun RememberPasskeyCardPreview() {
     TwoFacTheme {
         RememberPasskeyCard(
-            title = "Remember Passkey",
-            description = "Keep the passkey saved so you don't have to enter it every time the extension is opened. Only enable this on devices you trust.",
-            isRememberPasskeyEnabled = true,
-            onRememberPasskeyChanged = {},
-            showBiometricToggle = true,
-            isBiometricEnabled = false,
-            onBiometricChanged = {},
+            title = "Biometric Unlock",
+            description = "Use fingerprint or face recognition to unlock your vault",
+            isEnabled = true,
+            onEnabledChanged = {},
         )
     }
 }
