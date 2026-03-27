@@ -707,22 +707,20 @@ fun SettingsScreen(
                             return@launch
                         }
                         twoFacLib.unlock(passkey)
-                        secureSessionManager.setSecureUnlockEnabled(true)
-                        sessionManager.setRememberPasskey(true)
+                        // Enroll first, then set enabled — avoids a window where
+                        // isSecureUnlockEnabled is true but no passkey is stored.
                         val enrolled = secureSessionManager.enrollPasskey(passkey)
                         if (enrolled) {
+                            secureSessionManager.setSecureUnlockEnabled(true)
+                            sessionManager.setRememberPasskey(true)
                             isSecureUnlockEnabled.value = true
                             showEnrollmentDialog = false
                             onboardingViewModel?.refreshAndSyncDerivedCompletion()
                             snackbarHostState.showSnackbar(successMsg)
                         } else {
-                            secureSessionManager.setSecureUnlockEnabled(false)
-                            isSecureUnlockEnabled.value = false
                             enrollmentError = cancelledMsg
                         }
                     } catch (e: Exception) {
-                        secureSessionManager.setSecureUnlockEnabled(false)
-                        isSecureUnlockEnabled.value = false
                         enrollmentError = e.message ?: msgVerifyFailed
                     } finally {
                         isLoading = false
