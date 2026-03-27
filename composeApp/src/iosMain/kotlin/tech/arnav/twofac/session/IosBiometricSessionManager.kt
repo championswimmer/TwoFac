@@ -14,7 +14,6 @@ class IosBiometricSessionManager(
 
     companion object {
         private const val PREFS_BIOMETRIC_ENABLED = "twofac_biometric_enabled"
-        private const val PREFS_REMEMBER_ENABLED = "twofac_remember_passkey"
         private const val KEYCHAIN_SERVICE = "tech.arnav.twofac"
         private const val KEYCHAIN_ACCOUNT = "vault_passkey"
     }
@@ -45,33 +44,23 @@ class IosBiometricSessionManager(
     }
 
     override fun isRememberPasskeyEnabled(): Boolean {
-        return isBiometricEnabled() || userDefaults.boolForKey(PREFS_REMEMBER_ENABLED)
+        // On iOS, "remember passkey" is synonymous with biometric unlock
+        return isBiometricEnabled()
     }
 
     override fun setRememberPasskey(enabled: Boolean) {
-        userDefaults.setBool(enabled, forKey = PREFS_REMEMBER_ENABLED)
-        if (!enabled) {
-            clearPasskey()
-        }
+        // Delegate to biometric toggle — the two are synonymous on secure platforms
+        setBiometricEnabled(enabled)
     }
 
     override suspend fun getSavedPasskey(): String? {
-        if (!isRememberPasskeyEnabled()) return null
-        return if (isBiometricEnabled()) {
-            authenticateAndRetrieve()
-        } else {
-            KeychainHelper.read(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT)
-        }
+        if (!isBiometricEnabled()) return null
+        return authenticateAndRetrieve()
     }
 
     override fun savePasskey(passkey: String) {
-        if (!isRememberPasskeyEnabled()) return
-        KeychainHelper.save(
-            service = KEYCHAIN_SERVICE,
-            account = KEYCHAIN_ACCOUNT,
-            value = passkey,
-            requireBiometric = isBiometricEnabled(),
-        )
+        // No-op: on iOS, passkeys are only stored via enrollPasskey() with biometric
+        // Keychain protection. Plain-text persistence is not supported.
     }
 
     override fun clearPasskey() {

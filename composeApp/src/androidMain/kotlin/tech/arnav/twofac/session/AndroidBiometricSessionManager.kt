@@ -49,11 +49,13 @@ class AndroidBiometricSessionManager(
     override fun isAvailable(): Boolean = true
 
     override fun isRememberPasskeyEnabled(): Boolean {
-        return prefs.getBoolean(KEY_REMEMBER_ENABLED, false) && isBiometricAvailable()
+        // On Android, "remember passkey" is synonymous with biometric unlock
+        return isBiometricEnabled()
     }
 
     override fun setRememberPasskey(enabled: Boolean) {
-        setRememberEnabled(enabled)
+        // Delegate to biometric toggle — the two are synonymous on secure platforms
+        setBiometricEnabled(enabled)
     }
 
     override fun isBiometricEnabled(): Boolean {
@@ -87,24 +89,8 @@ class AndroidBiometricSessionManager(
     }
 
     override fun savePasskey(passkey: String) {
-        if (!isRememberPasskeyEnabled()) return
-
-        try {
-            val key = getOrCreateKey()
-            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            cipher.init(Cipher.ENCRYPT_MODE, key)
-
-            val encrypted = cipher.doFinal(passkey.toByteArray())
-            val iv = cipher.iv
-
-            prefs.edit()
-                .putString(KEY_ENCRYPTED_PASSKEY, Base64.encodeToString(encrypted, Base64.NO_WRAP))
-                .putString(KEY_PASSKEY_IV, Base64.encodeToString(iv, Base64.NO_WRAP))
-                .apply()
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to save passkey in biometric session storage", e)
-            // Don't clearPasskey() here in case enrollment data is still valid
-        }
+        // No-op: on Android, passkeys are only stored via enrollPasskey() with biometric
+        // protection. Plain-text persistence is not supported.
     }
 
     override fun clearPasskey() {

@@ -23,36 +23,29 @@ class IosBiometricSessionManagerTest {
     }
 
     @Test
-    fun rememberPasskeyPreferenceRoundTrips() {
+    fun rememberPasskeyDelegatesToBiometric() {
         val manager = createManager()
+        // isRememberPasskeyEnabled is synonymous with isBiometricEnabled
         assertFalse(manager.isRememberPasskeyEnabled())
-
-        manager.setRememberPasskey(true)
-        assertTrue(manager.isRememberPasskeyEnabled())
-
-        manager.setRememberPasskey(false)
-        assertFalse(manager.isRememberPasskeyEnabled())
+        assertEquals(manager.isBiometricEnabled(), manager.isRememberPasskeyEnabled())
     }
 
     @Test
-    fun getSavedPasskeyReturnsNullWhenRememberDisabled() {
+    fun getSavedPasskeyReturnsNullWhenBiometricDisabled() {
         runTest {
             val manager = createManager()
-            manager.setRememberPasskey(false)
+            manager.setBiometricEnabled(false)
             assertNull(manager.getSavedPasskey())
         }
     }
 
     @Test
-    fun rememberEnabledWithoutBiometricCanRoundTripPasskey() {
+    fun savePasskeyIsNoOp() {
         runTest {
             val manager = createManager()
-            manager.setBiometricEnabled(false)
-            manager.setRememberPasskey(true)
-
+            // savePasskey is a no-op on secure platforms — passkeys only stored via enrollPasskey
             manager.savePasskey("test-passkey")
-
-            assertEquals("test-passkey", manager.getSavedPasskey())
+            assertNull(manager.getSavedPasskey())
         }
     }
 
@@ -72,14 +65,11 @@ class IosBiometricSessionManagerTest {
     }
 
     @Test
-    fun secureUnlockReadinessReflectsStoredPasskey() {
+    fun secureUnlockReadinessRequiresBiometric() {
         runTest {
             val manager = createManager()
+            // Without biometric, secure unlock is never ready
             manager.setBiometricEnabled(false)
-            manager.setRememberPasskey(true)
-            assertFalse(manager.isSecureUnlockReady())
-
-            manager.savePasskey("test-passkey")
             assertFalse(manager.isSecureUnlockReady())
         }
     }

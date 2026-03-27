@@ -106,26 +106,32 @@ fun SettingsScreen(
     var companionDisplayName by remember {
         mutableStateOf(companionSyncCoordinator?.companionDisplayName ?: "")
     }
-    var isRememberPasskeyEnabled by remember {
-        mutableStateOf(sessionManager?.isRememberPasskeyEnabled() ?: false)
-    }
     val secureSessionManager = sessionManager as? SecureSessionManager
     val biometricSessionManager = sessionManager as? BiometricSessionManager
-    val usesGenericSecureUnlockFlow = secureSessionManager != null && biometricSessionManager == null
-    val rememberPasskeyTitle =
-        if (usesGenericSecureUnlockFlow) stringResource(Res.string.settings_secure_unlock_title) else stringResource(Res.string.settings_remember_passkey_title)
-    val rememberPasskeyDescription = if (usesGenericSecureUnlockFlow) {
-        stringResource(Res.string.settings_secure_unlock_description)
-    } else {
-        stringResource(Res.string.settings_remember_passkey_description)
+    // Determine if secure storage is available — if so, we show one unified toggle
+    val hasSecureStorage = secureSessionManager != null
+    val isSecureUnlockEnabled = remember(sessionManager) {
+        mutableStateOf(
+            if (hasSecureStorage) {
+                secureSessionManager!!.isSecureUnlockEnabled()
+            } else {
+                sessionManager?.isRememberPasskeyEnabled() ?: false
+            }
+        )
     }
-    var isBiometricEnabled by remember {
-        mutableStateOf(biometricSessionManager?.isBiometricEnabled() ?: false)
+    // Choose title/description based on platform capabilities
+    val toggleTitle = when {
+        biometricSessionManager != null -> stringResource(Res.string.settings_biometric_title)
+        secureSessionManager != null -> stringResource(Res.string.settings_secure_unlock_title)
+        else -> stringResource(Res.string.settings_remember_passkey_title)
     }
-    var showBiometricEnrollmentDialog by remember { mutableStateOf(false) }
-    var biometricEnrollmentError by remember { mutableStateOf<String?>(null) }
-    var showSecureEnrollmentDialog by remember { mutableStateOf(false) }
-    var secureEnrollmentError by remember { mutableStateOf<String?>(null) }
+    val toggleDescription = when {
+        biometricSessionManager != null -> stringResource(Res.string.settings_biometric_description)
+        secureSessionManager != null -> stringResource(Res.string.settings_secure_unlock_description)
+        else -> stringResource(Res.string.settings_remember_passkey_description)
+    }
+    var showEnrollmentDialog by remember { mutableStateOf(false) }
+    var enrollmentError by remember { mutableStateOf<String?>(null) }
     var backupProviders by remember { mutableStateOf<List<BackupProvider>>(emptyList()) }
 
     // Pre-resolve simple localizable strings for use in coroutine lambdas
@@ -296,37 +302,27 @@ fun SettingsScreen(
 
             if (sessionManager != null && sessionManager.isAvailable()) {
                 RememberPasskeyCard(
-                    title = rememberPasskeyTitle,
-                    description = rememberPasskeyDescription,
-                    isRememberPasskeyEnabled = isRememberPasskeyEnabled,
-                    onRememberPasskeyChanged = { enabled ->
+                    title = toggleTitle,
+                    description = toggleDescription,
+                    isEnabled = isSecureUnlockEnabled.value,
+                    onEnabledChanged = { enabled ->
                         if (!enabled) {
+                            // Disable: clear everything
+                            if (hasSecureStorage) {
+                                secureSessionManager!!.setSecureUnlockEnabled(false)
+                            }
                             sessionManager.setRememberPasskey(false)
-                            isRememberPasskeyEnabled = false
-                            showSecureEnrollmentDialog = false
-                            secureEnrollmentError = null
-                            biometricSessionManager?.setBiometricEnabled(false)
-                            isBiometricEnabled = false
-                        } else if (usesGenericSecureUnlockFlow) {
-                            secureEnrollmentError = null
-                            showSecureEnrollmentDialog = true
-                        } else if (biometricSessionManager != null) {
-                            // On iOS, remember-passkey requires biometric enrollment
-                            // since the Keychain protects the passkey with Face ID / Touch ID
-                            showBiometricEnrollmentDialog = true
+                            isSecureUnlockEnabled.value = false
+                            showEnrollmentDialog = false
+                            enrollmentError = null
+                        } else if (hasSecureStorage) {
+                            // Enable on secure platform: show enrollment dialog
+                            enrollmentError = null
+                            showEnrollmentDialog = true
                         } else {
+                            // Enable on plain platform (no secure storage)
                             sessionManager.setRememberPasskey(true)
-                            isRememberPasskeyEnabled = true
-                        }
-                    },
-                    showBiometricToggle = biometricSessionManager?.isBiometricAvailable() == true,
-                    isBiometricEnabled = isBiometricEnabled,
-                    onBiometricChanged = { enabled ->
-                        if (enabled) {
-                            showBiometricEnrollmentDialog = true
-                        } else {
-                            biometricSessionManager?.setBiometricEnabled(false)
-                            isBiometricEnabled = false
+                            isSecureUnlockEnabled.value = true
                         }
                     },
                 )
@@ -693,88 +689,49 @@ fun SettingsScreen(
         )
     }
 
-    if (showSecureEnrollmentDialog && usesGenericSecureUnlockFlow) {
-        val manager = checkNotNull(secureSessionManager)
+    // Unified enrollment dialog for secure/biometric unlock
+    if (showEnrollmentDialog && secureSessionManager != null) {
+        val successMsg = if (biometricSessionManager != null) msgBiometricEnabled else msgSecureEnabled
+        val cancelledMsg = if (biometricSessionManager != null) msgBiometricCancelled else msgSecureCancelled
         PasskeyDialog(
             isVisible = true,
             isLoading = isLoading,
-            error = secureEnrollmentError,
+            error = enrollmentError,
             onPasskeySubmit = { passkey ->
-                secureEnrollmentError = null
+                enrollmentError = null
                 isLoading = true
                 coroutineScope.launch {
                     try {
                         if (twoFacLib == null) {
-                            secureEnrollmentError = msgSecureUnavailable
+                            enrollmentError = msgSecureUnavailable
                             return@launch
                         }
                         twoFacLib.unlock(passkey)
-                        manager.setSecureUnlockEnabled(true)
-                        val enrolled = manager.enrollPasskey(passkey)
-                        if (enrolled) {
-                            isRememberPasskeyEnabled =
-                                manager.isSecureUnlockEnabled()
-                            showSecureEnrollmentDialog = false
-                            onboardingViewModel?.refreshAndSyncDerivedCompletion()
-                            snackbarHostState.showSnackbar(msgSecureEnabled)
-                        } else {
-                            manager.setSecureUnlockEnabled(false)
-                            isRememberPasskeyEnabled = false
-                            secureEnrollmentError = msgSecureCancelled
-                        }
-                    } catch (e: Exception) {
-                        manager.setSecureUnlockEnabled(false)
-                        isRememberPasskeyEnabled = false
-                        secureEnrollmentError = e.message ?: msgVerifyFailed
-                    } finally {
-                        isLoading = false
-                    }
-                }
-            },
-            onDismiss = {
-                showSecureEnrollmentDialog = false
-                secureEnrollmentError = null
-            }
-        )
-    }
-
-    // Passkey dialog for biometric enrollment
-    if (showBiometricEnrollmentDialog && biometricSessionManager != null) {
-        PasskeyDialog(
-            isVisible = true,
-            isLoading = isLoading,
-            error = biometricEnrollmentError,
-            onPasskeySubmit = { passkey ->
-                biometricEnrollmentError = null
-                isLoading = true
-                coroutineScope.launch {
-                    try {
-                        // Verify passkey is correct
-                        twoFacLib?.unlock(passkey)
-                        // Enable biometric and enroll the passkey
-                        biometricSessionManager.setBiometricEnabled(true)
+                        secureSessionManager.setSecureUnlockEnabled(true)
                         sessionManager.setRememberPasskey(true)
-                        val enrolled = biometricSessionManager.enrollPasskey(passkey)
+                        val enrolled = secureSessionManager.enrollPasskey(passkey)
                         if (enrolled) {
-                            isBiometricEnabled = true
-                            isRememberPasskeyEnabled = true
-                            showBiometricEnrollmentDialog = false
+                            isSecureUnlockEnabled.value = true
+                            showEnrollmentDialog = false
                             onboardingViewModel?.refreshAndSyncDerivedCompletion()
-                            snackbarHostState.showSnackbar(msgBiometricEnabled)
+                            snackbarHostState.showSnackbar(successMsg)
                         } else {
-                            biometricSessionManager.setBiometricEnabled(false)
-                            biometricEnrollmentError = msgBiometricCancelled
+                            secureSessionManager.setSecureUnlockEnabled(false)
+                            isSecureUnlockEnabled.value = false
+                            enrollmentError = cancelledMsg
                         }
                     } catch (e: Exception) {
-                        biometricEnrollmentError = e.message ?: msgVerifyFailed
+                        secureSessionManager.setSecureUnlockEnabled(false)
+                        isSecureUnlockEnabled.value = false
+                        enrollmentError = e.message ?: msgVerifyFailed
                     } finally {
                         isLoading = false
                     }
                 }
             },
             onDismiss = {
-                showBiometricEnrollmentDialog = false
-                biometricEnrollmentError = null
+                showEnrollmentDialog = false
+                enrollmentError = null
             }
         )
     }
