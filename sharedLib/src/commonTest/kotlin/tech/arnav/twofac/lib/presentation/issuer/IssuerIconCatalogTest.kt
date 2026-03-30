@@ -52,8 +52,13 @@ class IssuerIconCatalogTest {
     }
 
     @Test
-    fun glyphForIconKeyReturnsGlyphOnlyForSupportedIcons() {
-        assertNotNull(IssuerIconCatalog.glyphForIconKey("github"))
+    fun supportedIconKeysAllHaveFontAwesomeGlyphs() {
+        IssuerIconCatalog.supportedIconKeys()
+            .filterNot { it == IssuerIconCatalog.PLACEHOLDER_ICON_KEY }
+            .forEach { iconKey ->
+                assertNotNull(IssuerIconCatalog.glyphForIconKey(iconKey), iconKey)
+            }
+
         assertNull(IssuerIconCatalog.glyphForIconKey("not-a-real-icon"))
     }
 }

@@ -44,8 +44,8 @@ Issuer matching is intentionally derived from the current `issuer` value at UI o
 
 ## Adding a new issuer
 
-1. Add or extend aliases in `IssuerIconCatalog.normalizeIssuer()` / `aliasToIconKey`.
-2. Add the stable `iconKey` to `supportedIconKeys`.
+1. Add or extend aliases in `IssuerIconCatalog.normalizeIssuer()` / `issuerToIcon`.
+2. Point those aliases at the stable `iconKey` string you want to use.
 3. Add the matching Font Awesome glyph string in `glyphForIconKey`.
 4. Ensure the brand glyph exists in `fa_brands_400_regular.ttf`.
 5. Add the matching watchOS asset catalog entry at `iosApp/watchApp/Assets.xcassets/{iconKey}.imageset/`.
