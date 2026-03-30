@@ -11,23 +11,23 @@ useSEO({
 })
 
 const features = [
-  { name: 'Open Source', twofac: '✓', competitor: '✓' },
-  { name: 'Android App', twofac: '✓', competitor: '✓' },
-  { name: 'iOS App', twofac: '✓', competitor: '✓' },
-  { name: 'Desktop App (macOS/Windows/Linux)', twofac: '✓', competitor: '✓' },
-  { name: 'CLI Tool', twofac: '✓', competitor: '✗' },
-  { name: 'Web App', twofac: '✓', competitor: '✓' },
-  { name: 'Browser Extension', twofac: '✓', competitor: '✗' },
-  { name: 'Wear OS', twofac: '✓', competitor: '✗' },
-  { name: 'watchOS', twofac: '✓', competitor: '✗' },
-  { name: 'TOTP Support', twofac: '✓', competitor: '✓' },
-  { name: 'HOTP Support', twofac: '✓', competitor: '✓' },
-  { name: 'E2E Encrypted Sync', twofac: '✓', competitor: '✓' },
-  { name: 'Encrypted Backups', twofac: '✓', competitor: '✓' },
-  { name: 'Biometric Lock', twofac: '✓', competitor: '✗' },
-  { name: 'No Account Required', twofac: '✓', competitor: '✓ (local) / ✗ (sync)' },
-  { name: 'Kotlin Multiplatform (Native)', twofac: '✓', competitor: '✗ (Flutter)' },
-  { name: 'Completely Free', twofac: '✓', competitor: '✓ (5 GB free tier)' },
+  { name: 'Open Source', twofac: true, competitor: true },
+  { name: 'Android App', twofac: true, competitor: true },
+  { name: 'iOS App', twofac: true, competitor: true },
+  { name: 'Desktop App (macOS/Windows/Linux)', twofac: true, competitor: true },
+  { name: 'CLI Tool', twofac: true, competitor: false },
+  { name: 'Web App', twofac: true, competitor: true },
+  { name: 'Browser Extension', twofac: true, competitor: false },
+  { name: 'Wear OS', twofac: true, competitor: false },
+  { name: 'watchOS', twofac: true, competitor: false },
+  { name: 'TOTP Support', twofac: true, competitor: true },
+  { name: 'HOTP Support', twofac: true, competitor: true },
+  { name: 'E2E Encrypted Sync', twofac: true, competitor: true },
+  { name: 'Encrypted Backups', twofac: true, competitor: true },
+  { name: 'Biometric Lock', twofac: true, competitor: false },
+  { name: 'No Account Required', twofac: true, competitor: 'Yes (local) / No (sync)' },
+  { name: 'Kotlin Multiplatform (Native)', twofac: true, competitor: 'No (Flutter)' },
+  { name: 'Completely Free', twofac: true, competitor: 'Yes (5 GB free tier)' },
 ]
 </script>
 
@@ -55,7 +55,7 @@ const features = [
             href="#comparison-table"
             class="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            See Full Comparison ↓
+            See Full Comparison <i class="fa-solid fa-arrow-down ml-1" aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -77,7 +77,7 @@ const features = [
             <div class="mt-1 text-xs text-secondary-500 dark:text-secondary-400">Ente Auth uses Flutter</div>
           </div>
           <div class="rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-6 text-center">
-            <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">⌚</div>
+            <div class="text-3xl font-bold text-primary-600 dark:text-primary-400"><i class="fa-solid fa-clock" aria-hidden="true" /></div>
             <div class="mt-2 text-sm font-medium text-secondary-700 dark:text-secondary-300">Wear OS + watchOS</div>
             <div class="mt-1 text-xs text-secondary-500 dark:text-secondary-400">Ente Auth has no wearable apps</div>
           </div>
@@ -223,42 +223,42 @@ const features = [
         <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-8">Why Choose TwoFac Over Ente Auth?</h2>
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">💻 CLI for Developers</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-terminal mr-2" aria-hidden="true" />CLI for Developers</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Generate 2FA codes from your terminal with auto-refresh, account management, and scriptable output. Ente Auth offers
               no interactive CLI.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🧩 Browser Extension</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-puzzle-piece mr-2" aria-hidden="true" />Browser Extension</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Autofill 2FA codes directly in your browser login forms. No app-switching, no manual code entry. Ente Auth doesn't
               have a browser extension.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">⌚ Wearable Apps</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-clock mr-2" aria-hidden="true" />Wearable Apps</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               View 2FA codes on your Wear OS or Apple Watch. Quick glance at your wrist beats reaching for your phone every time.
               Ente Auth has no wearable support.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🔧 True Native Performance</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-microchip mr-2" aria-hidden="true" />True Native Performance</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Kotlin Multiplatform compiles to native code with platform-native UI frameworks — no Flutter rendering layer. Faster
               startup, better animations, and genuine platform behavior.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🔒 Biometric Lock</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-fingerprint mr-2" aria-hidden="true" />Biometric Lock</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Protect your 2FA codes with fingerprint or face recognition. Ente Auth lacks biometric lock, leaving codes accessible
               to anyone with device access.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🆓 No Account Required</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-user-check mr-2" aria-hidden="true" />No Account Required</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Use every TwoFac feature without creating any account. Ente Auth requires an Ente account for cloud sync and backup.
             </p>
@@ -333,7 +333,7 @@ const features = [
             to="/features"
             class="inline-flex items-center justify-center px-8 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            Explore All Features →
+            Explore All Features <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
           </RouterLink>
         </div>
       </div>

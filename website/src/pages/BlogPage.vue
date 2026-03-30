@@ -75,7 +75,7 @@ function formatDate(dateString: string): string {
 
             <!-- Read more -->
             <span class="mt-4 inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 group-hover:underline">
-              Read more →
+              Read more <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
             </span>
           </div>
         </RouterLink>

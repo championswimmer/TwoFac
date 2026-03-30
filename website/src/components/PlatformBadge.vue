@@ -18,7 +18,7 @@ withDefaults(
         : 'bg-white/5 text-white/40 backdrop-blur-sm'
     "
   >
-    <span class="text-base" aria-hidden="true">{{ icon }}</span>
+    <i :class="icon" class="text-base" aria-hidden="true" />
     {{ name }}
   </span>
 </template>

@@ -18,12 +18,13 @@ interface DownloadCard {
   external?: boolean
 }
 
-const categories: { title: string; cards: DownloadCard[] }[] = [
+const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
   {
-    title: '📱 Mobile',
+    title: 'Mobile',
+    icon: 'fa-solid fa-mobile-screen-button',
     cards: [
       {
-        icon: '🤖',
+        icon: 'fa-brands fa-android',
         name: 'Android',
         description: 'Full-featured 2FA app with biometric lock and Wear OS companion.',
         link: '#',
@@ -31,7 +32,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         external: true,
       },
       {
-        icon: '🍎',
+        icon: 'fa-brands fa-apple',
         name: 'iOS',
         description: 'Native iOS app with Face ID / Touch ID and watchOS companion.',
         link: '#',
@@ -41,10 +42,11 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
     ],
   },
   {
-    title: '🖥️ Desktop',
+    title: 'Desktop',
+    icon: 'fa-solid fa-desktop',
     cards: [
       {
-        icon: '🍎',
+        icon: 'fa-brands fa-apple',
         name: 'macOS',
         description: 'Native desktop app packaged as a DMG.',
         link: 'https://github.com/championswimmer/TwoFac/releases',
@@ -52,7 +54,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         external: true,
       },
       {
-        icon: '🪟',
+        icon: 'fa-brands fa-windows',
         name: 'Windows',
         description: 'Windows installer packaged as an MSI.',
         link: 'https://github.com/championswimmer/TwoFac/releases',
@@ -60,7 +62,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         external: true,
       },
       {
-        icon: '🐧',
+        icon: 'fa-brands fa-linux',
         name: 'Linux',
         description: 'Debian package for Ubuntu and other distributions.',
         link: 'https://github.com/championswimmer/TwoFac/releases',
@@ -70,10 +72,11 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
     ],
   },
   {
-    title: '🌐 Web',
+    title: 'Web',
+    icon: 'fa-solid fa-globe',
     cards: [
       {
-        icon: '🌐',
+        icon: 'fa-solid fa-globe',
         name: 'PWA',
         description: 'Install TwoFac as a Progressive Web App in any modern browser.',
         link: 'https://web.twofac.app',
@@ -81,7 +84,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         external: true,
       },
       {
-        icon: '🧩',
+        icon: 'fa-brands fa-chrome',
         name: 'Chrome Extension',
         description: 'Access your 2FA codes directly from the Chrome toolbar.',
         link: '#',
@@ -89,7 +92,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         external: true,
       },
       {
-        icon: '🦊',
+        icon: 'fa-brands fa-firefox-browser',
         name: 'Firefox Extension',
         description: 'Access your 2FA codes directly from the Firefox toolbar.',
         link: '#',
@@ -99,10 +102,11 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
     ],
   },
   {
-    title: '⌨️ CLI',
+    title: 'CLI',
+    icon: 'fa-solid fa-terminal',
     cards: [
       {
-        icon: '🍎',
+        icon: 'fa-brands fa-apple',
         name: 'macOS CLI',
         description: 'Native CLI binary for macOS (arm64 and x86_64).',
         link: 'https://github.com/championswimmer/TwoFac/releases',
@@ -110,7 +114,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         external: true,
       },
       {
-        icon: '🪟',
+        icon: 'fa-brands fa-windows',
         name: 'Windows CLI',
         description: 'Native CLI binary for Windows.',
         link: 'https://github.com/championswimmer/TwoFac/releases',
@@ -118,7 +122,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         external: true,
       },
       {
-        icon: '🐧',
+        icon: 'fa-brands fa-linux',
         name: 'Linux CLI',
         description: 'Native CLI binary for Linux (x86_64).',
         link: 'https://github.com/championswimmer/TwoFac/releases',
@@ -128,17 +132,18 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
     ],
   },
   {
-    title: '⌚ Wearables',
+    title: 'Wearables',
+    icon: 'fa-solid fa-clock',
     cards: [
       {
-        icon: '⌚',
+        icon: 'fa-solid fa-clock',
         name: 'Wear OS',
         description: 'Bundled with the Android app. Syncs codes automatically.',
         link: '#',
         linkText: 'Included with Android',
       },
       {
-        icon: '⌚',
+        icon: 'fa-solid fa-clock',
         name: 'watchOS',
         description: 'Bundled with the iOS app. Syncs codes automatically.',
         link: '#',
@@ -170,7 +175,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
           <h2
             class="text-2xl font-bold tracking-tight text-secondary-900 dark:text-white sm:text-3xl"
           >
-            {{ category.title }}
+            <i :class="category.icon" class="mr-2" aria-hidden="true" />{{ category.title }}
           </h2>
 
           <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -179,7 +184,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
               :key="card.name"
               class="flex flex-col rounded-xl border border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900 p-6 shadow-sm transition-shadow hover:shadow-md"
             >
-              <div class="text-4xl">{{ card.icon }}</div>
+              <div class="text-4xl text-primary-600 dark:text-primary-400"><i :class="card.icon" aria-hidden="true" /></div>
               <h3
                 class="mt-3 text-lg font-semibold text-secondary-900 dark:text-white"
               >

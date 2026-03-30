@@ -11,23 +11,23 @@ useSEO({
 })
 
 const features = [
-  { name: 'Open Source', twofac: '✓', competitor: '✓' },
-  { name: 'Android App', twofac: '✓', competitor: '✓' },
-  { name: 'iOS App', twofac: '✓', competitor: '✓' },
-  { name: 'Desktop App (macOS/Windows/Linux)', twofac: '✓', competitor: '✗' },
-  { name: 'CLI Tool', twofac: '✓', competitor: '✗' },
-  { name: 'Web App (PWA)', twofac: '✓', competitor: '✗' },
-  { name: 'Browser Extension', twofac: '✓', competitor: '✓' },
-  { name: 'Wear OS', twofac: '✓', competitor: '✗' },
-  { name: 'watchOS', twofac: '✓', competitor: '✓ (Apple Watch)' },
-  { name: 'TOTP Support', twofac: '✓', competitor: '✓' },
-  { name: 'HOTP Support', twofac: '✓', competitor: '✓' },
-  { name: 'Encrypted Backups', twofac: '✓', competitor: '✓' },
-  { name: 'Biometric Lock', twofac: '✓', competitor: '✓' },
-  { name: 'Cross-Platform Sync', twofac: '✓', competitor: 'Ecosystem-locked' },
-  { name: 'No Account Required', twofac: '✓', competitor: '✓' },
-  { name: 'Kotlin Multiplatform (Native)', twofac: '✓', competitor: '✗' },
-  { name: 'Completely Free', twofac: '✓', competitor: 'Free core / $9.99/yr Pass' },
+  { name: 'Open Source', twofac: true, competitor: true },
+  { name: 'Android App', twofac: true, competitor: true },
+  { name: 'iOS App', twofac: true, competitor: true },
+  { name: 'Desktop App (macOS/Windows/Linux)', twofac: true, competitor: false },
+  { name: 'CLI Tool', twofac: true, competitor: false },
+  { name: 'Web App (PWA)', twofac: true, competitor: false },
+  { name: 'Browser Extension', twofac: true, competitor: true },
+  { name: 'Wear OS', twofac: true, competitor: false },
+  { name: 'watchOS', twofac: true, competitor: 'Yes (Apple Watch)' },
+  { name: 'TOTP Support', twofac: true, competitor: true },
+  { name: 'HOTP Support', twofac: true, competitor: true },
+  { name: 'Encrypted Backups', twofac: true, competitor: true },
+  { name: 'Biometric Lock', twofac: true, competitor: true },
+  { name: 'Cross-Platform Sync', twofac: true, competitor: 'Ecosystem-locked' },
+  { name: 'No Account Required', twofac: true, competitor: true },
+  { name: 'Kotlin Multiplatform (Native)', twofac: true, competitor: false },
+  { name: 'Completely Free', twofac: true, competitor: 'Free core / $9.99/yr Pass' },
 ]
 </script>
 
@@ -55,7 +55,7 @@ const features = [
             href="#comparison-table"
             class="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            See Full Comparison ↓
+            See Full Comparison <i class="fa-solid fa-arrow-down ml-1" aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -216,28 +216,28 @@ const features = [
         <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-8">Why Choose TwoFac Over 2FAS?</h2>
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🖥️ Native Desktop Apps</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-desktop mr-2" aria-hidden="true" />Native Desktop Apps</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Standalone desktop apps for macOS, Windows, and Linux that work independently — no phone-to-browser bridge required.
               2FAS has no desktop application at all.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">💻 Powerful CLI Tool</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-terminal mr-2" aria-hidden="true" />Powerful CLI Tool</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Generate 2FA codes from your terminal — perfect for developers and system administrators. Scriptable, pipeable, and
               integrates into any workflow.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">⌚ Wear OS + watchOS</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-clock mr-2" aria-hidden="true" />Wear OS + watchOS</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Both apps support Apple Watch, but only TwoFac adds Wear OS support. View codes on your Android smartwatch without
               reaching for your phone.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🌐 Web PWA</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-globe mr-2" aria-hidden="true" />Web PWA</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Access your codes from any browser without installing an extension. TwoFac's progressive web app works on any device
               with a modern web browser.
@@ -250,7 +250,7 @@ const features = [
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🔧 Kotlin Multiplatform</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-code mr-2" aria-hidden="true" />Kotlin Multiplatform</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Built with Kotlin Multiplatform for true native performance. A single shared codebase compiles to native code on every
               platform — no runtime overhead.
@@ -327,7 +327,7 @@ const features = [
             to="/getting-started"
             class="inline-flex items-center justify-center px-8 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            Getting Started Guide →
+            Getting Started Guide <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
           </RouterLink>
         </div>
       </div>

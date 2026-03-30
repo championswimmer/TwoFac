@@ -11,24 +11,24 @@ useSEO({
 })
 
 const features = [
-  { name: 'Standalone 2FA App', twofac: '✓', competitor: 'Partial (standalone + PM add-on)' },
-  { name: 'Open Source', twofac: '✓', competitor: '✓' },
-  { name: 'Android App', twofac: '✓', competitor: '✓' },
-  { name: 'iOS App', twofac: '✓', competitor: '✓' },
-  { name: 'Desktop App (macOS/Windows/Linux)', twofac: '✓', competitor: '✗ (standalone) / ✓ (via PM)' },
-  { name: 'CLI Tool', twofac: '✓', competitor: '✗' },
-  { name: 'Web App (PWA)', twofac: '✓', competitor: '✗ (standalone) / ✓ (via PM)' },
-  { name: 'Browser Extension', twofac: '✓', competitor: '✗ (standalone) / ✓ (via PM)' },
-  { name: 'Wear OS', twofac: '✓', competitor: '✗' },
-  { name: 'watchOS', twofac: '✓', competitor: '✗' },
-  { name: 'TOTP Support', twofac: '✓', competitor: '✓' },
-  { name: 'HOTP Support', twofac: '✓', competitor: '✗' },
-  { name: 'E2E Encrypted Sync', twofac: '✓', competitor: '✓ (via PM vault)' },
-  { name: 'Biometric Lock', twofac: '✓', competitor: '✗' },
-  { name: 'No Account Required', twofac: '✓', competitor: '✓ (standalone) / ✗ (PM)' },
-  { name: 'Completely Free', twofac: '✓', competitor: 'Standalone free / PM TOTP: $10/yr' },
-  { name: 'Lightweight', twofac: '✓', competitor: '✗ (PM is heavy)' },
-  { name: 'Kotlin Multiplatform (Native)', twofac: '✓', competitor: '✗' },
+  { name: 'Standalone 2FA App', twofac: true, competitor: 'Partial (standalone + PM add-on)' },
+  { name: 'Open Source', twofac: true, competitor: true },
+  { name: 'Android App', twofac: true, competitor: true },
+  { name: 'iOS App', twofac: true, competitor: true },
+  { name: 'Desktop App (macOS/Windows/Linux)', twofac: true, competitor: 'No (standalone) / Yes (via PM)' },
+  { name: 'CLI Tool', twofac: true, competitor: false },
+  { name: 'Web App (PWA)', twofac: true, competitor: 'No (standalone) / Yes (via PM)' },
+  { name: 'Browser Extension', twofac: true, competitor: 'No (standalone) / Yes (via PM)' },
+  { name: 'Wear OS', twofac: true, competitor: false },
+  { name: 'watchOS', twofac: true, competitor: false },
+  { name: 'TOTP Support', twofac: true, competitor: true },
+  { name: 'HOTP Support', twofac: true, competitor: false },
+  { name: 'E2E Encrypted Sync', twofac: true, competitor: 'Yes (via PM vault)' },
+  { name: 'Biometric Lock', twofac: true, competitor: false },
+  { name: 'No Account Required', twofac: true, competitor: 'Yes (standalone) / No (PM)' },
+  { name: 'Completely Free', twofac: true, competitor: 'Standalone free / PM TOTP: $10/yr' },
+  { name: 'Lightweight', twofac: true, competitor: 'No (PM is heavy)' },
+  { name: 'Kotlin Multiplatform (Native)', twofac: true, competitor: false },
 ]
 </script>
 
@@ -56,7 +56,7 @@ const features = [
             href="#comparison-table"
             class="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            See Full Comparison ↓
+            See Full Comparison <i class="fa-solid fa-arrow-down ml-1" aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -78,7 +78,7 @@ const features = [
             <div class="mt-1 text-xs text-secondary-500 dark:text-secondary-400">Bitwarden standalone: mobile only</div>
           </div>
           <div class="rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-6 text-center">
-            <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">🎯</div>
+            <div class="text-3xl font-bold text-primary-600 dark:text-primary-400"><i class="fa-solid fa-bullseye" aria-hidden="true" /></div>
             <div class="mt-2 text-sm font-medium text-secondary-700 dark:text-secondary-300">Purpose-built for 2FA</div>
             <div class="mt-1 text-xs text-secondary-500 dark:text-secondary-400">Not a password manager add-on</div>
           </div>
@@ -213,41 +213,41 @@ const features = [
         <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-8">Why Choose TwoFac Over Bitwarden Authenticator?</h2>
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🎯 Purpose-Built for 2FA</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-bullseye mr-2" aria-hidden="true" />Purpose-Built for 2FA</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               TwoFac is a dedicated 2FA app — not a side feature of a password manager. It does one thing and does it
               exceptionally well across every platform.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🆓 100% Free, All Platforms</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-gift mr-2" aria-hidden="true" />100% Free, All Platforms</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               No premium tier, no subscription. Desktop, CLI, browser extension, and wearable access are free. Bitwarden charges
               $10/year for TOTP in the password manager.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🖥️ Native Desktop & CLI</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-desktop mr-2" aria-hidden="true" />Native Desktop & CLI</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Standalone desktop apps for macOS, Windows, and Linux, plus a CLI tool for terminal workflows. Bitwarden's standalone
               authenticator is mobile-only.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">⌚ Wearable Apps</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-clock mr-2" aria-hidden="true" />Wearable Apps</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               View codes on your Wear OS or Apple Watch. Neither Bitwarden product offers wearable companion apps.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🪶 Lightweight & Fast</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-feather-pointed mr-2" aria-hidden="true" />Lightweight & Fast</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               No password vault, no credential management, no bloat. TwoFac starts fast, runs lean, and focuses entirely on
               generating and managing 2FA codes.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🔓 No Account Required</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-user-check mr-2" aria-hidden="true" />No Account Required</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Start using TwoFac immediately — no sign-up, no email verification. Bitwarden's full-featured authenticator
               requires a Bitwarden account and Premium subscription.
@@ -325,7 +325,7 @@ const features = [
             to="/getting-started"
             class="inline-flex items-center justify-center px-8 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            Getting Started Guide →
+            Getting Started Guide <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
           </RouterLink>
         </div>
       </div>

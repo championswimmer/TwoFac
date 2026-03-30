@@ -3,13 +3,13 @@ import { RouterLink } from 'vue-router'
 import PlatformBadge from './PlatformBadge.vue'
 
 const platforms = [
-  { name: 'Android', icon: '📱' },
-  { name: 'iOS', icon: '🍎' },
-  { name: 'Desktop', icon: '🖥️' },
-  { name: 'Web', icon: '🌐' },
-  { name: 'CLI', icon: '⌨️' },
-  { name: 'Wear OS', icon: '⌚' },
-  { name: 'watchOS', icon: '⌚' },
+  { name: 'Android', icon: 'fa-brands fa-android' },
+  { name: 'iOS', icon: 'fa-brands fa-apple' },
+  { name: 'Desktop', icon: 'fa-solid fa-desktop' },
+  { name: 'Web', icon: 'fa-solid fa-globe' },
+  { name: 'CLI', icon: 'fa-solid fa-terminal' },
+  { name: 'Wear OS', icon: 'fa-solid fa-clock' },
+  { name: 'watchOS', icon: 'fa-solid fa-clock' },
 ]
 </script>
 

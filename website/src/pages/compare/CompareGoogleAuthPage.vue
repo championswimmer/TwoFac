@@ -11,24 +11,24 @@ useSEO({
 })
 
 const features = [
-  { name: 'Open Source', twofac: '✓', competitor: '✗' },
-  { name: 'Android App', twofac: '✓', competitor: '✓' },
-  { name: 'iOS App', twofac: '✓', competitor: '✓' },
-  { name: 'Desktop App (macOS/Windows/Linux)', twofac: '✓', competitor: '✗' },
-  { name: 'CLI Tool', twofac: '✓', competitor: '✗' },
-  { name: 'Web App (PWA)', twofac: '✓', competitor: '✗' },
-  { name: 'Browser Extension', twofac: '✓', competitor: '✗' },
-  { name: 'Wear OS', twofac: '✓', competitor: '✗' },
-  { name: 'watchOS', twofac: '✓', competitor: '✗' },
-  { name: 'TOTP Support', twofac: '✓', competitor: '✓' },
-  { name: 'HOTP Support', twofac: '✓', competitor: '✓' },
-  { name: 'E2E Encrypted Sync', twofac: '✓', competitor: '✗' },
-  { name: 'Encrypted Backups', twofac: '✓', competitor: '✗' },
-  { name: 'Biometric Lock', twofac: '✓', competitor: '✗' },
-  { name: 'Import/Export', twofac: '✓ (full)', competitor: 'Limited' },
-  { name: 'No Account Required', twofac: '✓', competitor: '✗ (Google account for sync)' },
-  { name: 'Offline Mode', twofac: '✓', competitor: '✓' },
-  { name: 'Kotlin Multiplatform (Native)', twofac: '✓', competitor: '✗' },
+  { name: 'Open Source', twofac: true, competitor: false },
+  { name: 'Android App', twofac: true, competitor: true },
+  { name: 'iOS App', twofac: true, competitor: true },
+  { name: 'Desktop App (macOS/Windows/Linux)', twofac: true, competitor: false },
+  { name: 'CLI Tool', twofac: true, competitor: false },
+  { name: 'Web App (PWA)', twofac: true, competitor: false },
+  { name: 'Browser Extension', twofac: true, competitor: false },
+  { name: 'Wear OS', twofac: true, competitor: false },
+  { name: 'watchOS', twofac: true, competitor: false },
+  { name: 'TOTP Support', twofac: true, competitor: true },
+  { name: 'HOTP Support', twofac: true, competitor: true },
+  { name: 'E2E Encrypted Sync', twofac: true, competitor: false },
+  { name: 'Encrypted Backups', twofac: true, competitor: false },
+  { name: 'Biometric Lock', twofac: true, competitor: false },
+  { name: 'Import/Export', twofac: 'Yes (full)', competitor: 'Limited' },
+  { name: 'No Account Required', twofac: true, competitor: 'No (Google account for sync)' },
+  { name: 'Offline Mode', twofac: true, competitor: true },
+  { name: 'Kotlin Multiplatform (Native)', twofac: true, competitor: false },
 ]
 </script>
 
@@ -57,7 +57,7 @@ const features = [
             href="#comparison-table"
             class="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            See Full Comparison ↓
+            See Full Comparison <i class="fa-solid fa-arrow-down ml-1" aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -244,28 +244,28 @@ const features = [
         <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-8">Why Choose TwoFac Over Google Authenticator?</h2>
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🔓 Fully Open Source</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-code-branch mr-2" aria-hidden="true" />Fully Open Source</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Every line of TwoFac's code is publicly auditable on GitHub. Google Authenticator went proprietary in 2021 — you can't
               verify what it does with your secrets.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🌍 11+ Platforms</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-globe mr-2" aria-hidden="true" />11+ Platforms</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Android, iOS, macOS, Windows, Linux, Web, CLI, browser extension, Wear OS, and watchOS. Google Authenticator only
               supports Android and iOS.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🔐 E2E Encrypted Sync</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-shield-halved mr-2" aria-hidden="true" />E2E Encrypted Sync</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Your 2FA secrets are encrypted on your device before syncing. Google Authenticator's cloud sync does not use end-to-end
               encryption — Google holds the decryption keys.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">💻 Developer-Friendly CLI</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-terminal mr-2" aria-hidden="true" />Developer-Friendly CLI</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Generate 2FA codes from your terminal. Integrate with scripts, SSH workflows, and CI/CD pipelines. Perfect for developers
               and sysadmins.
@@ -279,7 +279,7 @@ const features = [
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">📦 Easy Migration</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-box-open mr-2" aria-hidden="true" />Easy Migration</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Import your existing Google Authenticator accounts via QR scan or file import. The switch takes minutes and requires no
               reconfiguration of your online services.
@@ -353,7 +353,7 @@ const features = [
             to="/getting-started"
             class="inline-flex items-center justify-center px-8 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            Migration Guide →
+            Migration Guide <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
           </RouterLink>
         </div>
       </div>

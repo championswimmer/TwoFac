@@ -11,26 +11,26 @@ useSEO({
 })
 
 const features = [
-  { name: 'Open Source', twofac: '✓', competitor: '✗' },
-  { name: 'Android App', twofac: '✓', competitor: '✓' },
-  { name: 'iOS App', twofac: '✓', competitor: '✓' },
-  { name: 'Desktop App (macOS/Windows/Linux)', twofac: '✓', competitor: '✗' },
-  { name: 'CLI Tool', twofac: '✓', competitor: '✗' },
-  { name: 'Web App (PWA)', twofac: '✓', competitor: '✗' },
-  { name: 'Browser Extension', twofac: '✓', competitor: '✗' },
-  { name: 'Linux Support', twofac: '✓', competitor: '✗' },
-  { name: 'Wear OS', twofac: '✓', competitor: '✗' },
-  { name: 'watchOS', twofac: '✓', competitor: '✗' },
-  { name: 'TOTP Support', twofac: '✓', competitor: '✓' },
-  { name: 'HOTP Support', twofac: '✓', competitor: '✗' },
-  { name: 'Push Notification MFA', twofac: '✗', competitor: '✓ (Microsoft only)' },
-  { name: 'Passwordless Sign-In', twofac: '✗', competitor: '✓ (Microsoft only)' },
-  { name: 'E2E Encrypted Sync', twofac: '✓', competitor: '✗' },
-  { name: 'Privacy Focused', twofac: '✓ (no telemetry)', competitor: '✗ (telemetry)' },
-  { name: 'Biometric Lock', twofac: '✓', competitor: '✓' },
-  { name: 'Lightweight', twofac: '✓', competitor: '✗' },
-  { name: 'No Account Required', twofac: '✓', competitor: '✗ (Microsoft account)' },
-  { name: 'Vendor Independent', twofac: '✓', competitor: '✗ (Microsoft ecosystem)' },
+  { name: 'Open Source', twofac: true, competitor: false },
+  { name: 'Android App', twofac: true, competitor: true },
+  { name: 'iOS App', twofac: true, competitor: true },
+  { name: 'Desktop App (macOS/Windows/Linux)', twofac: true, competitor: false },
+  { name: 'CLI Tool', twofac: true, competitor: false },
+  { name: 'Web App (PWA)', twofac: true, competitor: false },
+  { name: 'Browser Extension', twofac: true, competitor: false },
+  { name: 'Linux Support', twofac: true, competitor: false },
+  { name: 'Wear OS', twofac: true, competitor: false },
+  { name: 'watchOS', twofac: true, competitor: false },
+  { name: 'TOTP Support', twofac: true, competitor: true },
+  { name: 'HOTP Support', twofac: true, competitor: false },
+  { name: 'Push Notification MFA', twofac: false, competitor: 'Yes (Microsoft only)' },
+  { name: 'Passwordless Sign-In', twofac: false, competitor: 'Yes (Microsoft only)' },
+  { name: 'E2E Encrypted Sync', twofac: true, competitor: false },
+  { name: 'Privacy Focused', twofac: 'Yes (no telemetry)', competitor: 'No (telemetry)' },
+  { name: 'Biometric Lock', twofac: true, competitor: true },
+  { name: 'Lightweight', twofac: true, competitor: false },
+  { name: 'No Account Required', twofac: true, competitor: 'No (Microsoft account)' },
+  { name: 'Vendor Independent', twofac: true, competitor: 'No (Microsoft ecosystem)' },
 ]
 </script>
 
@@ -59,7 +59,7 @@ const features = [
             href="#comparison-table"
             class="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            See Full Comparison ↓
+            See Full Comparison <i class="fa-solid fa-arrow-down ml-1" aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -224,35 +224,35 @@ const features = [
         <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-8">Why Choose TwoFac Over Microsoft Authenticator?</h2>
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🛡️ Privacy First</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-user-shield mr-2" aria-hidden="true" />Privacy First</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Zero telemetry, zero tracking. TwoFac is open source and collects no data. Microsoft Authenticator collects telemetry
               as part of the Microsoft ecosystem.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🐧 Linux, Desktop & CLI</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-brands fa-linux mr-2" aria-hidden="true" />Linux, Desktop & CLI</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Native apps for macOS, Windows, and Linux plus a CLI tool. Microsoft Authenticator is mobile-only with no desktop or
               terminal support.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🔓 Open Source</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-code-branch mr-2" aria-hidden="true" />Open Source</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Every line of code is on GitHub, auditable by anyone. Microsoft Authenticator is proprietary — you can't verify what
               it does with your data.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🪶 Lightweight & Focused</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-feather-pointed mr-2" aria-hidden="true" />Lightweight & Focused</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               Purpose-built for 2FA only. No password manager, no payment cards, no bloat. Fast, clean, and focused on doing one
               thing exceptionally well.
             </p>
           </div>
           <div class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700">
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">🔗 No Vendor Lock-In</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2"><i class="fa-solid fa-link mr-2" aria-hidden="true" />No Vendor Lock-In</h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">
               No Microsoft account required. No ecosystem dependency. Export your data anytime in standard formats. TwoFac works
               with any service that supports TOTP.
@@ -335,7 +335,7 @@ const features = [
             to="/features"
             class="inline-flex items-center justify-center px-8 py-3 rounded-lg border border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-300 font-medium hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
           >
-            Explore All Features →
+            Explore All Features <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
           </RouterLink>
         </div>
       </div>

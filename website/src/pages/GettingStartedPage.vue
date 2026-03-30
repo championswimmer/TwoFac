@@ -92,14 +92,14 @@ const steps = [
               to="/download"
               class="mt-3 inline-flex text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
             >
-              Go to Downloads →
+              Go to Downloads <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
             </router-link>
             <router-link
               v-if="step.number === 3"
               to="/blog"
               class="mt-3 inline-flex text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
             >
-              Read migration guides →
+              Read migration guides <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
             </router-link>
           </div>
         </li>
