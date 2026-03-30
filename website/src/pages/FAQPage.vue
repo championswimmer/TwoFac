@@ -67,18 +67,18 @@ const faqs = [
 <template>
   <MainLayout>
     <!-- Header -->
-    <section class="bg-primary-600 dark:bg-primary-800 py-16 sm:py-24">
+    <section class="border-b border-secondary-200 bg-secondary-100 py-16 sm:py-24 dark:border-secondary-800 dark:bg-secondary-900">
       <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-        <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 class="text-4xl font-bold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl">
           Frequently Asked Questions
         </h1>
-        <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-secondary-700 dark:text-secondary-300">
           Everything you need to know about TwoFac. Can't find an answer?
           <a
             href="https://github.com/championswimmer/TwoFac/discussions"
             target="_blank"
             rel="noopener noreferrer"
-            class="underline hover:text-white"
+            class="underline hover:text-primary-700 dark:hover:text-primary-400"
           >Ask on GitHub Discussions</a>.
         </p>
       </div>

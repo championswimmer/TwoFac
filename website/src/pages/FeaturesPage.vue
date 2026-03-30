@@ -28,12 +28,12 @@ const platforms = [
 <template>
   <MainLayout>
     <!-- Hero Banner -->
-    <section class="bg-primary-600 dark:bg-primary-800 py-16 sm:py-24">
+    <section class="border-b border-secondary-200 bg-secondary-100 py-16 sm:py-24 dark:border-secondary-800 dark:bg-secondary-900">
       <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-        <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 class="text-4xl font-bold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl">
           Features
         </h1>
-        <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-secondary-700 dark:text-secondary-300">
           Everything you need for secure, convenient two-factor authentication — across every device you own.
         </p>
       </div>
@@ -113,7 +113,7 @@ const platforms = [
           into scripts — all from the command line.
         </p>
         <div
-          class="mt-6 rounded-lg bg-secondary-900 dark:bg-secondary-950 p-4 font-mono text-sm text-green-400 overflow-x-auto"
+          class="mt-6 rounded-lg border border-secondary-300 bg-secondary-50 p-4 font-mono text-sm text-secondary-800 overflow-x-auto dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200"
         >
           <p>$ twofac list</p>
           <p>$ twofac code github</p>
@@ -178,7 +178,7 @@ const platforms = [
             href="https://github.com/championswimmer/TwoFac"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center rounded-lg bg-secondary-900 dark:bg-white px-5 py-2.5 text-sm font-semibold text-white dark:text-secondary-900 hover:bg-secondary-700 dark:hover:bg-secondary-200 transition-colors"
+            class="inline-flex items-center rounded-lg border border-primary-700 bg-primary-700 px-5 py-2.5 text-sm font-semibold text-secondary-50 hover:bg-primary-800 transition-colors dark:border-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500"
           >
             View on GitHub <i class="fa-solid fa-arrow-right-long ml-2" aria-hidden="true" />
           </a>

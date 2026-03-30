@@ -37,7 +37,7 @@ const features = [
 <template>
   <MainLayout>
     <!-- Hero -->
-    <section class="bg-gradient-to-br from-primary-50 to-white dark:from-secondary-900 dark:to-secondary-950 py-16 sm:py-24">
+    <section class="border-b border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900 py-16 sm:py-24">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-900 dark:text-white">
           TwoFac vs <span class="text-primary-600 dark:text-primary-400">Microsoft Authenticator</span>

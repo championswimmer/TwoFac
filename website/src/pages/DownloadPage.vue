@@ -157,12 +157,12 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
 <template>
   <MainLayout>
     <!-- Header -->
-    <section class="bg-primary-600 dark:bg-primary-800 py-16 sm:py-24">
+    <section class="border-b border-secondary-200 bg-secondary-100 py-16 sm:py-24 dark:border-secondary-800 dark:bg-secondary-900">
       <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-        <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 class="text-4xl font-bold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl">
           Download TwoFac
         </h1>
-        <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-secondary-700 dark:text-secondary-300">
           Free, open-source 2FA for every platform. Pick yours and get started in seconds.
         </p>
       </div>
@@ -182,7 +182,7 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
             <div
               v-for="card in category.cards"
               :key="card.name"
-              class="flex flex-col rounded-xl border border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900 p-6 shadow-sm transition-shadow hover:shadow-md"
+              class="flex flex-col rounded-xl border border-secondary-200 dark:border-secondary-700 bg-secondary-50 dark:bg-secondary-900 p-6 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-800"
             >
               <div class="text-4xl text-primary-600 dark:text-primary-400"><i :class="card.icon" aria-hidden="true" /></div>
               <h3

@@ -123,18 +123,18 @@ const platforms = [
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 sm:py-24 bg-primary-600 dark:bg-primary-800">
+    <section class="py-16 sm:py-24 border-y border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900">
       <div class="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-4xl">
           Ready to take control of your 2FA?
         </h2>
-        <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-secondary-700 dark:text-secondary-300">
           Download TwoFac for free and secure your accounts across all your devices.
         </p>
         <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <router-link
             to="/download"
-            class="inline-flex items-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-primary-700 shadow-sm hover:bg-primary-50 transition-colors"
+            class="inline-flex items-center rounded-lg border border-primary-700 bg-primary-700 px-6 py-3 text-base font-semibold text-secondary-50 hover:bg-primary-800 transition-colors dark:border-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500"
           >
             Download TwoFac
           </router-link>
@@ -142,7 +142,7 @@ const platforms = [
             href="https://github.com/championswimmer/TwoFac"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center rounded-lg border-2 border-white px-6 py-3 text-base font-semibold text-white hover:bg-white/10 transition-colors"
+            class="inline-flex items-center rounded-lg border border-secondary-400 px-6 py-3 text-base font-semibold text-secondary-800 hover:bg-secondary-200 transition-colors dark:border-secondary-600 dark:text-secondary-200 dark:hover:bg-secondary-800"
           >
             View on GitHub
           </a>

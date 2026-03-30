@@ -32,7 +32,7 @@ function formatDate(dateString: string): string {
           v-for="post in blogs"
           :key="post.slug"
           :to="`/blog/${post.slug}`"
-          class="group block rounded-xl border border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900 overflow-hidden hover:shadow-lg hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-200"
+          class="group block rounded-xl border border-secondary-200 dark:border-secondary-700 bg-secondary-50 dark:bg-secondary-900 overflow-hidden hover:bg-secondary-100 hover:border-primary-300 dark:hover:bg-secondary-800 dark:hover:border-primary-600 transition-colors duration-200"
         >
           <!-- Cover image -->
           <div v-if="post.cover" class="aspect-video overflow-hidden bg-secondary-100 dark:bg-secondary-800">

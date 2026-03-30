@@ -14,36 +14,17 @@ const platforms = [
 </script>
 
 <template>
-  <section class="relative overflow-hidden">
-    <!-- Gradient background -->
-    <div
-      class="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-purple-800 dark:from-primary-900 dark:via-primary-950 dark:to-purple-950"
-    />
-
-    <!-- Decorative floating shapes -->
-    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
-      <div
-        class="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/5 blur-3xl"
-      />
-      <div
-        class="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl"
-      />
-      <div
-        class="absolute left-1/2 top-1/4 h-48 w-48 -translate-x-1/2 rounded-full bg-primary-400/10 blur-2xl"
-      />
-    </div>
-
-    <!-- Content -->
-    <div class="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
+  <section class="border-b border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900">
+    <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div class="mx-auto max-w-3xl text-center">
         <h1
-          class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl"
+          class="text-4xl font-extrabold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl lg:text-6xl"
         >
           Your Codes. Your Devices.
-          <span class="block text-primary-200">Your Control.</span>
+          <span class="block text-primary-700 dark:text-primary-400">Your Control.</span>
         </h1>
 
-        <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-primary-100/90 sm:text-xl">
+        <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-secondary-700 dark:text-secondary-300 sm:text-xl">
           Open source, cross-platform 2FA authenticator for Watch, Mobile, Desktop, Web, and CLI.
         </p>
 
@@ -51,7 +32,7 @@ const platforms = [
         <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <RouterLink
             to="/download"
-            class="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-base font-semibold text-primary-700 shadow-lg transition-all hover:bg-primary-50 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-700"
+            class="inline-flex items-center gap-2 rounded-lg border border-primary-700 bg-primary-700 px-8 py-3.5 text-base font-semibold text-secondary-50 transition-colors hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-secondary-100 dark:border-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500 dark:focus:ring-offset-secondary-900"
           >
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -63,7 +44,7 @@ const platforms = [
             href="https://github.com/championswimmer/TwoFac"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 rounded-xl border-2 border-white/30 px-8 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition-all hover:border-white/60 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-700"
+            class="inline-flex items-center gap-2 rounded-lg border border-secondary-400 px-8 py-3.5 text-base font-semibold text-secondary-800 transition-colors hover:bg-secondary-200 focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:ring-offset-2 focus:ring-offset-secondary-100 dark:border-secondary-600 dark:text-secondary-200 dark:hover:bg-secondary-800 dark:focus:ring-offset-secondary-900"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path
