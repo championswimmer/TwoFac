@@ -1,1 +1,0 @@
-{"version":3,"file":"361.js","mappings":"yJAAO,MAAMA,EAAmB,IAAMC,KAAKC,K","sources":["webpack://composeApp/./kotlin/time.mjs"],"sourcesContent":["export const nowEpochMillisJs = () => Date.now();\n"],"names":["nowEpochMillisJs","Date","now"],"sourceRoot":""}

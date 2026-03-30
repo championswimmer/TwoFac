@@ -1,2 +1,0 @@
-"use strict";(globalThis.webpackChunkcomposeApp=globalThis.webpackChunkcomposeApp||[]).push([[641],{641:(e,o,t)=>{t.r(o),t.d(o,{isLocalStorageAccessible:()=>r,localStorageGetItem:()=>a,localStorageRemoveItem:()=>c,localStorageSetItem:()=>l});const a=e=>window.localStorage.getItem(e),l=(e,o)=>{window.localStorage.setItem(e,o)},c=e=>{window.localStorage.removeItem(e)},r=()=>{try{return window.localStorage.setItem("twofac_ls_test","1"),window.localStorage.removeItem("twofac_ls_test"),!0}catch{return!1}}}}]);
-//# sourceMappingURL=641.js.map
