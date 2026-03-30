@@ -7,17 +7,27 @@ Issuer brand icons use one shared lookup catalog in `sharedLib`:
 The current v1 icon keys are:
 
 - `amazon`
+- `atlassian`
+- `cloudflare`
 - `discord`
 - `dropbox`
 - `facebook`
 - `github`
 - `gitlab`
 - `google`
+- `instagram`
 - `linkedin`
+- `meta`
 - `microsoft`
+- `paypal`
+- `reddit`
+- `shopify`
 - `slack`
+- `steam`
+- `stripe`
 - `twitch`
 - `x_twitter`
+- `yahoo`
 - `placeholder`
 
 ## Source of truth
