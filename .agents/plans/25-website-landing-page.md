@@ -102,4 +102,25 @@ website/
 1. **SEO Optimization**: Ensure every page has unique meta titles, descriptions, canonical URLs, and OpenGraph tags.
 2. **Performance**: Audit with Lighthouse. Ensure images are optimized (WebP) and lazy-loaded. Tailwind purges unused CSS.
 3. **Responsive Design**: Test extensively on mobile (critical for an authenticator app landing page).
-4. **CI/CD Integration**: Add a GitHub Action to automatically build and deploy the `./website` folder to GitHub Pages and deploy to `gh-pages` branch
+4. **CI/CD Integration**: Add a GitHub Action workflow (`build-landing-page.yml`) to automatically:
+   - Build the website on every push to `main` branch (or specified trigger)
+   - Deploy the built website to the `gh-pages` branch
+   - Automatically create/update a CNAME file pointing to `twofac.app`
+   - Enable GitHub Pages to serve the site from the custom domain
+
+## 5. GitHub Pages Deployment Strategy
+
+### Workflow: `build-landing-page.yml`
+- **Trigger**: Push to `main` branch (or on workflow dispatch for manual runs)
+- **Build Steps**:
+  1. Checkout the repository
+  2. Set up Node.js environment
+  3. Install dependencies (`npm install` in `./website`)
+  4. Run build script (`npm run build`)
+  5. Generate `CNAME` file with content: `twofac.app`
+  6. Deploy to `gh-pages` branch using `actions/deploy-pages@v2` or similar
+- **GitHub Pages Configuration**:
+  - Source: `gh-pages` branch, root directory
+  - Custom domain: `twofac.app`
+  - HTTPS: Automatically enforced
+- **CNAME File Location**: The CNAME file will be placed in the root of the built website (typically `website/dist/CNAME`) before deployment to ensure it persists in the `gh-pages` branch
