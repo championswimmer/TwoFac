@@ -14,6 +14,7 @@ class WatchSyncSnapshotCodecTest {
                 WatchSyncAccount(
                     accountId = "github:user@example.com",
                     issuer = "GitHub",
+                    issuerIconKey = "github",
                     accountLabel = "user@example.com",
                     otpAuthUri = "otpauth://totp/GitHub:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub",
                 ),

@@ -82,7 +82,7 @@ final object tech.arnav.twofac.lib.backup/BackupProviderIds // tech.arnav.twofac
 final object tech.arnav.twofac.lib.backup/BackupRestorePolicy // tech.arnav.twofac.lib.backup/BackupRestorePolicy|null[0]
 
 final object tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog { // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog|null[0]
-    final fun codePointForIconKey(kotlin/String): kotlin/Int? // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.codePointForIconKey|codePointForIconKey(kotlin.String){}[0]
+    final fun glyphForIconKey(kotlin/String): kotlin/String? // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.glyphForIconKey|glyphForIconKey(kotlin.String){}[0]
     final fun normalizeIssuer(kotlin/String?): kotlin/String? // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.normalizeIssuer|normalizeIssuer(kotlin.String?){}[0]
     final fun resolveIssuerIcon(kotlin/String?): tech.arnav.twofac.lib.presentation.issuer/IssuerIconMatch // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.resolveIssuerIcon|resolveIssuerIcon(kotlin.String?){}[0]
     final fun resolveIssuerIconKey(kotlin/String?): kotlin/String // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.resolveIssuerIconKey|resolveIssuerIconKey(kotlin.String?){}[0]

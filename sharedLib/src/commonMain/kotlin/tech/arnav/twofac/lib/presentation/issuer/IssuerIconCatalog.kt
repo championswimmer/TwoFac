@@ -73,19 +73,19 @@ object IssuerIconCatalog {
         PLACEHOLDER_ICON_KEY,
     )
 
-    private val iconCodePoints = mapOf(
-        AMAZON_ICON_KEY to 0xf270,
-        DISCORD_ICON_KEY to 0xf392,
-        DROPBOX_ICON_KEY to 0xf16b,
-        FACEBOOK_ICON_KEY to 0xf09a,
-        GITHUB_ICON_KEY to 0xf09b,
-        GITLAB_ICON_KEY to 0xf296,
-        GOOGLE_ICON_KEY to 0xf1a0,
-        LINKEDIN_ICON_KEY to 0xf08c,
-        MICROSOFT_ICON_KEY to 0xf3ca,
-        SLACK_ICON_KEY to 0xf198,
-        TWITCH_ICON_KEY to 0xf1e8,
-        X_TWITTER_ICON_KEY to 0xe61b,
+    private val iconGlyphs = mapOf(
+        AMAZON_ICON_KEY to "\uF270",
+        DISCORD_ICON_KEY to "\uF392",
+        DROPBOX_ICON_KEY to "\uF16B",
+        FACEBOOK_ICON_KEY to "\uF09A",
+        GITHUB_ICON_KEY to "\uF09B",
+        GITLAB_ICON_KEY to "\uF296",
+        GOOGLE_ICON_KEY to "\uF1A0",
+        LINKEDIN_ICON_KEY to "\uF08C",
+        MICROSOFT_ICON_KEY to "\uF3CA",
+        SLACK_ICON_KEY to "\uF198",
+        TWITCH_ICON_KEY to "\uF1E8",
+        X_TWITTER_ICON_KEY to "\uE61B",
     )
 
     @PublicApi
@@ -122,7 +122,7 @@ object IssuerIconCatalog {
     fun resolveIssuerIconKey(rawIssuer: String?): String = resolveIssuerIcon(rawIssuer).iconKey
 
     @PublicApi
-    fun codePointForIconKey(iconKey: String): Int? = iconCodePoints[iconKey]
+    fun glyphForIconKey(iconKey: String): String? = iconGlyphs[iconKey]
 
     private fun toLookupKey(normalizedIssuer: String): String {
         return buildString(normalizedIssuer.length) {
