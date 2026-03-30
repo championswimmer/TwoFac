@@ -8,31 +8,33 @@ struct IssuerBrandIconView: View {
 
     @ViewBuilder
     var body: some View {
-        let rendered = Group {
-            if iconKey == "placeholder" {
-                ZStack {
-                    Circle()
-                        .stroke(tint.opacity(0.6), lineWidth: 1.2)
-                    Text("?")
-                        .font(.system(size: size * 0.55, weight: .bold, design: .rounded))
-                        .foregroundStyle(tint)
-                }
-            } else {
-                Image(iconKey)
-                    .resizable()
-                    .scaledToFit()
-                    .renderingMode(.template)
-                    .foregroundStyle(tint)
-            }
-        }
-        .frame(width: size, height: size)
-
         if let accessibilityLabel {
-            rendered
+            iconBody
                 .accessibilityLabel(Text(accessibilityLabel))
                 .accessibilityHidden(false)
         } else {
-            rendered.accessibilityHidden(true)
+            iconBody.accessibilityHidden(true)
+        }
+    }
+
+    @ViewBuilder
+    private var iconBody: some View {
+        if iconKey == "placeholder" {
+            ZStack {
+                Circle()
+                    .stroke(tint.opacity(0.6), lineWidth: 1.2)
+                Text("?")
+                    .font(.system(size: size * 0.55, weight: .bold, design: .rounded))
+                    .foregroundStyle(tint)
+            }
+            .frame(width: size, height: size)
+        } else {
+            Image(iconKey)
+                .resizable()
+                .scaledToFit()
+                .renderingMode(.template)
+                .foregroundStyle(tint)
+                .frame(width: size, height: size)
         }
     }
 }

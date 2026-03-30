@@ -28,6 +28,7 @@ data class StoredAccount constructor(
     fun forDisplay(
         nextCodeAt: Long? = 0L,
         issuer: String? = null,
+        accountLabel: String = this.accountLabel,
     ): DisplayAccount {
         return DisplayAccount(
             accountID = accountID.toString(),

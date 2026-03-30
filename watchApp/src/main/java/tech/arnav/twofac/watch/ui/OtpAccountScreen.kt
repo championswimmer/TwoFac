@@ -61,6 +61,12 @@ fun OtpAccountScreen(
         ) {
             val issuer = entry.issuer
             val issuerOrLabel = issuer?.takeIf { it.isNotBlank() } ?: entry.account.accountLabel
+            IssuerBrandIcon(
+                issuer = issuer,
+                size = 18.dp,
+                tint = MaterialTheme.colors.onBackground.copy(alpha = 0.85f),
+                modifier = Modifier.padding(bottom = 6.dp),
+            )
             Text(
                 text = issuerOrLabel,
                 style = MaterialTheme.typography.caption1,
@@ -166,6 +172,7 @@ private fun OtpAccountScreenPreview() {
                 account = StoredAccount.DisplayAccount(
                     accountID = "preview-account",
                     accountLabel = "arnav@example.com",
+                    issuer = "GitHub",
                 ),
                 issuer = "GitHub",
                 otpCode = "123456",

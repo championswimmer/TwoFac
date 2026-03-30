@@ -151,4 +151,20 @@ class TwoFacLibTest {
         assertTrue(deleted)
         assertTrue(lib.getAllAccounts().isEmpty())
     }
+
+    @Test
+    fun testGetAllAccountsSeparatesIssuerFromDisplayLabel() = runTest {
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        assertTrue(
+            lib.addAccount(
+                "otpauth://totp/GitHub:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"
+            )
+        )
+
+        val account = lib.getAllAccounts().single()
+
+        assertEquals("alice@example.com", account.accountLabel)
+        assertEquals("GitHub", account.issuer)
+        assertEquals("github", account.issuerIconMatch.iconKey)
+    }
 }
