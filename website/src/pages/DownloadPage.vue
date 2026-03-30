@@ -47,7 +47,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         icon: '🍎',
         name: 'macOS',
         description: 'Native desktop app packaged as a DMG.',
-        link: 'https://github.com/aspect-build/twofac/releases',
+        link: 'https://github.com/championswimmer/TwoFac/releases',
         linkText: 'Download DMG',
         external: true,
       },
@@ -55,7 +55,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         icon: '🪟',
         name: 'Windows',
         description: 'Windows installer packaged as an MSI.',
-        link: 'https://github.com/aspect-build/twofac/releases',
+        link: 'https://github.com/championswimmer/TwoFac/releases',
         linkText: 'Download MSI',
         external: true,
       },
@@ -63,7 +63,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         icon: '🐧',
         name: 'Linux',
         description: 'Debian package for Ubuntu and other distributions.',
-        link: 'https://github.com/aspect-build/twofac/releases',
+        link: 'https://github.com/championswimmer/TwoFac/releases',
         linkText: 'Download DEB',
         external: true,
       },
@@ -105,7 +105,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         icon: '🍎',
         name: 'macOS CLI',
         description: 'Native CLI binary for macOS (arm64 and x86_64).',
-        link: 'https://github.com/aspect-build/twofac/releases',
+        link: 'https://github.com/championswimmer/TwoFac/releases',
         linkText: 'GitHub Releases',
         external: true,
       },
@@ -113,7 +113,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         icon: '🪟',
         name: 'Windows CLI',
         description: 'Native CLI binary for Windows.',
-        link: 'https://github.com/aspect-build/twofac/releases',
+        link: 'https://github.com/championswimmer/TwoFac/releases',
         linkText: 'GitHub Releases',
         external: true,
       },
@@ -121,7 +121,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         icon: '🐧',
         name: 'Linux CLI',
         description: 'Native CLI binary for Linux (x86_64).',
-        link: 'https://github.com/aspect-build/twofac/releases',
+        link: 'https://github.com/championswimmer/TwoFac/releases',
         linkText: 'GitHub Releases',
         external: true,
       },
@@ -209,7 +209,7 @@ const categories: { title: string; cards: DownloadCard[] }[] = [
         <p class="text-secondary-700 dark:text-secondary-300">
           All desktop and CLI binaries are available on
           <a
-            href="https://github.com/aspect-build/twofac/releases"
+            href="https://github.com/championswimmer/TwoFac/releases"
             target="_blank"
             rel="noopener noreferrer"
             class="font-semibold text-primary-600 dark:text-primary-400 hover:underline"

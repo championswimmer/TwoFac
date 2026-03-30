@@ -139,7 +139,7 @@ const platforms = [
             Download TwoFac
           </router-link>
           <a
-            href="https://github.com/aspect-build/twofac"
+            href="https://github.com/championswimmer/TwoFac"
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center rounded-lg border-2 border-white px-6 py-3 text-base font-semibold text-white hover:bg-white/10 transition-colors"

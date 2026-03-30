@@ -175,7 +175,7 @@ const platforms = [
         </p>
         <div class="mt-6">
           <a
-            href="https://github.com/aspect-build/twofac"
+            href="https://github.com/championswimmer/TwoFac"
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center rounded-lg bg-secondary-900 dark:bg-white px-5 py-2.5 text-sm font-semibold text-white dark:text-secondary-900 hover:bg-secondary-700 dark:hover:bg-secondary-200 transition-colors"

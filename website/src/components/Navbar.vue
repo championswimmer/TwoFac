@@ -40,7 +40,7 @@ const navLinks = [
       <!-- GitHub button (desktop) -->
       <div class="hidden items-center gap-3 md:flex">
         <a
-          href="#"
+          href="https://github.com/championswimmer/TwoFac"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 rounded-lg border border-secondary-300 bg-white px-4 py-2 text-sm font-medium text-secondary-700 shadow-sm transition-all hover:bg-secondary-50 hover:shadow dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700"
@@ -113,7 +113,7 @@ const navLinks = [
             {{ link.name }}
           </RouterLink>
           <a
-            href="#"
+            href="https://github.com/championswimmer/TwoFac"
             target="_blank"
             rel="noopener noreferrer"
             class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-base font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white"

@@ -35,7 +35,7 @@ for (const file of mdFiles) {
   const { data: frontmatter, content } = matter(raw);
 
   // Convert markdown to HTML
-  let html = marked(content);
+  let html = marked.parse(content);
 
   // Fix image paths: ./img/ → /images/blogs/
   html = html.replace(/\.\/img\//g, '/images/blogs/');

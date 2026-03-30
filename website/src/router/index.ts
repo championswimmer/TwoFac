@@ -66,6 +66,11 @@ const router = createRouter({
       name: 'compare-microsoft-authenticator',
       component: () => import('../pages/compare/CompareMicrosoftAuthPage.vue'),
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../pages/NotFoundPage.vue'),
+    },
   ],
 })
 

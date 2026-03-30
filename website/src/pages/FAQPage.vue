@@ -75,7 +75,7 @@ const faqs = [
         <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
           Everything you need to know about TwoFac. Can't find an answer?
           <a
-            href="https://github.com/aspect-build/twofac/discussions"
+            href="https://github.com/championswimmer/TwoFac/discussions"
             target="_blank"
             rel="noopener noreferrer"
             class="underline hover:text-white"
