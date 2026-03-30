@@ -69,14 +69,16 @@ fun HomeOtpListSectionPreview() {
 private val previewAccountsWithOtps = listOf(
     StoredAccount.DisplayAccount(
         accountID = "google",
-        accountLabel = "Google",
+        accountLabel = "arnav@gmail.com",
+        issuer = "Google",
     ) to "123456",
     StoredAccount.DisplayAccount(
         accountID = "github",
-        accountLabel = "GitHub",
+        accountLabel = "championswimmer",
+        issuer = "GitHub",
     ) to "654321",
     StoredAccount.DisplayAccount(
-        accountID = "microsoft",
-        accountLabel = "Microsoft",
+        accountID = "unknown",
+        accountLabel = "team@example.com",
     ) to "987654",
 )

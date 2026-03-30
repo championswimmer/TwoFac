@@ -24,6 +24,7 @@ fun AccountsListContent(
         items(accounts) { account ->
             AccountListItem(
                 accountLabel = account.accountLabel,
+                issuer = account.issuer,
                 onClick = { onAccountClick(account.accountID) },
             )
         }
@@ -38,11 +39,12 @@ private fun AccountsListContentPreview() {
             accounts = listOf(
                 StoredAccount.DisplayAccount(
                     accountID = "github-id",
-                    accountLabel = "GitHub",
+                    accountLabel = "arnav@example.com",
+                    issuer = "GitHub",
                 ),
                 StoredAccount.DisplayAccount(
-                    accountID = "google-id",
-                    accountLabel = "Google",
+                    accountID = "unknown-id",
+                    accountLabel = "team@example.com",
                 ),
             ),
             onAccountClick = {},

@@ -107,7 +107,10 @@ class TwoFacLib private constructor(
             val otp = account.toOTP(
                 cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
             )
-            account.forDisplay(issuer = otp.issuer)
+            account.forDisplay(
+                accountLabel = otp.accountName,
+                issuer = otp.issuer,
+            )
         }
     }
 
@@ -132,7 +135,12 @@ class TwoFacLib private constructor(
                 else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
             }
             return@map Pair(
-                account.forDisplay(nextCodeAt, issuer = otpGen.issuer), otpString
+                account.forDisplay(
+                    accountLabel = otpGen.accountName,
+                    nextCodeAt = nextCodeAt,
+                    issuer = otpGen.issuer,
+                ),
+                otpString,
             )
         }
     }

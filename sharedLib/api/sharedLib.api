@@ -355,8 +355,8 @@ public final class tech/arnav/twofac/lib/storage/StoredAccount {
 	public final fun copy (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount;
 	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun forDisplay (Ljava/lang/Long;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
-	public static synthetic fun forDisplay$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Ljava/lang/Long;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
+	public final fun forDisplay (Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
+	public static synthetic fun forDisplay$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
 	public final fun getAccountID ()Lkotlin/uuid/Uuid;
 	public final fun getAccountLabel ()Ljava/lang/String;
 	public final fun getEncryptedURI ()Ljava/lang/String;

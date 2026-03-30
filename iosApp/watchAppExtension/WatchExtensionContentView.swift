@@ -66,6 +66,12 @@ struct WatchExtensionContentView: View {
                     TabView {
                         ForEach(connectivityManager.accounts, id: \.accountId) { account in
                             VStack(spacing: 10) {
+                                IssuerBrandIconView(
+                                    iconKey: account.issuerIconKey,
+                                    size: 18,
+                                    tint: .secondary
+                                )
+
                                 Text(account.issuer ?? "TwoFac")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)

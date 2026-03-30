@@ -1,14 +1,14 @@
 ---
 name: Issuer Brand Icons Rollout Plan
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0 - Audit issuer-bearing UI surfaces and lock the cross-platform icon strategy"
-  - "[ ] Phase 1 - Add shared issuer normalization and icon-key resolution in sharedLib"
-  - "[ ] Phase 2 - Prepare Font Awesome Free Brands assets plus a default placeholder icon"
-  - "[ ] Phase 3 - Add shared Compose issuer icon rendering for Android, iOS, Desktop, Web, and Wear OS"
-  - "[ ] Phase 4 - Roll issuer icons through account-list and OTP surfaces"
-  - "[ ] Phase 5 - Add native watchOS issuer icon rendering using Apple asset catalogs"
-  - "[ ] Phase 6 - Add tests, QA coverage, and icon-catalog maintenance docs"
+  - "[x] Phase 0 - Audit issuer-bearing UI surfaces and lock the cross-platform icon strategy"
+  - "[x] Phase 1 - Add shared issuer normalization and icon-key resolution in sharedLib"
+  - "[x] Phase 2 - Prepare Font Awesome Free Brands assets plus a default placeholder icon"
+  - "[x] Phase 3 - Add shared Compose issuer icon rendering for Android, iOS, Desktop, Web, and Wear OS"
+  - "[x] Phase 4 - Roll issuer icons through account-list and OTP surfaces"
+  - "[x] Phase 5 - Add native watchOS issuer icon rendering using Apple asset catalogs"
+  - "[x] Phase 6 - Add tests, QA coverage, and icon-catalog maintenance docs"
 ---
 
 # Issuer Brand Icons Rollout Plan
