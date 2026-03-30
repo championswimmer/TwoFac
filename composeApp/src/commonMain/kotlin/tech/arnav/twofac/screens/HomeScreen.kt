@@ -45,6 +45,7 @@ fun HomeScreen(
     val error by viewModel.error.collectAsState()
     val otpListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    @Suppress("DEPRECATION")
     val clipboardManager = LocalClipboardManager.current
     val snackbarHostState = remember { SnackbarHostState() }
     val otpCopiedMessage = stringResource(Res.string.otp_copied)

@@ -113,7 +113,7 @@ fun SettingsScreen(
     val isSecureUnlockEnabled = remember(sessionManager) {
         mutableStateOf(
             if (hasSecureStorage) {
-                secureSessionManager!!.isSecureUnlockEnabled()
+                secureSessionManager.isSecureUnlockEnabled()
             } else {
                 sessionManager?.isRememberPasskeyEnabled() ?: false
             }
@@ -309,7 +309,7 @@ fun SettingsScreen(
                         if (!enabled) {
                             // Disable: clear everything
                             if (hasSecureStorage) {
-                                secureSessionManager!!.setSecureUnlockEnabled(false)
+                                secureSessionManager.setSecureUnlockEnabled(false)
                             }
                             sessionManager.setRememberPasskey(false)
                             isSecureUnlockEnabled.value = false

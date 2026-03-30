@@ -87,7 +87,7 @@ interface MacOSKeychainNative : Library {
                     // TwoFac.app/Contents/app
                     appDir.parentFile?.resolve("app")?.let { possiblePaths.add(it.absolutePath) }
                     // TwoFac.app/Contents/app/resources
-                    appDir.resolve("resources")?.let { possiblePaths.add(it.absolutePath) }
+                    appDir.resolve("resources").let { possiblePaths.add(it.absolutePath) }
                 }
             } catch (e: Exception) {
                 // ignore
