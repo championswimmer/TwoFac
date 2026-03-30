@@ -3,6 +3,7 @@ package tech.arnav.twofac.lib.watchsync
 import kotlinx.serialization.json.Json
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.presentation.issuer.IssuerIconCatalog
 import kotlin.time.Clock
 
 @OptIn(kotlin.time.ExperimentalTime::class)
@@ -24,9 +25,11 @@ object IosWatchSyncHelper {
         val uris = lib.exportAccountsPlaintext()
         
         val watchAccounts = accounts.zip(uris).map { (account, uri) ->
+            val issuer = account.issuer ?: runCatching { tech.arnav.twofac.lib.uri.OtpAuthURI.parse(uri).issuer }.getOrNull()
             WatchSyncAccount(
                 accountId = account.accountID,
-                issuer = runCatching { tech.arnav.twofac.lib.uri.OtpAuthURI.parse(uri).issuer }.getOrNull(),
+                issuer = issuer,
+                issuerIconKey = IssuerIconCatalog.resolveIssuerIconKey(issuer),
                 accountLabel = account.accountLabel,
                 otpAuthUri = uri
             )
