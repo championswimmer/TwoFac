@@ -57,6 +57,8 @@ final class tech.arnav.twofac.lib.importer.adapters/EnteImportAdapter : tech.arn
 
 final class tech.arnav.twofac.lib.importer.adapters/TwoFasImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/TwoFasImportAdapter|null[0]
 
+final class tech.arnav.twofac.lib.presentation.issuer/IssuerIconMatch // tech.arnav.twofac.lib.presentation.issuer/IssuerIconMatch|null[0]
+
 final class tech.arnav.twofac.lib.storage/StoredAccount // tech.arnav.twofac.lib.storage/StoredAccount|null[0]
 
 final class tech.arnav.twofac.lib.theme/ThemeColor // tech.arnav.twofac.lib.theme/ThemeColor|null[0]
@@ -78,6 +80,14 @@ final object tech.arnav.twofac.lib.backup/BackupProviderCapabilityRules // tech.
 final object tech.arnav.twofac.lib.backup/BackupProviderIds // tech.arnav.twofac.lib.backup/BackupProviderIds|null[0]
 
 final object tech.arnav.twofac.lib.backup/BackupRestorePolicy // tech.arnav.twofac.lib.backup/BackupRestorePolicy|null[0]
+
+final object tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog { // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog|null[0]
+    final fun codePointForIconKey(kotlin/String): kotlin/Int? // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.codePointForIconKey|codePointForIconKey(kotlin.String){}[0]
+    final fun normalizeIssuer(kotlin/String?): kotlin/String? // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.normalizeIssuer|normalizeIssuer(kotlin.String?){}[0]
+    final fun resolveIssuerIcon(kotlin/String?): tech.arnav.twofac.lib.presentation.issuer/IssuerIconMatch // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.resolveIssuerIcon|resolveIssuerIcon(kotlin.String?){}[0]
+    final fun resolveIssuerIconKey(kotlin/String?): kotlin/String // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.resolveIssuerIconKey|resolveIssuerIconKey(kotlin.String?){}[0]
+    final fun supportedIconKeys(): kotlin.collections/Set<kotlin/String> // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.supportedIconKeys|supportedIconKeys(){}[0]
+}
 
 final object tech.arnav.twofac.lib.theme/TimerSemantics // tech.arnav.twofac.lib.theme/TimerSemantics|null[0]
 
