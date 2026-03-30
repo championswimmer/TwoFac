@@ -40,6 +40,8 @@ Brand assets come from **Font Awesome Free Brands**.
 
 The placeholder is intentionally drawn in code as a circled `?` so all platforms can share the same fallback behavior without shipping a second non-brand icon font.
 
+Issuer matching is intentionally derived from the current `issuer` value at UI or sync time. Stored account records do not persist a matched icon key, so catalog updates can change icon selection without any secrets-store migration.
+
 ## Adding a new issuer
 
 1. Add or extend aliases in `IssuerIconCatalog.normalizeIssuer()` / `aliasToIconKey`.
@@ -47,7 +49,7 @@ The placeholder is intentionally drawn in code as a circled `?` so all platforms
 3. Add the matching Font Awesome glyph string in `glyphForIconKey`.
 4. Ensure the brand glyph exists in `fa_brands_400_regular.ttf`.
 5. Add the matching watchOS asset catalog entry at `iosApp/watchApp/Assets.xcassets/{iconKey}.imageset/`.
-6. If the issuer should sync to watchOS, no extra mapping is needed because `WatchSyncAccount.issuerIconKey` is populated from the shared catalog.
+6. If the issuer should sync to watchOS, no extra mapping is needed because `WatchSyncAccount.issuerIconKey` is derived from the shared catalog when the sync snapshot is produced.
 7. Run:
    - `./gradlew --no-daemon :sharedLib:allTests :sharedLib:updateLegacyAbi`
    - `./gradlew --no-daemon :composeApp:compileKotlinMetadata`

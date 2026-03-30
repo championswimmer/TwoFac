@@ -4,8 +4,6 @@ package tech.arnav.twofac.lib.storage
 
 import kotlinx.serialization.Serializable
 import tech.arnav.twofac.lib.PublicApi
-import tech.arnav.twofac.lib.presentation.issuer.IssuerIconCatalog
-import tech.arnav.twofac.lib.presentation.issuer.IssuerIconMatch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -22,7 +20,6 @@ data class StoredAccount constructor(
         val accountLabel: String,
         val nextCodeAt: Long = 0L,
         val issuer: String? = null,
-        val issuerIconMatch: IssuerIconMatch = IssuerIconCatalog.resolveIssuerIcon(issuer),
     )
 
     fun forDisplay(
