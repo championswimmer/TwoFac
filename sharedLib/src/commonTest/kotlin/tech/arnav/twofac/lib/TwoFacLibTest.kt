@@ -1,6 +1,7 @@
 package tech.arnav.twofac.lib
 
 import kotlinx.coroutines.test.runTest
+import tech.arnav.twofac.lib.presentation.issuer.IssuerIconCatalog
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -165,6 +166,6 @@ class TwoFacLibTest {
 
         assertEquals("alice@example.com", account.accountLabel)
         assertEquals("GitHub", account.issuer)
-        assertEquals("github", account.issuerIconMatch.iconKey)
+        assertEquals("github", IssuerIconCatalog.resolveIssuerIcon(account.issuer).iconKey)
     }
 }
