@@ -18,8 +18,10 @@ const resourceExternalLinks = [
 
 const compareLinks = [
   { name: 'vs Google Authenticator', to: '/compare/google-authenticator' },
+  { name: 'vs Microsoft Authenticator', to: '/compare/microsoft-authenticator' },
   { name: 'vs 2FAS', to: '/compare/2fas' },
   { name: 'vs Ente Auth', to: '/compare/ente-auth' },
+  { name: 'vs Bitwarden', to: '/compare/bitwarden' },
 ]
 
 const communityLinks = [
