@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build Website
+    name: Build and Deploy Landing Page
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -44,19 +44,9 @@ jobs:
       - name: Generate CNAME file
         run: echo "twofac.app" > website/dist/CNAME
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'website/dist'
-
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: 'website/dist'
