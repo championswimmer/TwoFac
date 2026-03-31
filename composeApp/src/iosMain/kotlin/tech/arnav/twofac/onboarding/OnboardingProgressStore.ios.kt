@@ -9,14 +9,7 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 
-private fun getDocumentDirectory(): String {
-    val documentDirectories = NSSearchPathForDirectoriesInDomains(
-        directory = NSDocumentDirectory,
-        domainMask = NSUserDomainMask,
-        expandTilde = true,
-    )
-    return documentDirectories.firstOrNull() as? String ?: ""
-}
+import tech.arnav.twofac.internal.getDocumentDirectory
 
 actual fun createOnboardingProgressStore(): KStore<OnboardingProgressSnapshot> {
     val dir = getDocumentDirectory()

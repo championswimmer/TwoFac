@@ -34,9 +34,9 @@ progress:
 - Committed in: `627c52f` (HappyZenith, plan 07 phase 4 included website/ changes)
 
 ### Phase 1: Page/template abstraction pass 🔄 (PureRaven)
-- [ ] Extract shared compare-page scaffold into reusable component/composable.
-- [ ] Move per-competitor differences to structured config objects.
-- [ ] Reduce repetitive static blocks across `compare/*.vue` files.
+- [x] Extract shared compare-page scaffold into reusable component/composable.
+- [x] Move per-competitor differences to structured config objects.
+- [x] Reduce repetitive static blocks across `compare/*.vue` files.
 - Note: PureRaven owns this phase. 3 of 5 compare pages already refactored (Bitwarden, EnteAuth, GoogleAuth bundle sizes halved to ~10KB).
 
 ### Phase 2: Build/dependency footprint reduction ✅
@@ -52,5 +52,5 @@ progress:
 
 ## Success Criteria
 - [x] Website assets have one source of truth. ✅
-- [ ] Compare pages share a single template path and diverge only by data. (Phase 1, in progress by PureRaven)
+- [x] Compare pages share a single template path and diverge only by data. (Phase 1, in progress by PureRaven)
 - [x] Website build remains deterministic and lean. ✅

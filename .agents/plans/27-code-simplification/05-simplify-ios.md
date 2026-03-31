@@ -38,32 +38,32 @@ progress:
 ## Simplification Roadmap
 
 ### Phase 0: Remove dead sync coordinator path
-- [ ] Delete `iosApp/iosApp/WatchSyncCoordinator.swift`.
-- [ ] Update `iosApp/AGENTS.md` to reflect actual KMP-driven sync path (`IosCompanionSyncCoordinator`).
+- [x] Delete `iosApp/iosApp/WatchSyncCoordinator.swift`.
+- [x] Update `iosApp/AGENTS.md` to reflect actual KMP-driven sync path (`IosCompanionSyncCoordinator`).
 
 ### Phase 1: Unify iOS/watch payload contract keys
-- [ ] Define a single contract constant strategy for iOS payload key(s), shared across Kotlin + Swift bridge.
-- [ ] Replace ad-hoc key literals in:
+- [x] Define a single contract constant strategy for iOS payload key(s), shared across Kotlin + Swift bridge.
+- [x] Replace ad-hoc key literals in:
   - `composeApp/src/iosMain/.../IosCompanionSyncCoordinator.kt`
   - `iosApp/watchAppExtension/WatchConnectivityManager.swift`
-- [ ] Add compatibility fallback during migration if needed.
+- [x] Add compatibility fallback during migration if needed.
 
 ### Phase 2: Reduce watch extension runtime overhead
-- [ ] Refactor `handleIncomingPayloadString` to process in-memory payload directly after persist.
-- [ ] Replace 30fps ticker with `TimelineView` or 1Hz update cadence for countdown.
-- [ ] Keep behavior-equivalent UI output and verify no staleness in displayed OTP expiry.
+- [x] Refactor `handleIncomingPayloadString` to process in-memory payload directly after persist.
+- [x] Replace 30fps ticker with `TimelineView` or 1Hz update cadence for countdown.
+- [x] Keep behavior-equivalent UI output and verify no staleness in displayed OTP expiry.
 
 ### Phase 3: Theme/token alignment and diagnostics cleanup
-- [ ] Route watch background/timer track colors through `TwoFacKit` tokens instead of hardcoded black.
-- [ ] Gate verbose debug event collection/log feed behind DEBUG build condition.
+- [x] Route watch background/timer track colors through `TwoFacKit` tokens instead of hardcoded black.
+- [x] Gate verbose debug event collection/log feed behind DEBUG build condition.
 
 ### Phase 4: Validate iOS + watchOS sync end-to-end
-- [ ] Validate on simulator/device pair:
+- [x] Validate on simulator/device pair:
   - initial sync
   - app relaunch with persisted payload
   - stale payload rejection logic
   - manual refresh behavior
-- [ ] Confirm no regression in watch page navigation and OTP generation.
+- [x] Confirm no regression in watch page navigation and OTP generation.
 
 ## Success Criteria
 - Only one sync coordinator path exists for iOS -> watch sync.

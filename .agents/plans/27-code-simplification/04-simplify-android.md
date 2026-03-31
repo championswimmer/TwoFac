@@ -77,23 +77,23 @@ progress:
 ## Simplification Roadmap
 
 ### Phase 0: Thin-wrapper cleanup
-- [ ] Delete `androidApp/src/main/res/drawable-anydpi-v26/ic_launcher_foreground.xml`.
-- [ ] Confirm launcher icon unchanged: run `./gradlew :androidApp:assembleDebug` and inspect the icon.
+- [x] Delete `androidApp/src/main/res/drawable-anydpi-v26/ic_launcher_foreground.xml`.
+- [x] Confirm launcher icon unchanged: run `./gradlew :androidApp:assembleDebug` and inspect the icon.
 
 ### Phase 1: Backup and release hardening
-- [ ] Create `androidApp/src/main/res/xml/data_extraction_rules.xml` with `disableIfNoEncryptionCapabilities="true"` in `<cloud-backup>` and `<exclude domain="root" path="."/>` in `<device-transfer>`.
-- [ ] Create `androidApp/src/main/res/xml/backup_rules.xml` with equivalent excludes for Android ≤ 11 (`fullBackupContent`).
-- [ ] Add `android:dataExtractionRules="@xml/data_extraction_rules"` and `android:fullBackupContent="@xml/backup_rules"` to `AndroidManifest.xml`.
-- [ ] Set `isMinifyEnabled = true` and `isShrinkResources = true` in the release build type.
-- [ ] Add a `proguard-rules.pro` in `androidApp/` starting from `proguard-android-optimize.txt`.
-- [ ] Create `composeApp/consumer-rules.pro` with KMP/Compose/Koin/Serialization keep rules and reference it via `consumerProguardFiles`.
-- [ ] Verify release build: `./gradlew :androidApp:assembleRelease`; check `missing_rules.txt` and iterate.
+- [x] Create `androidApp/src/main/res/xml/data_extraction_rules.xml` with `disableIfNoEncryptionCapabilities="true"` in `<cloud-backup>` and `<exclude domain="root" path="."/>` in `<device-transfer>`.
+- [x] Create `androidApp/src/main/res/xml/backup_rules.xml` with equivalent excludes for Android ≤ 11 (`fullBackupContent`).
+- [x] Add `android:dataExtractionRules="@xml/data_extraction_rules"` and `android:fullBackupContent="@xml/backup_rules"` to `AndroidManifest.xml`.
+- [x] Set `isMinifyEnabled = true` and `isShrinkResources = true` in the release build type.
+- [x] Add a `proguard-rules.pro` in `androidApp/` starting from `proguard-android-optimize.txt`.
+- [x] Create `composeApp/consumer-rules.pro` with KMP/Compose/Koin/Serialization keep rules and reference it via `consumerProguardFiles`.
+- [x] Verify release build: `./gradlew :androidApp:assembleRelease`; check `missing_rules.txt` and iterate.
 
 ### Phase 2: Validate wrapper remains minimal
-- [ ] Build checks:
+- [x] Build checks:
   - `./gradlew :androidApp:assembleDebug`
   - `./gradlew :androidApp:assembleRelease`
-- [ ] Smoke test startup, biometric prompt path, and import/export screens on a release build.
+- [x] Smoke test startup, biometric prompt path, and import/export screens on a release build.
 
 ## Success Criteria
 - No duplicate icon assets.

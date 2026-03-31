@@ -9,14 +9,7 @@ import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 import tech.arnav.twofac.lib.storage.StoredAccount
 
-private fun getDocumentDirectory(): String {
-    val documentDirectories = NSSearchPathForDirectoriesInDomains(
-        directory = NSDocumentDirectory,
-        domainMask = NSUserDomainMask,
-        expandTilde = true
-    )
-    return documentDirectories.firstOrNull() as? String ?: ""
-}
+import tech.arnav.twofac.internal.getDocumentDirectory
 
 actual fun createAccountsStore(): KStore<List<StoredAccount>> {
     val dir = getDocumentDirectory()

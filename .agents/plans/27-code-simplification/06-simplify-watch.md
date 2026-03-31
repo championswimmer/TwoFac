@@ -72,19 +72,19 @@ progress:
 
 ### Phase 0: Stabilize repository lifecycle and message semantics
 
-- [ ] **Remove spurious `repository.initialize()` from `onMessageReceived`.**
+- [x] **Remove spurious `repository.initialize()` from `onMessageReceived`.**
   `WatchSyncListenerService.onMessageReceived()` calls `repository.initialize()` (a disk read)
   every time the phone pings the watch. The service's `onCreate()` already initializes the
   repository. The `onMessageReceived` handler should send the ACK only; it should not re-read
   the store on every ping.
 
-- [ ] **Remove duplicate `LaunchedEffect` init from `WearApp()`.**
+- [x] **Remove duplicate `LaunchedEffect` init from `WearApp()`.**
   `MainActivity.onCreate()` already launches `repository.initialize()`. The
   `LaunchedEffect(repository) { repository.initialize() }` in `WearApp()` is a redundant second
   call in the same process. Remove it; the composable reads state via `collectAsState()`, which
   works with whatever the `onCreate` init left.
 
-- [ ] **Clarify/rename sync message paths in `WatchSyncContract`.**
+- [x] **Clarify/rename sync message paths in `WatchSyncContract`.**
   Both directions currently share `REQUEST_SYNC_NOW_MESSAGE_PATH`. Rename to make direction
   explicit:
   - `WATCH_REQUEST_SYNC_PATH` = `"/twofac/sync/watch/request_sync"` — watch → phone (sync request)
@@ -99,17 +99,17 @@ progress:
 
 ### Phase 1: Remove dead state and synchronous suspend noise
 
-- [ ] **Remove redundant `schemaVersion` from `WatchSyncCacheState`.**
+- [x] **Remove redundant `schemaVersion` from `WatchSyncCacheState`.**
   `schemaVersion: Int = WatchSyncContract.SCHEMA_VERSION` duplicates `snapshot?.version`.
   Remove it. Consumers that need the version should read `snapshot?.version` directly.
   `lastSyncedAtEpochSec` and `lastError` are intentionally retained — they have clear
   diagnostic/display value even if not yet surfaced in UI.
 
-- [ ] **Rename `WatchSyncSyncError` → `WatchSyncError`.**
+- [x] **Rename `WatchSyncSyncError` → `WatchSyncError`.**
   The "SyncSync" naming stutter is a straightforward rename. The enum is internal to
   `storage/`, so no external API breakage.
 
-- [ ] **Remove `suspend` from `WatchOtpProvider.buildCodes()` and cache `nextCodeAt`.**
+- [x] **Remove `suspend` from `WatchOtpProvider.buildCodes()` and cache `nextCodeAt`.**
   - `buildCodes()` contains zero suspension points. The Kotlin compiler emits
     `RedundantSuspendModifier` lint for exactly this pattern.
   - The `suspend` modifier forces all callers into a coroutine for no benefit, adds CPS
@@ -124,12 +124,12 @@ progress:
 
 ### Phase 2: Simplify startup abstractions
 
-- [ ] **Delete `WatchCapabilityRegistrar`.**
+- [x] **Delete `WatchCapabilityRegistrar`.**
   The `wear.xml` static declaration is authoritative. The programmatic call always results in
   error 4006 (as documented by the code's own comment). The class serves no purpose.
   `WatchApplication.onCreate()` can be simplified to an empty override or removed entirely.
 
-- [ ] **Fix `DefaultPreview` to not require live infrastructure.**
+- [x] **Fix `DefaultPreview` to not require live infrastructure.**
   Replace the parameterless `WearApp()` call in `DefaultPreview` with a preview-specific
   composable that accepts pre-built `WatchOtpEntry` list and a `WatchSyncCacheState`. Options:
   - Extract `WearAppContent(entries, state)` composable and have `WearApp()` pass real state
@@ -141,11 +141,11 @@ progress:
 
 ### Phase 3: Build hygiene and dependency cleanup
 
-- [ ] **Remove `kotlin.multiplatform.appdirs` from `watchApp/build.gradle.kts`.**
+- [x] **Remove `kotlin.multiplatform.appdirs` from `watchApp/build.gradle.kts`.**
   Confirmed: zero imports in any `.kt` source file. File paths are resolved via
   `context.filesDir` (Android platform API) which is correct for an Android-only module.
 
-- [ ] **Enable release minification.**
+- [x] **Enable release minification.**
   Set `isMinifyEnabled = true` in the `release` block.
   `kotlinx.serialization` ≥ 1.5 includes consumer rules that automatically cover standard
   `@Serializable` data classes (the only pattern used in `WatchSyncCacheState`). Verify
@@ -157,7 +157,7 @@ progress:
 
 ### Phase 4: Battery/perf on wearable
 
-- [ ] **Gate the 30 fps update loop with `AmbientLifecycleObserver`.**
+- [x] **Gate the 30 fps update loop with `AmbientLifecycleObserver`.**
   The `delay(33)` loop in `WearApp` must stop when the watch enters ambient mode.
   Correct approach:
   ```kotlin
@@ -171,7 +171,7 @@ progress:
   The `MutableState<Boolean> isAmbient` flag derived from the observer can be passed to
   `WearApp` / `OtpPagerScreen` to also switch the arc animation to a static display.
 
-- [ ] **Lower `otpProvider.ticker` cadence in ambient mode.**
+- [x] **Lower `otpProvider.ticker` cadence in ambient mode.**
   The OTP ticker (`delay(1000)`) is fine when interactive. In ambient, OTPs do not need
   second-by-second refresh — updating once every 30 s is sufficient. Pass `isAmbient` into
   the ticker (or use a separate ambient flow) to slow the refresh.

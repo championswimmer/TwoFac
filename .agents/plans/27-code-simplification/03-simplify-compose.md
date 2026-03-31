@@ -72,17 +72,17 @@ Two tasks were **dropped** (see § Dropped Tasks at the bottom).
 
 ### Phase 0: Remove tracked artifacts and release-debug leftovers
 
-- [ ] Remove tracked `.dylib` from source tree; add `*.dylib` to `.gitignore`.
+- [x] Remove tracked `.dylib` from source tree; add `*.dylib` to `.gitignore`.
   - _Reason_: Compiled native binaries must never be committed. The `build.sh` + `TwoFacKeychain.swift` source is already in the same directory.
-- [ ] Remove tracked `composeApp/bin/desktopMain/**` resource duplicates.
+- [x] Remove tracked `composeApp/bin/desktopMain/**` resource duplicates.
   - _Reason_: MD5 confirmed byte-for-byte identical to `src/desktopMain/resources/**`. Two copies mean divergence risk on any icon update. Add `composeApp/bin/` to `.gitignore`.
-- [ ] Update `.gitignore` to prevent future artifact commits (`*.dylib`, `composeApp/bin/`).
-- [ ] Remove startup debug file writes from `DesktopModules.kt`.
+- [x] Update `.gitignore` to prevent future artifact commits (`*.dylib`, `composeApp/bin/`).
+- [x] Remove startup debug file writes from `DesktopModules.kt`.
   - _Reason_: Production code should not write arbitrary files to `~/` without user consent. These were clearly temporary debug statements. Remove the three `logFile.appendText(...)` calls and the `logFile` variable; keep the OS-detection logic.
 
 ### Phase 1: Consolidate platform storage/session path helpers
 
-- [ ] **iOS**: Extract `getDocumentDirectory()` into a single `internal` function in a new file (e.g., `iosMain/kotlin/tech/arnav/twofac/internal/IosFileUtils.kt`) and have both `AppDirUtils.ios.kt` and `OnboardingProgressStore.ios.kt` call it.
+- [x] **iOS**: Extract `getDocumentDirectory()` into a single `internal` function in a new file (e.g., `iosMain/kotlin/tech/arnav/twofac/internal/IosFileUtils.kt`) and have both `AppDirUtils.ios.kt` and `OnboardingProgressStore.ios.kt` call it.
   - _Reason_: Currently byte-for-byte duplicated. Any change (e.g., switching to `FileManager.defaultManager`) must be made in two places. `IOSPlatform.getAppDataDir()` in `Platform.ios.kt` is a third copy and will be removed with the Platform abstraction (Phase 3).
 - [ ] **JVM/Android**: Extract `AppDirs { … }` initialisation into a single top-level val per source set (e.g., a shared `internal val appDirs` in a new `jvmMain/internal/JvmAppDirs.kt`) and reuse it in both `AppDirUtils.jvm.kt` and `OnboardingProgressStore.jvm.kt`.
   - _Reason_: The same `AppDirs { appName="TwoFac"; appAuthor="tech.arnav"; macOS.useSpaceBetweenAuthorAndApp=false }` block appears independently in two JVM files (and two Android files). Note: the Android config intentionally omits the `macOS` flag, so keep the targets separate.
