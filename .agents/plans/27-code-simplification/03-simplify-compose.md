@@ -1,12 +1,12 @@
 ---
 name: Code Simplification Plan - composeApp
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0: Remove tracked artifacts and release-debug leftovers"
-  - "[ ] Phase 1: Consolidate platform storage/session path helpers"
-  - "[ ] Phase 2: Reduce onboarding and DI duplication"
-  - "[ ] Phase 3: Delete dead compatibility and unused code"
-  - "[ ] Phase 4: Verify all targets and update docs"
+  - "[x] Phase 0: Remove tracked artifacts and release-debug leftovers"
+  - "[x] Phase 1: Consolidate platform storage/session path helpers"
+  - "[x] Phase 2: Reduce onboarding and DI duplication"
+  - "[x] Phase 3: Delete dead compatibility and unused code"
+  - "[x] Phase 4: Verify all targets and update docs"
 ---
 
 # Code Simplification Plan - composeApp
