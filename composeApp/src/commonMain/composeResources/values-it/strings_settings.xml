@@ -63,6 +63,7 @@
     <string name="desktop_window_title">TwoFac</string>
     <string name="desktop_tray_tooltip">TwoFac</string>
     <string name="desktop_tray_open">Apri TwoFac</string>
+    <string name="desktop_tray_quick_view">Vista rapida</string>
     <string name="desktop_tray_quit">Esci da TwoFac</string>
     <string name="desktop_tray_popup_title">Tray di TwoFac</string>
 </resources>

@@ -63,8 +63,10 @@ object LinuxNativeTray {
         lightIconPath: String,
         darkIconPath: String,
         tooltip: String,
+        quickViewLabel: String,
         openLabel: String,
         quitLabel: String,
+        onQuickView: () -> Unit,
         onOpen: () -> Unit,
         onQuit: () -> Unit,
     ) {
@@ -87,6 +89,8 @@ object LinuxNativeTray {
         tray.setTooltip(tooltip)
         tray.setStatus(tooltip)
 
+        // Quick View is the first item — the primary action on AppIndicator menus
+        tray.menu.add(MenuItem(quickViewLabel) { _: ActionEvent -> onQuickView() })
         tray.menu.add(MenuItem(openLabel) { _: ActionEvent -> onOpen() })
         tray.menu.add(MenuItem(quitLabel) { _: ActionEvent ->
             onQuit()

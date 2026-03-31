@@ -34,6 +34,7 @@ import twofac.composeapp.generated.resources.desktop_window_title
 import twofac.composeapp.generated.resources.desktop_tray_tooltip
 import twofac.composeapp.generated.resources.desktop_tray_open
 import twofac.composeapp.generated.resources.desktop_tray_quit
+import twofac.composeapp.generated.resources.desktop_tray_quick_view
 import twofac.composeapp.generated.resources.desktop_tray_popup_title
 
 private val osName = System.getProperty("os.name").lowercase()
@@ -66,6 +67,7 @@ fun main() = runBlocking {
         val windowTitle = stringResource(Res.string.desktop_window_title)
         val trayTooltip = stringResource(Res.string.desktop_tray_tooltip)
         val trayOpenText = stringResource(Res.string.desktop_tray_open)
+        val trayQuickViewText = stringResource(Res.string.desktop_tray_quick_view)
         val trayQuitText = stringResource(Res.string.desktop_tray_quit)
         val trayPopupTitle = stringResource(Res.string.desktop_tray_popup_title)
         
@@ -101,8 +103,15 @@ fun main() = runBlocking {
                         lightIconPath = "tray_lock_linux_light.png",
                         darkIconPath = "tray_lock_linux_dark.png",
                         tooltip = trayTooltip,
+                        quickViewLabel = trayQuickViewText,
                         openLabel = trayOpenText,
                         quitLabel = trayQuitText,
+                        onQuickView = {
+                            if (!isTrayPopupVisible) {
+                                trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
+                            }
+                            isTrayPopupVisible = !isTrayPopupVisible
+                        },
                         onOpen = { isMainWindowOpen = true },
                         onQuit = ::exitApplication,
                     )
@@ -138,39 +147,40 @@ fun main() = runBlocking {
                         )
                     }
                 )
+            }
 
-                Window(
-                    onCloseRequest = { isTrayPopupVisible = false },
-                    state = trayWindowState,
-                    visible = isTrayPopupVisible,
-                    undecorated = true,
-                    transparent = true,
-                    resizable = false,
-                    alwaysOnTop = true,
-                    title = trayPopupTitle,
+            // Tray popup window — shared across all platforms
+            Window(
+                onCloseRequest = { isTrayPopupVisible = false },
+                state = trayWindowState,
+                visible = isTrayPopupVisible,
+                undecorated = true,
+                transparent = true,
+                resizable = false,
+                alwaysOnTop = true,
+                title = trayPopupTitle,
+            ) {
+                val window = this.window
+                DisposableEffect(window) {
+                    val listener = object : java.awt.event.WindowFocusListener {
+                        override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {}
+                        override fun windowLostFocus(e: java.awt.event.WindowEvent?) {
+                            isTrayPopupVisible = false
+                        }
+                    }
+                    window.addWindowFocusListener(listener)
+                    onDispose {
+                        window.removeWindowFocusListener(listener)
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.background,
+                    shadowElevation = 8.dp
                 ) {
-                    val window = this.window
-                    DisposableEffect(window) {
-                        val listener = object : java.awt.event.WindowFocusListener {
-                            override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {}
-                            override fun windowLostFocus(e: java.awt.event.WindowEvent?) {
-                                isTrayPopupVisible = false
-                            }
-                        }
-                        window.addWindowFocusListener(listener)
-                        onDispose {
-                            window.removeWindowFocusListener(listener)
-                        }
-                    }
-
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.background,
-                        shadowElevation = 8.dp
-                    ) {
-                        App(onQuit = { exitApplication() })
-                    }
+                    App(onQuit = { exitApplication() })
                 }
             }
         }
