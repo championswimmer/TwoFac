@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.io.files.Path
 import kotlinx.serialization.Serializable
-import tech.arnav.twofac.lib.watchsync.WatchSyncContract
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -32,14 +31,13 @@ class WatchSyncSnapshotRepository private constructor(
         val updated = WatchSyncCacheState(
             snapshot = snapshot,
             lastSyncedAtEpochSec = Clock.System.now().epochSeconds,
-            schemaVersion = snapshot.version,
             lastError = null,
         )
         store.set(updated)
         _state.value = updated
     }
 
-    suspend fun persistError(error: WatchSyncSyncError) {
+    suspend fun persistError(error: WatchSyncError) {
         val current = _state.value
         val updated = current.copy(lastError = error.name)
         store.set(updated)
@@ -64,11 +62,10 @@ class WatchSyncSnapshotRepository private constructor(
 data class WatchSyncCacheState(
     val snapshot: WatchSyncSnapshot? = null,
     val lastSyncedAtEpochSec: Long? = null,
-    val schemaVersion: Int = WatchSyncContract.SCHEMA_VERSION,
     val lastError: String? = null,
 )
 
-enum class WatchSyncSyncError {
+enum class WatchSyncError {
     MISSING_PAYLOAD,
     MALFORMED_PAYLOAD,
     UNSUPPORTED_SCHEMA,

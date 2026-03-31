@@ -139,7 +139,7 @@ class WearSyncDataLayerClient(context: Context) {
                 Tasks.await(
                     messageClient.sendMessage(
                         node.id,
-                        WatchSyncContract.REQUEST_SYNC_NOW_MESSAGE_PATH,
+                        WatchSyncContract.PHONE_PING_WATCH_PATH,
                         ByteArray(0),
                     )
                 )

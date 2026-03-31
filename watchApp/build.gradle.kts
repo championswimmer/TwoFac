@@ -19,7 +19,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -43,12 +43,12 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.wear.tooling.preview)
+    implementation(libs.androidx.wear)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.kstore)
     implementation(libs.kstore.file)
-    implementation(libs.kotlin.multiplatform.appdirs)
     implementation(project(":sharedLib"))
 
 

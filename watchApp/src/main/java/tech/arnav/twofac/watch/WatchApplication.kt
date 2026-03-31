@@ -1,11 +1,7 @@
 package tech.arnav.twofac.watch
 
 import android.app.Application
-import tech.arnav.twofac.watch.datalayer.WatchCapabilityRegistrar
 
-class WatchApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        WatchCapabilityRegistrar.register(this)
-    }
-}
+// Wear capability is declared statically in res/values/wear.xml via android_wear_capabilities;
+// no programmatic registration needed.
+class WatchApplication : Application()

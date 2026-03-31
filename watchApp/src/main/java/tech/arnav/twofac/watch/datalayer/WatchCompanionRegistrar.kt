@@ -58,7 +58,7 @@ class WatchCompanionRegistrar(
                 Tasks.await(
                     messageClient.sendMessage(
                         node.id,
-                        WatchSyncContract.REQUEST_SYNC_NOW_MESSAGE_PATH,
+                        WatchSyncContract.WATCH_REQUEST_SYNC_PATH,
                         ByteArray(0),
                     )
                 )

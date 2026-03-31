@@ -20,8 +20,7 @@ class WatchOtpProvider(
     private val clock: Clock = Clock.System,
 ) {
 
-    @OptIn(ExperimentalTime::class)
-    suspend fun buildCodes(
+    fun buildCodes(
         snapshot: WatchSyncSnapshot,
         nowEpochSec: Long = clock.now().epochSeconds
     ): List<WatchOtpEntry> {
@@ -29,17 +28,20 @@ class WatchOtpProvider(
             try {
                 val otp = OtpAuthURI.parse(account.otpAuthUri)
                 when (otp) {
-                    is TOTP -> WatchOtpEntry.Valid(
-                        account = StoredAccount.DisplayAccount(
-                            accountID = account.accountId,
-                            accountLabel = account.accountLabel,
-                            nextCodeAt = otp.nextCodeAt(nowEpochSec),
-                        ),
-                        issuer = account.issuer,
-                        otpCode = otp.generateOTP(nowEpochSec),
-                        nextRefreshAtEpochSec = otp.nextCodeAt(nowEpochSec),
-                        periodSec = otp.timeInterval,
-                    )
+                    is TOTP -> {
+                        val nextCodeAt = otp.nextCodeAt(nowEpochSec)
+                        WatchOtpEntry.Valid(
+                            account = StoredAccount.DisplayAccount(
+                                accountID = account.accountId,
+                                accountLabel = account.accountLabel,
+                                nextCodeAt = nextCodeAt,
+                            ),
+                            issuer = account.issuer,
+                            otpCode = otp.generateOTP(nowEpochSec),
+                            nextRefreshAtEpochSec = nextCodeAt,
+                            periodSec = otp.timeInterval,
+                        )
+                    }
 
                     is HOTP -> WatchOtpEntry.Valid(
                         account = StoredAccount.DisplayAccount(

@@ -15,7 +15,7 @@ import kotlinx.serialization.SerializationException
 import tech.arnav.twofac.lib.watchsync.WatchSyncContract
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshotCodec
 import tech.arnav.twofac.watch.storage.WatchSyncSnapshotRepository
-import tech.arnav.twofac.watch.storage.WatchSyncSyncError
+import tech.arnav.twofac.watch.storage.WatchSyncError
 
 class WatchSyncListenerService : WearableListenerService() {
 
@@ -42,7 +42,7 @@ class WatchSyncListenerService : WearableListenerService() {
                 val payload = DataMapItem.fromDataItem(dataItem).dataMap
                     .getByteArray(WatchSyncContract.SNAPSHOT_PAYLOAD_KEY)
                 if (payload == null) {
-                    serviceScope.launch { repository.persistError(WatchSyncSyncError.MISSING_PAYLOAD) }
+                    serviceScope.launch { repository.persistError(WatchSyncError.MISSING_PAYLOAD) }
                     return@forEach
                 }
 
@@ -51,9 +51,9 @@ class WatchSyncListenerService : WearableListenerService() {
                         val snapshot = WatchSyncSnapshotCodec.decode(payload)
                         repository.persistSnapshot(snapshot)
                     } catch (_: SerializationException) {
-                        repository.persistError(WatchSyncSyncError.MALFORMED_PAYLOAD)
+                        repository.persistError(WatchSyncError.MALFORMED_PAYLOAD)
                     } catch (_: IllegalArgumentException) {
-                        repository.persistError(WatchSyncSyncError.UNSUPPORTED_SCHEMA)
+                        repository.persistError(WatchSyncError.UNSUPPORTED_SCHEMA)
                     }
                 }
             }
@@ -61,9 +61,9 @@ class WatchSyncListenerService : WearableListenerService() {
     }
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
-        if (messageEvent.path == WatchSyncContract.REQUEST_SYNC_NOW_MESSAGE_PATH) {
+        if (messageEvent.path == WatchSyncContract.PHONE_PING_WATCH_PATH) {
+            // Respond to phone ping with ACK; no re-initialization needed (onCreate already did it).
             serviceScope.launch {
-                repository.initialize()
                 runCatching {
                     Wearable.getMessageClient(this@WatchSyncListenerService)
                         .sendMessage(
