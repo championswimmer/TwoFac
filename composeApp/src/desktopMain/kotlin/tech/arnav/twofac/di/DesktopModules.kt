@@ -38,13 +38,9 @@ val desktopOnboardingModule = module {
 val desktopSessionModule = module {
     val osName = System.getProperty("os.name")?.lowercase() ?: ""
     single<DesktopSecureUnlockBackend> {
-        val logFile = java.io.File(System.getProperty("user.home"), "twofac-native-debug.log")
-        logFile.appendText("[${java.time.Instant.now()}] desktopSessionModule: osName=$osName\n")
         if (osName.contains("mac")) {
-            logFile.appendText("[${java.time.Instant.now()}] desktopSessionModule: Creating MacOSKeychainBackend\n")
             MacOSKeychainBackend()
         } else {
-            logFile.appendText("[${java.time.Instant.now()}] desktopSessionModule: Creating UnsupportedDesktopSecureUnlockBackend\n")
             UnsupportedDesktopSecureUnlockBackend()
         }
     }

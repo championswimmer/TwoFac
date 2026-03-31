@@ -20,5 +20,11 @@ captures
 google-cloud-credentials.json
 google-cloud-credentials.plist
 
+# Compiled native libraries
+*.dylib
+
+# Staging/build artifact directories
+composeApp/bin/
+
 # Maestro UI Testing
 .maestro/outputs/
