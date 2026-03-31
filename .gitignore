@@ -28,3 +28,4 @@ composeApp/bin/
 
 # Maestro UI Testing
 .maestro/outputs/
+.pi/messenger/feed.jsonl
