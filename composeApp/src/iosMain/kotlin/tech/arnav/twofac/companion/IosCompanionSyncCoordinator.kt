@@ -13,6 +13,7 @@ import platform.WatchConnectivity.WCSessionActivationStateActivated
 import platform.WatchConnectivity.WCSessionDelegateProtocol
 import platform.darwin.NSObject
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.watchsync.WatchSyncContract
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -117,9 +118,9 @@ class IosCompanionSyncCoordinator(
         val payloadString = Json.encodeToString(WatchSyncSnapshot.serializer(), snapshot)
         // Keep values as strings so payload is always valid property-list data for WCSession.
         val payload: Map<Any?, Any?> = mapOf(
-            IOS_PAYLOAD_STRING_KEY to payloadString,
-            IOS_GENERATED_AT_EPOCH_SEC_KEY to snapshot.generatedAtEpochSec.toString(),
-            IOS_MANUAL_SYNC_KEY to manual.toString(),
+            WatchSyncContract.IOS_WC_PAYLOAD_STRING_KEY to payloadString,
+            WatchSyncContract.IOS_WC_GENERATED_AT_EPOCH_SEC_KEY to snapshot.generatedAtEpochSec.toString(),
+            WatchSyncContract.IOS_WC_MANUAL_SYNC_KEY to manual.toString(),
         )
 
         NSLog(
@@ -177,7 +178,4 @@ class IosCompanionSyncCoordinator(
     }
 }
 
-private const val IOS_PAYLOAD_STRING_KEY = "payloadString"
-private const val IOS_GENERATED_AT_EPOCH_SEC_KEY = "generatedAtEpochSec"
-private const val IOS_MANUAL_SYNC_KEY = "manualSync"
 private const val ACTIVATION_TIMEOUT_MS = 3000L

@@ -11,7 +11,7 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     @Published var lastSyncError: String? = nil
     @Published var debugEvents: [String] = []
 
-    private let payloadStringKey = "payloadString"
+    private let payloadStringKey = WatchSyncContract.shared.IOS_WC_PAYLOAD_STRING_KEY
     private var latestAppliedGeneratedAtEpochSec: Int64 = 0
     
     override init() {

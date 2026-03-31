@@ -13,4 +13,9 @@ object WatchSyncContract {
     const val SNAPSHOT_PAYLOAD_KEY = "payload"
     const val SNAPSHOT_GENERATED_AT_KEY = "generatedAtEpochSec"
     const val SNAPSHOT_PUBLISHED_AT_KEY = "publishedAtMs"
+
+    // iOS WCSession message/context keys (used by IosCompanionSyncCoordinator and WatchConnectivityManager)
+    const val IOS_WC_PAYLOAD_STRING_KEY = "payloadString"
+    const val IOS_WC_GENERATED_AT_EPOCH_SEC_KEY = "generatedAtEpochSec"
+    const val IOS_WC_MANUAL_SYNC_KEY = "manualSync"
 }
