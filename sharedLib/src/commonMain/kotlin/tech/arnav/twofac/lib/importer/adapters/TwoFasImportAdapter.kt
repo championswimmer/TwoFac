@@ -2,11 +2,11 @@ package tech.arnav.twofac.lib.importer.adapters
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.crypto.CryptoTools
 import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
+import tech.arnav.twofac.lib.importer.ImporterJson
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 
 /**
@@ -58,10 +58,7 @@ class TwoFasImportAdapter : ImportAdapter {
         val algorithm: String? = null
     )
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
+    private val json = ImporterJson
 
     override suspend fun parse(fileContent: String, password: String?): ImportResult {
         return try {
@@ -91,12 +88,7 @@ class TwoFasImportAdapter : ImportAdapter {
             val digits = getField(service.digits, service.otpSection?.digits, OtpAuthURI.DEFAULT_DIGITS)
             val period = getField(service.period, service.otpSection?.period, OtpAuthURI.DEFAULT_PERIOD).toLong()
             val algorithmStr = getField(service.algorithm, service.otpSection?.algorithm, "SHA1")
-            val algorithm = when (algorithmStr.uppercase()) {
-                "SHA1" -> CryptoTools.Algo.SHA1
-                "SHA256" -> CryptoTools.Algo.SHA256
-                "SHA512" -> CryptoTools.Algo.SHA512
-                else -> CryptoTools.Algo.SHA1
-            }
+            val algorithm = CryptoTools.Algo.fromString(algorithmStr)
 
             val accountName = service.account ?: service.otpSection?.account ?: "Unknown"
             val issuer = service.name

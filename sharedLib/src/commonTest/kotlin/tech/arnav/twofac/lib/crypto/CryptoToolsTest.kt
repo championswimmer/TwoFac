@@ -40,4 +40,25 @@ class CryptoToolsTest {
         // Assert that the keys are equal
         assertEquals(signingKey, signingKey2)
     }
+
+    @Test
+    fun testAlgoFromStringKnownValues() {
+        assertEquals(CryptoTools.Algo.SHA1,   CryptoTools.Algo.fromString("SHA1"))
+        assertEquals(CryptoTools.Algo.SHA256, CryptoTools.Algo.fromString("SHA256"))
+        assertEquals(CryptoTools.Algo.SHA512, CryptoTools.Algo.fromString("SHA512"))
+    }
+
+    @Test
+    fun testAlgoFromStringCaseInsensitive() {
+        assertEquals(CryptoTools.Algo.SHA256, CryptoTools.Algo.fromString("sha256"))
+        assertEquals(CryptoTools.Algo.SHA512, CryptoTools.Algo.fromString("Sha512"))
+        assertEquals(CryptoTools.Algo.SHA1,   CryptoTools.Algo.fromString("sha1"))
+    }
+
+    @Test
+    fun testAlgoFromStringUnknownFallsBackToSha1() {
+        // Unknown strings should default to SHA1 (otpauth spec default).
+        assertEquals(CryptoTools.Algo.SHA1, CryptoTools.Algo.fromString("MD5"))
+        assertEquals(CryptoTools.Algo.SHA1, CryptoTools.Algo.fromString(""))
+    }
 }

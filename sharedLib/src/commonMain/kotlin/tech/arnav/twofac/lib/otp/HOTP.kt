@@ -1,11 +1,10 @@
 package tech.arnav.twofac.lib.otp
 
 import dev.whyoleg.cryptography.BinarySize.Companion.bytes
-import dev.whyoleg.cryptography.CryptographyProvider
 import kotlinx.io.bytestring.ByteString
 import tech.arnav.twofac.lib.crypto.CryptoTools
-import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
 import tech.arnav.twofac.lib.crypto.Encoding
+import tech.arnav.twofac.lib.crypto.sharedCryptoTools
 import kotlin.experimental.and
 import kotlin.math.pow
 
@@ -15,12 +14,18 @@ class HOTP(
     override val secret: String,
     override val accountName: String,
     override val issuer: String?,
+    /**
+     * The initial counter value provisioned via the otpauth URI (RFC 4226 §7.2).
+     * Stored so that [tech.arnav.twofac.lib.TwoFacLib.getAllAccountOTPs] can seed the
+     * first code correctly instead of always starting at counter 0.
+     */
+    val initialCounter: Long = 0L,
+    private val cryptoTools: CryptoTools = sharedCryptoTools,
 ) : OTP {
     private companion object {
         private const val MSB_MASK = 0x7F // most significant bit mask 01111111
         private const val BYTE_MASK = 0xFF // byte mask 11111111
     }
-    private val cryptoTools = DefaultCryptoTools(CryptographyProvider.Default)
 
     /**
      * Generate a new OTP based on the current counter.

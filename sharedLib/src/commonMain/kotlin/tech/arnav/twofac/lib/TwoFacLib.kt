@@ -116,7 +116,7 @@ class TwoFacLib private constructor(
             )
             val timeNow = Clock.System.now().epochSeconds
             val otpString: String = when (otpGen) {
-                is HOTP -> otpGen.generateOTP(0)
+                is HOTP -> otpGen.generateOTP(otpGen.initialCounter)
                 is TOTP -> otpGen.generateOTP(timeNow)
                 else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
             }
@@ -256,7 +256,4 @@ class TwoFacLib private constructor(
             salt = entry.salt,
         )
     }
-
-    @Deprecated("Use exportAccountsPlaintext()", ReplaceWith("exportAccountsPlaintext()"))
-    suspend fun exportAccountURIs(): List<String> = exportAccountsPlaintext()
 }

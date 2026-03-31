@@ -3,6 +3,25 @@ package tech.arnav.twofac.lib.backup
 import kotlin.coroutines.cancellation.CancellationException
 import tech.arnav.twofac.lib.PublicApi
 
+/**
+ * Maps a [BackupTransport] to its [BackupProvider] snapshot DTO.
+ *
+ * Centralises the field-by-field projection so that adding a new capability to
+ * [BackupTransport] only requires updating this one function rather than
+ * both [BackupTransportRegistry.providerInfo] and [BackupProvider].
+ *
+ * @param isAvailable Runtime availability queried by the caller.
+ */
+fun BackupTransport.toProvider(isAvailable: Boolean): BackupProvider = BackupProvider(
+    id = id,
+    displayName = displayName,
+    supportsManualBackup = supportsManualBackup,
+    supportsManualRestore = supportsManualRestore,
+    supportsAutomaticRestore = supportsAutomaticRestore,
+    requiresAuthentication = requiresAuthentication,
+    isAvailable = isAvailable,
+)
+
 @PublicApi
 class BackupTransportRegistry(
     transports: List<BackupTransport> = emptyList(),
@@ -31,16 +50,7 @@ class BackupTransportRegistry(
             } catch (_: Throwable) {
                 false
             }
-
-            BackupProvider(
-                id = transport.id,
-                displayName = transport.displayName,
-                supportsManualBackup = transport.supportsManualBackup,
-                supportsManualRestore = transport.supportsManualRestore,
-                supportsAutomaticRestore = transport.supportsAutomaticRestore,
-                requiresAuthentication = transport.requiresAuthentication,
-                isAvailable = available,
-            )
+            transport.toProvider(available)
         }
     }
 }

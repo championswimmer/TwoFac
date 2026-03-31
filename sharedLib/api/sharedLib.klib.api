@@ -39,8 +39,6 @@ final class tech.arnav.twofac.lib.backup/BackupPreferences // tech.arnav.twofac.
 
 final class tech.arnav.twofac.lib.backup/BackupProvider // tech.arnav.twofac.lib.backup/BackupProvider|null[0]
 
-final class tech.arnav.twofac.lib.backup/BackupProviderCapabilities // tech.arnav.twofac.lib.backup/BackupProviderCapabilities|null[0]
-
 final class tech.arnav.twofac.lib.backup/BackupProviderMetadata // tech.arnav.twofac.lib.backup/BackupProviderMetadata|null[0]
 
 final class tech.arnav.twofac.lib.backup/BackupRemoteMarker // tech.arnav.twofac.lib.backup/BackupRemoteMarker|null[0]
@@ -72,8 +70,6 @@ sealed class <#A: out kotlin/Any?> tech.arnav.twofac.lib.backup/BackupResult // 
 sealed class tech.arnav.twofac.lib.importer/ImportResult // tech.arnav.twofac.lib.importer/ImportResult|null[0]
 
 final object tech.arnav.twofac.lib.backup/BackupPayloadCodec // tech.arnav.twofac.lib.backup/BackupPayloadCodec|null[0]
-
-final object tech.arnav.twofac.lib.backup/BackupProviderCapabilityRules // tech.arnav.twofac.lib.backup/BackupProviderCapabilityRules|null[0]
 
 final object tech.arnav.twofac.lib.backup/BackupProviderIds // tech.arnav.twofac.lib.backup/BackupProviderIds|null[0]
 

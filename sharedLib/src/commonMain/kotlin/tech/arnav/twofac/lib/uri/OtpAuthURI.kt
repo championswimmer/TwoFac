@@ -64,8 +64,8 @@ object OtpAuthURI {
         otp.issuer?.let { builder.issuer(it) }
 
         if (otp is HOTP) {
-            // For HOTP, we need a counter
-            builder.counter(0) // Default to 0 if not specified
+            // Preserve the provisioned initial counter so round-trips are lossless
+            builder.counter(otp.initialCounter)
         }
 
         if (otp is TOTP) {
@@ -136,13 +136,7 @@ object OtpAuthURI {
 
         // Extract optional parameters with defaults
         val digits = params["digits"]?.toIntOrNull() ?: DEFAULT_DIGITS
-        val algorithm = when (params["algorithm"]?.uppercase()) {
-            "SHA1" -> CryptoTools.Algo.SHA1
-            "SHA256" -> CryptoTools.Algo.SHA256
-            "SHA512" -> CryptoTools.Algo.SHA512
-            null -> CryptoTools.Algo.SHA1 // Default
-            else -> throw IllegalArgumentException("Invalid algorithm: ${params["algorithm"]}")
-        }
+        val algorithm = CryptoTools.Algo.fromString(params["algorithm"] ?: "SHA1")
 
         // Create the appropriate OTP object
         return when (type) {
@@ -159,15 +153,15 @@ object OtpAuthURI {
             }
 
             Type.HOTP -> {
-                val counter = params["counter"]?.toLongOrNull() ?: 0
+                val counter = params["counter"]?.toLongOrNull() ?: 0L
                 HOTP(
                     digits = digits,
                     algorithm = algorithm,
                     secret = secret,
                     accountName = accountName,
-                    issuer = issuer
+                    issuer = issuer,
+                    initialCounter = counter,
                 )
-                // Note: The counter is not used in the HOTP constructor, but it's a required parameter in the URI
             }
         }
     }
@@ -288,7 +282,7 @@ object OtpAuthURI {
                 params.add("counter=$counter")
             }
 
-            if (type == Type.TOTP && period != 30L) {
+            if (type == Type.TOTP && period != DEFAULT_PERIOD) {
                 params.add("period=$period")
             }
 

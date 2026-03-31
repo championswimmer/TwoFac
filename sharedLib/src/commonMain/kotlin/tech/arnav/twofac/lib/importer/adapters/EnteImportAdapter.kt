@@ -1,10 +1,10 @@
 package tech.arnav.twofac.lib.importer.adapters
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
+import tech.arnav.twofac.lib.importer.ImporterJson
 
 /**
  * Import adapter for Ente Auth export files
@@ -47,10 +47,7 @@ class EnteImportAdapter : ImportAdapter {
         val salt: String? = null
     )
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
+    private val json = ImporterJson
 
     override suspend fun parse(fileContent: String, password: String?): ImportResult {
         return try {

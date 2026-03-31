@@ -1,11 +1,11 @@
 package tech.arnav.twofac.lib.importer.adapters
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import tech.arnav.twofac.lib.PublicApi
 import tech.arnav.twofac.lib.crypto.CryptoTools
 import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
+import tech.arnav.twofac.lib.importer.ImporterJson
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 
 /**
@@ -44,10 +44,7 @@ class AuthyImportAdapter : ImportAdapter {
         val algorithm: String? = null
     )
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
+    private val json = ImporterJson
 
     override suspend fun parse(fileContent: String, password: String?): ImportResult {
         return try {
@@ -70,12 +67,7 @@ class AuthyImportAdapter : ImportAdapter {
         try {
             val digits = token.digits ?: OtpAuthURI.DEFAULT_DIGITS
             val period = (token.period ?: OtpAuthURI.DEFAULT_PERIOD).toLong()
-            val algorithm = when ((token.algorithm ?: "SHA1").uppercase()) {
-                "SHA1" -> CryptoTools.Algo.SHA1
-                "SHA256" -> CryptoTools.Algo.SHA256
-                "SHA512" -> CryptoTools.Algo.SHA512
-                else -> CryptoTools.Algo.SHA1
-            }
+            val algorithm = CryptoTools.Algo.fromString(token.algorithm ?: "SHA1")
 
             val issuer = token.issuer ?: token.name
             val accountName = token.name

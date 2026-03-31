@@ -16,7 +16,19 @@ interface CryptoTools {
     enum class Algo {
         SHA1,
         SHA256,
-        SHA512
+        SHA512;
+
+        companion object {
+            /**
+             * Parse an algorithm name string (case-insensitive) into an [Algo] value.
+             * Unknown values fall back to [SHA1] to match authenticator conventions.
+             */
+            fun fromString(value: String): Algo = when (value.uppercase()) {
+                "SHA256" -> SHA256
+                "SHA512" -> SHA512
+                else -> SHA1 // SHA1 is the universal default in the otpauth spec
+            }
+        }
     }
 
     public data class SigningKey(

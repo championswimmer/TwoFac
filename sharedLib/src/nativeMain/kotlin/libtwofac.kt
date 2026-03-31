@@ -40,11 +40,8 @@ fun genHOTP(
 @CName("gen_hotp_from_uri")
 fun genHOTPFromUri(otpauthUri: String): String {
     val hotp = OtpAuthURI.parse(otpauthUri) as HOTP
-    val counter = otpauthUri
-        .substringAfter("counter=").substringBefore("&")
-        .toLongOrNull() ?: 0L
     return runBlocking {
-        hotp.generateOTP(counter)
+        hotp.generateOTP(hotp.initialCounter)
     }
 }
 

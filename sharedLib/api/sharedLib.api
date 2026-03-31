@@ -5,7 +5,6 @@ public final class tech/arnav/twofac/lib/TwoFacLib {
 	public final fun decryptEncryptedBackupAccount (Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteAllAccountsFromStorage (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun exportAccountURIs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun exportAccountsEncrypted (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun exportAccountsPlaintext (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAllAccountOTPs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -116,26 +115,6 @@ public final class tech/arnav/twofac/lib/backup/BackupProvider {
 	public fun hashCode ()I
 	public final fun isAvailable ()Z
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class tech/arnav/twofac/lib/backup/BackupProviderCapabilities {
-	public fun <init> (ZZZ)V
-	public final fun component1 ()Z
-	public final fun component2 ()Z
-	public final fun component3 ()Z
-	public final fun copy (ZZZ)Ltech/arnav/twofac/lib/backup/BackupProviderCapabilities;
-	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupProviderCapabilities;ZZZILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupProviderCapabilities;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getSupportsAutomaticRestore ()Z
-	public final fun getSupportsManualBackup ()Z
-	public final fun getSupportsManualRestore ()Z
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class tech/arnav/twofac/lib/backup/BackupProviderCapabilityRules {
-	public static final field INSTANCE Ltech/arnav/twofac/lib/backup/BackupProviderCapabilityRules;
-	public final fun expectedCapabilitiesFor (Ljava/lang/String;)Ltech/arnav/twofac/lib/backup/BackupProviderCapabilities;
 }
 
 public final class tech/arnav/twofac/lib/backup/BackupProviderIds {

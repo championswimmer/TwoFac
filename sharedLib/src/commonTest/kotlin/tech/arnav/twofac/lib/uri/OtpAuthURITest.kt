@@ -192,4 +192,55 @@ class OtpAuthURITest {
         val parsedOtpValue = parsedOtp.generateOTP(timestamp)
         assertEquals(originalOtp, parsedOtpValue, "Generated OTPs should match")
     }
+
+    // ── Phase 0 regression tests ──────────────────────────────────────────────
+
+    @Test
+    fun testHOTPCounterPreservedInRoundTrip() = runTest {
+        // RFC 4226 §7.2: counter in an otpauth://hotp/ URI sets the initial client-side
+        // counter state. Parsing an HOTP URI must preserve that counter.
+        val uri = "otpauth://hotp/Example%3Abob%40example.com?secret=$testSecret&issuer=Example&counter=42"
+        val otp = OtpAuthURI.parse(uri)
+
+        assertTrue(otp is HOTP, "Parsed OTP should be HOTP")
+        assertEquals(42L, otp.initialCounter, "initialCounter must survive parse")
+    }
+
+    @Test
+    fun testHOTPCounterRoundTripViaCreate() = runTest {
+        // Creating a URI from an HOTP with initialCounter=7 must embed counter=7.
+        val hotp = HOTP(
+            secret = testSecret,
+            accountName = "carol@example.com",
+            issuer = "Example",
+            initialCounter = 7L,
+        )
+        val uri = OtpAuthURI.create(hotp)
+        assertTrue(uri.contains("counter=7"), "URI must contain the provisioned counter")
+
+        val parsed = OtpAuthURI.parse(uri) as HOTP
+        assertEquals(7L, parsed.initialCounter, "initialCounter must survive create→parse round-trip")
+    }
+
+    @Test
+    fun testTOTPDefaultPeriodUsesConstant() {
+        // The builder must use DEFAULT_PERIOD, not a magic 30L literal.
+        // When period == DEFAULT_PERIOD the parameter is omitted from the URI.
+        val uri = OtpAuthURI.Builder()
+            .type(OtpAuthURI.Type.TOTP)
+            .label("Example:user@example.com")
+            .secret(testSecret)
+            .period(OtpAuthURI.DEFAULT_PERIOD)
+            .build()
+        assertTrue(!uri.contains("period="), "Default period must be omitted from URI")
+
+        // Explicitly setting a non-default period must appear in the URI.
+        val uri60 = OtpAuthURI.Builder()
+            .type(OtpAuthURI.Type.TOTP)
+            .label("Example:user@example.com")
+            .secret(testSecret)
+            .period(60L)
+            .build()
+        assertTrue(uri60.contains("period=60"), "Non-default period must appear in URI")
+    }
 }
