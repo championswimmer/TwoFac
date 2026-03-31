@@ -1,12 +1,12 @@
 ---
 name: Code Simplification Plan - iosApp
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0: Remove dead sync coordinator path"
-  - "[ ] Phase 1: Unify iOS/watch payload contract keys"
-  - "[ ] Phase 2: Reduce watch extension runtime overhead"
-  - "[ ] Phase 3: Theme/token alignment and diagnostics cleanup"
-  - "[ ] Phase 4: Validate iOS + watchOS sync end-to-end"
+  - "[x] Phase 0: Remove dead sync coordinator path"
+  - "[x] Phase 1: Unify iOS/watch payload contract keys"
+  - "[x] Phase 2: Reduce watch extension runtime overhead"
+  - "[x] Phase 3: Theme/token alignment and diagnostics cleanup"
+  - "[x] Phase 4: Validate iOS + watchOS sync end-to-end"
 ---
 
 # Code Simplification Plan - iosApp
