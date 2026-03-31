@@ -1,12 +1,12 @@
 ---
 name: Code Simplification Plan - cliApp
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0: Baseline and safety net"
-  - "[ ] Phase 1: Remove redundant abstraction layers"
-  - "[ ] Phase 2: Fix command dispatch and storage coroutine patterns"
-  - "[ ] Phase 3: Package/layout flattening and cleanup"
-  - "[ ] Phase 4: Verification and docs updates"
+  - "[x] Phase 0: Baseline and safety net"
+  - "[x] Phase 1: Remove redundant abstraction layers"
+  - "[x] Phase 2: Fix command dispatch and storage coroutine patterns"
+  - "[x] Phase 3: Package/layout flattening and cleanup"
+  - "[x] Phase 4: Verification and docs updates"
 ---
 
 # Code Simplification Plan - cliApp
