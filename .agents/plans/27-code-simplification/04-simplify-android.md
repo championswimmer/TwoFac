@@ -1,10 +1,10 @@
 ---
 name: Code Simplification Plan - androidApp
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0: Thin-wrapper cleanup"
-  - "[ ] Phase 1: Backup and release hardening"
-  - "[ ] Phase 2: Validate wrapper remains minimal"
+  - "[x] Phase 0: Thin-wrapper cleanup"
+  - "[x] Phase 1: Backup and release hardening"
+  - "[x] Phase 2: Validate wrapper remains minimal"
 ---
 
 # Code Simplification Plan - androidApp
