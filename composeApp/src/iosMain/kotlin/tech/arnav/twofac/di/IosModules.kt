@@ -1,6 +1,7 @@
 package tech.arnav.twofac.di
 
 import org.koin.core.qualifier.named
+import org.koin.dsl.binds
 import org.koin.dsl.module
 import tech.arnav.twofac.backup.ICloudBackupTransport
 import tech.arnav.twofac.backup.LocalFileBackupTransport

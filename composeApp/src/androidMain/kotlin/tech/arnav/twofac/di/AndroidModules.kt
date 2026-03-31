@@ -3,6 +3,7 @@ package tech.arnav.twofac.di
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import org.koin.core.qualifier.named
+import org.koin.dsl.binds
 import org.koin.dsl.module
 import tech.arnav.twofac.onboarding.PlatformOnboardingStepContributor
 import tech.arnav.twofac.onboarding.SecureUnlockOnboardingContributor

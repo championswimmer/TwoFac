@@ -1,12 +1,22 @@
 package tech.arnav.twofac.onboarding
 
 import io.github.xxfast.kstore.KStore
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 
 const val ONBOARDING_PROGRESS_STORAGE_KEY = "twofac_onboarding_progress"
 const val ONBOARDING_PROGRESS_STORAGE_FILE = "onboarding_progress.json"
 
 expect fun createOnboardingProgressStore(): KStore<OnboardingProgressSnapshot>
 
+internal fun ensureOnboardingFileExists(filePath: Path) {
+    if (SystemFileSystem.exists(filePath)) return
+    SystemFileSystem.sink(filePath).buffered().use { sink ->
+        sink.write("""{"hasSeenInitialOnboardingGuide":false,"stepStates":{}}""".encodeToByteArray())
+        sink.flush()
+    }
+}
 interface OnboardingProgressRepository {
     suspend fun load(): OnboardingProgressSnapshot
     suspend fun markInitialGuideSeen(timestampEpochMillis: Long)
