@@ -25,9 +25,8 @@ Compiles natively (Kotlin/Native) to:
 - `src/commonMain/kotlin/tech/arnav/twofac/cli/`:
   - `Main.kt`: Entry point routing via Clikt subcommands.
   - `commands/`: CLI command implementations (`DisplayCommand`, `AddCommand`, `BackupCommand`, `InfoCommand`, `StorageCommand`).
-  - `di/`: Koin modules and qualifiers used to wire the CLI runtime.
+  - `di/`: Koin modules used to wire the CLI runtime.
   - `theme/`: `CliTheme` terminal styling that maps shared theme/timer semantics into Mordant text styles.
-  - `viewmodels/`: View models acting as a bridge to `TwoFacLib` methods.
   - `storage/`: Configuration for local path resolution and FileStorage via KStore.
   - `backup/`: CLI-specific implementation of the local filesystem `BackupTransport`.
 - `src/{linuxMain,macosMain,mingwMain}/kotlin/tech/arnav/twofac/cli/`: Native platform shims for filesystem and terminal integration.
