@@ -23,13 +23,11 @@ import tech.arnav.twofac.di.desktopQrModule
 import tech.arnav.twofac.di.desktopSessionModule
 import tech.arnav.twofac.di.desktopSettingsModule
 import tech.arnav.twofac.settings.DesktopSettingsManager
-import androidx.compose.foundation.isSystemInDarkTheme
+import tech.arnav.twofac.tray.LinuxNativeTray
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.tray_lock_color
-import twofac.composeapp.generated.resources.tray_lock_linux_dark
-import twofac.composeapp.generated.resources.tray_lock_linux_light
 import twofac.composeapp.generated.resources.tray_lock_monochrome_light
 import twofac.composeapp.generated.resources.twofac_icon
 import twofac.composeapp.generated.resources.desktop_window_title
@@ -37,6 +35,10 @@ import twofac.composeapp.generated.resources.desktop_tray_tooltip
 import twofac.composeapp.generated.resources.desktop_tray_open
 import twofac.composeapp.generated.resources.desktop_tray_quit
 import twofac.composeapp.generated.resources.desktop_tray_popup_title
+
+private val osName = System.getProperty("os.name").lowercase()
+private val isMac = osName.contains("mac")
+private val isLinux = osName.contains("linux") || osName.contains("nix")
 
 fun main() = runBlocking {
     // On macOS, this enables the system tray icon to be treated as a "template image"
@@ -90,75 +92,84 @@ fun main() = runBlocking {
         }
 
         if (isTrayEnabled) {
-            val os = System.getProperty("os.name").lowercase()
-            val isMac = os.contains("mac")
-            val isLinux = os.contains("linux") || os.contains("nix")
-            val isDark = isSystemInDarkTheme()
-            // On Linux, AWT SystemTray cannot render SVG painters correctly (shows
-            // a white square). Use pre-rasterized PNG icons loaded as bitmaps instead.
-            val trayIconPainter = when {
-                // On macOS, apple.awt.enableTemplateImages makes the icon a template image,
-                // so macOS handles dark/light mode automatically — always use the black icon.
-                isMac -> painterResource(Res.drawable.tray_lock_monochrome_light)
-                isLinux -> if (isDark) painterResource(Res.drawable.tray_lock_linux_dark) else painterResource(Res.drawable.tray_lock_linux_light)
-                else -> painterResource(Res.drawable.tray_lock_color)
-            }
-
-            Tray(
-                icon = trayIconPainter,
-                tooltip = trayTooltip,
-                onAction = {
-                    if (!isTrayPopupVisible) {
-                        trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
-                    }
-                    isTrayPopupVisible = !isTrayPopupVisible
-                },
-                menu = {
-                    Item(
-                        text = trayOpenText,
-                        onClick = {
-                            isMainWindowOpen = true
-                            isTrayPopupVisible = false
-                        }
+            if (isLinux) {
+                // On Linux, AWT SystemTray uses the legacy xembed protocol which GNOME
+                // dropped in 3.26. On Wayland it renders as a white square or is invisible.
+                // Use dorkbox/SystemTray which talks native GTK/AppIndicator instead.
+                DisposableEffect(Unit) {
+                    LinuxNativeTray.show(
+                        iconResourcePath = "tray_lock_linux_light.png",
+                        tooltip = trayTooltip,
+                        openLabel = trayOpenText,
+                        quitLabel = trayQuitText,
+                        onOpen = { isMainWindowOpen = true },
+                        onQuit = ::exitApplication,
                     )
-                    Item(
-                        text = trayQuitText,
-                        onClick = ::exitApplication
-                    )
+                    onDispose { LinuxNativeTray.shutdown() }
                 }
-            )
-
-            Window(
-                onCloseRequest = { isTrayPopupVisible = false },
-                state = trayWindowState,
-                visible = isTrayPopupVisible,
-                undecorated = true,
-                transparent = true,
-                resizable = false,
-                alwaysOnTop = true,
-                title = trayPopupTitle,
-            ) {
-                val window = this.window
-                DisposableEffect(window) {
-                    val listener = object : java.awt.event.WindowFocusListener {
-                        override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {}
-                        override fun windowLostFocus(e: java.awt.event.WindowEvent?) {
-                            isTrayPopupVisible = false
-                        }
-                    }
-                    window.addWindowFocusListener(listener)
-                    onDispose {
-                        window.removeWindowFocusListener(listener)
-                    }
+            } else {
+                // macOS and Windows — Compose's built-in Tray works correctly.
+                val trayIconPainter = when {
+                    isMac -> painterResource(Res.drawable.tray_lock_monochrome_light)
+                    else -> painterResource(Res.drawable.tray_lock_color)
                 }
 
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.background,
-                    shadowElevation = 8.dp
+                Tray(
+                    icon = trayIconPainter,
+                    tooltip = trayTooltip,
+                    onAction = {
+                        if (!isTrayPopupVisible) {
+                            trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
+                        }
+                        isTrayPopupVisible = !isTrayPopupVisible
+                    },
+                    menu = {
+                        Item(
+                            text = trayOpenText,
+                            onClick = {
+                                isMainWindowOpen = true
+                                isTrayPopupVisible = false
+                            }
+                        )
+                        Item(
+                            text = trayQuitText,
+                            onClick = ::exitApplication
+                        )
+                    }
+                )
+
+                Window(
+                    onCloseRequest = { isTrayPopupVisible = false },
+                    state = trayWindowState,
+                    visible = isTrayPopupVisible,
+                    undecorated = true,
+                    transparent = true,
+                    resizable = false,
+                    alwaysOnTop = true,
+                    title = trayPopupTitle,
                 ) {
-                    App(onQuit = { exitApplication() })
+                    val window = this.window
+                    DisposableEffect(window) {
+                        val listener = object : java.awt.event.WindowFocusListener {
+                            override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {}
+                            override fun windowLostFocus(e: java.awt.event.WindowEvent?) {
+                                isTrayPopupVisible = false
+                            }
+                        }
+                        window.addWindowFocusListener(listener)
+                        onDispose {
+                            window.removeWindowFocusListener(listener)
+                        }
+                    }
+
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.background,
+                        shadowElevation = 8.dp
+                    ) {
+                        App(onQuit = { exitApplication() })
+                    }
                 }
             }
         }
