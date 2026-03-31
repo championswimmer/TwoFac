@@ -8,14 +8,14 @@ import com.github.ajalt.clikt.parameters.options.prompt
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import tech.arnav.twofac.cli.viewmodels.AccountsViewModel
+import tech.arnav.twofac.lib.TwoFacLib
 
 class AddCommand : CliktCommand(name = "add"), KoinComponent {
     override fun help(context: Context): String {
         return "Adds new accounts to the database. Provide an otpauth://... URI"
     }
 
-    private val accountsViewModel: AccountsViewModel by inject()
+    private val twoFacLib: TwoFacLib by inject()
 
     private val uri by argument(help = "otpauth:// URI")
     private val passkey by option("-p", "--passkey", help = "Passkey to add account").prompt(
@@ -24,8 +24,8 @@ class AddCommand : CliktCommand(name = "add"), KoinComponent {
     )
 
     override fun run() = runBlocking {
-        accountsViewModel.unlock(passkey)
-        accountsViewModel.addAccount(uri)
+        twoFacLib.unlock(passkey)
+        twoFacLib.addAccount(uri)
         echo("Account added successfully")
     }
 }

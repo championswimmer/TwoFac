@@ -3,10 +3,6 @@ package tech.arnav.twofac.cli.storage
 import io.github.xxfast.kstore.extensions.getOrEmpty
 import io.github.xxfast.kstore.extensions.plus
 import io.github.xxfast.kstore.file.extensions.listStoreOf
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.async
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import tech.arnav.twofac.lib.storage.Storage
@@ -19,45 +15,39 @@ class FileStorage(
 ) : Storage {
     private val kstore = listStoreOf<StoredAccount>(storageFilePath)
 
-    // TODO: need to use IO dispatcher for file operations
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
-
-    override suspend fun getAccountList(): List<StoredAccount> = coroutineScope.async {
+    override suspend fun getAccountList(): List<StoredAccount> =
         kstore.getOrEmpty()
-    }.await()
 
-    override suspend fun getAccount(accountLabel: String): StoredAccount? = coroutineScope.async {
+    override suspend fun getAccount(accountLabel: String): StoredAccount? =
         kstore.getOrEmpty().firstOrNull { it.accountLabel == accountLabel }
-    }.await()
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getAccount(accountID: Uuid): StoredAccount? = coroutineScope.async {
+    override suspend fun getAccount(accountID: Uuid): StoredAccount? =
         kstore.getOrEmpty().firstOrNull { it.accountID == accountID }
-    }.await()
 
-    override suspend fun saveAccount(account: StoredAccount): Boolean = coroutineScope.async {
+    override suspend fun saveAccount(account: StoredAccount): Boolean {
         // TODO: handle duplicates and/or update existing accounts
         kstore.plus(account)
-        true
-    }.await()
+        return true
+    }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun deleteAccount(accountID: Uuid): Boolean = coroutineScope.async {
-        return@async try {
+    override suspend fun deleteAccount(accountID: Uuid): Boolean {
+        return try {
             val currentAccounts = kstore.getOrEmpty()
             val updatedAccounts = currentAccounts.filterNot { it.accountID == accountID }
             if (updatedAccounts.size == currentAccounts.size) {
-                return@async false
+                return false
             }
             kstore.set(updatedAccounts)
             true
         } catch (_: Exception) {
             false
         }
-    }.await()
+    }
 
-    override suspend fun deleteAllAccounts(): Boolean = coroutineScope.async {
-        return@async try {
+    override suspend fun deleteAllAccounts(): Boolean {
+        return try {
             if (SystemFileSystem.exists(storageFilePath)) {
                 SystemFileSystem.delete(storageFilePath)
             }
@@ -65,5 +55,5 @@ class FileStorage(
         } catch (_: Exception) {
             false
         }
-    }.await()
+    }
 }

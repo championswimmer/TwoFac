@@ -12,15 +12,15 @@ import tech.arnav.twofac.cli.commands.StorageCommand
 import tech.arnav.twofac.cli.di.appModule
 import tech.arnav.twofac.cli.di.storageModule
 
-class MainCommand(val args: Array<String>) : CliktCommand() {
+class MainCommand : CliktCommand() {
 
 
     override val invokeWithoutSubcommand = true
     override fun run() {
         // If a subcommand is invoked, skip the main command logic
         if (currentContext.invokedSubcommands.isNotEmpty()) return
-        // Else, run the display logic directly here
-        DisplayCommand().main(args)
+        // Else, run the display logic (passkey will be prompted)
+        DisplayCommand().main(emptyArray())
     }
 }
 
@@ -29,7 +29,7 @@ fun main(args: Array<String>) {
         modules(storageModule, appModule)
     }
 
-    MainCommand(args).subcommands(
+    MainCommand().subcommands(
         DisplayCommand(),
         InfoCommand(),
         AddCommand(),

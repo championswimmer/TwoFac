@@ -15,22 +15,24 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import tech.arnav.twofac.cli.viewmodels.AccountsViewModel
-import tech.arnav.twofac.cli.viewmodels.DisplayAccountsStatic
 import tech.arnav.twofac.cli.theme.CliTheme
 import tech.arnav.twofac.cli.theme.CliThemeStyles
+import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.lib.theme.timerStateByRemainingProgress
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
+typealias DisplayAccountsStatic = List<Pair<StoredAccount.DisplayAccount, String>>
+
 class DisplayCommand : CliktCommand(), KoinComponent {
     override fun help(context: Context): String {
         return "(default) Displays all OTPs of registered accounts."
     }
 
-    val accountsViewModel: AccountsViewModel by inject()
+    private val twoFacLib: TwoFacLib by inject()
 
     val passkey by option("-p", "--passkey", help = "Passkey to display").prompt("Enter passkey", hideInput = true)
 
@@ -44,8 +46,8 @@ class DisplayCommand : CliktCommand(), KoinComponent {
         val isInteractive = terminal.terminalInfo.inputInteractive && terminal.terminalInfo.outputInteractive
 
         runBlocking {
-            accountsViewModel.unlock(passkey)
-            val displayAccounts = accountsViewModel.showAllAccountOTPs()
+            twoFacLib.unlock(passkey)
+            val displayAccounts = twoFacLib.getAllAccountOTPs()
 
             if (isInteractive) {
                 val animation = terminal.animation<DisplayAccountsStatic> { displayAccounts ->
@@ -53,7 +55,7 @@ class DisplayCommand : CliktCommand(), KoinComponent {
                 }
                 echo("\n")
                 repeat(2.minutes.inWholeSeconds.toInt()) {
-                    animation.update(accountsViewModel.showAllAccountOTPs())
+                    animation.update(twoFacLib.getAllAccountOTPs())
                     delay(1.seconds.inWholeMilliseconds)
                 }
                 echo(styles.footer("Exiting display command after 2 minutes of inactivity."))
