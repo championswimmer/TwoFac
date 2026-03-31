@@ -8,8 +8,10 @@ import tech.arnav.twofac.lib.backup.BackupProviderIds
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.companion.IosCompanionSyncCoordinator
 import tech.arnav.twofac.lib.backup.BackupTransport
-import tech.arnav.twofac.onboarding.IosOnboardingContributor
 import tech.arnav.twofac.onboarding.PlatformOnboardingStepContributor
+import tech.arnav.twofac.onboarding.SecureUnlockOnboardingContributor
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.onboarding_step_secure_unlock_ios_description
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.IosCameraQRCodeReader
 import tech.arnav.twofac.session.BiometricSessionManager
@@ -24,9 +26,11 @@ fun iosCompanionSyncModule() = module {
 }
 
 val iosBiometricModule = module {
-    single<BiometricSessionManager> { IosBiometricSessionManager() }
-    single<SecureSessionManager> { get<BiometricSessionManager>() }
-    single<SessionManager> { get<BiometricSessionManager>() }
+    single { IosBiometricSessionManager() } binds arrayOf(
+        BiometricSessionManager::class,
+        SecureSessionManager::class,
+        SessionManager::class,
+    )
 }
 
 val iosQrModule = module {
@@ -43,5 +47,5 @@ val iosBackupModule = module {
 }
 
 val iosOnboardingModule = module {
-    single<PlatformOnboardingStepContributor> { IosOnboardingContributor() }
+    single<PlatformOnboardingStepContributor> { SecureUnlockOnboardingContributor(Res.string.onboarding_step_secure_unlock_ios_description) }
 }

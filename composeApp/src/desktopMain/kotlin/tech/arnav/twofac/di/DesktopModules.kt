@@ -44,7 +44,9 @@ val desktopSessionModule = module {
             UnsupportedDesktopSecureUnlockBackend()
         }
     }
-    single<BiometricSessionManager> { DesktopBiometricSessionManager(get()) }
-    single<SecureSessionManager> { get<BiometricSessionManager>() }
-    single<SessionManager> { get<BiometricSessionManager>() }
+    single { DesktopBiometricSessionManager(get()) } binds arrayOf(
+        BiometricSessionManager::class,
+        SecureSessionManager::class,
+        SessionManager::class,
+    )
 }

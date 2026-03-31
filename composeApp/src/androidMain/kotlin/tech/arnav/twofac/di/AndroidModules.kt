@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import tech.arnav.twofac.onboarding.AndroidOnboardingContributor
 import tech.arnav.twofac.onboarding.PlatformOnboardingStepContributor
+import tech.arnav.twofac.onboarding.SecureUnlockOnboardingContributor
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.onboarding_step_secure_unlock_android_description
 import tech.arnav.twofac.backup.GoogleDriveAppDataBackupTransport
 import tech.arnav.twofac.backup.LocalFileBackupTransport
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
@@ -36,14 +38,16 @@ fun androidBiometricModule(
     appContext: Context,
     activityProvider: () -> FragmentActivity,
 ) = module {
-    single<BiometricSessionManager> {
+    single {
         AndroidBiometricSessionManager(
             context = appContext,
             activityProvider = activityProvider,
         )
-    }
-    single<SecureSessionManager> { get<BiometricSessionManager>() }
-    single<SessionManager> { get<BiometricSessionManager>() }
+    } binds arrayOf(
+        BiometricSessionManager::class,
+        SecureSessionManager::class,
+        SessionManager::class,
+    )
 }
 
 val androidQrModule = module {
@@ -51,7 +55,7 @@ val androidQrModule = module {
 }
 
 val androidOnboardingModule = module {
-    single<PlatformOnboardingStepContributor> { AndroidOnboardingContributor() }
+    single<PlatformOnboardingStepContributor> { SecureUnlockOnboardingContributor(Res.string.onboarding_step_secure_unlock_android_description) }
 }
 
 fun androidBackupModule(
