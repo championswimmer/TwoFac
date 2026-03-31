@@ -1,12 +1,12 @@
 ---
 name: Code Simplification Plan - sharedLib
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0: Lock correctness with tests"
-  - "[ ] Phase 1: Fix URI/HOTP correctness issues"
-  - "[ ] Phase 2: Remove duplicated conversion/JSON/crypto setup"
-  - "[ ] Phase 3: Reduce backup/watchsync surface bloat"
-  - "[ ] Phase 4: API cleanup and migration notes"
+  - "[x] Phase 0: Lock correctness with tests"
+  - "[x] Phase 1: Fix URI/HOTP correctness issues"
+  - "[x] Phase 2: Remove duplicated conversion/JSON/crypto setup"
+  - "[x] Phase 3: Reduce backup/watchsync surface bloat"
+  - "[x] Phase 4: API cleanup and migration notes"
 ---
 
 # Code Simplification Plan - sharedLib
