@@ -4,100 +4,98 @@ import TwoFacKit
 struct WatchExtensionContentView: View {
     @EnvironmentObject private var connectivityManager: WatchConnectivityManager
     @Environment(\.scenePhase) private var scenePhase
-    @State private var now = Date()
-    private let ticker = Timer.publish(every: 1.0 / 30.0, on: .main, in: .common).autoconnect()
 
-    private var remainingSeconds: Int {
-        let seconds = Int(now.timeIntervalSince1970)
+    private func remainingSeconds(for date: Date) -> Int {
+        let seconds = Int(date.timeIntervalSince1970)
         let mod = seconds % 30
         return mod == 0 ? 30 : 30 - mod
     }
 
-    private var elapsedProgress: Double {
-        let elapsedInWindow = now.timeIntervalSince1970.truncatingRemainder(dividingBy: 30.0)
+    private func elapsedProgress(for date: Date) -> Double {
+        let elapsedInWindow = date.timeIntervalSince1970.truncatingRemainder(dividingBy: 30.0)
         return min(max(elapsedInWindow / 30.0, 0), 1)
     }
 
     var body: some View {
-        ZStack {
-            WatchThemeTokens.backgroundColor().ignoresSafeArea()
-            Group {
-                if connectivityManager.accounts.isEmpty {
-                    VStack(spacing: 8) {
-                        Text("No Accounts")
-                            .font(.headline)
-                        Text("Open iPhone app and sync to Apple Watch.")
-                            .font(.footnote)
-                            .multilineTextAlignment(.center)
-                            .foregroundStyle(.secondary)
-                        if let lastSyncError = connectivityManager.lastSyncError {
-                            Text(lastSyncError)
-                                .font(.caption2)
+        TimelineView(.periodic(from: .now, by: 1.0)) { context in
+            let now = context.date
+            ZStack {
+                WatchThemeTokens.backgroundColor().ignoresSafeArea()
+                Group {
+                    if connectivityManager.accounts.isEmpty {
+                        VStack(spacing: 8) {
+                            Text("No Accounts")
+                                .font(.headline)
+                            Text("Open iPhone app and sync to Apple Watch.")
+                                .font(.footnote)
                                 .multilineTextAlignment(.center)
-                                .foregroundStyle(WatchThemeTokens.errorColor())
-                        }
-                        if let lastSyncTime = connectivityManager.lastSyncTime {
-                            Text("Last sync: \(lastSyncTime.formatted(date: .omitted, time: .shortened))")
-                                .font(.caption2)
                                 .foregroundStyle(.secondary)
-                        }
-                        Button("Refresh") {
-                            connectivityManager.refreshFromLatestAvailableData()
-                        }
-                        .font(.caption2)
-                        .buttonStyle(.bordered)
-                    }
-                    .padding()
-                    if !connectivityManager.debugEvents.isEmpty {
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 2) {
-                                ForEach(Array(connectivityManager.debugEvents.suffix(8).enumerated()), id: \.offset) { _, line in
-                                    Text(line)
-                                        .font(.system(size: 9, weight: .regular, design: .monospaced))
-                                        .foregroundStyle(.secondary)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .multilineTextAlignment(.leading)
-                                }
+                            if let lastSyncError = connectivityManager.lastSyncError {
+                                Text(lastSyncError)
+                                    .font(.caption2)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundStyle(WatchThemeTokens.errorColor())
                             }
-                        }
-                        .padding(.horizontal, 6)
-                    }
-                } else {
-                    TabView {
-                        ForEach(connectivityManager.accounts, id: \.accountId) { account in
-                            VStack(spacing: 10) {
-                                Text(account.issuer ?? "TwoFac")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-
-                                Text(account.accountLabel)
-                                    .font(.footnote)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.75)
-
-                                Text(connectivityManager.otpCode(for: account))
-                                    .font(.system(size: 32, weight: .semibold, design: .monospaced))
-                                    .minimumScaleFactor(0.6)
-                                    .lineLimit(1)
-
-                                Text("Expires in \(remainingSeconds)s")
+                            if let lastSyncTime = connectivityManager.lastSyncTime {
+                                Text("Last sync: \(lastSyncTime.formatted(date: .omitted, time: .shortened))")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
-
-                                CountdownBar(progress: elapsedProgress)
-                                    .frame(height: 8)
                             }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 12)
+                            Button("Refresh") {
+                                connectivityManager.refreshFromLatestAvailableData()
+                            }
+                            .font(.caption2)
+                            .buttonStyle(.bordered)
                         }
+                        .padding()
+                        if !connectivityManager.debugEvents.isEmpty {
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    ForEach(Array(connectivityManager.debugEvents.suffix(8).enumerated()), id: \.offset) { _, line in
+                                        Text(line)
+                                            .font(.system(size: 9, weight: .regular, design: .monospaced))
+                                            .foregroundStyle(.secondary)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .multilineTextAlignment(.leading)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 6)
+                        }
+                    } else {
+                        TabView {
+                            ForEach(connectivityManager.accounts, id: \.accountId) { account in
+                                VStack(spacing: 10) {
+                                    Text(account.issuer ?? "TwoFac")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+
+                                    Text(account.accountLabel)
+                                        .font(.footnote)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.75)
+
+                                    Text(connectivityManager.otpCode(for: account))
+                                        .font(.system(size: 32, weight: .semibold, design: .monospaced))
+                                        .minimumScaleFactor(0.6)
+                                        .lineLimit(1)
+
+                                    Text("Expires in \(remainingSeconds(for: now))s")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+
+                                    CountdownBar(progress: elapsedProgress(for: now))
+                                        .frame(height: 8)
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 12)
+                            }
+                        }
+                        .tabViewStyle(.verticalPage)
                     }
-                    .tabViewStyle(.verticalPage)
                 }
             }
-        }
-        .onReceive(ticker) { tickDate in
-            now = tickDate
         }
         .onAppear {
             connectivityManager.refreshFromLatestAvailableData()

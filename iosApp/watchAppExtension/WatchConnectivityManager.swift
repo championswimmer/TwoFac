@@ -84,8 +84,8 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     private func handleIncomingPayloadString(_ payloadString: String, source: String) {
         log("Incoming payload from \(source) (length=\(payloadString.count))")
         persistPayloadString(payloadString)
-        // Re-read the persisted payload to guarantee UI reflects exactly what was saved.
-        refreshFromPersistedPayload()
+        // Process the already-in-memory string directly instead of re-reading from disk.
+        processPayloadData(payloadString, source: source)
         log("Applied payload from \(source)")
     }
 
