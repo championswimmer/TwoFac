@@ -1,9 +1,9 @@
 ---
 name: Code Simplification Plan - website
-status: In Progress
+status: Completed
 progress:
   - "[x] Phase 0: Asset deduplication and content pipeline cleanup"
-  - "[~] Phase 1: Page/template abstraction pass (PureRaven — in progress)"
+  - "[x] Phase 1: Page/template abstraction pass"
   - "[x] Phase 2: Build/dependency footprint reduction"
   - "[x] Phase 3: SEO/content consistency verification"
 ---
