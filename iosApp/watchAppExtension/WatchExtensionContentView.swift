@@ -48,6 +48,7 @@ struct WatchExtensionContentView: View {
                             .buttonStyle(.bordered)
                         }
                         .padding()
+                        #if DEBUG
                         if !connectivityManager.debugEvents.isEmpty {
                             ScrollView {
                                 VStack(alignment: .leading, spacing: 2) {
@@ -62,6 +63,7 @@ struct WatchExtensionContentView: View {
                             }
                             .padding(.horizontal, 6)
                         }
+                        #endif
                     } else {
                         TabView {
                             ForEach(connectivityManager.accounts, id: \.accountId) { account in

@@ -9,7 +9,9 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     @Published var accounts: [WatchSyncAccount] = []
     @Published var lastSyncTime: Date? = nil
     @Published var lastSyncError: String? = nil
+    #if DEBUG
     @Published var debugEvents: [String] = []
+    #endif
 
     private let payloadStringKey = WatchSyncContract.shared.IOS_WC_PAYLOAD_STRING_KEY
     private var latestAppliedGeneratedAtEpochSec: Int64 = 0
@@ -182,11 +184,13 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         let timestamp = ISO8601DateFormatter().string(from: Date())
         let line = "\(timestamp) \(message)"
         print("[WatchSync] \(line)")
+        #if DEBUG
         DispatchQueue.main.async {
             self.debugEvents.append(line)
             if self.debugEvents.count > 200 {
                 self.debugEvents.removeFirst(self.debugEvents.count - 200)
             }
         }
+        #endif
     }
 }

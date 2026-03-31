@@ -24,7 +24,7 @@ enum WatchThemeTokens {
     }
 
     static func timerTrackColor() -> Color {
-        .black
+        Color(themeColor: tokens().timerTrack)
     }
 
     static func errorColor() -> Color {
@@ -32,7 +32,7 @@ enum WatchThemeTokens {
     }
 
     static func backgroundColor() -> Color {
-        .black
+        Color(themeColor: tokens().background)
     }
 
     private static func timerState(for remainingProgress: Double) -> TimerState {
