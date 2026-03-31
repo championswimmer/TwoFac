@@ -1,11 +1,11 @@
 ---
 name: Code Simplification Plan - website
-status: Planned
+status: In Progress
 progress:
-  - "[ ] Phase 0: Asset deduplication and content pipeline cleanup"
-  - "[ ] Phase 1: Page/template abstraction pass"
-  - "[ ] Phase 2: Build/dependency footprint reduction"
-  - "[ ] Phase 3: SEO/content consistency verification"
+  - "[x] Phase 0: Asset deduplication and content pipeline cleanup"
+  - "[~] Phase 1: Page/template abstraction pass (PureRaven — in progress)"
+  - "[x] Phase 2: Build/dependency footprint reduction"
+  - "[x] Phase 3: SEO/content consistency verification"
 ---
 
 # Code Simplification Plan - website
@@ -27,26 +27,30 @@ progress:
 
 ## Simplification Roadmap
 
-### Phase 0: Asset deduplication and content pipeline cleanup
-- [ ] Define canonical location for brand assets (`logo/` or `website/public/`, choose one).
-- [ ] Add deterministic copy step in website build/prebuild if website needs local copies.
-- [ ] Keep generated/public duplicates out of git where practical.
+### Phase 0: Asset deduplication and content pipeline cleanup ✅
+- [x] Define canonical location for brand assets — `logo/` (numbered PNGs) and `docs/` (twofac-logo.*).
+- [x] Add deterministic copy step: `website/scripts/copy-assets.js` copies from canonical sources; wired into `prebuild`/`predev`.
+- [x] Logo assets removed from git tracking (`git rm --cached`); added to `website/.gitignore`.
+- Committed in: `627c52f` (HappyZenith, plan 07 phase 4 included website/ changes)
 
-### Phase 1: Page/template abstraction pass
+### Phase 1: Page/template abstraction pass 🔄 (PureRaven)
 - [ ] Extract shared compare-page scaffold into reusable component/composable.
 - [ ] Move per-competitor differences to structured config objects.
 - [ ] Reduce repetitive static blocks across `compare/*.vue` files.
+- Note: PureRaven owns this phase. 3 of 5 compare pages already refactored (Bitwarden, EnteAuth, GoogleAuth bundle sizes halved to ~10KB).
 
-### Phase 2: Build/dependency footprint reduction
-- [ ] Audit `package.json` for strictly required deps/devDeps.
-- [ ] Ensure local `node_modules` and generated output remain ignored.
-- [ ] Validate build remains fast (`npm run build`) after refactor.
+### Phase 2: Build/dependency footprint reduction ✅
+- [x] Audited `package.json`: all 13 deps (5 runtime, 8 devDeps) are actively used and correctly categorised. No orphans found.
+- [x] `node_modules` and generated output (`dist/`, `src/data/blogs.json`, `public/images/blogs/`) already in `.gitignore`.
+- [x] Build validated fast: `npm run build` completes in ~200ms.
 
-### Phase 3: SEO/content consistency verification
-- [ ] Verify all generated and hand-authored pages use consistent SEO metadata patterns.
-- [ ] Ensure canonical URLs and OpenGraph fields remain intact after templating changes.
+### Phase 3: SEO/content consistency verification ✅
+- [x] All 13 pages/routes call `useSEO()` with `title`, `description`, and `canonicalPath`.
+- [x] The `useSEO` composable consistently emits: `og:title`, `og:description`, `og:image` (absolute URL), `og:type: website`, `twitter:card: summary_large_image`, and `<link rel="canonical">`.
+- [x] Fixed: `index.html` static fallback `og:image` was relative (`/twofac_logo_512.png`); corrected to absolute `https://twofac.app/twofac_logo_512.png` (Open Graph spec requires absolute URLs). Committed in: `cf28057`.
+- [x] All compare pages retain their `useSEO()` calls in `<script setup>` (not moved into template component), so SEO remains auditable per-page.
 
 ## Success Criteria
-- Website assets have one source of truth.
-- Compare pages share a single template path and diverge only by data.
-- Website build remains deterministic and lean.
+- [x] Website assets have one source of truth. ✅
+- [ ] Compare pages share a single template path and diverge only by data. (Phase 1, in progress by PureRaven)
+- [x] Website build remains deterministic and lean. ✅
