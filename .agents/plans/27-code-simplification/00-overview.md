@@ -2,10 +2,10 @@
 name: Code Simplification Program Overview
 status: Planned
 progress:
-  - "[ ] Wave 1: P0/P1 safety and artifact cleanup"
-  - "[ ] Wave 2: module-level abstraction reduction"
-  - "[ ] Wave 3: cross-module contract alignment"
-  - "[ ] Wave 4: docs and repo hygiene finalization"
+  - "[x] Wave 1: P0/P1 safety and artifact cleanup"
+  - "[x] Wave 2: module-level abstraction reduction"
+  - "[x] Wave 3: cross-module contract alignment"
+  - "[x] Wave 4: docs and repo hygiene finalization"
 ---
 
 # 27 - Code Simplification Program Overview
