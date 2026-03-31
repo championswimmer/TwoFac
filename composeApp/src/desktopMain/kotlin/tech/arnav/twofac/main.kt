@@ -98,7 +98,8 @@ fun main() = runBlocking {
                 // Use dorkbox/SystemTray which talks native GTK/AppIndicator instead.
                 DisposableEffect(Unit) {
                     LinuxNativeTray.show(
-                        iconResourcePath = "tray_lock_linux_light.png",
+                        lightIconPath = "tray_lock_linux_light.png",
+                        darkIconPath = "tray_lock_linux_dark.png",
                         tooltip = trayTooltip,
                         openLabel = trayOpenText,
                         quitLabel = trayQuitText,
