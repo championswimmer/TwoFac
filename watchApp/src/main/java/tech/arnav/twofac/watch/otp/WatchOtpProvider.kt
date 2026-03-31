@@ -20,7 +20,8 @@ class WatchOtpProvider(
     private val clock: Clock = Clock.System,
 ) {
 
-    fun buildCodes(
+    @OptIn(ExperimentalTime::class)
+    suspend fun buildCodes(
         snapshot: WatchSyncSnapshot,
         nowEpochSec: Long = clock.now().epochSeconds
     ): List<WatchOtpEntry> {
