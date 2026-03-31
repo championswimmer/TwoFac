@@ -26,3 +26,10 @@ dist-ssr
 # Generated at build time
 src/data/blogs.json
 public/images/blogs/
+
+# Logo assets copied at build time from canonical sources (logo/, docs/)
+# Run `npm run predev` or `npm run prebuild` to regenerate
+public/twofac_logo_128.png
+public/twofac_logo_512.png
+public/twofac-logo.png
+public/twofac-logo.svg
