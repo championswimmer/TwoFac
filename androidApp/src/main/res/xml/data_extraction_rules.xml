@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android 12+ (API 31+) backup/transfer policy for TwoFac.
+
+    Cloud backup:
+      - Disabled entirely when the device has no encryption (e.g. unlocked bootloader).
+      - Excludes the root data directory so TOTP secrets cannot be auto-backed up
+        to Google Drive without the user's intentional encrypted backup feature.
+
+    Device-to-device transfer (e.g. Quick Switch):
+      - Excludes the root data directory to prevent unencrypted transfer of secrets
+        during device migrations.
+
+    The app's own AndroidBackupModule provides intentional, user-controlled, and
+    encrypted backup flows that are not affected by these excludes.
+-->
+<data-extraction-rules>
+    <cloud-backup disableIfNoEncryptionCapabilities="true">
+        <exclude domain="root" path="."/>
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" path="."/>
+    </device-transfer>
+</data-extraction-rules>

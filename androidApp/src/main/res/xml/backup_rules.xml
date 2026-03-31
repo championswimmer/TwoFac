@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android 11 and below (API ≤ 30) backup policy for TwoFac.
+    Paired with android:fullBackupContent in AndroidManifest.xml.
+
+    Excludes the root shared-preferences and files directories so TOTP secrets
+    cannot be auto-backed up to Google Drive without the user's intentional
+    encrypted backup feature (androidBackupModule in composeApp).
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="."/>
+    <exclude domain="database" path="."/>
+    <exclude domain="file" path="."/>
+    <exclude domain="root" path="."/>
+</full-backup-content>

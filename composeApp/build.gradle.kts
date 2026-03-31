@@ -151,6 +151,10 @@ kotlin {
         androidResources {
             enable = true
         }
+        optimization {
+            consumerKeepRules.publish = true
+            consumerKeepRules.files.add(project.file("consumer-rules.pro"))
+        }
     }
 
     listOf(
