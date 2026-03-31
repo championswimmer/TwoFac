@@ -1,12 +1,12 @@
 ---
 name: Code Simplification Plan - watchApp
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0: Stabilize repository lifecycle and message semantics"
-  - "[ ] Phase 1: Remove dead state and synchronous suspend noise"
-  - "[ ] Phase 2: Simplify startup abstractions"
-  - "[ ] Phase 3: Build hygiene and dependency cleanup"
-  - "[ ] Phase 4: Battery/perf on wearable"
+  - "[x] Phase 0: Stabilize repository lifecycle and message semantics"
+  - "[x] Phase 1: Remove dead state and synchronous suspend noise"
+  - "[x] Phase 2: Simplify startup abstractions"
+  - "[x] Phase 3: Build hygiene and dependency cleanup"
+  - "[x] Phase 4: Battery/perf on wearable"
 ---
 
 # Code Simplification Plan - watchApp
