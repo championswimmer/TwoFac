@@ -119,7 +119,7 @@ class BackupCommandTest {
             result.output,
             "Error: Incorrect passkey — could not decrypt the backup accounts."
         )
-        assertEquals(0, twoFacLib.getAllAccounts().size)
+        assertEquals(0, twoFacLib.storage.getAccountList().size)
     }
 
     private fun buildBackupService(lib: TwoFacLib, directory: String): BackupService {
