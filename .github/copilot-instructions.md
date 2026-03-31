@@ -1,11 +1,8 @@
 This is a Kotlin Multiplatform project.
 
-This is what each module is for:
-
-- `sharedLib`: shared common business logic code
-- `composeApp`: Android, Desktop and Web (wasm) app using Compose
-- `iosApp`: iOS app that uses the `TwoFacUIKit` (from `composeApp`) as a framework
-- `cliApp`: command line interface app that uses the `sharedLib` for business logic
+For the full module map, dependency direction, and platform-to-module routing see
+[AGENTS.md](../AGENTS.md) — that file is the single source of truth for contributor
+guidance and is kept up to date as the codebase evolves.
 
 ## Environment Setup
 

@@ -70,6 +70,10 @@
 
 ### Project structure
 
+See [AGENTS.md](AGENTS.md) for the full module map, dependency direction, and
+platform-to-module routing — it is the single source of truth for contributor
+guidance.
+
 ```
 TwoFac/
 ├── sharedLib/    # Shared 2FA library (TOTP/HOTP, crypto, storage)
