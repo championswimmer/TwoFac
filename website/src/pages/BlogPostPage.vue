@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import mermaid from 'mermaid'
+import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
 import { useSEO } from '../composables/useSEO'
@@ -7,6 +8,7 @@ import blogs from '../data/blogs.json'
 
 const route = useRoute()
 const post = computed(() => blogs.find((b) => b.slug === route.params.slug))
+const blogContent = ref<HTMLElement | null>(null)
 
 useSEO({
   title: post.value?.title ?? 'Post Not Found',
@@ -21,6 +23,49 @@ function formatDate(dateString: string): string {
     day: 'numeric',
   })
 }
+
+function getMermaidTheme(): 'default' | 'dark' {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default'
+}
+
+async function renderMermaidDiagrams(): Promise<void> {
+  if (!blogContent.value) {
+    return
+  }
+
+  const mermaidBlocks = Array.from(blogContent.value.querySelectorAll<HTMLElement>('pre.mermaid'))
+
+  if (mermaidBlocks.length === 0) {
+    return
+  }
+
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: getMermaidTheme(),
+    htmlLabels: true,
+    securityLevel: 'loose',
+  })
+
+  await mermaid.run({ nodes: mermaidBlocks })
+}
+
+function queueMermaidRender(): void {
+  void renderMermaidDiagrams().catch((error: unknown) => {
+    console.error('Failed to render Mermaid diagrams for blog post content.', error)
+  })
+}
+
+onMounted(() => {
+  queueMermaidRender()
+})
+
+watch(
+  () => post.value?.content,
+  () => {
+    queueMermaidRender()
+  },
+  { flush: 'post' },
+)
 </script>
 
 <template>
@@ -59,7 +104,7 @@ function formatDate(dateString: string): string {
       </header>
 
       <!-- Content -->
-      <div class="blog-content" v-html="post.content" />
+      <div ref="blogContent" class="blog-content" v-html="post.content" />
     </article>
 
     <!-- Post not found -->
@@ -140,6 +185,18 @@ function formatDate(dateString: string): string {
   overflow-x: auto;
   margin: 1.5rem 0;
 }
+.blog-content :deep(pre.mermaid) {
+  padding: 0.75rem;
+  background-color: transparent;
+  color: inherit;
+  border: 1px solid var(--color-secondary-200);
+}
+.blog-content :deep(pre.mermaid svg) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
 .blog-content :deep(pre code) {
   padding: 0;
   background: none;
@@ -207,6 +264,10 @@ function formatDate(dateString: string): string {
   .blog-content :deep(pre) {
     background-color: var(--color-secondary-800);
     color: var(--color-secondary-200);
+  }
+  .blog-content :deep(pre.mermaid) {
+    background-color: transparent;
+    border-color: var(--color-secondary-700);
   }
   .blog-content :deep(blockquote) {
     color: var(--color-secondary-400);

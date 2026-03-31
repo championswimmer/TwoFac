@@ -11,29 +11,29 @@ useSEO({
 })
 
 const platforms = [
-  { name: 'Android', icon: '🤖', available: true },
-  { name: 'iOS', icon: '🍎', available: true },
-  { name: 'macOS', icon: '🖥️', available: true },
-  { name: 'Windows', icon: '🪟', available: true },
-  { name: 'Linux', icon: '🐧', available: true },
-  { name: 'Web', icon: '🌐', available: true },
-  { name: 'CLI', icon: '⌨️', available: true },
-  { name: 'Wear OS', icon: '⌚', available: true },
-  { name: 'watchOS', icon: '⌚', available: true },
-  { name: 'Chrome', icon: '🧩', available: true },
-  { name: 'Firefox', icon: '🦊', available: true },
+  { name: 'Android', icon: 'fa-brands fa-android', available: true },
+  { name: 'iOS', icon: 'fa-brands fa-apple', available: true },
+  { name: 'macOS', icon: 'fa-brands fa-apple', available: true },
+  { name: 'Windows', icon: 'fa-brands fa-windows', available: true },
+  { name: 'Linux', icon: 'fa-brands fa-linux', available: true },
+  { name: 'Web', icon: 'fa-solid fa-globe', available: true },
+  { name: 'CLI', icon: 'fa-solid fa-terminal', available: true },
+  { name: 'Wear OS', icon: 'fa-solid fa-clock', available: true },
+  { name: 'watchOS', icon: 'fa-solid fa-clock', available: true },
+  { name: 'Chrome', icon: 'fa-brands fa-chrome', available: true },
+  { name: 'Firefox', icon: 'fa-brands fa-firefox-browser', available: true },
 ]
 </script>
 
 <template>
   <MainLayout>
     <!-- Hero Banner -->
-    <section class="bg-primary-600 dark:bg-primary-800 py-16 sm:py-24">
+    <section class="border-b border-secondary-200 bg-secondary-100 py-16 sm:py-24 dark:border-secondary-800 dark:bg-secondary-900">
       <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-        <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 class="text-4xl font-bold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl">
           Features
         </h1>
-        <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-secondary-700 dark:text-secondary-300">
           Everything you need for secure, convenient two-factor authentication — across every device you own.
         </p>
       </div>
@@ -43,7 +43,7 @@ const platforms = [
       <!-- Multi-Platform Support -->
       <section class="py-16 sm:py-20 border-b border-secondary-200 dark:border-secondary-800">
         <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-white">
-          📱 Multi-Platform Support
+          <i class="fa-solid fa-mobile-screen-button mr-2" aria-hidden="true" />Multi-Platform Support
         </h2>
         <p class="mt-4 max-w-3xl text-lg text-secondary-600 dark:text-secondary-400">
           TwoFac runs natively on 11+ platforms. From phones and desktops to wearables, browsers,
@@ -64,7 +64,7 @@ const platforms = [
       <!-- Security First -->
       <section class="py-16 sm:py-20 border-b border-secondary-200 dark:border-secondary-800">
         <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-white">
-          🔐 Security First
+          <i class="fa-solid fa-shield-halved mr-2" aria-hidden="true" />Security First
         </h2>
         <p class="mt-4 max-w-3xl text-lg text-secondary-600 dark:text-secondary-400">
           Your 2FA secrets are encrypted end-to-end before they ever leave your device. TwoFac uses
@@ -72,19 +72,19 @@ const platforms = [
         </p>
         <ul class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <li class="flex items-start gap-3 text-secondary-700 dark:text-secondary-300">
-            <span class="mt-1 text-primary-500">✓</span>
+            <i class="mt-1 fa-solid fa-circle-check text-primary-500" aria-hidden="true" />
             <span>End-to-end encryption for all secrets and backups</span>
           </li>
           <li class="flex items-start gap-3 text-secondary-700 dark:text-secondary-300">
-            <span class="mt-1 text-primary-500">✓</span>
+            <i class="mt-1 fa-solid fa-circle-check text-primary-500" aria-hidden="true" />
             <span>Biometric authentication on Android and iOS (fingerprint, face unlock)</span>
           </li>
           <li class="flex items-start gap-3 text-secondary-700 dark:text-secondary-300">
-            <span class="mt-1 text-primary-500">✓</span>
+            <i class="mt-1 fa-solid fa-circle-check text-primary-500" aria-hidden="true" />
             <span>WebAuthn / passkey support in browser extensions</span>
           </li>
           <li class="flex items-start gap-3 text-secondary-700 dark:text-secondary-300">
-            <span class="mt-1 text-primary-500">✓</span>
+            <i class="mt-1 fa-solid fa-circle-check text-primary-500" aria-hidden="true" />
             <span>Secure session management with automatic lock</span>
           </li>
         </ul>
@@ -93,7 +93,7 @@ const platforms = [
       <!-- Wearable Integration -->
       <section class="py-16 sm:py-20 border-b border-secondary-200 dark:border-secondary-800">
         <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-white">
-          ⌚ Wearable Integration
+          <i class="fa-solid fa-clock mr-2" aria-hidden="true" />Wearable Integration
         </h2>
         <p class="mt-4 max-w-3xl text-lg text-secondary-600 dark:text-secondary-400">
           Check your 2FA codes with a glance at your wrist. TwoFac offers companion apps for both
@@ -105,7 +105,7 @@ const platforms = [
       <!-- CLI Power Tools -->
       <section class="py-16 sm:py-20 border-b border-secondary-200 dark:border-secondary-800">
         <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-white">
-          ⌨️ CLI Power Tools
+          <i class="fa-solid fa-terminal mr-2" aria-hidden="true" />CLI Power Tools
         </h2>
         <p class="mt-4 max-w-3xl text-lg text-secondary-600 dark:text-secondary-400">
           Built for developers who live in the terminal. The TwoFac CLI lets you add and manage
@@ -113,7 +113,7 @@ const platforms = [
           into scripts — all from the command line.
         </p>
         <div
-          class="mt-6 rounded-lg bg-secondary-900 dark:bg-secondary-950 p-4 font-mono text-sm text-green-400 overflow-x-auto"
+          class="mt-6 rounded-lg border border-secondary-300 bg-secondary-50 p-4 font-mono text-sm text-secondary-800 overflow-x-auto dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200"
         >
           <p>$ twofac list</p>
           <p>$ twofac code github</p>
@@ -125,7 +125,7 @@ const platforms = [
       <!-- Browser Extensions -->
       <section class="py-16 sm:py-20 border-b border-secondary-200 dark:border-secondary-800">
         <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-white">
-          🧩 Browser Extensions
+          <i class="fa-solid fa-puzzle-piece mr-2" aria-hidden="true" />Browser Extensions
         </h2>
         <p class="mt-4 max-w-3xl text-lg text-secondary-600 dark:text-secondary-400">
           Access your 2FA codes directly in your browser with extensions for Chrome and Firefox.
@@ -137,7 +137,7 @@ const platforms = [
       <!-- Import & Migration -->
       <section class="py-16 sm:py-20 border-b border-secondary-200 dark:border-secondary-800">
         <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-white">
-          🔄 Import &amp; Migration
+          <i class="fa-solid fa-right-left mr-2" aria-hidden="true" />Import &amp; Migration
         </h2>
         <p class="mt-4 max-w-3xl text-lg text-secondary-600 dark:text-secondary-400">
           Switching to TwoFac is effortless. Import your existing accounts in one click from popular
@@ -145,19 +145,19 @@ const platforms = [
         </p>
         <ul class="mt-6 space-y-3 text-secondary-700 dark:text-secondary-300">
           <li class="flex items-start gap-3">
-            <span class="mt-1 text-primary-500">→</span>
+            <i class="mt-1 fa-solid fa-arrow-right text-primary-500" aria-hidden="true" />
             <span><strong>Authy</strong> — Import via JSON export</span>
           </li>
           <li class="flex items-start gap-3">
-            <span class="mt-1 text-primary-500">→</span>
+            <i class="mt-1 fa-solid fa-arrow-right text-primary-500" aria-hidden="true" />
             <span><strong>2FAS</strong> — Import via JSON export</span>
           </li>
           <li class="flex items-start gap-3">
-            <span class="mt-1 text-primary-500">→</span>
+            <i class="mt-1 fa-solid fa-arrow-right text-primary-500" aria-hidden="true" />
             <span><strong>Ente Auth</strong> — Import via plaintext <code class="rounded bg-secondary-100 dark:bg-secondary-800 px-1.5 py-0.5 text-sm">otpauth://</code> URIs</span>
           </li>
           <li class="flex items-start gap-3">
-            <span class="mt-1 text-primary-500">→</span>
+            <i class="mt-1 fa-solid fa-arrow-right text-primary-500" aria-hidden="true" />
             <span><strong>Google Authenticator</strong> — Import via QR code export</span>
           </li>
         </ul>
@@ -166,7 +166,7 @@ const platforms = [
       <!-- Open Source -->
       <section class="py-16 sm:py-20">
         <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-white">
-          🔓 Open Source
+          <i class="fa-solid fa-code-branch mr-2" aria-hidden="true" />Open Source
         </h2>
         <p class="mt-4 max-w-3xl text-lg text-secondary-600 dark:text-secondary-400">
           TwoFac is fully open source under the MIT license. Every line of code is available for
@@ -178,9 +178,9 @@ const platforms = [
             href="https://github.com/championswimmer/TwoFac"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center rounded-lg bg-secondary-900 dark:bg-white px-5 py-2.5 text-sm font-semibold text-white dark:text-secondary-900 hover:bg-secondary-700 dark:hover:bg-secondary-200 transition-colors"
+            class="inline-flex items-center rounded-lg border border-primary-700 bg-primary-700 px-5 py-2.5 text-sm font-semibold text-secondary-50 hover:bg-primary-800 transition-colors dark:border-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500"
           >
-            View on GitHub →
+            View on GitHub <i class="fa-solid fa-arrow-right-long ml-2" aria-hidden="true" />
           </a>
         </div>
       </section>

@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import twofac.composeapp.generated.resources.*
+import tech.arnav.twofac.components.icons.IssuerBrandIcon
 import tech.arnav.twofac.lib.theme.TimerState
 import tech.arnav.twofac.lib.theme.timerStateByElapsedProgress
 import tech.arnav.twofac.lib.storage.StoredAccount
@@ -103,12 +104,33 @@ fun OTPCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Account label
-            Text(
-                text = account.accountLabel,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IssuerBrandIcon(
+                    issuer = account.issuer,
+                    size = 24.dp,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    account.issuer?.takeIf { it.isNotBlank() }?.let { issuer ->
+                        Text(
+                            text = issuer,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Text(
+                        text = account.accountLabel,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            }
 
             // OTP Code
             Row(
@@ -159,8 +181,9 @@ fun OTPCardPreview() {
     TwoFacTheme {
         OTPCard(
             account = StoredAccount.DisplayAccount(
-                "arnav@gmail.com",
-                accountLabel = "Google",
+                accountID = "google-account",
+                accountLabel = "arnav@gmail.com",
+                issuer = "Google",
             ),
             otpCode = "123456",
             onRefreshOTP = {},

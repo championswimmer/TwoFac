@@ -52,12 +52,12 @@ const steps = [
 <template>
   <MainLayout>
     <!-- Header -->
-    <section class="bg-primary-600 dark:bg-primary-800 py-16 sm:py-24">
+    <section class="border-b border-secondary-200 bg-secondary-100 py-16 sm:py-24 dark:border-secondary-800 dark:bg-secondary-900">
       <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-        <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 class="text-4xl font-bold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl">
           Getting Started with TwoFac
         </h1>
-        <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-secondary-700 dark:text-secondary-300">
           Go from zero to fully protected in just a few minutes.
         </p>
       </div>
@@ -72,7 +72,7 @@ const steps = [
         >
           <!-- Step Number -->
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-600 text-lg font-bold text-white"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-700 text-lg font-bold text-secondary-50 dark:bg-primary-600"
           >
             {{ step.number }}
           </div>
@@ -92,14 +92,14 @@ const steps = [
               to="/download"
               class="mt-3 inline-flex text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
             >
-              Go to Downloads →
+              Go to Downloads <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
             </router-link>
             <router-link
               v-if="step.number === 3"
               to="/blog"
               class="mt-3 inline-flex text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
             >
-              Read migration guides →
+              Read migration guides <i class="fa-solid fa-arrow-right-long ml-1" aria-hidden="true" />
             </router-link>
           </div>
         </li>

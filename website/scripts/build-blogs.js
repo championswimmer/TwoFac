@@ -13,6 +13,31 @@ const imgDestDir = path.join(websiteDir, 'public', 'images', 'blogs');
 const dataDir = path.join(websiteDir, 'src', 'data');
 const outputFile = path.join(dataDir, 'blogs.json');
 
+function escapeHtml(value) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+const renderer = new marked.Renderer();
+const defaultCodeRenderer = renderer.code.bind(renderer);
+
+renderer.code = (token) => {
+  const normalizedLang = token.lang?.match(/\S+/)?.[0]?.toLowerCase();
+
+  if (normalizedLang === 'mermaid') {
+    const diagramSource = token.text.replace(/\n$/, '');
+    return `<pre class="mermaid">${escapeHtml(diagramSource)}</pre>\n`;
+  }
+
+  return defaultCodeRenderer(token);
+};
+
+marked.use({ renderer });
+
 // Ensure output directories exist
 fs.mkdirSync(imgDestDir, { recursive: true });
 fs.mkdirSync(dataDir, { recursive: true });

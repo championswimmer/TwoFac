@@ -14,37 +14,37 @@ useSEO({
 
 const features = [
   {
-    icon: '🔓',
+    icon: 'fa-solid fa-code-branch',
     title: 'Open Source',
     description:
       'Fully open source under MIT license. Audit the code, contribute, or fork it.',
   },
   {
-    icon: '🔐',
+    icon: 'fa-solid fa-shield-halved',
     title: 'End-to-End Encryption',
     description:
       'Your secrets are encrypted before they leave your device. Zero-knowledge architecture.',
   },
   {
-    icon: '📱',
+    icon: 'fa-solid fa-mobile-screen-button',
     title: 'Cross-Platform',
     description:
       'Native apps for Android, iOS, macOS, Windows, Linux, Web, and CLI.',
   },
   {
-    icon: '⌚',
+    icon: 'fa-solid fa-clock',
     title: 'Wearable Support',
     description:
       'Apple Watch and Wear OS companion apps with offline sync.',
   },
   {
-    icon: '💾',
+    icon: 'fa-solid fa-database',
     title: 'Encrypted Backups',
     description:
       'Export and import your accounts securely with passkey-encrypted backups.',
   },
   {
-    icon: '🔄',
+    icon: 'fa-solid fa-right-left',
     title: 'Easy Migration',
     description:
       'Import from Google Authenticator, Authy, 2FAS, and Ente Auth with one click.',
@@ -52,17 +52,17 @@ const features = [
 ]
 
 const platforms = [
-  { name: 'Android', icon: '🤖', available: true },
-  { name: 'iOS', icon: '🍎', available: true },
-  { name: 'macOS', icon: '🖥️', available: true },
-  { name: 'Windows', icon: '🪟', available: true },
-  { name: 'Linux', icon: '🐧', available: true },
-  { name: 'Web', icon: '🌐', available: true },
-  { name: 'CLI', icon: '⌨️', available: true },
-  { name: 'Wear OS', icon: '⌚', available: true },
-  { name: 'watchOS', icon: '⌚', available: true },
-  { name: 'Chrome', icon: '🧩', available: true },
-  { name: 'Firefox', icon: '🦊', available: true },
+  { name: 'Android', icon: 'fa-brands fa-android', available: true },
+  { name: 'iOS', icon: 'fa-brands fa-apple', available: true },
+  { name: 'macOS', icon: 'fa-brands fa-apple', available: true },
+  { name: 'Windows', icon: 'fa-brands fa-windows', available: true },
+  { name: 'Linux', icon: 'fa-brands fa-linux', available: true },
+  { name: 'Web', icon: 'fa-solid fa-globe', available: true },
+  { name: 'CLI', icon: 'fa-solid fa-terminal', available: true },
+  { name: 'Wear OS', icon: 'fa-solid fa-clock', available: true },
+  { name: 'watchOS', icon: 'fa-solid fa-clock', available: true },
+  { name: 'Chrome', icon: 'fa-brands fa-chrome', available: true },
+  { name: 'Firefox', icon: 'fa-brands fa-firefox-browser', available: true },
 ]
 </script>
 
@@ -123,18 +123,18 @@ const platforms = [
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 sm:py-24 bg-primary-600 dark:bg-primary-800">
+    <section class="py-16 sm:py-24 border-y border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900">
       <div class="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        <h2 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-4xl">
           Ready to take control of your 2FA?
         </h2>
-        <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-secondary-700 dark:text-secondary-300">
           Download TwoFac for free and secure your accounts across all your devices.
         </p>
         <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <router-link
             to="/download"
-            class="inline-flex items-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-primary-700 shadow-sm hover:bg-primary-50 transition-colors"
+            class="inline-flex items-center rounded-lg border border-primary-700 bg-primary-700 px-6 py-3 text-base font-semibold text-secondary-50 hover:bg-primary-800 transition-colors dark:border-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500"
           >
             Download TwoFac
           </router-link>
@@ -142,7 +142,7 @@ const platforms = [
             href="https://github.com/championswimmer/TwoFac"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center rounded-lg border-2 border-white px-6 py-3 text-base font-semibold text-white hover:bg-white/10 transition-colors"
+            class="inline-flex items-center rounded-lg border border-secondary-400 px-6 py-3 text-base font-semibold text-secondary-800 hover:bg-secondary-200 transition-colors dark:border-secondary-600 dark:text-secondary-200 dark:hover:bg-secondary-800"
           >
             View on GitHub
           </a>

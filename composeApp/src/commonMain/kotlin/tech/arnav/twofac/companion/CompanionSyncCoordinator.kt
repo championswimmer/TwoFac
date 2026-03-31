@@ -5,6 +5,7 @@ import tech.arnav.twofac.lib.uri.OtpAuthURI
 import tech.arnav.twofac.lib.watchsync.WatchSyncAccount
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.presentation.issuer.IssuerIconCatalog
 
 interface CompanionSyncCoordinator {
     val companionDisplayName: String
@@ -51,9 +52,11 @@ fun buildCompanionSyncSnapshot(
     generatedAtEpochSec: Long,
 ): WatchSyncSnapshot {
     val companionAccounts = sourceAccounts.map { source ->
+        val issuer = runCatching { OtpAuthURI.parse(source.otpAuthUri).issuer }.getOrNull()
         WatchSyncAccount(
             accountId = source.accountId,
-            issuer = runCatching { OtpAuthURI.parse(source.otpAuthUri).issuer }.getOrNull(),
+            issuer = issuer,
+            issuerIconKey = IssuerIconCatalog.resolveIssuerIconKey(issuer),
             accountLabel = source.accountLabel,
             otpAuthUri = source.otpAuthUri,
         )

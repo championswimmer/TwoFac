@@ -14,7 +14,7 @@ const navLinks = [
 
 <template>
   <header
-    class="sticky top-0 z-50 w-full border-b border-secondary-200/60 bg-white/80 backdrop-blur-lg dark:border-secondary-800/60 dark:bg-secondary-950/80"
+    class="sticky top-0 z-50 w-full border-b border-secondary-200 bg-secondary-50 dark:border-secondary-800 dark:bg-secondary-950"
   >
     <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
       <!-- Logo -->
@@ -43,7 +43,7 @@ const navLinks = [
           href="https://github.com/championswimmer/TwoFac"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 rounded-lg border border-secondary-300 bg-white px-4 py-2 text-sm font-medium text-secondary-700 shadow-sm transition-all hover:bg-secondary-50 hover:shadow dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700"
+          class="inline-flex items-center gap-2 rounded-lg border border-secondary-300 bg-secondary-50 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800"
         >
           <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -100,7 +100,7 @@ const navLinks = [
     >
       <div
         v-if="mobileMenuOpen"
-        class="border-t border-secondary-200/60 bg-white/95 backdrop-blur-lg md:hidden dark:border-secondary-800/60 dark:bg-secondary-950/95"
+        class="border-t border-secondary-200 bg-secondary-50 md:hidden dark:border-secondary-800 dark:bg-secondary-950"
       >
         <div class="space-y-1 px-4 py-3">
           <RouterLink

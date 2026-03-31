@@ -249,6 +249,7 @@ kotlin {
             implementation(libs.zxing.javase)
             implementation(libs.jna)
             implementation(libs.jna.platform)
+            implementation(libs.dorkbox.systemtray)
             implementation(project(":sharedLib"))
         }
         wasmJsMain.resources.srcDir(layout.buildDirectory.dir("generated/wasmJs/resources"))

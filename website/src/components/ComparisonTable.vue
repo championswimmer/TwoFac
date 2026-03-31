@@ -9,8 +9,8 @@ defineProps<{
 }>()
 
 function displayValue(value: boolean | string): string {
-  if (typeof value === 'string') return value
-  return value ? '✓' : '✗'
+  if (typeof value !== 'string') return value ? 'Yes' : 'No'
+  return value
 }
 
 function cellClass(value: boolean | string, isTwoFac: boolean): string {
@@ -54,10 +54,20 @@ function cellClass(value: boolean | string, isTwoFac: boolean): string {
             {{ feature.name }}
           </td>
           <td class="px-6 py-3.5 text-center text-lg" :class="cellClass(feature.twofac, true)">
-            {{ displayValue(feature.twofac) }}
+            <i
+              v-if="typeof feature.twofac === 'boolean'"
+              :class="feature.twofac ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'"
+              aria-hidden="true"
+            />
+            <span v-else>{{ displayValue(feature.twofac) }}</span>
           </td>
           <td class="px-6 py-3.5 text-center text-lg" :class="cellClass(feature.competitor, false)">
-            {{ displayValue(feature.competitor) }}
+            <i
+              v-if="typeof feature.competitor === 'boolean'"
+              :class="feature.competitor ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'"
+              aria-hidden="true"
+            />
+            <span v-else>{{ displayValue(feature.competitor) }}</span>
           </td>
         </tr>
       </tbody>

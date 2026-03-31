@@ -1,5 +1,6 @@
 package tech.arnav.twofac.components.accounts
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,11 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import tech.arnav.twofac.components.icons.IssuerBrandIcon
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
 fun AccountListItem(
     accountLabel: String,
+    issuer: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -25,8 +28,14 @@ fun AccountListItem(
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            IssuerBrandIcon(
+                issuer = issuer,
+                size = 28.dp,
+                tint = MaterialTheme.colorScheme.primary,
+            )
             Text(
                 text = accountLabel,
                 style = MaterialTheme.typography.bodyLarge,
@@ -40,7 +49,8 @@ fun AccountListItem(
 private fun AccountListItemPreview() {
     TwoFacTheme {
         AccountListItem(
-            accountLabel = "GitHub",
+            accountLabel = "arnav@example.com",
+            issuer = "GitHub",
             onClick = {},
         )
     }

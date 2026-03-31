@@ -23,20 +23,23 @@ import tech.arnav.twofac.di.desktopQrModule
 import tech.arnav.twofac.di.desktopSessionModule
 import tech.arnav.twofac.di.desktopSettingsModule
 import tech.arnav.twofac.settings.DesktopSettingsManager
-import androidx.compose.foundation.isSystemInDarkTheme
-import org.jetbrains.compose.resources.DrawableResource
+import tech.arnav.twofac.tray.LinuxNativeTray
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.tray_lock_color
-import twofac.composeapp.generated.resources.tray_lock_monochrome_dark
 import twofac.composeapp.generated.resources.tray_lock_monochrome_light
 import twofac.composeapp.generated.resources.twofac_icon
 import twofac.composeapp.generated.resources.desktop_window_title
 import twofac.composeapp.generated.resources.desktop_tray_tooltip
 import twofac.composeapp.generated.resources.desktop_tray_open
 import twofac.composeapp.generated.resources.desktop_tray_quit
+import twofac.composeapp.generated.resources.desktop_tray_quick_view
 import twofac.composeapp.generated.resources.desktop_tray_popup_title
+
+private val osName = System.getProperty("os.name").lowercase()
+private val isMac = osName.contains("mac")
+private val isLinux = osName.contains("linux") || osName.contains("nix")
 
 fun main() = runBlocking {
     // On macOS, this enables the system tray icon to be treated as a "template image"
@@ -64,6 +67,7 @@ fun main() = runBlocking {
         val windowTitle = stringResource(Res.string.desktop_window_title)
         val trayTooltip = stringResource(Res.string.desktop_tray_tooltip)
         val trayOpenText = stringResource(Res.string.desktop_tray_open)
+        val trayQuickViewText = stringResource(Res.string.desktop_tray_quick_view)
         val trayQuitText = stringResource(Res.string.desktop_tray_quit)
         val trayPopupTitle = stringResource(Res.string.desktop_tray_popup_title)
         
@@ -90,42 +94,62 @@ fun main() = runBlocking {
         }
 
         if (isTrayEnabled) {
-            val os = System.getProperty("os.name").lowercase()
-            val isMac = os.contains("mac")
-            val isLinux = os.contains("linux") || os.contains("nix")
-            val isDark = isSystemInDarkTheme()
-            val trayIcon: DrawableResource = when {
-                // On macOS, apple.awt.enableTemplateImages makes the icon a template image,
-                // so macOS handles dark/light mode automatically — always use the black icon.
-                isMac -> Res.drawable.tray_lock_monochrome_light
-                isLinux -> if (isDark) Res.drawable.tray_lock_monochrome_dark else Res.drawable.tray_lock_monochrome_light
-                else -> Res.drawable.tray_lock_color
+            if (isLinux) {
+                // On Linux, AWT SystemTray uses the legacy xembed protocol which GNOME
+                // dropped in 3.26. On Wayland it renders as a white square or is invisible.
+                // Use dorkbox/SystemTray which talks native GTK/AppIndicator instead.
+                DisposableEffect(Unit) {
+                    LinuxNativeTray.show(
+                        lightIconPath = "tray_lock_linux_light.png",
+                        darkIconPath = "tray_lock_linux_dark.png",
+                        tooltip = trayTooltip,
+                        quickViewLabel = trayQuickViewText,
+                        openLabel = trayOpenText,
+                        quitLabel = trayQuitText,
+                        onQuickView = {
+                            if (!isTrayPopupVisible) {
+                                trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
+                            }
+                            isTrayPopupVisible = !isTrayPopupVisible
+                        },
+                        onOpen = { isMainWindowOpen = true },
+                        onQuit = ::exitApplication,
+                    )
+                    onDispose { LinuxNativeTray.shutdown() }
+                }
+            } else {
+                // macOS and Windows — Compose's built-in Tray works correctly.
+                val trayIconPainter = when {
+                    isMac -> painterResource(Res.drawable.tray_lock_monochrome_light)
+                    else -> painterResource(Res.drawable.tray_lock_color)
+                }
+
+                Tray(
+                    icon = trayIconPainter,
+                    tooltip = trayTooltip,
+                    onAction = {
+                        if (!isTrayPopupVisible) {
+                            trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
+                        }
+                        isTrayPopupVisible = !isTrayPopupVisible
+                    },
+                    menu = {
+                        Item(
+                            text = trayOpenText,
+                            onClick = {
+                                isMainWindowOpen = true
+                                isTrayPopupVisible = false
+                            }
+                        )
+                        Item(
+                            text = trayQuitText,
+                            onClick = ::exitApplication
+                        )
+                    }
+                )
             }
 
-            Tray(
-                icon = painterResource(trayIcon),
-                tooltip = trayTooltip,
-                onAction = {
-                    if (!isTrayPopupVisible) {
-                        trayWindowState.position = TrayPositionCalculator.calculatePopupPosition(trayWindowState.size)
-                    }
-                    isTrayPopupVisible = !isTrayPopupVisible
-                },
-                menu = {
-                    Item(
-                        text = trayOpenText,
-                        onClick = {
-                            isMainWindowOpen = true
-                            isTrayPopupVisible = false
-                        }
-                    )
-                    Item(
-                        text = trayQuitText,
-                        onClick = ::exitApplication
-                    )
-                }
-            )
-
+            // Tray popup window — shared across all platforms
             Window(
                 onCloseRequest = { isTrayPopupVisible = false },
                 state = trayWindowState,

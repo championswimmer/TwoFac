@@ -19,13 +19,19 @@ data class StoredAccount constructor(
         val accountID: String,
         val accountLabel: String,
         val nextCodeAt: Long = 0L,
+        val issuer: String? = null,
     )
 
-    fun forDisplay(nextCodeAt: Long? = 0L): DisplayAccount {
+    fun forDisplay(
+        nextCodeAt: Long? = 0L,
+        issuer: String? = null,
+        accountLabel: String = this.accountLabel,
+    ): DisplayAccount {
         return DisplayAccount(
             accountID = accountID.toString(),
             accountLabel = accountLabel,
             nextCodeAt = nextCodeAt ?: 0L,
+            issuer = issuer,
         )
     }
 }

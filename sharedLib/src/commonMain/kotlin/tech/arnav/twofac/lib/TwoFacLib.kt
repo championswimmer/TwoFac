@@ -101,8 +101,17 @@ class TwoFacLib private constructor(
 
     suspend fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
         checkUnlockedOrThrow()
+        val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
-        return accounts.map(StoredAccount::forDisplay)
+        return accounts.map { account ->
+            val otp = account.toOTP(
+                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
+            )
+            account.forDisplay(
+                accountLabel = otp.accountName,
+                issuer = otp.issuer,
+            )
+        }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -126,7 +135,12 @@ class TwoFacLib private constructor(
                 else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
             }
             return@map Pair(
-                account.forDisplay(nextCodeAt), otpString
+                account.forDisplay(
+                    accountLabel = otpGen.accountName,
+                    nextCodeAt = nextCodeAt,
+                    issuer = otpGen.issuer,
+                ),
+                otpString,
             )
         }
     }

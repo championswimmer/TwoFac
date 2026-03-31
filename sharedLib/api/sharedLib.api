@@ -290,6 +290,31 @@ public abstract interface class tech/arnav/twofac/lib/otp/OTP {
 	public abstract fun validateOTP (Ljava/lang/String;JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class tech/arnav/twofac/lib/presentation/issuer/IssuerIconCatalog {
+	public static final field INSTANCE Ltech/arnav/twofac/lib/presentation/issuer/IssuerIconCatalog;
+	public static final field PLACEHOLDER_ICON_KEY Ljava/lang/String;
+	public final fun glyphForIconKey (Ljava/lang/String;)Ljava/lang/String;
+	public final fun normalizeIssuer (Ljava/lang/String;)Ljava/lang/String;
+	public final fun resolveIssuerIcon (Ljava/lang/String;)Ltech/arnav/twofac/lib/presentation/issuer/IssuerIconMatch;
+	public final fun resolveIssuerIconKey (Ljava/lang/String;)Ljava/lang/String;
+	public final fun supportedIconKeys ()Ljava/util/Set;
+}
+
+public final class tech/arnav/twofac/lib/presentation/issuer/IssuerIconMatch {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Z)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Z
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Z)Ltech/arnav/twofac/lib/presentation/issuer/IssuerIconMatch;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/presentation/issuer/IssuerIconMatch;Ljava/lang/String;Ljava/lang/String;ZILjava/lang/Object;)Ltech/arnav/twofac/lib/presentation/issuer/IssuerIconMatch;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIconKey ()Ljava/lang/String;
+	public final fun getNormalizedIssuer ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun isPlaceholder ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
 public abstract interface class tech/arnav/twofac/lib/storage/Storage {
 	public abstract fun deleteAccount (Lkotlin/uuid/Uuid;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun deleteAllAccounts (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -309,8 +334,8 @@ public final class tech/arnav/twofac/lib/storage/StoredAccount {
 	public final fun copy (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount;
 	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun forDisplay (Ljava/lang/Long;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
-	public static synthetic fun forDisplay$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Ljava/lang/Long;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
+	public final fun forDisplay (Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
+	public static synthetic fun forDisplay$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
 	public final fun getAccountID ()Lkotlin/uuid/Uuid;
 	public final fun getAccountLabel ()Ljava/lang/String;
 	public final fun getEncryptedURI ()Ljava/lang/String;
