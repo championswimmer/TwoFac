@@ -1,5 +1,5 @@
 ---
-name: Gradle Build Commands
+name: gradle-build
 description: Use Gradle commands to build and run the app by platform.
 ---
 # Skill: Gradle Build Commands

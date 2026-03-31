@@ -1,5 +1,5 @@
 ---
-name: Simulators and Emulators
+name: simulators-emulators
 description: How to list, pick, and boot Android emulators and iOS simulators for local app runs.
 ---
 # Skill: Simulators and Emulators

@@ -1,5 +1,5 @@
 ---
-name: Module Routing
+name: module-routing
 description: Guidelines for where to place different types of code in a Kotlin Multiplatform project.
 ---
 # Skill: Module Routing

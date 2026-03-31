@@ -1,5 +1,5 @@
 ---
-name: Kotlin Multiplatform Module Structure
+name: kmp-modules
 description: Guidance on where to place different types of code in this Kotlin Multiplatform project.
 ---
 # Skill: Kotlin Multiplatform Layout

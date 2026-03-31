@@ -1,5 +1,5 @@
 ---
-name: Compose UI Components and Screens
+name: ui-components
 description: Structure and routing guide for composeApp screens, components, and their relationships.
 ---
 # Skill: Compose UI Components and Screens

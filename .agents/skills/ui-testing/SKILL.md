@@ -1,5 +1,5 @@
 ---
-name: Local UI Testing with Maestro
+name: ui-testing
 description: How to run, write, and debug Maestro E2E tests for Android and iOS using local simulators/devices.
 ---
 

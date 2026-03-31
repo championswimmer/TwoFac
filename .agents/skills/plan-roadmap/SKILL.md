@@ -1,5 +1,5 @@
 ---
-name: Plans and Roadmapping
+name: plan-roadmap
 description: How to create plans and follow roadmaps
 ---
 
