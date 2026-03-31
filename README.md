@@ -1,7 +1,7 @@
 | <img src="docs/twofac-logo.png" alt="TwoFac logo" width="128" height="128" /> | <h1 align="left">TwoFac</h1> <br> Open Source, Native, Cross-Platform 2FA App for Watch, Mobile, Desktop, Web and CLI! | 
 |---|---|
 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.2.0-blue.svg?logo=kotlin)](https://kotlinlang.org/)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.3.10-blue.svg?logo=kotlin)](https://kotlinlang.org/)
 [![Compose Multiplatform](https://img.shields.io/badge/compose-multiplatform-blue.svg?logo=jetbrains)](https://github.com/JetBrains/compose-multiplatform)
 
 [![Android](https://img.shields.io/badge/android-11%2B-3DDC84.svg?logo=android)](https://developer.android.com/)

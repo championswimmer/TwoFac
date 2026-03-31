@@ -13,6 +13,6 @@ The project uses `.github/workflows/copilot-setup-steps.yml` to pre-configure th
 
 - **JDK 21** (Temurin distribution) - matches the version used in GitHub Actions
 - **Node.js 22** - required for Web/Wasm builds
-- **Gradle 8.14.4** - pre-downloaded and cached for faster builds
+- **Gradle 9.1.0** - pre-downloaded and cached for faster builds
 
 This ensures you can run Gradle tasks (like `./gradlew test`, `./gradlew check`) immediately without waiting for dependency downloads.
