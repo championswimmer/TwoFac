@@ -24,12 +24,12 @@ import tech.arnav.twofac.di.desktopSessionModule
 import tech.arnav.twofac.di.desktopSettingsModule
 import tech.arnav.twofac.settings.DesktopSettingsManager
 import androidx.compose.foundation.isSystemInDarkTheme
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.tray_lock_color
-import twofac.composeapp.generated.resources.tray_lock_monochrome_dark
+import twofac.composeapp.generated.resources.tray_lock_linux_dark
+import twofac.composeapp.generated.resources.tray_lock_linux_light
 import twofac.composeapp.generated.resources.tray_lock_monochrome_light
 import twofac.composeapp.generated.resources.twofac_icon
 import twofac.composeapp.generated.resources.desktop_window_title
@@ -94,16 +94,18 @@ fun main() = runBlocking {
             val isMac = os.contains("mac")
             val isLinux = os.contains("linux") || os.contains("nix")
             val isDark = isSystemInDarkTheme()
-            val trayIcon: DrawableResource = when {
+            // On Linux, AWT SystemTray cannot render SVG painters correctly (shows
+            // a white square). Use pre-rasterized PNG icons loaded as bitmaps instead.
+            val trayIconPainter = when {
                 // On macOS, apple.awt.enableTemplateImages makes the icon a template image,
                 // so macOS handles dark/light mode automatically — always use the black icon.
-                isMac -> Res.drawable.tray_lock_monochrome_light
-                isLinux -> if (isDark) Res.drawable.tray_lock_monochrome_dark else Res.drawable.tray_lock_monochrome_light
-                else -> Res.drawable.tray_lock_color
+                isMac -> painterResource(Res.drawable.tray_lock_monochrome_light)
+                isLinux -> if (isDark) painterResource(Res.drawable.tray_lock_linux_dark) else painterResource(Res.drawable.tray_lock_linux_light)
+                else -> painterResource(Res.drawable.tray_lock_color)
             }
 
             Tray(
-                icon = painterResource(trayIcon),
+                icon = trayIconPainter,
                 tooltip = trayTooltip,
                 onAction = {
                     if (!isTrayPopupVisible) {
