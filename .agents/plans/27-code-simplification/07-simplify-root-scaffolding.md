@@ -1,12 +1,12 @@
 ---
 name: Code Simplification Plan - Root Scaffolding & Repo Hygiene
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0: Correct stale metadata and version drift"
-  - "[ ] Phase 1: Plan system hygiene (numbering/archive)"
-  - "[ ] Phase 2: Build config noise reduction"
-  - "[ ] Phase 3: Asset/source-of-truth cleanup"
-  - "[ ] Phase 4: CI/workflow consistency"
+  - "[x] Phase 0: Correct stale metadata and version drift"
+  - "[x] Phase 1: Plan system hygiene (numbering/archive)"
+  - "[x] Phase 2: Build config noise reduction"
+  - "[x] Phase 3: Asset/source-of-truth cleanup"
+  - "[x] Phase 4: CI/workflow consistency"
 ---
 
 # Code Simplification Plan - Root Scaffolding & Repo Hygiene
