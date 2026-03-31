@@ -10,7 +10,6 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSize
 import platform.Foundation.NSNumber
 import platform.Foundation.NSURL
-import platform.Foundation.URLByAppendingPathComponent
 import platform.Foundation.create
 import platform.Foundation.lastPathComponent
 import platform.Foundation.writeToURL
