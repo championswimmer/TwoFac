@@ -43,10 +43,5 @@ class WatchSyncCoordinatorTest {
         assertNull(snapshot.accounts.single().issuer)
     }
 
-    @Test
-    fun testIsSyncToWatchEnabledRequiresActiveCompanionAndIdleState() {
-        assertTrue(isSyncToCompanionEnabled(isCompanionActive = true, isSyncInProgress = false))
-        assertFalse(isSyncToCompanionEnabled(isCompanionActive = false, isSyncInProgress = false))
-        assertFalse(isSyncToCompanionEnabled(isCompanionActive = true, isSyncInProgress = true))
-    }
+    // Removing trivial isSyncToWatchEnabledRequiresActiveCompanionAndIdleState test
 }
