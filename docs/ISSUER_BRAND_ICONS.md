@@ -36,7 +36,10 @@ Brand assets come from **Font Awesome Free Brands**.
 
 - Compose Multiplatform font: `composeApp/src/commonMain/composeResources/font/fa_brands_400_regular.ttf`
 - Wear OS font copy: `watchApp/src/main/res/font/fa_brands_400_regular.ttf`
-- watchOS SVG assets: `iosApp/watchApp/Assets.xcassets/*.imageset/*.svg`
+- watchOS font copy: `iosApp/watchApp/Fonts/fa_brands_400_regular.ttf`
+  - Register in `iosApp/watchApp/Info.plist` under `UIAppFonts`.
+  - SwiftUI must use the font PostScript name: `FontAwesome6Brands-Regular`.
+  - watchOS glyph lookup should come from `IssuerIconCatalog.shared.glyphForIconKey(iconKey:)` via `TwoFacKit`.
 
 The placeholder is intentionally drawn in code as a circled `?` so all platforms can share the same fallback behavior without shipping a second non-brand icon font.
 
@@ -48,13 +51,12 @@ Issuer matching is intentionally derived from the current `issuer` value at UI o
 2. Point those aliases at the stable `iconKey` string you want to use.
 3. Add the matching Font Awesome glyph string in `glyphForIconKey`.
 4. Ensure the brand glyph exists in `fa_brands_400_regular.ttf`.
-5. Add the matching watchOS asset catalog entry at `iosApp/watchApp/Assets.xcassets/{iconKey}.imageset/`.
-6. If the issuer should sync to watchOS, no extra mapping is needed because `WatchSyncAccount.issuerIconKey` is derived from the shared catalog when the sync snapshot is produced.
-7. Run:
+5. If the issuer should sync to watchOS, no extra mapping is needed because `WatchSyncAccount.issuerIconKey` is derived from the shared catalog when the sync snapshot is produced.
+6. Run:
    - `./gradlew --no-daemon :sharedLib:allTests :sharedLib:updateLegacyAbi`
    - `./gradlew --no-daemon :composeApp:compileKotlinMetadata`
 
 ## Notes
 
-- `composeApp` and `watchApp` intentionally keep separate copies of the Font Awesome Brands TTF because the modules are independent and do not share a resource pipeline.
-- Unknown or blank issuers must continue to resolve to `placeholder`; do not add UI-local fallback logic.
+- `composeApp`, `watchApp` (Wear OS), and `iosApp/watchApp` (watchOS) intentionally keep separate copies of the Font Awesome Brands TTF because the modules are independent and do not share a resource pipeline.
+- Unknown or blank issuers must continue to resolve to `placeholder`; do not add UI-local issuer matching or alias tables.

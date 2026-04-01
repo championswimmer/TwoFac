@@ -1,13 +1,13 @@
 ---
 name: watchOS Font Awesome Migration Plan
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0 - Confirm the active watchOS target, bundle, and plist wiring for custom fonts"
-  - "[ ] Phase 1 - Expose a Swift-friendly shared glyph API for watchOS"
-  - "[ ] Phase 2 - Add the Font Awesome Brands font to the watch target and register it properly"
-  - "[ ] Phase 3 - Replace SVG image rendering with a SwiftUI font-based issuer icon view"
-  - "[ ] Phase 4 - Remove obsolete watchOS SVG assets and align maintenance docs"
-  - "[ ] Phase 5 - Validate rendering, fallback behavior, and watchOS packaging"
+  - "[x] Phase 0 - Confirm the active watchOS target, bundle, and plist wiring for custom fonts"
+  - "[x] Phase 1 - Expose a Swift-friendly shared glyph API for watchOS"
+  - "[x] Phase 2 - Add the Font Awesome Brands font to the watch target and register it properly"
+  - "[x] Phase 3 - Replace SVG image rendering with a SwiftUI font-based issuer icon view"
+  - "[x] Phase 4 - Remove obsolete watchOS SVG assets and align maintenance docs"
+  - "[x] Phase 5 - Validate rendering, fallback behavior, and watchOS packaging"
 ---
 
 # 26-a: watchOS Font Awesome Migration Plan

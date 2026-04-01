@@ -28,3 +28,7 @@ It provides the native Swift/Objective-C scaffolding required to boot the Kotlin
   - `WatchConnectivityManager.swift`: Listens for incoming snapshots, decodes them using `TwoFacKit`, and persists them locally.
   - `WatchThemeTokens.swift`: Bridges `TwoFacKit` theme/timer tokens into native SwiftUI `Color` values.
   - `WatchExtensionContentView.swift`: A SwiftUI pager of accounts with countdown bars colored via shared timer semantics.
+  - `IssuerBrandIconView.swift`: Renders issuer brand icons from shared glyphs using the bundled Font Awesome Brands font.
+    - Uses `Font.custom("FontAwesome6Brands-Regular", size: …)` with glyph lookup from `IssuerIconCatalog.shared.glyphForIconKey(iconKey:)` (from `TwoFacKit`).
+    - Requires `iosApp/watchApp/Fonts/fa_brands_400_regular.ttf` to be bundled by the `watchApp` target and registered under `UIAppFonts` in `watchApp/Info.plist`.
+    - Unknown or unavailable glyphs fall back to a code-drawn circled `?` placeholder.
