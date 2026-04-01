@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +46,8 @@ import twofac.composeapp.generated.resources.account_detail_delete_dialog_title
 import twofac.composeapp.generated.resources.account_detail_delete_dialog_message
 import twofac.composeapp.generated.resources.action_delete
 import twofac.composeapp.generated.resources.action_cancel
-import org.koin.compose.viewmodel.koinViewModel
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +55,7 @@ import tech.arnav.twofac.viewmodels.AccountsViewModel
 fun AccountDetailScreen(
     accountId: String,
     onNavigateBack: () -> Unit,
-    viewModel: AccountsViewModel = koinViewModel()
+    viewModel: AccountsViewModel = koinInject()
 ) {
     var passkeyText by remember { mutableStateOf("") }
     var currentOtp by remember { mutableStateOf<String?>(null) }
@@ -64,6 +66,7 @@ fun AccountDetailScreen(
     val error by viewModel.error.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isLibUnlocked = viewModel.twoFacLibUnlocked
+    val coroutineScope = rememberCoroutineScope()
 
     val account = accounts.find { it.accountID == accountId }
 
@@ -114,9 +117,11 @@ fun AccountDetailScreen(
 
                 Button(
                     onClick = {
-                        currentOtp = viewModel.getOtpForAccount(accountId)
+                        coroutineScope.launch {
+                            currentOtp = viewModel.getFreshOtpForAccount(accountId)
+                        }
                     },
-                    enabled = isLibUnlocked || passkeyText.isNotBlank()
+                    enabled = isLibUnlocked
                 ) {
                     Text(stringResource(Res.string.account_detail_generate_otp))
                 }

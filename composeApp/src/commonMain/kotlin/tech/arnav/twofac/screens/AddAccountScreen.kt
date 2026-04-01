@@ -42,7 +42,7 @@ import twofac.composeapp.generated.resources.add_account_error_qr_prefix
 import twofac.composeapp.generated.resources.error_prefix
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import tech.arnav.twofac.components.accounts.AddAccountPasskeyField
 import tech.arnav.twofac.components.accounts.InlineErrorMessage
 import tech.arnav.twofac.components.accounts.OtpUriInputField
@@ -56,8 +56,8 @@ import tech.arnav.twofac.viewmodels.OnboardingViewModel
 @Composable
 fun AddAccountScreen(
     onNavigateBack: () -> Unit,
-    viewModel: AccountsViewModel = koinViewModel(),
-    onboardingViewModel: OnboardingViewModel = koinViewModel(),
+    viewModel: AccountsViewModel = koinInject(),
+    onboardingViewModel: OnboardingViewModel = koinInject(),
 ) {
     var uriText by remember { mutableStateOf("") }
     var passkeyText by remember { mutableStateOf("") }

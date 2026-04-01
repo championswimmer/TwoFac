@@ -2,14 +2,12 @@ package tech.arnav.twofac.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
@@ -29,9 +27,6 @@ class AccountsViewModel(
     val clipboardQRCodeReader: ClipboardQRCodeReader? = null,
 ) : ViewModel() {
 
-    companion object {
-        const val REFRESH_DEBOUNCE = 100L // milliseconds
-    }
 
     private val _accounts = MutableStateFlow<List<StoredAccount.DisplayAccount>>(emptyList())
     val accounts: StateFlow<List<StoredAccount.DisplayAccount>> = _accounts.asStateFlow()
@@ -57,19 +52,11 @@ class AccountsViewModel(
     fun isSecureUnlockReady(): Boolean =
         (sessionManager as? SecureSessionManager)?.isSecureUnlockReady() ?: false
 
-    private val _refreshTrigger = MutableStateFlow(0L)
-
-    @OptIn(FlowPreview::class)
-    private val triggerRefreshFlow = _refreshTrigger
-        .filter { it > 0 }
-        .debounce(REFRESH_DEBOUNCE)
+    private var otpAutoRefreshJob: Job? = null
 
     init {
         loadAccounts()
-
-        triggerRefreshFlow
-            .onEach { refreshOtpsInternal() }
-            .launchIn(viewModelScope)
+        startOtpAutoRefreshLoop()
     }
 
     fun loadAccounts() {
@@ -206,6 +193,23 @@ class AccountsViewModel(
         return _accountOtps.value.find { it.first.accountID == accountId }?.second
     }
 
+    suspend fun getFreshOtpForAccount(accountId: String): String? {
+        if (!twoFacLibUnlocked) {
+            _error.value = "Accounts are not loaded. Please unlock accounts first"
+            return null
+        }
+
+        return try {
+            val accountOtpList = twoFacLib.getAllAccountOTPs()
+            _accountOtps.value = accountOtpList
+            _accounts.value = accountOtpList.map { it.first }
+            accountOtpList.find { it.first.accountID == accountId }?.second
+        } catch (e: Exception) {
+            _error.value = e.message ?: "Failed to generate OTP"
+            null
+        }
+    }
+
     /** Re-read accounts (and OTPs if unlocked) from TwoFacLib after external mutations. */
     fun reloadAccounts() {
         viewModelScope.launch {
@@ -222,9 +226,43 @@ class AccountsViewModel(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     fun refreshOtps() {
-        _refreshTrigger.value = Clock.System.now().toEpochMilliseconds()
+        viewModelScope.launch {
+            refreshOtpsInternal()
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun startOtpAutoRefreshLoop() {
+        if (otpAutoRefreshJob?.isActive == true) return
+
+        otpAutoRefreshJob = viewModelScope.launch {
+            while (isActive) {
+                if (!twoFacLibUnlocked || _accounts.value.isEmpty()) {
+                    delay(1000)
+                    continue
+                }
+
+                if (_accountOtps.value.isEmpty()) {
+                    refreshOtpsInternal()
+                    delay(1000)
+                    continue
+                }
+
+                val nowEpochSeconds = Clock.System.now().epochSeconds
+                val nextTotpCodeAt = _accountOtps.value
+                    .asSequence()
+                    .map { it.first.nextCodeAt }
+                    .filter { it > 0L }
+                    .minOrNull()
+
+                if (nextTotpCodeAt != null && nowEpochSeconds >= nextTotpCodeAt) {
+                    refreshOtpsInternal()
+                }
+
+                delay(1000)
+            }
+        }
     }
 
     private suspend fun refreshOtpsInternal() {

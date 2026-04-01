@@ -32,7 +32,7 @@ import twofac.composeapp.generated.resources.accounts_title
 import twofac.composeapp.generated.resources.action_back
 import twofac.composeapp.generated.resources.accounts_add_account
 import kotlinx.coroutines.launch
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import tech.arnav.twofac.components.accounts.AccountsErrorState
 import tech.arnav.twofac.components.accounts.AccountsListContent
 import tech.arnav.twofac.components.accounts.AccountsLockedState
@@ -45,7 +45,7 @@ fun AccountsScreen(
     onNavigateToAddAccount: () -> Unit,
     onNavigateToAccountDetail: (String) -> Unit,
     onNavigateBack: (() -> Unit)? = null,
-    viewModel: AccountsViewModel = koinViewModel()
+    viewModel: AccountsViewModel = koinInject()
 ) {
     val accounts by viewModel.accounts.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()

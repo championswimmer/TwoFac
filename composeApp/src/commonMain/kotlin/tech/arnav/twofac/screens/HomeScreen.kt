@@ -22,7 +22,7 @@ import org.jetbrains.compose.resources.stringResource
 import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.otp_copied
 import kotlinx.coroutines.launch
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import tech.arnav.twofac.components.home.HomeEmptyState
 import tech.arnav.twofac.components.home.HomeLoadingState
 import tech.arnav.twofac.components.home.HomeLockedState
@@ -36,8 +36,8 @@ import tech.arnav.twofac.viewmodels.AccountsViewModel
 fun HomeScreen(
     onNavigateToAccounts: () -> Unit,
     onNavigateToOnboarding: (unseenOnly: Boolean) -> Unit,
-    viewModel: AccountsViewModel = koinViewModel(),
-    onboardingViewModel: OnboardingViewModel = koinViewModel(),
+    viewModel: AccountsViewModel = koinInject(),
+    onboardingViewModel: OnboardingViewModel = koinInject(),
 ) {
     val accounts by viewModel.accounts.collectAsState()
     val accountOtps by viewModel.accountOtps.collectAsState()
@@ -78,6 +78,11 @@ fun HomeScreen(
         if (isUnlocked) {
             showPasskeyDialog = false
         }
+    }
+
+    LaunchedEffect(isUnlocked, accounts.size) {
+        if (!isUnlocked || accounts.isEmpty()) return@LaunchedEffect
+        viewModel.refreshOtps()
     }
 
     val onboardingState by onboardingViewModel.uiState.collectAsState()
@@ -140,9 +145,6 @@ fun HomeScreen(
                     HomeOtpListSection(
                         accountsWithOtps = accountOtps,
                         listState = otpListState,
-                        onRefreshOtp = {
-                            viewModel.refreshOtps()
-                        },
                         onCopyOtp = { otp ->
                             clipboardManager.setText(AnnotatedString(otp))
                             coroutineScope.launch {

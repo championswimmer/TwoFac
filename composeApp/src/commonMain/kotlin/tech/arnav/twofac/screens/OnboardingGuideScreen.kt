@@ -27,7 +27,7 @@ import org.jetbrains.compose.resources.stringResource
 import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.onboarding_title
 import twofac.composeapp.generated.resources.action_back
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import tech.arnav.twofac.components.onboarding.OnboardingCompletedState
 import tech.arnav.twofac.components.onboarding.OnboardingEmptyState
 import tech.arnav.twofac.components.onboarding.OnboardingGuideHeader
@@ -47,7 +47,7 @@ fun OnboardingGuideScreen(
     onNavigateToAccounts: () -> Unit,
     onNavigateToSettings: () -> Unit,
     unseenOnly: Boolean,
-    viewModel: OnboardingViewModel = koinViewModel(),
+    viewModel: OnboardingViewModel = koinInject(),
 ) {
     val state by viewModel.uiState.collectAsState()
     val seenKey = remember(unseenOnly) { "onboarding_seen_$unseenOnly" }

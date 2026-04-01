@@ -47,7 +47,6 @@ fun OTPCard(
     account: StoredAccount.DisplayAccount,
     otpCode: String,
     timeInterval: Long = 30L,
-    onRefreshOTP: () -> Unit,
     onCopyOtp: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -77,18 +76,11 @@ fun OTPCard(
     // Adjust the progress to start from the correct position
     val progress = (rawProgress + initialProgress) % 1f
 
-    // Monitor for OTP refresh - check every second
-    LaunchedEffect(Unit) {
+    // Keep the displayed countdown in sync with wall clock time.
+    LaunchedEffect(timeInterval) {
         while (true) {
-            val newTime = Clock.System.now().epochSeconds
-
-            // Check if we crossed into a new TOTP interval
-            if (hasTotpIntervalChanged(currentTime, newTime, timeInterval)) {
-                onRefreshOTP()
-            }
-
-            currentTime = newTime
-            delay(1000) // Check every second for OTP refresh
+            currentTime = Clock.System.now().epochSeconds
+            delay(1000)
         }
     }
 
@@ -186,7 +178,6 @@ fun OTPCardPreview() {
                 issuer = "Google",
             ),
             otpCode = "123456",
-            onRefreshOTP = {},
         )
     }
 }
