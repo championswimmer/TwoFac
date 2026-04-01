@@ -2,10 +2,10 @@
     <string name="app_name">TwoFac</string>
 
     <!-- Empty state -->
-    <string name="watch_empty_message">No accounts synced yet.\nOpen phone app to sync.</string>
+    <string name="watch_empty_message">No accounts synced yet.\nTap Sync now to sync from phone.</string>
     <string name="watch_sync_button">Sync now</string>
     <string name="watch_sync_requesting">Requesting…</string>
-    <string name="watch_sync_request_sent">Sync requested. Open phone app.</string>
+    <string name="watch_sync_request_sent">Sync requested on phone.</string>
     <string name="watch_sync_companion_missing">Companion app not found.</string>
     <string name="watch_sync_companion_unreachable">Phone not reachable.</string>
 
