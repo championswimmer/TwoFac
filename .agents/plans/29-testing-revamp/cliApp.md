@@ -6,10 +6,10 @@
 3. Mock external dependencies.
 
 ## Progress
-- [ ] Review `KoinVerificationTest.kt`
-- [ ] Review `DisplayCommandTest.kt`
-- [ ] Review `BackupCommandTest.kt`
-- [ ] Review `StorageCommandTest.kt`
-- [ ] Review `InfoCommandTest.kt`
-- [ ] Identify and remove trivial tests
-- [ ] Add new complex flow tests
+- [x] Review `KoinVerificationTest.kt`
+- [x] Review `DisplayCommandTest.kt` (Deleted, trivial)
+- [x] Review `BackupCommandTest.kt` (Kept, solid flow tests)
+- [x] Review `StorageCommandTest.kt` (Kept)
+- [x] Review `InfoCommandTest.kt` (Deleted, trivial)
+- [x] Identify and remove trivial tests
+- [x] Add new complex flow tests (`AddCommandTest`, `ParsingFlowTest`)
