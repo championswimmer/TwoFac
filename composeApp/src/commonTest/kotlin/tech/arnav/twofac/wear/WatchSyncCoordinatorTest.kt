@@ -2,12 +2,9 @@ package tech.arnav.twofac.wear
 
 import tech.arnav.twofac.companion.CompanionSyncSourceAccount
 import tech.arnav.twofac.companion.buildCompanionSyncSnapshot
-import tech.arnav.twofac.companion.isSyncToCompanionEnabled
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class WatchSyncCoordinatorTest {
     @Test
@@ -42,6 +39,4 @@ class WatchSyncCoordinatorTest {
 
         assertNull(snapshot.accounts.single().issuer)
     }
-
-    // Removing trivial isSyncToWatchEnabledRequiresActiveCompanionAndIdleState test
 }
