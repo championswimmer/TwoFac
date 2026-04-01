@@ -168,4 +168,29 @@ class TwoFacLibTest {
         assertEquals("GitHub", account.issuer)
         assertEquals("github", IssuerIconCatalog.resolveIssuerIcon(account.issuer).iconKey)
     }
+
+    @Test
+    fun testIsStoreInitializedLazyLoading() = runTest {
+        val storage = MemoryStorage()
+        val lib = TwoFacLib.initialise(storage = storage)
+
+        // Initially unknown
+        assertFalse(lib.isStoreInitialized)
+
+        // Adding an account outside the lib (simulating existing storage)
+        val otherLib = TwoFacLib.initialise(storage = storage)
+        otherLib.unlock("passkey")
+        otherLib.addAccount("otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example")
+
+        // First attempt to get accounts throws locked exception but caches the status
+        val ex = assertFailsWithSuspend<IllegalStateException> {
+            lib.getAllAccounts()
+        }
+        assertTrue(
+            ex.message?.contains("Secrets store is locked. Enter password to unlock it.") == true
+        )
+
+        // Now we know it has accounts
+        assertTrue(lib.isStoreInitialized)
+    }
 }
