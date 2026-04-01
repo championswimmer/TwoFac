@@ -43,6 +43,7 @@
 		950547452F53EE3A00A5ABB0 /* Exceptions for "watchAppExtension" folder in "watchApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				IssuerBrandIconView.swift,
 				TwoFacWatchApp.swift,
 				WatchConnectivityManager.swift,
 				WatchExtensionContentView.swift,

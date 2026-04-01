@@ -26,6 +26,10 @@
     <string>tech.arnav.twofac.app</string>
     <key>WKRunsIndependently</key>
     <false />
+    <key>UIAppFonts</key>
+    <array>
+        <string>fa_brands_400_regular.ttf</string>
+    </array>
     <key>WKWatchOnly</key>
     <false />
 </dict>

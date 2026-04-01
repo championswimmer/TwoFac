@@ -68,10 +68,16 @@ struct WatchExtensionContentView: View {
                         TabView {
                             ForEach(connectivityManager.accounts, id: \.accountId) { account in
                                 VStack(spacing: 10) {
-                                    Text(account.issuer ?? "TwoFac")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(1)
+                                    HStack(spacing: 4) {
+                                        IssuerBrandIconView(
+                                            iconKey: account.issuerIconKey,
+                                            size: 18
+                                        )
+                                        Text(account.issuer ?? "TwoFac")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                    }
 
                                     Text(account.accountLabel)
                                         .font(.footnote)
