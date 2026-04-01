@@ -4,7 +4,9 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSize
@@ -34,35 +36,37 @@ class ICloudBackupTransport(
     override val requiresAuthentication: Boolean = true
 
     override suspend fun isAvailable(): Boolean {
-        val backupDirectory = ensureBackupDirectoryExists()
-        return backupDirectory != null
+        val hasToken = runFileSystemTask { fileManager.ubiquityIdentityToken != null }
+        if (!hasToken) return false
+        return resolveUbiquityContainerUrl() != null
     }
 
     override suspend fun listBackups(): BackupResult<List<BackupDescriptor>> {
         val backupDirectory = ensureBackupDirectoryExists() ?: return unavailableFailure()
-        val files = fileManager.contentsOfDirectoryAtURL(
-            url = backupDirectory,
-            includingPropertiesForKeys = null,
-            options = 0u,
-            error = null,
-        ).orEmpty()
+        val descriptors = runFileSystemTask {
+            val files = fileManager.contentsOfDirectoryAtURL(
+                url = backupDirectory,
+                includingPropertiesForKeys = null,
+                options = 0u,
+                error = null,
+            ).orEmpty()
 
-        val descriptors = files
-            .mapNotNull { it as? NSURL }
-            .mapNotNull { url ->
-                val fileName = url.lastPathComponent ?: return@mapNotNull null
-                if (!fileName.endsWith(".json")) return@mapNotNull null
-                val filePath = url.path ?: return@mapNotNull null
-                val attrs = fileManager.attributesOfItemAtPath(filePath, error = null)
-                val byteSize = (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue ?: 0L
-                BackupDescriptor(
-                    id = fileName,
-                    transportId = id,
-                    createdAt = parseTimestampFromFilename(fileName),
-                    byteSize = byteSize,
-                )
-            }
-            .sortedByDescending { it.createdAt }
+            files
+                .mapNotNull { it as? NSURL }
+                .mapNotNull { url ->
+                    val fileName = url.lastPathComponent ?: return@mapNotNull null
+                    if (!fileName.endsWith(".json")) return@mapNotNull null
+                    val filePath = url.path ?: return@mapNotNull null
+                    val attrs = fileManager.attributesOfItemAtPath(filePath, error = null)
+                    val byteSize = (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue ?: 0L
+                    BackupDescriptor(
+                        id = fileName,
+                        transportId = id,
+                        createdAt = parseTimestampFromFilename(fileName),
+                        byteSize = byteSize,
+                    )
+                }
+        }.sortedByDescending { it.createdAt }
 
         return BackupResult.Success(descriptors)
     }
@@ -74,7 +78,7 @@ class ICloudBackupTransport(
         val backupFileUrl = backupFileUrl(descriptor.id) ?: return unavailableFailure()
         val data = content.toNSData()
             ?: return BackupResult.Failure("Failed to prepare backup bytes for iCloud write")
-        val written = data.writeToURL(backupFileUrl, atomically = true)
+        val written = runFileSystemTask { data.writeToURL(backupFileUrl, atomically = true) }
         if (!written) {
             return BackupResult.Failure("Failed to write backup file to iCloud container")
         }
@@ -86,14 +90,15 @@ class ICloudBackupTransport(
         val filePath = backupFileUrl.path
             ?: return BackupResult.Failure("Unable to resolve iCloud backup path")
 
-        if (!fileManager.fileExistsAtPath(filePath)) {
+        val exists = runFileSystemTask { fileManager.fileExistsAtPath(filePath) }
+        if (!exists) {
             return BackupResult.Failure("Backup '$backupId' not found in iCloud")
         }
 
         // Trigger download of cloud-only placeholders if needed.
-        fileManager.startDownloadingUbiquitousItemAtURL(backupFileUrl, error = null)
+        runFileSystemTask { fileManager.startDownloadingUbiquitousItemAtURL(backupFileUrl, error = null) }
 
-        val data = NSData.create(contentsOfFile = filePath)
+        val data = runFileSystemTask { NSData.create(contentsOfFile = filePath) }
             ?: return BackupResult.Failure(
                 "Backup '$backupId' is not available locally yet. Wait for iCloud sync/download and try again."
             )
@@ -114,7 +119,7 @@ class ICloudBackupTransport(
 
     override suspend fun delete(backupId: String): BackupResult<Unit> {
         val backupFileUrl = backupFileUrl(backupId) ?: return unavailableFailure()
-        val removed = fileManager.removeItemAtURL(backupFileUrl, error = null)
+        val removed = runFileSystemTask { fileManager.removeItemAtURL(backupFileUrl, error = null) }
         if (!removed) {
             return BackupResult.Failure("Failed to delete iCloud backup '$backupId'")
         }
@@ -131,13 +136,16 @@ class ICloudBackupTransport(
         val backups = documents.URLByAppendingPathComponent(ICLOUD_BACKUPS_DIRECTORY, isDirectory = true) ?: return null
 
         val path = backups.path ?: return null
-        if (!fileManager.fileExistsAtPath(path)) {
-            val created = fileManager.createDirectoryAtURL(
-                url = backups,
-                withIntermediateDirectories = true,
-                attributes = null,
-                error = null,
-            )
+        val exists = runFileSystemTask { fileManager.fileExistsAtPath(path) }
+        if (!exists) {
+            val created = runFileSystemTask {
+                fileManager.createDirectoryAtURL(
+                    url = backups,
+                    withIntermediateDirectories = true,
+                    attributes = null,
+                    error = null,
+                )
+            }
             if (!created) return null
         }
         return backups
@@ -145,9 +153,13 @@ class ICloudBackupTransport(
 
     private suspend fun resolveUbiquityContainerUrl(): NSURL? {
         repeat(CONTAINER_RESOLVE_ATTEMPTS) { attempt ->
-            val explicit = fileManager.URLForUbiquityContainerIdentifier(ICLOUD_CONTAINER_ID)
+            val explicit = runFileSystemTask {
+                fileManager.URLForUbiquityContainerIdentifier(ICLOUD_CONTAINER_ID)
+            }
             if (explicit != null) return explicit
-            val fallback = fileManager.URLForUbiquityContainerIdentifier(null)
+            val fallback = runFileSystemTask {
+                fileManager.URLForUbiquityContainerIdentifier(null)
+            }
             if (fallback != null) return fallback
             if (attempt < CONTAINER_RESOLVE_ATTEMPTS - 1) {
                 delay(CONTAINER_RESOLVE_DELAY_MS)
@@ -157,7 +169,7 @@ class ICloudBackupTransport(
     }
 
     private suspend fun unavailableFailure(): BackupResult.Failure {
-        val hasToken = fileManager.ubiquityIdentityToken != null
+        val hasToken = runFileSystemTask { fileManager.ubiquityIdentityToken != null }
         if (!hasToken) {
             return BackupResult.Failure(
                 "iCloud account is not active for this app session yet. Open iOS Settings and confirm iCloud Drive is enabled, then retry."
@@ -166,6 +178,10 @@ class ICloudBackupTransport(
         return BackupResult.Failure(
             "iCloud container is unavailable for '${ICLOUD_CONTAINER_ID}'. Verify the iCloud container ID and app entitlements."
         )
+    }
+
+    private suspend fun <T> runFileSystemTask(block: () -> T): T {
+        return withContext(Dispatchers.Default) { block() }
     }
 
     private fun parseTimestampFromFilename(filename: String): Long {
