@@ -165,8 +165,8 @@ class TwoFacLibTest {
 
         val account = lib.getAllAccounts().single()
 
-        assertEquals("GitHub:alice@example.com", account.accountLabel)
-        assertEquals(null, account.issuer)
+        assertEquals("alice@example.com", account.accountLabel)
+        assertEquals("GitHub", account.issuer)
     }
 
     @Test
