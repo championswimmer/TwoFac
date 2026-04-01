@@ -6,7 +6,9 @@
 - Mock external dependencies where necessary.
 
 ## Progress
-- [ ] Review existing tests
-- [ ] Drop trivial tests
-- [ ] Add tests for complex flows
-- [ ] Commit changes
+- [x] Review existing tests
+- [x] Drop trivial tests
+- [x] Add tests for complex flows
+    - [x] `importAccounts` functionality (TwoFacLibImportTest)
+    - [x] `isStoreInitialized` caching behavior
+- [x] Commit changes

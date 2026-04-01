@@ -24,6 +24,7 @@ class TwoFacLibImportTest {
     @Test
     fun testImportAccountsSuccess() = runTest {
         val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        lib.unlock("testpasskey")
         val uris = listOf(
             "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub",
             "otpauth://totp/Google:test@gmail.com?secret=JBSWY3DPEHPK3PXP&issuer=Google"
@@ -40,6 +41,7 @@ class TwoFacLibImportTest {
     @Test
     fun testImportAccountsFailure() = runTest {
         val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        lib.unlock("testpasskey")
         val adapter = MockAdapter(success = false)
         
         val result = lib.importAccounts(adapter, "dummy_content")
@@ -51,6 +53,7 @@ class TwoFacLibImportTest {
     @Test
     fun testImportAccountsPartialSuccess() = runTest {
         val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        lib.unlock("testpasskey")
         val uris = listOf(
             "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub",
             "invalid_uri"
