@@ -41,10 +41,10 @@ class AddCommandTest {
     @Test
     fun testAddCommandWithUri() = runBlocking {
         val uri = "otpauth://totp/GitHub:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"
-        val result = AddCommand().test("--passkey=test", stdin = "$uri\n")
+        val result = AddCommand().test("--passkey=test $uri")
 
         assertEquals(0, result.statusCode)
-        assertContains(result.output, "Imported 1 account(s)")
+        assertContains(result.output, "Account added successfully")
         assertEquals(1, twoFacLib.getAllAccounts().size)
     }
 }

@@ -36,7 +36,7 @@ class ParsingFlowTest {
 
     @Test
     fun testRootCommandHelp() {
-        val root = RootCommand().subcommands(DisplayCommand(), AddCommand(), InfoCommand(), StorageCommand(), BackupCommand())
+        val root = tech.arnav.twofac.cli.MainCommand().subcommands(DisplayCommand(), AddCommand(), InfoCommand(), StorageCommand(), BackupCommand())
         val result = root.test("--help")
         assertEquals(0, result.statusCode)
         assertContains(result.output, "Usage:")
