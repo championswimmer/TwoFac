@@ -91,7 +91,7 @@ TwoFac/
 
 # Module tests
 ./gradlew :sharedLib:test
-./gradlew :cliApp:test
+./gradlew :cliApp:allTests
 ./gradlew :composeApp:test
 
 # Run desktop app
@@ -100,3 +100,35 @@ TwoFac/
 # Run web app
 ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
 ```
+
+### CLI usage (dual mode)
+
+`2fac` now supports two run modes:
+
+- **Interactive TUI mode**: run `2fac` in an interactive terminal
+- **One-shot CLI mode**: run explicit subcommands
+
+When `2fac` is run without subcommands in a non-interactive terminal, it prints help and exits.
+
+```text
+2fac
+  display
+  info
+  accounts
+    add
+    remove
+  storage
+    --use-backend <standalone|common>
+    clean
+    delete
+    reinitialize
+    backup
+      export
+      import
+```
+
+#### Migration notes
+
+- Root-level commands `2fac add ...` and `2fac backup ...` were removed.
+- Use `2fac accounts add ...` and `2fac storage backup ...` instead.
+
