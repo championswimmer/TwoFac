@@ -1,8 +1,10 @@
 package tech.arnav.twofac.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.core.terminal
 import org.koin.core.context.startKoin
 import tech.arnav.twofac.cli.commands.AccountsCommand
 import tech.arnav.twofac.cli.commands.DisplayCommand
@@ -10,16 +12,29 @@ import tech.arnav.twofac.cli.commands.InfoCommand
 import tech.arnav.twofac.cli.commands.StorageCommand
 import tech.arnav.twofac.cli.di.appModule
 import tech.arnav.twofac.cli.di.storageModule
+import tech.arnav.twofac.cli.runtime.CliMode
+import tech.arnav.twofac.cli.runtime.CliModeResolver
+import tech.arnav.twofac.cli.runtime.DefaultCliModeResolver
 
-class MainCommand : CliktCommand() {
-
+class MainCommand(
+    private val modeResolver: CliModeResolver = DefaultCliModeResolver,
+    private val runInteractiveMode: () -> Unit = { DisplayCommand().main(emptyArray()) },
+) : CliktCommand() {
 
     override val invokeWithoutSubcommand = true
+
     override fun run() {
-        // If a subcommand is invoked, skip the main command logic
         if (currentContext.invokedSubcommands.isNotEmpty()) return
-        // Else, run the display logic (passkey will be prompted)
-        DisplayCommand().main(emptyArray())
+
+        when (
+            modeResolver.resolve(
+                inputInteractive = terminal.terminalInfo.inputInteractive,
+                outputInteractive = terminal.terminalInfo.outputInteractive,
+            )
+        ) {
+            CliMode.INTERACTIVE -> runInteractiveMode()
+            CliMode.NON_INTERACTIVE -> throw PrintHelpMessage(currentContext)
+        }
     }
 }
 
