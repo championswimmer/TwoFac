@@ -1,6 +1,6 @@
 ---
 name: CLI Dual Mode (Interactive TUI + Non-Interactive CLI) Plan
-status: In Progress
+status: Completed
 progress:
   - "[x] Phase 0 - Lock command IA, UX scope, and migration strategy"
   - "[x] Phase 1 - Refactor command tree into explicit one-shot command groups"
@@ -11,7 +11,7 @@ progress:
   - "[x] Phase 6 - Implement SettingsScreen (storage backend + backup provider surfaces)"
   - "[x] Phase 7 - Wire storage/backup subcommands under storage namespace"
   - "[x] Phase 8 - Add tests for parsing, mode detection, and TUI state reducers"
-  - "[ ] Phase 9 - Rollout, docs, and compatibility/deprecation messaging"
+  - "[x] Phase 9 - Rollout, docs, and compatibility/deprecation messaging"
 ---
 
 # CLI Dual Mode (Interactive TUI + Non-Interactive CLI) Plan
@@ -290,8 +290,8 @@ Also include:
 - [x] Parser, state, behavior tests; manual cross-platform checks.
 
 ## Phase 9 - Docs and deprecations
-- Update CLI help text and docs.
-- Add migration notes for any renamed commands.
+- [x] Update CLI help text and docs.
+- [x] Add migration notes for any renamed commands.
 
 ---
 
