@@ -7,7 +7,7 @@ progress:
   - "[x] Phase 2 - Implement root mode switch (interactive TUI vs non-interactive help)"
   - "[x] Phase 3 - Build TUI runtime (event loop, renderer, screen navigation, animation)"
   - "[x] Phase 4 - Implement HomeScreen (live OTP list + filters + countdown)"
-  - "[ ] Phase 5 - Implement AccountScreen (details + add/remove flows)"
+  - "[x] Phase 5 - Implement AccountScreen (details + add/remove flows)"
   - "[ ] Phase 6 - Implement SettingsScreen (storage backend + backup provider surfaces)"
   - "[ ] Phase 7 - Wire storage/backup subcommands under storage namespace"
   - "[ ] Phase 8 - Add tests for parsing, mode detection, and TUI state reducers"
@@ -278,7 +278,7 @@ Also include:
 - [x] Render accounts table + live OTP countdown + filters.
 
 ## Phase 5 - AccountScreen
-- Selection, details, remove flow with confirmation.
+- [x] Selection, details, remove flow with confirmation.
 
 ## Phase 6 - SettingsScreen
 - Info, backend setting, backup provider surface.

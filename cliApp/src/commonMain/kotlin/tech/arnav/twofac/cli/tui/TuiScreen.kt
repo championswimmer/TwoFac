@@ -31,9 +31,15 @@ data class TuiNavigatorState(
         get() = stack.lastOrNull() ?: TuiScreenId.HOME
 }
 
+data class AccountScreenState(
+    val isRemoveConfirmationActive: Boolean = false,
+    val message: String? = null,
+)
+
 data class TuiAppState(
     val navigator: TuiNavigatorState = TuiNavigatorState(),
     val home: HomeScreenState = HomeScreenState(),
+    val account: AccountScreenState = AccountScreenState(),
     val selectedAccountId: String? = null,
     val shouldExit: Boolean = false,
     val tick: Long = 0,
@@ -55,6 +61,10 @@ sealed interface TuiAction {
     data object RemoveFilterCharacter : TuiAction
     data object OpenSelectedAccount : TuiAction
     data class RefreshHomeAccounts(val accounts: List<TuiOtpEntry>) : TuiAction
+
+    data object ActivateRemoveConfirmation : TuiAction
+    data object DeactivateRemoveConfirmation : TuiAction
+    data object ConfirmRemoveSelectedAccount : TuiAction
 }
 
 interface TuiScreen {

@@ -46,7 +46,7 @@ class TuiApp(
                 render = { state -> screenFor(state).render(state) },
                 onKey = { event, state ->
                     val action = screenFor(state).onKey(event, state)
-                    navigator.reduce(state, action)
+                    applyAction(state, action)
                 },
                 onTick = { state -> refreshHomeAccounts(state) },
             )
@@ -57,6 +57,52 @@ class TuiApp(
 
     private fun screenFor(state: TuiAppState): TuiScreen {
         return screens[state.navigator.current] ?: screens.getValue(TuiScreenId.HOME)
+    }
+
+    private fun applyAction(state: TuiAppState, action: TuiAction): TuiAppState {
+        return when (action) {
+            TuiAction.ConfirmRemoveSelectedAccount -> removeSelectedAccount(state)
+            else -> navigator.reduce(state, action)
+        }
+    }
+
+    private fun removeSelectedAccount(state: TuiAppState): TuiAppState {
+        val accountId = state.selectedAccountId
+            ?: return state.copy(
+                account = state.account.copy(
+                    isRemoveConfirmationActive = false,
+                    message = "No account selected",
+                ),
+            )
+
+        val removed = runCatching {
+            runBlocking { twoFacLib.deleteAccount(accountId) }
+        }.getOrElse { error ->
+            return state.copy(
+                account = state.account.copy(
+                    isRemoveConfirmationActive = false,
+                    message = "Remove failed: ${error.message}",
+                ),
+            )
+        }
+
+        if (!removed) {
+            return state.copy(
+                account = state.account.copy(
+                    isRemoveConfirmationActive = false,
+                    message = "Account not found",
+                ),
+            )
+        }
+
+        val refreshedState = refreshHomeAccounts(
+            state.copy(
+                selectedAccountId = null,
+                account = AccountScreenState(),
+                message = "Account removed successfully",
+            ),
+        )
+        return navigator.reduce(refreshedState, TuiAction.Back)
     }
 
     private fun refreshHomeAccounts(state: TuiAppState): TuiAppState {
