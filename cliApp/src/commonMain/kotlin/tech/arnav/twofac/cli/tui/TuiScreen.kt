@@ -9,6 +9,21 @@ enum class TuiScreenId {
     SETTINGS,
 }
 
+data class TuiOtpEntry(
+    val accountId: String,
+    val accountLabel: String,
+    val issuer: String?,
+    val otp: String,
+    val nextCodeAt: Long,
+)
+
+data class HomeScreenState(
+    val accounts: List<TuiOtpEntry> = emptyList(),
+    val filterQuery: String = "",
+    val isFilterInputActive: Boolean = false,
+    val selectedIndex: Int = 0,
+)
+
 data class TuiNavigatorState(
     val stack: List<TuiScreenId> = listOf(TuiScreenId.HOME),
 ) {
@@ -18,9 +33,12 @@ data class TuiNavigatorState(
 
 data class TuiAppState(
     val navigator: TuiNavigatorState = TuiNavigatorState(),
+    val home: HomeScreenState = HomeScreenState(),
+    val selectedAccountId: String? = null,
     val shouldExit: Boolean = false,
     val tick: Long = 0,
     val nowEpochSeconds: Long = 0,
+    val message: String? = null,
 )
 
 sealed interface TuiAction {
@@ -28,6 +46,15 @@ sealed interface TuiAction {
     data object Quit : TuiAction
     data object Back : TuiAction
     data class Navigate(val destination: TuiScreenId) : TuiAction
+
+    data object SelectNextAccount : TuiAction
+    data object SelectPreviousAccount : TuiAction
+    data object ActivateFilterInput : TuiAction
+    data object DeactivateFilterInput : TuiAction
+    data class AppendFilterCharacter(val character: Char) : TuiAction
+    data object RemoveFilterCharacter : TuiAction
+    data object OpenSelectedAccount : TuiAction
+    data class RefreshHomeAccounts(val accounts: List<TuiOtpEntry>) : TuiAction
 }
 
 interface TuiScreen {
@@ -36,4 +63,14 @@ interface TuiScreen {
     fun render(state: TuiAppState): Widget
 
     fun onKey(event: KeyboardEvent, state: TuiAppState): TuiAction = TuiAction.NoOp
+}
+
+fun HomeScreenState.filteredAccounts(): List<TuiOtpEntry> {
+    val normalizedQuery = filterQuery.trim().lowercase()
+    if (normalizedQuery.isBlank()) return accounts
+
+    return accounts.filter { account ->
+        account.accountLabel.lowercase().contains(normalizedQuery) ||
+            (account.issuer?.lowercase()?.contains(normalizedQuery) == true)
+    }
 }

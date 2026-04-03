@@ -16,6 +16,7 @@ class TuiRenderLoop(
         initialState: TuiAppState,
         render: (TuiAppState) -> com.github.ajalt.mordant.rendering.Widget,
         onKey: (KeyboardEvent, TuiAppState) -> TuiAppState,
+        onTick: (TuiAppState) -> TuiAppState = { it },
     ): TuiAppState {
         var state = if (initialState.nowEpochSeconds == 0L) {
             initialState.copy(nowEpochSeconds = Clock.System.now().epochSeconds)
@@ -41,10 +42,11 @@ class TuiRenderLoop(
 
                 val nowEpochSeconds = Clock.System.now().epochSeconds
                 if (nowEpochSeconds != state.nowEpochSeconds) {
-                    state = state.copy(
+                    val tickState = state.copy(
                         nowEpochSeconds = nowEpochSeconds,
                         tick = state.tick + 1,
                     )
+                    state = onTick(tickState)
                     animation.update(state)
                 }
             }
