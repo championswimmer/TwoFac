@@ -4,7 +4,7 @@ status: In Progress
 progress:
   - "[x] Phase 0 - Lock command IA, UX scope, and migration strategy"
   - "[x] Phase 1 - Refactor command tree into explicit one-shot command groups"
-  - "[ ] Phase 2 - Implement root mode switch (interactive TUI vs non-interactive help)"
+  - "[x] Phase 2 - Implement root mode switch (interactive TUI vs non-interactive help)"
   - "[ ] Phase 3 - Build TUI runtime (event loop, renderer, screen navigation, animation)"
   - "[ ] Phase 4 - Implement HomeScreen (live OTP list + filters + countdown)"
   - "[ ] Phase 5 - Implement AccountScreen (details + add/remove flows)"
@@ -269,7 +269,7 @@ Also include:
 - [x] Nest backup under storage.
 
 ## Phase 2 - Root mode switch
-- Add terminal interactivity detection and branch logic in `MainCommand.run()`.
+- [x] Add terminal interactivity detection and branch logic in `MainCommand.run()`.
 
 ## Phase 3 - TUI runtime scaffold
 - Add navigator, base screen contract, render loop, key event loop.
