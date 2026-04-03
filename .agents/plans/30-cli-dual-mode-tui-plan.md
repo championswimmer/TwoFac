@@ -1,8 +1,8 @@
 ---
 name: CLI Dual Mode (Interactive TUI + Non-Interactive CLI) Plan
-status: Planned
+status: In Progress
 progress:
-  - "[ ] Phase 0 - Lock command IA, UX scope, and migration strategy"
+  - "[x] Phase 0 - Lock command IA, UX scope, and migration strategy"
   - "[ ] Phase 1 - Refactor command tree into explicit one-shot command groups"
   - "[ ] Phase 2 - Implement root mode switch (interactive TUI vs non-interactive help)"
   - "[ ] Phase 3 - Build TUI runtime (event loop, renderer, screen navigation, animation)"
@@ -247,8 +247,21 @@ Also include:
 ## 9) Implementation Phases (Detailed)
 
 ## Phase 0 - Lock IA + migration policy
-- Confirm exact subcommand names and aliases.
-- Confirm how much backup provider functionality is immediate vs placeholder.
+- [x] Confirm exact subcommand names and aliases.
+- [x] Confirm how much backup provider functionality is immediate vs placeholder.
+
+### Phase 0 decisions (locked)
+- Command IA for one-shot mode is now locked to:
+  - `2fac display`
+  - `2fac info`
+  - `2fac accounts add`
+  - `2fac accounts remove`
+  - `2fac storage delete|clean|reinitialize` (rolled out incrementally)
+  - `2fac storage backup ...`
+- Migration strategy is a **hard cutover** (no deprecated root-level `add` or `backup` aliases).
+- Backup functionality in this roadmap remains:
+  - Immediate: local provider export/import flows under `storage backup ...`
+  - Placeholder/future-facing: additional provider lifecycle/auth surfaces in Settings and storage subcommands as phased follow-up work.
 
 ## Phase 1 - Command tree refactor
 - Introduce `accounts` group.
