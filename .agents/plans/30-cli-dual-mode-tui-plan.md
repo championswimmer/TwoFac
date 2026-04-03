@@ -110,8 +110,8 @@ All actions above must remain possible as one-shot commands.
 - Refactor: `commands/StorageCommand.kt` to include clean/delete/reinitialize + backup group
 
 ### Compatibility strategy
-- Option A (recommended): keep aliases for one release (`add` and `backup` as hidden/deprecated wrappers).
-- Option B: hard cutover (simpler, potentially disruptive).
+- Option A (reject): keep aliases for one release (`add` and `backup` as hidden/deprecated wrappers).
+- Option B (confirmed): hard cutover (simpler, potentially disruptive).
 
 ---
 
@@ -206,7 +206,7 @@ This keeps behavior consistent across one-shot and TUI flows.
 
 1. **Phase A (now):**
    - Add option and plumbing in command/TUI settings.
-   - Validate accepted values (`standalone`, `desktop-common` or equivalent enum).
+   - Validate accepted values (`standalone`, `common` or equivalent enum).
    - Persist selected value in local CLI config (new small config file in app dir).
    - No hard backend switch yet if shared backend integration is not available.
 
