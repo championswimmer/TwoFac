@@ -56,4 +56,13 @@ class TuiNavigatorTest {
 
         assertFalse(next.account.isRemoveConfirmationActive)
     }
+
+    @Test
+    fun testCycleStorageBackendTogglesSetting() {
+        val state = TuiAppState(settings = SettingsScreenState(StorageBackendOption.STANDALONE))
+
+        val next = navigator.reduce(state, TuiAction.CycleStorageBackend)
+
+        assertEquals(StorageBackendOption.COMMON, next.settings.backend)
+    }
 }

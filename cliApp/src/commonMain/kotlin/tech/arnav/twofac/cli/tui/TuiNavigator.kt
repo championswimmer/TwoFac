@@ -30,6 +30,17 @@ class TuiNavigator {
                 ),
             )
             TuiAction.ConfirmRemoveSelectedAccount -> state
+
+            TuiAction.CycleStorageBackend -> {
+                val nextBackend = when (state.settings.backend) {
+                    StorageBackendOption.STANDALONE -> StorageBackendOption.COMMON
+                    StorageBackendOption.COMMON -> StorageBackendOption.STANDALONE
+                }
+                state.copy(
+                    settings = state.settings.copy(backend = nextBackend),
+                    message = "Storage backend set to ${nextBackend.name.lowercase()}",
+                )
+            }
         }
     }
 
