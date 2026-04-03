@@ -36,10 +36,20 @@ data class AccountScreenState(
     val message: String? = null,
 )
 
+enum class StorageBackendOption {
+    STANDALONE,
+    COMMON,
+}
+
+data class SettingsScreenState(
+    val backend: StorageBackendOption = StorageBackendOption.STANDALONE,
+)
+
 data class TuiAppState(
     val navigator: TuiNavigatorState = TuiNavigatorState(),
     val home: HomeScreenState = HomeScreenState(),
     val account: AccountScreenState = AccountScreenState(),
+    val settings: SettingsScreenState = SettingsScreenState(),
     val selectedAccountId: String? = null,
     val shouldExit: Boolean = false,
     val tick: Long = 0,
@@ -65,6 +75,8 @@ sealed interface TuiAction {
     data object ActivateRemoveConfirmation : TuiAction
     data object DeactivateRemoveConfirmation : TuiAction
     data object ConfirmRemoveSelectedAccount : TuiAction
+
+    data object CycleStorageBackend : TuiAction
 }
 
 interface TuiScreen {
