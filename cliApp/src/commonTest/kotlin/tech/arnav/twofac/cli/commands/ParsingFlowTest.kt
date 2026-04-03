@@ -74,4 +74,17 @@ class ParsingFlowTest {
         assertEquals(0, result.statusCode)
         assertContains(result.output, "Export all accounts")
     }
+
+    @Test
+    fun testStorageBackendOptionParsesWithSubcommand() {
+        val root = tech.arnav.twofac.cli.MainCommand().subcommands(
+            DisplayCommand(),
+            InfoCommand(),
+            AccountsCommand(),
+            StorageCommand(),
+        )
+        val result = root.test("storage --use-backend=common clean --help")
+        assertEquals(0, result.statusCode)
+        assertContains(result.output, "clean")
+    }
 }

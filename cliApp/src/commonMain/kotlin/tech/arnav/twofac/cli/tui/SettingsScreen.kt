@@ -8,7 +8,7 @@ class SettingsScreen : TuiScreen {
     override val id: TuiScreenId = TuiScreenId.SETTINGS
 
     override fun render(state: TuiAppState): Text {
-        val backend = state.settings.backend.name.lowercase()
+        val backend = state.settings.backend.cliValue
         return Text(
             """
             TwoFac TUI

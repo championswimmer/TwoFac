@@ -2,6 +2,7 @@ package tech.arnav.twofac.cli.tui
 
 import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.rendering.Widget
+import tech.arnav.twofac.cli.storage.CliStorageBackend
 
 enum class TuiScreenId {
     HOME,
@@ -36,13 +37,8 @@ data class AccountScreenState(
     val message: String? = null,
 )
 
-enum class StorageBackendOption {
-    STANDALONE,
-    COMMON,
-}
-
 data class SettingsScreenState(
-    val backend: StorageBackendOption = StorageBackendOption.STANDALONE,
+    val backend: CliStorageBackend = CliStorageBackend.STANDALONE,
 )
 
 data class TuiAppState(

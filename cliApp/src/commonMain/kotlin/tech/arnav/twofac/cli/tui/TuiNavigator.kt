@@ -1,5 +1,7 @@
 package tech.arnav.twofac.cli.tui
 
+import tech.arnav.twofac.cli.storage.CliStorageBackend
+
 class TuiNavigator {
     fun reduce(state: TuiAppState, action: TuiAction): TuiAppState {
         return when (action) {
@@ -33,8 +35,8 @@ class TuiNavigator {
 
             TuiAction.CycleStorageBackend -> {
                 val nextBackend = when (state.settings.backend) {
-                    StorageBackendOption.STANDALONE -> StorageBackendOption.COMMON
-                    StorageBackendOption.COMMON -> StorageBackendOption.STANDALONE
+                    CliStorageBackend.STANDALONE -> CliStorageBackend.COMMON
+                    CliStorageBackend.COMMON -> CliStorageBackend.STANDALONE
                 }
                 state.copy(
                     settings = state.settings.copy(backend = nextBackend),
