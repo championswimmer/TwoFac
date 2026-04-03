@@ -16,6 +16,20 @@ class TuiNavigator {
             TuiAction.RemoveFilterCharacter -> updateFilterQuery(state, state.home.filterQuery.dropLast(1))
             TuiAction.OpenSelectedAccount -> openSelectedAccount(state)
             is TuiAction.RefreshHomeAccounts -> refreshAccounts(state, action.accounts)
+
+            TuiAction.ActivateRemoveConfirmation -> state.copy(
+                account = state.account.copy(
+                    isRemoveConfirmationActive = true,
+                    message = "Press Enter to confirm removal, Escape to cancel",
+                ),
+            )
+            TuiAction.DeactivateRemoveConfirmation -> state.copy(
+                account = state.account.copy(
+                    isRemoveConfirmationActive = false,
+                    message = null,
+                ),
+            )
+            TuiAction.ConfirmRemoveSelectedAccount -> state
         }
     }
 
@@ -50,7 +64,13 @@ class TuiNavigator {
     private fun openSelectedAccount(state: TuiAppState): TuiAppState {
         val selected = state.home.filteredAccounts().getOrNull(state.home.selectedIndex) ?: return state
         return push(
-            state.copy(selectedAccountId = selected.accountId),
+            state.copy(
+                selectedAccountId = selected.accountId,
+                account = state.account.copy(
+                    isRemoveConfirmationActive = false,
+                    message = null,
+                ),
+            ),
             TuiScreenId.ACCOUNT,
         )
     }

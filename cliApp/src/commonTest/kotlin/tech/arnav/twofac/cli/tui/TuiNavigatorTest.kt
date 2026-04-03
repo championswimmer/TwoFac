@@ -38,4 +38,22 @@ class TuiNavigatorTest {
 
         assertTrue(next.shouldExit)
     }
+
+    @Test
+    fun testActivateRemoveConfirmationSetsFlag() {
+        val state = TuiAppState()
+
+        val next = navigator.reduce(state, TuiAction.ActivateRemoveConfirmation)
+
+        assertTrue(next.account.isRemoveConfirmationActive)
+    }
+
+    @Test
+    fun testDeactivateRemoveConfirmationClearsFlag() {
+        val state = TuiAppState(account = AccountScreenState(isRemoveConfirmationActive = true))
+
+        val next = navigator.reduce(state, TuiAction.DeactivateRemoveConfirmation)
+
+        assertFalse(next.account.isRemoveConfirmationActive)
+    }
 }
