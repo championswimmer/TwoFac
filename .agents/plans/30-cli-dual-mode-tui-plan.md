@@ -10,7 +10,7 @@ progress:
   - "[x] Phase 5 - Implement AccountScreen (details + add/remove flows)"
   - "[x] Phase 6 - Implement SettingsScreen (storage backend + backup provider surfaces)"
   - "[x] Phase 7 - Wire storage/backup subcommands under storage namespace"
-  - "[ ] Phase 8 - Add tests for parsing, mode detection, and TUI state reducers"
+  - "[x] Phase 8 - Add tests for parsing, mode detection, and TUI state reducers"
   - "[ ] Phase 9 - Rollout, docs, and compatibility/deprecation messaging"
 ---
 
@@ -287,7 +287,7 @@ Also include:
 - [x] Wire concrete command/service behavior to same backend as TUI.
 
 ## Phase 8 - Tests and stabilization
-- Parser, state, behavior tests; manual cross-platform checks.
+- [x] Parser, state, behavior tests; manual cross-platform checks.
 
 ## Phase 9 - Docs and deprecations
 - Update CLI help text and docs.
