@@ -36,16 +36,42 @@ class ParsingFlowTest {
 
     @Test
     fun testRootCommandHelp() {
-        val root = tech.arnav.twofac.cli.MainCommand().subcommands(DisplayCommand(), AddCommand(), InfoCommand(), StorageCommand(), BackupCommand())
+        val root = tech.arnav.twofac.cli.MainCommand().subcommands(
+            DisplayCommand(),
+            InfoCommand(),
+            AccountsCommand(),
+            StorageCommand(),
+        )
         val result = root.test("--help")
         assertEquals(0, result.statusCode)
         assertContains(result.output, "Usage:")
+        assertContains(result.output, "accounts")
+        assertContains(result.output, "storage")
     }
 
     @Test
-    fun testAddCommandWithMissingArguments() {
-        val result = AddCommand().test()
+    fun testAccountsAddCommandWithMissingArguments() {
+        val root = tech.arnav.twofac.cli.MainCommand().subcommands(
+            DisplayCommand(),
+            InfoCommand(),
+            AccountsCommand(),
+            StorageCommand(),
+        )
+        val result = root.test("accounts add")
         assertEquals(1, result.statusCode)
         assertContains(result.output, "Error:")
+    }
+
+    @Test
+    fun testStorageBackupExportHelpParses() {
+        val root = tech.arnav.twofac.cli.MainCommand().subcommands(
+            DisplayCommand(),
+            InfoCommand(),
+            AccountsCommand(),
+            StorageCommand(),
+        )
+        val result = root.test("storage backup export --help")
+        assertEquals(0, result.statusCode)
+        assertContains(result.output, "Export all accounts")
     }
 }

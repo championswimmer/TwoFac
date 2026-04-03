@@ -14,7 +14,10 @@ class StorageCommand : CliktCommand(name = "storage") {
     override fun help(context: Context): String = "Manage account storage"
 
     init {
-        subcommands(StorageDeleteCommand())
+        subcommands(
+            StorageDeleteCommand(),
+            BackupCommand(),
+        )
     }
 
     override fun run() = Unit

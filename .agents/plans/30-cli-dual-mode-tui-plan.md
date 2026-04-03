@@ -3,7 +3,7 @@ name: CLI Dual Mode (Interactive TUI + Non-Interactive CLI) Plan
 status: In Progress
 progress:
   - "[x] Phase 0 - Lock command IA, UX scope, and migration strategy"
-  - "[ ] Phase 1 - Refactor command tree into explicit one-shot command groups"
+  - "[x] Phase 1 - Refactor command tree into explicit one-shot command groups"
   - "[ ] Phase 2 - Implement root mode switch (interactive TUI vs non-interactive help)"
   - "[ ] Phase 3 - Build TUI runtime (event loop, renderer, screen navigation, animation)"
   - "[ ] Phase 4 - Implement HomeScreen (live OTP list + filters + countdown)"
@@ -264,9 +264,9 @@ Also include:
   - Placeholder/future-facing: additional provider lifecycle/auth surfaces in Settings and storage subcommands as phased follow-up work.
 
 ## Phase 1 - Command tree refactor
-- Introduce `accounts` group.
-- Move/refactor add/remove.
-- Nest backup under storage.
+- [x] Introduce `accounts` group.
+- [x] Move/refactor add/remove.
+- [x] Nest backup under storage.
 
 ## Phase 2 - Root mode switch
 - Add terminal interactivity detection and branch logic in `MainCommand.run()`.
