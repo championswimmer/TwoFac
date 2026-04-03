@@ -65,6 +65,7 @@ class TuiApp(
     private fun applyAction(state: TuiAppState, action: TuiAction): TuiAppState {
         return when (action) {
             TuiAction.ConfirmRemoveSelectedAccount -> removeSelectedAccount(state)
+            TuiAction.SubmitNewAccount -> submitNewAccount(state)
             TuiAction.CycleStorageBackend -> {
                 val nextState = navigator.reduce(state, action)
                 if (!CliConfigStore.write(CliConfig(storageBackend = nextState.settings.backend))) {
@@ -116,6 +117,31 @@ class TuiApp(
         return navigator.reduce(refreshedState, TuiAction.Back)
     }
 
+    private fun submitNewAccount(state: TuiAppState): TuiAppState {
+        val uri = state.addAccount.uriInput.trim()
+        if (uri.isBlank()) {
+            return state.copy(addAccount = state.addAccount.copy(message = "URI cannot be empty"))
+        }
+
+        val success = runCatching {
+            runBlocking { twoFacLib.addAccount(uri) }
+        }.getOrElse { error ->
+            return state.copy(addAccount = state.addAccount.copy(message = "Failed: ${error.message}"))
+        }
+
+        if (!success) {
+            return state.copy(addAccount = state.addAccount.copy(message = "Failed to add account. Storage returned false."))
+        }
+
+        val refreshedState = refreshHomeAccounts(
+            state.copy(
+                addAccount = AddAccountScreenState(),
+                message = "Account added successfully",
+            )
+        )
+        return navigator.reduce(refreshedState, TuiAction.Back)
+    }
+
     private fun refreshHomeAccounts(state: TuiAppState): TuiAppState {
         val accounts = runCatching {
             runBlocking { fetchOtpEntries() }
@@ -147,6 +173,7 @@ class TuiApp(
                 HomeScreen(),
                 AccountScreen(),
                 SettingsScreen(),
+                AddAccountScreen(),
             ).associateBy { it.id }
         }
     }

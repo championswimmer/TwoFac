@@ -8,7 +8,13 @@ enum class TuiScreenId {
     HOME,
     ACCOUNT,
     SETTINGS,
+    ADD_ACCOUNT,
 }
+
+data class AddAccountScreenState(
+    val uriInput: String = "",
+    val message: String? = null,
+)
 
 data class TuiOtpEntry(
     val accountId: String,
@@ -46,6 +52,7 @@ data class TuiAppState(
     val home: HomeScreenState = HomeScreenState(),
     val account: AccountScreenState = AccountScreenState(),
     val settings: SettingsScreenState = SettingsScreenState(),
+    val addAccount: AddAccountScreenState = AddAccountScreenState(),
     val selectedAccountId: String? = null,
     val shouldExit: Boolean = false,
     val tick: Long = 0,
@@ -71,6 +78,10 @@ sealed interface TuiAction {
     data object ActivateRemoveConfirmation : TuiAction
     data object DeactivateRemoveConfirmation : TuiAction
     data object ConfirmRemoveSelectedAccount : TuiAction
+
+    data class AppendAddAccountCharacter(val character: Char) : TuiAction
+    data object RemoveAddAccountCharacter : TuiAction
+    data object SubmitNewAccount : TuiAction
 
     data object CycleStorageBackend : TuiAction
 }

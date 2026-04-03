@@ -32,6 +32,24 @@ class TuiNavigator {
                 ),
             )
             TuiAction.ConfirmRemoveSelectedAccount -> state
+            TuiAction.SubmitNewAccount -> state
+
+            is TuiAction.AppendAddAccountCharacter -> {
+                state.copy(
+                    addAccount = state.addAccount.copy(
+                        uriInput = state.addAccount.uriInput + action.character,
+                        message = null
+                    )
+                )
+            }
+            TuiAction.RemoveAddAccountCharacter -> {
+                state.copy(
+                    addAccount = state.addAccount.copy(
+                        uriInput = state.addAccount.uriInput.dropLast(1),
+                        message = null
+                    )
+                )
+            }
 
             TuiAction.CycleStorageBackend -> {
                 val nextBackend = when (state.settings.backend) {

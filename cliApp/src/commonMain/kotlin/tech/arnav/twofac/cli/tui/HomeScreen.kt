@@ -47,7 +47,7 @@ class HomeScreen : TuiScreen {
                 append("\n")
                 append(it)
             }
-            append("\n↑/↓ move • Enter open • / or f filter • s settings • q quit")
+            append("\n↑/↓ move • Enter open • / or f filter • n new • s settings • q quit")
         }
         captionBottom(footerText, align = TextAlign.LEFT)
     }
@@ -66,6 +66,7 @@ class HomeScreen : TuiScreen {
 
         return when (event.key) {
             "q", "Q" -> TuiAction.Quit
+            "n", "N", "+" -> TuiAction.Navigate(TuiScreenId.ADD_ACCOUNT)
             "ArrowUp", "k", "K" -> TuiAction.SelectPreviousAccount
             "ArrowDown", "j", "J" -> TuiAction.SelectNextAccount
             "Enter", "a", "A" -> TuiAction.OpenSelectedAccount
