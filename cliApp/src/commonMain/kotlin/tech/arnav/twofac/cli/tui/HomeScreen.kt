@@ -3,7 +3,9 @@ package tech.arnav.twofac.cli.tui
 import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.input.isCtrlC
 import com.github.ajalt.mordant.rendering.BorderType
+import com.github.ajalt.mordant.rendering.TextAlign
 import com.github.ajalt.mordant.table.Borders
+import com.github.ajalt.mordant.table.ColumnWidth.Companion.Fixed
 import com.github.ajalt.mordant.table.table
 
 class HomeScreen : TuiScreen {
@@ -11,16 +13,16 @@ class HomeScreen : TuiScreen {
 
     override fun render(state: TuiAppState) = table {
         borderType = BorderType.SQUARE_DOUBLE_SECTION_SEPARATOR
+        column(0) {
+            width = Fixed(1)
+            cellBorders = Borders.NONE
+        }
 
         header {
             row(" ", "Account", "Issuer", "OTP", "TTL")
         }
 
         body {
-            column(0) {
-                cellBorders = Borders.NONE
-            }
-
             val filteredAccounts = state.home.filteredAccounts()
             if (filteredAccounts.isEmpty()) {
                 row("", "No matching accounts", "", "", "")
@@ -38,13 +40,16 @@ class HomeScreen : TuiScreen {
             }
         }
 
-        footer {
-            cellBorders = Borders.NONE
-            val filterPrefix = if (state.home.isFilterInputActive) "(filtering)" else ""
-            row("filter: '${state.home.filterQuery}' $filterPrefix", "", "", "", "")
-            state.message?.let { row(it, "", "", "", "") }
-            row("↑/↓ move • Enter open • / or f filter • s settings • q quit", "", "", "", "")
+        val filterPrefix = if (state.home.isFilterInputActive) "(filtering)" else ""
+        val footerText = buildString {
+            append("filter: '${state.home.filterQuery}' $filterPrefix")
+            state.message?.let {
+                append("\n")
+                append(it)
+            }
+            append("\n↑/↓ move • Enter open • / or f filter • s settings • q quit")
         }
+        captionBottom(footerText, align = TextAlign.LEFT)
     }
 
     override fun onKey(event: KeyboardEvent, state: TuiAppState): TuiAction {
