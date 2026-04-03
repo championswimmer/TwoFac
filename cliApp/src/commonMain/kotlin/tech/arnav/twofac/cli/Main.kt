@@ -4,8 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import org.koin.core.context.startKoin
-import tech.arnav.twofac.cli.commands.AddCommand
-import tech.arnav.twofac.cli.commands.BackupCommand
+import tech.arnav.twofac.cli.commands.AccountsCommand
 import tech.arnav.twofac.cli.commands.DisplayCommand
 import tech.arnav.twofac.cli.commands.InfoCommand
 import tech.arnav.twofac.cli.commands.StorageCommand
@@ -32,8 +31,7 @@ fun main(args: Array<String>) {
     MainCommand().subcommands(
         DisplayCommand(),
         InfoCommand(),
-        AddCommand(),
-        BackupCommand(),
+        AccountsCommand(),
         StorageCommand(),
     ).main(args)
 }
