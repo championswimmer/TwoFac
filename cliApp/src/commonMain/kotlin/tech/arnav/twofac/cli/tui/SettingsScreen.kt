@@ -2,35 +2,31 @@ package tech.arnav.twofac.cli.tui
 
 import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.input.isCtrlC
-import com.github.ajalt.mordant.widgets.Text
+import com.github.ajalt.mordant.rendering.BorderType
+import com.github.ajalt.mordant.rendering.TextAlign
+import com.github.ajalt.mordant.table.ColumnWidth.Companion.Fixed
+import com.github.ajalt.mordant.table.table
+import tech.arnav.twofac.cli.theme.CliThemeStyles
 
 class SettingsScreen : TuiScreen {
     override val id: TuiScreenId = TuiScreenId.SETTINGS
 
-    override fun render(state: TuiAppState): Text {
-        val backend = state.settings.backend.cliValue
-        return Text(
-            """
-            TwoFac TUI
+    override fun render(state: TuiAppState, styles: CliThemeStyles) = table {
+        borderType = BorderType.SQUARE_DOUBLE_SECTION_SEPARATOR
+        column(0) { width = Fixed(18) }
 
-            Settings Screen
+        header {
+            row(styles.title("TwoFac"), styles.title("Settings"))
+        }
 
-            Storage backend: $backend
-            (press 'u' to switch between standalone/common)
+        body {
+            row(styles.label("storage backend"), styles.key(state.settings.backend.cliValue))
+            row(styles.label("backup provider"), styles.label("local (available)"))
+        }
 
-            Backup provider surface:
-              - local provider: available
-              - provider auth/list UI: placeholder (next phases)
-
-            ${state.message ?: ""}
-
-            Shortcuts:
-              u        : Toggle backend
-              h        : Home
-              b/Escape : Back
-              q        : Quit
-            """.trimIndent()
-        )
+        val messageLine = state.message?.let { styles.key(it) + "\n" } ?: ""
+        val footerText = messageLine + styles.footer("u toggle backend • h home • b/Esc back • q quit")
+        captionBottom(footerText, align = TextAlign.LEFT)
     }
 
     override fun onKey(event: KeyboardEvent, state: TuiAppState): TuiAction {

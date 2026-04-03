@@ -2,38 +2,44 @@ package tech.arnav.twofac.cli.tui
 
 import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.input.isCtrlC
-import com.github.ajalt.mordant.widgets.Text
+import com.github.ajalt.mordant.rendering.BorderType
+import com.github.ajalt.mordant.rendering.TextAlign
+import com.github.ajalt.mordant.table.ColumnWidth.Companion.Fixed
+import com.github.ajalt.mordant.table.table
+import tech.arnav.twofac.cli.theme.CliThemeStyles
 
 class AccountScreen : TuiScreen {
     override val id: TuiScreenId = TuiScreenId.ACCOUNT
 
-    override fun render(state: TuiAppState): Text {
+    override fun render(state: TuiAppState, styles: CliThemeStyles) = table {
+        borderType = BorderType.SQUARE_DOUBLE_SECTION_SEPARATOR
+        column(0) { width = Fixed(10) }
+
         val selectedAccount = state.home.accounts.firstOrNull { it.accountId == state.selectedAccountId }
-        val removalHint = if (state.account.isRemoveConfirmationActive) {
-            "Confirm remove: Enter = yes, Escape = cancel"
-        } else {
-            "Press d to remove this account"
+
+        header {
+            row(styles.title("TwoFac"), styles.title("Account Details"))
         }
 
-        return Text(
-            """
-            TwoFac TUI
+        body {
+            row(styles.label("account"), styles.key(selectedAccount?.accountLabel ?: "-"))
+            row(styles.label("issuer"), selectedAccount?.issuer ?: "-")
+            row(
+                styles.label("otp"),
+                styles.otp(selectedAccount?.otp?.chunked(3)?.joinToString(" ") ?: "-"),
+            )
+        }
 
-            Account Screen
-            account: ${selectedAccount?.accountLabel ?: "-"}
-            issuer : ${selectedAccount?.issuer ?: "-"}
-            otp    : ${selectedAccount?.otp ?: "-"}
-
-            $removalHint
-            ${state.account.message ?: ""}
-
-            Shortcuts:
-              d        : Remove account
-              b/Escape : Back
-              s        : Open settings
-              q        : Quit
-            """.trimIndent()
-        )
+        val removalLine = if (state.account.isRemoveConfirmationActive) {
+            styles.danger("Confirm remove: Enter = yes, Escape = cancel")
+        } else {
+            styles.footer("d remove • b/Esc back • s settings • q quit")
+        }
+        val footerText = buildString {
+            state.account.message?.let { append(it).append("\n") }
+            append(removalLine)
+        }
+        captionBottom(footerText, align = TextAlign.LEFT)
     }
 
     override fun onKey(event: KeyboardEvent, state: TuiAppState): TuiAction {

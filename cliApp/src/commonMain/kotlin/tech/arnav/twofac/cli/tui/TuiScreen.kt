@@ -3,6 +3,7 @@ package tech.arnav.twofac.cli.tui
 import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.rendering.Widget
 import tech.arnav.twofac.cli.storage.CliStorageBackend
+import tech.arnav.twofac.cli.theme.CliThemeStyles
 
 enum class TuiScreenId {
     HOME,
@@ -89,7 +90,7 @@ sealed interface TuiAction {
 interface TuiScreen {
     val id: TuiScreenId
 
-    fun render(state: TuiAppState): Widget
+    fun render(state: TuiAppState, styles: CliThemeStyles): Widget
 
     fun onKey(event: KeyboardEvent, state: TuiAppState): TuiAction = TuiAction.NoOp
 }

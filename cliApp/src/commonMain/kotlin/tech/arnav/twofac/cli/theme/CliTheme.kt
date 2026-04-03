@@ -11,7 +11,9 @@ import tech.arnav.twofac.lib.theme.TimerState
 import tech.arnav.twofac.lib.theme.TwoFacThemeTokens
 
 data class CliThemeStyles(
+    val title: TextStyle,
     val header: TextStyle,
+    val label: TextStyle,
     val key: TextStyle,
     val otp: TextStyle,
     val footer: TextStyle,
@@ -41,10 +43,12 @@ object CliTheme {
     }
 
     private fun trueColorStyles() = CliThemeStyles(
-        header = TextStyles.dim + trueColor(tokens.brand),
+        title = TextStyles.bold + trueColor(tokens.brand),
+        header = TextStyles.bold + trueColor(tokens.brand),
+        label = TextStyles.dim + trueColor(tokens.onSurfaceVariant),
         key = TextStyles.bold + trueColor(tokens.accent),
-        otp = TextStyles.bold.style,
-        footer = TextStyles.dim + trueColor(tokens.timer.healthy),
+        otp = TextStyles.bold + trueColor(tokens.onBackground),
+        footer = TextStyles.dim + trueColor(tokens.onSurfaceVariant),
         timerHealthy = trueColor(tokens.timer.healthy),
         timerWarning = trueColor(tokens.timer.warning),
         timerCritical = trueColor(tokens.timer.critical),
@@ -53,10 +57,12 @@ object CliTheme {
     )
 
     private fun ansi256Styles() = CliThemeStyles(
-        header = TextStyles.dim + ansi256(33), // xterm-256 #0087ff (azure blue)
+        title = TextStyles.bold + ansi256(39),  // xterm-256 #00afff (dodger blue)
+        header = TextStyles.bold + ansi256(33), // xterm-256 #0087ff (azure blue)
+        label = TextStyles.dim + ansi256(250),  // xterm-256 #bcbcbc (light gray)
         key = TextStyles.bold + ansi256(45), // xterm-256 #00d7ff (bright cyan)
-        otp = TextStyles.bold.style,
-        footer = TextStyles.dim + ansi256(71), // xterm-256 #5faf5f (medium green)
+        otp = TextStyles.bold + ansi256(255), // xterm-256 #eeeeee (near-white)
+        footer = TextStyles.dim + ansi256(250), // xterm-256 #bcbcbc (light gray)
         timerHealthy = ansi256(71), // xterm-256 #5faf5f (medium green)
         timerWarning = ansi256(214), // xterm-256 #ffaf00 (amber/orange)
         timerCritical = ansi256(203), // xterm-256 #ff5f5f (salmon red)
@@ -65,10 +71,12 @@ object CliTheme {
     )
 
     private fun ansi16Styles() = CliThemeStyles(
-        header = TextStyles.dim + TextColors.blue, // ANSI 34 blue
+        title = TextStyles.bold + TextColors.blue, // ANSI 34 blue, bold
+        header = TextStyles.bold + TextColors.blue, // ANSI 34 blue
+        label = TextStyles.dim + TextColors.white, // ANSI dim white
         key = TextStyles.bold + TextColors.cyan, // ANSI 36 cyan
-        otp = TextStyles.bold.style,
-        footer = TextStyles.dim + TextColors.green, // ANSI 32 green
+        otp = TextStyles.bold + TextColors.brightWhite, // ANSI bold bright white
+        footer = TextStyles.dim + TextColors.white, // ANSI dim white
         timerHealthy = TextColors.green, // ANSI 32 green
         timerWarning = TextColors.yellow, // ANSI 33 yellow
         timerCritical = TextColors.red, // ANSI 31 red
@@ -77,7 +85,9 @@ object CliTheme {
     )
 
     private fun noColorStyles() = CliThemeStyles(
-        header = TextStyles.dim.style,
+        title = TextStyles.bold.style,
+        header = TextStyles.bold.style,
+        label = TextStyles.dim.style,
         key = TextStyles.bold.style,
         otp = TextStyles.bold.style,
         footer = TextStyles.dim.style,

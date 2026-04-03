@@ -7,6 +7,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tech.arnav.twofac.cli.storage.CliConfig
 import tech.arnav.twofac.cli.storage.CliConfigStore
+import tech.arnav.twofac.cli.theme.CliTheme
+import tech.arnav.twofac.cli.theme.CliThemeStyles
 import tech.arnav.twofac.lib.TwoFacLib
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -18,6 +20,7 @@ class TuiApp(
     private val renderLoop: TuiRenderLoop = TuiRenderLoop(terminal),
 ) : KoinComponent {
     private val twoFacLib: TwoFacLib by inject()
+    private val styles: CliThemeStyles = CliTheme.styles(terminal)
 
     @OptIn(ExperimentalTime::class)
     fun run() {
@@ -46,7 +49,7 @@ class TuiApp(
         runCatching {
             renderLoop.run(
                 initialState = initialState,
-                render = { state -> screenFor(state).render(state) },
+                render = { state -> screenFor(state).render(state, styles) },
                 onKey = { event, state ->
                     val action = screenFor(state).onKey(event, state)
                     applyAction(state, action)

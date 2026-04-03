@@ -7,11 +7,12 @@ import com.github.ajalt.mordant.rendering.TextAlign
 import com.github.ajalt.mordant.table.Borders
 import com.github.ajalt.mordant.table.ColumnWidth.Companion.Fixed
 import com.github.ajalt.mordant.table.table
+import tech.arnav.twofac.cli.theme.CliThemeStyles
 
 class HomeScreen : TuiScreen {
     override val id: TuiScreenId = TuiScreenId.HOME
 
-    override fun render(state: TuiAppState) = table {
+    override fun render(state: TuiAppState, styles: CliThemeStyles) = table {
         borderType = BorderType.SQUARE_DOUBLE_SECTION_SEPARATOR
         column(0) {
             width = Fixed(1)
@@ -19,35 +20,54 @@ class HomeScreen : TuiScreen {
         }
 
         header {
-            row(" ", "Account", "Issuer", "OTP", "TTL")
+            row(
+                styles.header(" "),
+                styles.header("Account"),
+                styles.header("Issuer"),
+                styles.header("OTP"),
+                styles.header("TTL"),
+            )
         }
 
         body {
             val filteredAccounts = state.home.filteredAccounts()
             if (filteredAccounts.isEmpty()) {
-                row("", "No matching accounts", "", "", "")
+                row("", styles.label("No matching accounts"), "", "", "")
             } else {
                 filteredAccounts.forEachIndexed { index, account ->
-                    val selectedMarker = if (index == state.home.selectedIndex) ">" else " "
-                    val otp = account.otp.chunked(1).joinToString(" ")
+                    val isSelected = index == state.home.selectedIndex
+                    val selectedMarker = if (isSelected) styles.key(">") else " "
+                    val otp = account.otp.chunked(3).joinToString(" ")
                     val ttl = if (account.nextCodeAt <= 0L) {
-                        "--"
+                        styles.label("--")
                     } else {
-                        "${(account.nextCodeAt - state.nowEpochSeconds).coerceAtLeast(0)}s"
+                        val remaining = (account.nextCodeAt - state.nowEpochSeconds).coerceAtLeast(0)
+                        val timerStyle = when {
+                            remaining <= 5 -> styles.timerCritical
+                            remaining <= 10 -> styles.timerWarning
+                            else -> styles.timerHealthy
+                        }
+                        timerStyle("${remaining}s")
                     }
-                    row(selectedMarker, account.accountLabel, account.issuer ?: "-", otp, ttl)
+                    val accountLabel = if (isSelected) styles.key(account.accountLabel) else account.accountLabel
+                    val issuerLabel = if (isSelected) styles.key(account.issuer ?: "-") else (account.issuer ?: "-")
+                    val otpFormatted = styles.otp(otp)
+                    row(selectedMarker, accountLabel, issuerLabel, otpFormatted, ttl)
                 }
             }
         }
 
-        val filterPrefix = if (state.home.isFilterInputActive) "(filtering)" else ""
+        val filterPrefix = if (state.home.isFilterInputActive) styles.key("(filtering)") else ""
+        val filterLine = "filter: '${styles.key(state.home.filterQuery)}' $filterPrefix"
+        val shortcutsLine = styles.footer("↑/↓ move • Enter open • / or f filter • n new • s settings • q quit")
         val footerText = buildString {
-            append("filter: '${state.home.filterQuery}' $filterPrefix")
+            append(filterLine)
             state.message?.let {
                 append("\n")
                 append(it)
             }
-            append("\n↑/↓ move • Enter open • / or f filter • n new • s settings • q quit")
+            append("\n")
+            append(shortcutsLine)
         }
         captionBottom(footerText, align = TextAlign.LEFT)
     }
