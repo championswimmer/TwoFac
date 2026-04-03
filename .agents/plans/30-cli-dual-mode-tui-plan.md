@@ -5,7 +5,7 @@ progress:
   - "[x] Phase 0 - Lock command IA, UX scope, and migration strategy"
   - "[x] Phase 1 - Refactor command tree into explicit one-shot command groups"
   - "[x] Phase 2 - Implement root mode switch (interactive TUI vs non-interactive help)"
-  - "[ ] Phase 3 - Build TUI runtime (event loop, renderer, screen navigation, animation)"
+  - "[x] Phase 3 - Build TUI runtime (event loop, renderer, screen navigation, animation)"
   - "[ ] Phase 4 - Implement HomeScreen (live OTP list + filters + countdown)"
   - "[ ] Phase 5 - Implement AccountScreen (details + add/remove flows)"
   - "[ ] Phase 6 - Implement SettingsScreen (storage backend + backup provider surfaces)"
@@ -272,7 +272,7 @@ Also include:
 - [x] Add terminal interactivity detection and branch logic in `MainCommand.run()`.
 
 ## Phase 3 - TUI runtime scaffold
-- Add navigator, base screen contract, render loop, key event loop.
+- [x] Add navigator, base screen contract, render loop, key event loop.
 
 ## Phase 4 - HomeScreen
 - Render accounts table + live OTP countdown + filters.
