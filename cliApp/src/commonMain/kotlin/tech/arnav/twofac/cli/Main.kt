@@ -15,10 +15,11 @@ import tech.arnav.twofac.cli.di.storageModule
 import tech.arnav.twofac.cli.runtime.CliMode
 import tech.arnav.twofac.cli.runtime.CliModeResolver
 import tech.arnav.twofac.cli.runtime.DefaultCliModeResolver
+import tech.arnav.twofac.cli.tui.TuiApp
 
 class MainCommand(
     private val modeResolver: CliModeResolver = DefaultCliModeResolver,
-    private val runInteractiveMode: () -> Unit = { DisplayCommand().main(emptyArray()) },
+    private val runInteractiveMode: () -> Unit = { TuiApp().run() },
 ) : CliktCommand() {
 
     override val invokeWithoutSubcommand = true
