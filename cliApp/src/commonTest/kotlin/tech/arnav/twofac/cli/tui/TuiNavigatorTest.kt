@@ -1,5 +1,6 @@
 package tech.arnav.twofac.cli.tui
 
+import tech.arnav.twofac.cli.storage.CliStorageBackend
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -59,10 +60,10 @@ class TuiNavigatorTest {
 
     @Test
     fun testCycleStorageBackendTogglesSetting() {
-        val state = TuiAppState(settings = SettingsScreenState(StorageBackendOption.STANDALONE))
+        val state = TuiAppState(settings = SettingsScreenState(CliStorageBackend.STANDALONE))
 
         val next = navigator.reduce(state, TuiAction.CycleStorageBackend)
 
-        assertEquals(StorageBackendOption.COMMON, next.settings.backend)
+        assertEquals(CliStorageBackend.COMMON, next.settings.backend)
     }
 }

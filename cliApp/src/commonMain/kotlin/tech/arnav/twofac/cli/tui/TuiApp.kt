@@ -5,6 +5,8 @@ import com.github.ajalt.mordant.terminal.prompt
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import tech.arnav.twofac.cli.storage.CliConfig
+import tech.arnav.twofac.cli.storage.CliConfigStore
 import tech.arnav.twofac.lib.TwoFacLib
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -38,6 +40,7 @@ class TuiApp(
         val initialState = TuiAppState(
             nowEpochSeconds = Clock.System.now().epochSeconds,
             home = HomeScreenState(accounts = initialAccounts),
+            settings = SettingsScreenState(backend = CliConfigStore.read().storageBackend),
         )
 
         runCatching {
@@ -62,6 +65,14 @@ class TuiApp(
     private fun applyAction(state: TuiAppState, action: TuiAction): TuiAppState {
         return when (action) {
             TuiAction.ConfirmRemoveSelectedAccount -> removeSelectedAccount(state)
+            TuiAction.CycleStorageBackend -> {
+                val nextState = navigator.reduce(state, action)
+                if (!CliConfigStore.write(CliConfig(storageBackend = nextState.settings.backend))) {
+                    nextState.copy(message = "Failed to persist storage backend setting")
+                } else {
+                    nextState
+                }
+            }
             else -> navigator.reduce(state, action)
         }
     }

@@ -9,7 +9,7 @@ progress:
   - "[x] Phase 4 - Implement HomeScreen (live OTP list + filters + countdown)"
   - "[x] Phase 5 - Implement AccountScreen (details + add/remove flows)"
   - "[x] Phase 6 - Implement SettingsScreen (storage backend + backup provider surfaces)"
-  - "[ ] Phase 7 - Wire storage/backup subcommands under storage namespace"
+  - "[x] Phase 7 - Wire storage/backup subcommands under storage namespace"
   - "[ ] Phase 8 - Add tests for parsing, mode detection, and TUI state reducers"
   - "[ ] Phase 9 - Rollout, docs, and compatibility/deprecation messaging"
 ---
@@ -284,7 +284,7 @@ Also include:
 - [x] Info, backend setting, backup provider surface.
 
 ## Phase 7 - Storage/backup integration
-- Wire concrete command/service behavior to same backend as TUI.
+- [x] Wire concrete command/service behavior to same backend as TUI.
 
 ## Phase 8 - Tests and stabilization
 - Parser, state, behavior tests; manual cross-platform checks.
