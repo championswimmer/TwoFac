@@ -46,6 +46,7 @@ class TuiApp(
             settings = SettingsScreenState(backend = CliConfigStore.read().storageBackend),
         )
 
+        terminal.println()
         runCatching {
             renderLoop.run(
                 initialState = initialState,
