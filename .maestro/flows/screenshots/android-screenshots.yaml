@@ -1,0 +1,36 @@
+appId: tech.arnav.twofac
+---
+# Launch the app fresh (clear all state)
+- launchApp:
+    clearState: true
+
+# Step 1: Lock screen — capture before entering passkey
+- assertVisible: "Enter Passkey"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/android-01-lock-screen
+
+# Step 2: Enter passkey 123456 and unlock
+- tapOn: "Passkey"
+- inputText: "123456"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/android-02-passkey-entered
+- tapOn: "Unlock"
+
+# Step 3: Home screen
+- assertVisible: "Home"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/android-03-home-screen
+
+# Step 4a: Accounts screen
+- tapOn: "Accounts"
+- assertVisible: "Accounts"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/android-04-accounts-screen
+
+# Step 4b: Settings screen
+- tapOn: "Settings"
+- assertVisible: "Settings"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/android-05-settings-screen
+
+# Step 5: Add Account screen (navigate via Accounts tab FAB)
+- tapOn: "Accounts"
+- assertVisible: "Accounts"
+- tapOn: "Add Account"
+- assertVisible: "Add Account"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/android-06-add-account-screen

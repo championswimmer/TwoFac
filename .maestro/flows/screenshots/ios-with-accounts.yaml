@@ -1,0 +1,86 @@
+appId: tech.arnav.twofac.app
+---
+# Launch fresh
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# Dismiss any iOS system dialogs
+- runFlow:
+    when:
+      visible: "Not Now"
+    commands:
+      - tapOn: "Not Now"
+
+# Unlock with passkey 123456
+- assertVisible: "Enter Passkey"
+- tapOn: "Passkey"
+- inputText: "123456"
+- tapOn: "Unlock"
+- assertVisible: "Home"
+
+# ── Add account 1: GitHub ──────────────────────────────
+- tapOn: "Accounts"
+- tapOn: "Add Account"
+- assertVisible: "Add Account"
+- tapOn: "2FA URI"
+- inputText: "otpauth://totp/GitHub:user@example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub"
+- tapOn:
+    point: "50%,25%"  # Empty content area (non-interactive) to dismiss keyboard
+- tapOn:
+    text: "Add Account"
+    index: 1  # index 0 = title, index 1 = submit button
+- assertVisible: "Accounts"
+
+# ── Add account 2: Google ──────────────────────────────
+- tapOn: "Add Account"
+- assertVisible: "Add Account"
+- tapOn: "2FA URI"
+- inputText: "otpauth://totp/Google:test@gmail.com?secret=JBSWY3DPEHPK3PXP&issuer=Google"
+- tapOn:
+    point: "50%,25%"  # Dismiss keyboard
+- tapOn:
+    text: "Add Account"
+    index: 1
+- assertVisible: "Accounts"
+
+# ── Add account 3: Example ─────────────────────────────
+- tapOn: "Add Account"
+- assertVisible: "Add Account"
+- tapOn: "2FA URI"
+- inputText: "otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example"
+- tapOn:
+    point: "50%,25%"  # Dismiss keyboard
+- tapOn:
+    text: "Add Account"
+    index: 1
+- assertVisible: "Accounts"
+
+# ── Add account 4: Dropbox ─────────────────────────────
+- tapOn: "Add Account"
+- assertVisible: "Add Account"
+- tapOn: "2FA URI"
+- inputText: "otpauth://totp/Dropbox:bob@example.com?secret=GEZDGNBVGY3TQOJQ&issuer=Dropbox"
+- tapOn:
+    point: "50%,25%"  # Dismiss keyboard
+- tapOn:
+    text: "Add Account"
+    index: 1
+- assertVisible: "Accounts"
+
+# ── Screenshots with accounts ──────────────────────────
+
+# Home screen with OTP codes
+- tapOn: "Home"
+- assertVisible: "Home"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/ios-07-home-with-accounts
+
+# Accounts list
+- tapOn: "Accounts"
+- assertVisible: "Accounts"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/ios-08-accounts-list-with-accounts
+
+# Account detail page (tap the GitHub account)
+- tapOn: "user@example.com"
+- assertVisible: "Account Details"
+- takeScreenshot: /Users/championswimmer/Development/Personal/Kotlin/TwoFac/docs/screenshots/ios-09-account-detail
