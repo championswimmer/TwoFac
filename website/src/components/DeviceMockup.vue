@@ -34,7 +34,7 @@ const screenshotStyles = computed(() => {
 </script>
 
 <template>
-  <div class="relative inline-block w-full max-w-[280px] sm:max-w-[320px] leading-none">
+  <div class="relative inline-block leading-none">
     <!-- The device frame SVG overlay -->
     <img
       :src="frameSrc"

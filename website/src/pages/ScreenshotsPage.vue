@@ -73,7 +73,7 @@ const screenshots = {
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 justify-items-center">
           <div v-for="shot in screenshots[activeTab]" :key="shot.src" class="flex flex-col items-center">
-            <DeviceMockup :platform="activeTab" :screenshotSrc="shot.src" :altText="shot.title" />
+            <DeviceMockup :platform="activeTab" :screenshotSrc="shot.src" :altText="shot.title" class="w-64 sm:w-72" />
             <p class="mt-6 text-lg font-semibold text-secondary-900 dark:text-white">
               {{ shot.title }}
             </p>
