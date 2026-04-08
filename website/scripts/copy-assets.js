@@ -38,3 +38,22 @@ for (const { src, dest } of assets) {
   copied++
 }
 console.log(`copy-assets: copied ${copied}/${assets.length} logo asset(s) to public/`)
+
+// Copy screenshots
+const screenshotsDir = path.join(repoRoot, 'docs', 'screenshots')
+const destScreenshotsDir = path.join(publicDir, 'images', 'screenshots')
+
+if (fs.existsSync(screenshotsDir)) {
+  if (!fs.existsSync(destScreenshotsDir)) {
+    fs.mkdirSync(destScreenshotsDir, { recursive: true })
+  }
+  const files = fs.readdirSync(screenshotsDir)
+  let copiedScreenshots = 0
+  for (const file of files) {
+    if (file.endsWith('.png') || file.endsWith('.jpg')) {
+      fs.copyFileSync(path.join(screenshotsDir, file), path.join(destScreenshotsDir, file))
+      copiedScreenshots++
+    }
+  }
+  console.log(`copy-assets: copied ${copiedScreenshots} screenshot(s) to public/images/screenshots/`)
+}

@@ -3,6 +3,7 @@ import { RouterLink } from 'vue-router'
 
 const productLinks = [
   { name: 'Features', to: '/features' },
+  { name: 'Screenshots', to: '/screenshots' },
   { name: 'Download', to: '/download' },
   { name: 'Getting Started', to: '/getting-started' },
 ]

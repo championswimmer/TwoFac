@@ -27,6 +27,11 @@ const router = createRouter({
       component: () => import('../pages/GettingStartedPage.vue'),
     },
     {
+      path: '/screenshots',
+      name: 'screenshots',
+      component: () => import('../pages/ScreenshotsPage.vue'),
+    },
+    {
       path: '/faq',
       name: 'faq',
       component: () => import('../pages/FAQPage.vue'),

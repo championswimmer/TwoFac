@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import PlatformBadge from './PlatformBadge.vue'
+import DeviceMockup from './DeviceMockup.vue'
 
 const platforms = [
   { name: 'Android', icon: 'fa-brands fa-android' },
@@ -65,6 +66,16 @@ const platforms = [
             :name="platform.name"
             :icon="platform.icon"
           />
+        </div>
+        
+        <!-- Screenshots Showcase -->
+        <div class="mt-16 sm:mt-24 relative max-w-4xl mx-auto flex justify-center pb-8 pt-8">
+          <div class="relative z-10 -mr-12 sm:-mr-20 transform hover:scale-105 transition-transform duration-500">
+            <DeviceMockup platform="ios" screenshotSrc="/images/screenshots/ios-03-home-screen.png" altText="TwoFac iOS Home Screen" class="w-48 sm:w-64" />
+          </div>
+          <div class="relative z-20 mt-12 sm:mt-16 transform hover:scale-105 transition-transform duration-500 shadow-2xl rounded-3xl">
+            <DeviceMockup platform="android" screenshotSrc="/images/screenshots/android-03-home-screen.png" altText="TwoFac Android Home Screen" class="w-56 sm:w-72" />
+          </div>
         </div>
       </div>
     </div>
