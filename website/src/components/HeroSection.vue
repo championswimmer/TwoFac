@@ -70,13 +70,22 @@ const platforms = [
       </div>
         
       <!-- Screenshots Showcase -->
-      <div class="mt-16 sm:mt-24 lg:mt-0 relative w-full max-w-2xl mx-auto flex justify-center pb-8 pt-8 lg:flex-1 lg:max-w-none [perspective:1000px]">
-        <div class="relative z-10 -mr-12 sm:-mr-20 lg:-mr-24 transform transition-transform duration-500 hover:scale-105 [transform:rotateY(-15deg)_rotateX(5deg)_translateZ(-40px)]">
-          <DeviceMockup platform="ios" screenshotSrc="/images/screenshots/ios-07-home-with-accounts.png" altText="TwoFac iOS Home Screen" class="w-48 sm:w-64 lg:w-72" />
+      <div class="mt-16 sm:mt-24 lg:mt-0 relative w-full max-w-2xl mx-auto flex justify-center pb-8 pt-8 lg:flex-1 lg:max-w-none" style="perspective: 1200px;">
+        
+        <!-- iOS Device -->
+        <div class="relative z-10 -mr-12 sm:-mr-20 lg:-mr-24" style="transform: rotateX(4deg) rotateY(-12deg) rotateZ(-4deg) translateZ(-30px); transform-style: preserve-3d;">
+          <div class="transform transition-transform duration-500 hover:scale-105">
+            <DeviceMockup platform="ios" screenshotSrc="/images/screenshots/ios-07-home-with-accounts.png" altText="TwoFac iOS Home Screen" class="w-48 sm:w-64 lg:w-72" />
+          </div>
         </div>
-        <div class="relative z-20 mt-12 sm:mt-16 lg:mt-20 transform transition-transform duration-500 hover:scale-105 shadow-2xl rounded-3xl [transform:rotateY(-15deg)_rotateX(5deg)_translateZ(40px)]">
-          <DeviceMockup platform="android" screenshotSrc="/images/screenshots/android-07-home-with-accounts.png" altText="TwoFac Android Home Screen" class="w-56 sm:w-72 lg:w-80" />
+
+        <!-- Android Device -->
+        <div class="relative z-20 mt-12 sm:mt-16 lg:mt-20 shadow-2xl rounded-3xl" style="transform: rotateX(6deg) rotateY(-8deg) rotateZ(2deg) translateZ(30px); transform-style: preserve-3d;">
+          <div class="transform transition-transform duration-500 hover:scale-105">
+            <DeviceMockup platform="android" screenshotSrc="/images/screenshots/android-07-home-with-accounts.png" altText="TwoFac Android Home Screen" class="w-56 sm:w-72 lg:w-80" />
+          </div>
         </div>
+
       </div>
     </div>
   </section>
