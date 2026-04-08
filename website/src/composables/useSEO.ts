@@ -15,6 +15,8 @@ export function useSEO(options: {
     ? (ogImage ?? DEFAULT_OG_IMAGE)
     : `${SITE_URL}${ogImage ?? DEFAULT_OG_IMAGE}`
 
+  const canonicalUrl = canonicalPath ? `${SITE_URL}${canonicalPath}` : undefined
+
   useHead({
     title: `${title} | TwoFac`,
     meta: [
@@ -23,10 +25,14 @@ export function useSEO(options: {
       { property: 'og:description', content: description },
       { property: 'og:image', content: resolvedImage },
       { property: 'og:type', content: 'website' },
+      ...(canonicalUrl ? [{ property: 'og:url', content: canonicalUrl }] : []),
       { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: `${title} | TwoFac` },
+      { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: resolvedImage },
     ],
-    link: canonicalPath
-      ? [{ rel: 'canonical', href: `${SITE_URL}${canonicalPath}` }]
+    link: canonicalUrl
+      ? [{ rel: 'canonical', href: canonicalUrl }]
       : [],
   })
 }

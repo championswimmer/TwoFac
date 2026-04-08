@@ -3,6 +3,7 @@ import MainLayout from '../layouts/MainLayout.vue'
 import HeroSection from '../components/HeroSection.vue'
 import FeatureCard from '../components/FeatureCard.vue'
 import PlatformBadge from '../components/PlatformBadge.vue'
+import WaitlistSection from '../components/WaitlistSection.vue'
 import { useSEO } from '../composables/useSEO'
 
 useSEO({
@@ -121,6 +122,9 @@ const platforms = [
         </div>
       </div>
     </section>
+
+    <!-- Waitlist Section -->
+    <WaitlistSection />
 
     <!-- CTA Section -->
     <section class="py-16 sm:py-24 border-y border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900">
