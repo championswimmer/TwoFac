@@ -70,7 +70,7 @@ const platforms = [
       </div>
         
       <!-- Screenshots Showcase -->
-      <div class="mt-16 sm:mt-24 lg:mt-0 relative w-full max-w-2xl mx-auto flex justify-center pb-8 pt-8 lg:flex-1 lg:max-w-none" style="perspective: 1200px;">
+      <div class="mt-16 sm:mt-24 lg:mt-0 relative w-full max-w-2xl mx-auto flex justify-center items-center pb-8 pt-8 lg:flex-1 lg:max-w-none" style="perspective: 1200px;">
         
         <!-- iOS Device -->
         <div class="relative z-10 -mr-12 sm:-mr-20 lg:-mr-24" style="transform: rotateX(4deg) rotateY(-12deg) rotateZ(-4deg) translateZ(-30px); transform-style: preserve-3d;">
@@ -83,6 +83,20 @@ const platforms = [
         <div class="relative z-20 mt-12 sm:mt-16 lg:mt-20" style="transform: rotateX(6deg) rotateY(-8deg) rotateZ(2deg) translateZ(30px); transform-style: preserve-3d;">
           <div class="transform transition-transform duration-500 hover:scale-105 drop-shadow-2xl">
             <DeviceMockup platform="android" screenshotSrc="/images/screenshots/android-07-home-with-accounts.png" altText="TwoFac Android Home Screen" class="w-56 sm:w-72 lg:w-80" />
+          </div>
+        </div>
+
+        <!-- watchOS Device (Center, Front, Lower) -->
+        <div class="absolute z-30" style="margin-right: 22%; margin-top: 55%; transform: rotateX(6deg) rotateY(-10deg) rotateZ(-2deg) translateZ(60px); transform-style: preserve-3d;">
+          <div class="transform transition-transform duration-500 hover:scale-105 drop-shadow-2xl">
+            <DeviceMockup platform="watchos" screenshotSrc="/images/screenshots/watchos-01-account.png" altText="TwoFac watchOS Account Screen" class="w-64 sm:w-72 lg:w-96" />
+          </div>
+        </div>
+
+        <!-- Wear OS Device (Right, Front, Lower) -->
+        <div class="absolute z-30" style="margin-left: 45%; margin-top: 55%; transform: rotateX(8deg) rotateY(-5deg) rotateZ(15deg) translateZ(80px); transform-style: preserve-3d;">
+          <div class="transform transition-transform duration-500 hover:scale-105 drop-shadow-2xl">
+            <DeviceMockup platform="wearos" screenshotSrc="/images/screenshots/wearos-01-account.png" altText="TwoFac Wear OS Account Screen" class="w-64 sm:w-72 lg:w-96" />
           </div>
         </div>
 
