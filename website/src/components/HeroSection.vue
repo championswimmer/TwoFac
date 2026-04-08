@@ -74,14 +74,14 @@ const platforms = [
         
         <!-- iOS Device -->
         <div class="relative z-10 -mr-12 sm:-mr-20 lg:-mr-24" style="transform: rotateX(4deg) rotateY(-12deg) rotateZ(-4deg) translateZ(-30px); transform-style: preserve-3d;">
-          <div class="transform transition-transform duration-500 hover:scale-105">
+          <div class="transform transition-transform duration-500 hover:scale-105 drop-shadow-2xl">
             <DeviceMockup platform="ios" screenshotSrc="/images/screenshots/ios-07-home-with-accounts.png" altText="TwoFac iOS Home Screen" class="w-48 sm:w-64 lg:w-72" />
           </div>
         </div>
 
         <!-- Android Device -->
-        <div class="relative z-20 mt-12 sm:mt-16 lg:mt-20 shadow-2xl rounded-3xl" style="transform: rotateX(6deg) rotateY(-8deg) rotateZ(2deg) translateZ(30px); transform-style: preserve-3d;">
-          <div class="transform transition-transform duration-500 hover:scale-105">
+        <div class="relative z-20 mt-12 sm:mt-16 lg:mt-20" style="transform: rotateX(6deg) rotateY(-8deg) rotateZ(2deg) translateZ(30px); transform-style: preserve-3d;">
+          <div class="transform transition-transform duration-500 hover:scale-105 drop-shadow-2xl">
             <DeviceMockup platform="android" screenshotSrc="/images/screenshots/android-07-home-with-accounts.png" altText="TwoFac Android Home Screen" class="w-56 sm:w-72 lg:w-80" />
           </div>
         </div>

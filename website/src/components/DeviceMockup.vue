@@ -20,7 +20,7 @@ const screenshotStyles = computed(() => {
       top: '1.53139%',
       width: '93.6%',
       height: '96.9372%',
-      borderRadius: '10.5%',
+      borderRadius: '11.11% / 5.13%',
     }
   }
   return {
@@ -28,24 +28,24 @@ const screenshotStyles = computed(() => {
     top: '1.5974%',
     width: '93.1034%',
     height: '96.8051%',
-    borderRadius: '7.5%',
+    borderRadius: '8.33% / 3.71%',
   }
 })
 </script>
 
 <template>
-  <div class="relative inline-block w-full max-w-[280px] sm:max-w-[320px]">
+  <div class="relative inline-block w-full max-w-[280px] sm:max-w-[320px] leading-none">
     <!-- The device frame SVG overlay -->
     <img
       :src="frameSrc"
-      class="pointer-events-none relative z-10 w-full h-auto drop-shadow-2xl"
+      class="pointer-events-none relative z-10 block w-full h-auto"
       aria-hidden="true"
     />
     <!-- The screenshot image -->
     <img
       :src="screenshotSrc"
       :alt="altText"
-      class="absolute z-0 object-cover object-top bg-secondary-100 dark:bg-secondary-900"
+      class="absolute z-0 block object-cover object-top bg-secondary-100 dark:bg-secondary-900"
       :style="screenshotStyles"
     />
   </div>
