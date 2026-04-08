@@ -16,7 +16,7 @@ const platforms = [
 
 <template>
   <section class="border-b border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900 overflow-hidden">
-    <div class="mx-auto max-w-7xl px-4 pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28 lg:flex lg:items-center lg:gap-12">
+    <div class="mx-auto max-w-7xl px-4 pt-4 pb-20 sm:pt-6 sm:pb-24 lg:pt-8 lg:pb-28 lg:flex lg:items-center lg:gap-12">
       <div class="mx-auto max-w-3xl text-center lg:text-left lg:flex-1 lg:max-w-none">
         <h1
           class="text-4xl font-extrabold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl lg:text-6xl"
@@ -80,7 +80,7 @@ const platforms = [
         </div>
 
         <!-- Android Device -->
-        <div class="relative z-20 mt-12 sm:mt-16 lg:mt-20" style="transform: rotateX(6deg) rotateY(-8deg) rotateZ(2deg) translateZ(30px); transform-style: preserve-3d;">
+        <div class="relative z-20 mt-8 sm:mt-12 lg:mt-16" style="transform: rotateX(6deg) rotateY(-8deg) rotateZ(2deg) translateZ(30px); transform-style: preserve-3d;">
           <div class="transform transition-transform duration-500 hover:scale-105 drop-shadow-2xl">
             <DeviceMockup platform="android" screenshotSrc="/images/screenshots/android-07-home-with-accounts.png" altText="TwoFac Android Home Screen" class="w-56 sm:w-72 lg:w-80" />
           </div>
