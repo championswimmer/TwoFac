@@ -16,7 +16,7 @@ const platforms = [
 
 <template>
   <section class="border-b border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900 overflow-hidden">
-    <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28 lg:flex lg:items-center lg:gap-12">
+    <div class="mx-auto max-w-7xl px-4 pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28 lg:flex lg:items-center lg:gap-12">
       <div class="mx-auto max-w-3xl text-center lg:text-left lg:flex-1 lg:max-w-none">
         <h1
           class="text-4xl font-extrabold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl lg:text-6xl"

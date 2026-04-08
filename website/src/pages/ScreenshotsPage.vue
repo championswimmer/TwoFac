@@ -10,7 +10,7 @@ useSEO({
   canonicalPath: '/screenshots',
 })
 
-const activeTab = ref<'ios' | 'android'>('ios')
+const activeTab = ref<'ios' | 'android' | 'watch'>('ios')
 
 const screenshots = {
   ios: [
@@ -34,6 +34,10 @@ const screenshots = {
     { src: '/images/screenshots/android-06-add-account-screen.png', title: 'Add Account' },
     { src: '/images/screenshots/android-09-account-detail.png', title: 'Account Detail' },
     { src: '/images/screenshots/android-05-settings-screen.png', title: 'Settings' },
+  ],
+  watch: [
+    { src: '/images/screenshots/watchos-01-account.png', title: 'Apple Watch', platform: 'watchos' },
+    { src: '/images/screenshots/wearos-01-account.png', title: 'Android Wear', platform: 'wearos' },
   ],
 }
 </script>
@@ -65,6 +69,13 @@ const screenshots = {
           >
             <i class="fa-brands fa-android mr-2" /> Android
           </button>
+          <button
+            class="px-6 py-2.5 rounded-full font-semibold transition-colors"
+            :class="activeTab === 'watch' ? 'bg-primary-600 text-white' : 'bg-secondary-200 dark:bg-secondary-800 text-secondary-800 dark:text-secondary-200 hover:bg-secondary-300 dark:hover:bg-secondary-700'"
+            @click="activeTab = 'watch'"
+          >
+            <i class="fa-solid fa-clock mr-2" /> Watch
+          </button>
         </div>
       </div>
     </section>
@@ -73,7 +84,7 @@ const screenshots = {
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 justify-items-center">
           <div v-for="shot in screenshots[activeTab]" :key="shot.src" class="flex flex-col items-center">
-            <DeviceMockup :platform="activeTab" :screenshotSrc="shot.src" :altText="shot.title" class="w-64 sm:w-72" />
+            <DeviceMockup :platform="shot.platform || activeTab" :screenshotSrc="shot.src" :altText="shot.title" class="w-64 sm:w-72" />
             <p class="mt-6 text-lg font-semibold text-secondary-900 dark:text-white">
               {{ shot.title }}
             </p>
