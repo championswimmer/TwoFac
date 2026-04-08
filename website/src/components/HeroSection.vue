@@ -15,9 +15,9 @@ const platforms = [
 </script>
 
 <template>
-  <section class="border-b border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900">
-    <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
-      <div class="mx-auto max-w-3xl text-center">
+  <section class="border-b border-secondary-200 bg-secondary-100 dark:border-secondary-800 dark:bg-secondary-900 overflow-hidden">
+    <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28 lg:flex lg:items-center lg:gap-12">
+      <div class="mx-auto max-w-3xl text-center lg:text-left lg:flex-1 lg:max-w-none">
         <h1
           class="text-4xl font-extrabold tracking-tight text-secondary-900 dark:text-secondary-50 sm:text-5xl lg:text-6xl"
         >
@@ -25,12 +25,12 @@ const platforms = [
           <span class="block text-primary-700 dark:text-primary-400">Your Control.</span>
         </h1>
 
-        <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-secondary-700 dark:text-secondary-300 sm:text-xl">
+        <p class="mx-auto lg:mx-0 mt-6 max-w-2xl text-lg leading-relaxed text-secondary-700 dark:text-secondary-300 sm:text-xl">
           Open source, cross-platform 2FA authenticator for Watch, Mobile, Desktop, Web, and CLI.
         </p>
 
         <!-- CTA buttons -->
-        <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <div class="mt-10 flex flex-col items-center lg:items-start justify-center lg:justify-start gap-4 sm:flex-row">
           <RouterLink
             to="/download"
             class="inline-flex items-center gap-2 rounded-lg border border-primary-700 bg-primary-700 px-8 py-3.5 text-base font-semibold text-secondary-50 transition-colors hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-secondary-100 dark:border-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500 dark:focus:ring-offset-secondary-900"
@@ -59,7 +59,7 @@ const platforms = [
         </div>
 
         <!-- Platform badges -->
-        <div class="mt-14 flex flex-wrap items-center justify-center gap-3">
+        <div class="mt-14 flex flex-wrap items-center justify-center lg:justify-start gap-3">
           <PlatformBadge
             v-for="platform in platforms"
             :key="platform.name"
@@ -67,15 +67,15 @@ const platforms = [
             :icon="platform.icon"
           />
         </div>
+      </div>
         
-        <!-- Screenshots Showcase -->
-        <div class="mt-16 sm:mt-24 relative max-w-4xl mx-auto flex justify-center pb-8 pt-8">
-          <div class="relative z-10 -mr-12 sm:-mr-20 transform hover:scale-105 transition-transform duration-500">
-            <DeviceMockup platform="ios" screenshotSrc="/images/screenshots/ios-03-home-screen.png" altText="TwoFac iOS Home Screen" class="w-48 sm:w-64" />
-          </div>
-          <div class="relative z-20 mt-12 sm:mt-16 transform hover:scale-105 transition-transform duration-500 shadow-2xl rounded-3xl">
-            <DeviceMockup platform="android" screenshotSrc="/images/screenshots/android-03-home-screen.png" altText="TwoFac Android Home Screen" class="w-56 sm:w-72" />
-          </div>
+      <!-- Screenshots Showcase -->
+      <div class="mt-16 sm:mt-24 lg:mt-0 relative w-full max-w-2xl mx-auto flex justify-center pb-8 pt-8 lg:flex-1 lg:max-w-none [perspective:1000px]">
+        <div class="relative z-10 -mr-12 sm:-mr-20 lg:-mr-24 transform transition-transform duration-500 hover:scale-105 [transform:rotateY(-15deg)_rotateX(5deg)_translateZ(-40px)]">
+          <DeviceMockup platform="ios" screenshotSrc="/images/screenshots/ios-07-home-with-accounts.png" altText="TwoFac iOS Home Screen" class="w-48 sm:w-64 lg:w-72" />
+        </div>
+        <div class="relative z-20 mt-12 sm:mt-16 lg:mt-20 transform transition-transform duration-500 hover:scale-105 shadow-2xl rounded-3xl [transform:rotateY(-15deg)_rotateX(5deg)_translateZ(40px)]">
+          <DeviceMockup platform="android" screenshotSrc="/images/screenshots/android-07-home-with-accounts.png" altText="TwoFac Android Home Screen" class="w-56 sm:w-72 lg:w-80" />
         </div>
       </div>
     </div>
