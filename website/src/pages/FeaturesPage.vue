@@ -115,10 +115,14 @@ const platforms = [
         <div
           class="mt-6 rounded-lg border border-secondary-300 bg-secondary-50 p-4 font-mono text-sm text-secondary-800 overflow-x-auto dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200"
         >
-          <p>$ twofac list</p>
-          <p>$ twofac code github</p>
-          <p>$ twofac add --issuer GitHub --account user@example.com</p>
-          <p>$ twofac backup export --encrypted</p>
+          <p>$ # Launch interactive TUI</p>
+          <p>$ twofac</p>
+          <p>$ # List all account codes with auto-refresh</p>
+          <p>$ twofac display</p>
+          <p>$ # Add account from URI</p>
+          <p>$ twofac accounts add "otpauth://totp/GitHub:user?secret=..."</p>
+          <p>$ # Create encrypted backup</p>
+          <p>$ twofac storage backup export --encrypted</p>
         </div>
       </section>
 
