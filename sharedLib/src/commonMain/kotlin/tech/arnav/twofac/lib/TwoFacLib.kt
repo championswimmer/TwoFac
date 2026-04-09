@@ -142,8 +142,9 @@ class TwoFacLib private constructor(
                 is TOTP -> {
                     currentCode = otpGen.generateOTP(timeNow)
                     nextCodeAt = otpGen.nextCodeAt(timeNow)
-                    nextCode = otpGen.generateOTP(nextCodeAt)
-
+                    if (nextOtpShownDuration > 0 && (nextCodeAt - timeNow) <= nextOtpShownDuration) {
+                        nextCode = otpGen.generateOTP(nextCodeAt)
+                    }
                 }
 
                 else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
