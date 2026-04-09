@@ -37,7 +37,7 @@ class HomeScreen : TuiScreen {
                 filteredAccounts.forEachIndexed { index, account ->
                     val isSelected = index == state.home.selectedIndex
                     val selectedMarker = if (isSelected) styles.key(">") else " "
-                    val otp = account.otp.chunked(3).joinToString(" ")
+                    val otp = account.otp.currentOTP.chunked(3).joinToString(" ")
                     val ttl = if (account.nextCodeAt <= 0L) {
                         styles.label("--")
                     } else {
