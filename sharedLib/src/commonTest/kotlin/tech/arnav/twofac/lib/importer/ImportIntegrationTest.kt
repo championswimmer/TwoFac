@@ -8,7 +8,7 @@ import tech.arnav.twofac.lib.importer.adapters.TwoFasImportAdapter
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -146,11 +146,51 @@ class ImportIntegrationTest {
         assertTrue(importResult is ImportResult.Success, "Import should succeed")
 
         // Verify we can generate OTPs
-        val accountOTPs = lib.getAllAccountOTPs()
+        val accountOTPs = lib.getAllAccountOTPs(nextOtpShownDuration = -1)
         assertEquals(1, accountOTPs.size, "Should have 1 account with OTP")
 
         val (account, otp) = accountOTPs[0]
-        assertEquals(6, otp.length, "OTP should be 6 digits")
-        assertTrue(otp.all { it.isDigit() }, "OTP should contain only digits")
+        assertEquals(6, otp.currentOTP.length, "OTP should be 6 digits")
+        assertEquals(null, otp.nextOTP, "Next OTP should be null")
+        assertTrue(otp.currentOTP.all { it.isDigit() }, "OTP should contain only digits")
+        assertTrue(otp.nextOTP == null || otp.nextOTP.all { it.isDigit() }, "Next OTP should be null or contain only digits")
+
+    }
+
+    @Test
+    fun testNextOTPGeneration() = runTest {
+        val lib = TwoFacLib.initialise(MemoryStorage(), "test-password")
+        lib.unlock("test-password")
+
+        val twoFasExport = """
+        {
+          "services": [
+            {
+              "name": "TestService",
+              "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
+              "account": "test@example.com",
+              "digits": 6,
+              "period": 30
+            }
+          ]
+        }
+        """.trimIndent()
+        val adapter = TwoFasImportAdapter()
+        val importResult = lib.importAccounts(adapter, twoFasExport)
+
+        assertTrue(importResult is ImportResult.Success, "Import should succeed")
+
+        // Verify we can generate OTPs
+        val accountOTPs = lib.getAllAccountOTPs(nextOtpShownDuration = 20)
+        println(accountOTPs)
+        assertEquals(1, accountOTPs.size, "Should have 1 account with OTP")
+
+        val (account, otp) = accountOTPs[0]
+        assertEquals(6, otp.currentOTP.length, "OTP should be 6 digits")
+        assertNotNull( otp.nextOTP, "Next OTP should not be null")
+        assertTrue(otp.currentOTP.all { it.isDigit() }, "OTP should contain only digits")
+        assertTrue(otp.nextOTP.all { it.isDigit() }, "Next OTP should contain only digits")
+
+
     }
 }

@@ -7,6 +7,7 @@ import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
 import tech.arnav.twofac.lib.backup.EncryptedAccountEntry
 import tech.arnav.twofac.lib.otp.HOTP
+import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.lib.otp.TOTP
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import tech.arnav.twofac.lib.storage.Storage
@@ -102,7 +103,8 @@ class TwoFacLib private constructor(
     suspend fun getAllAccounts(): List<StoredAccount.DisplayAccount> {
         checkUnlockedOrThrow()
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
-        val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+        val accounts = accountList
+            ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
             val otp = account.toOTP(
                 cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
@@ -115,32 +117,46 @@ class TwoFacLib private constructor(
     }
 
     @OptIn(ExperimentalTime::class)
-    suspend fun getAllAccountOTPs(): List<Pair<StoredAccount.DisplayAccount, String>> {
+    suspend fun getAllAccountOTPs(
+        nextOtpShownDuration: Long = 10,
+    ): List<Pair<StoredAccount.DisplayAccount, OtpCodes>> {
         checkUnlockedOrThrow()
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
-        val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+        val accounts = accountList
+            ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
             val otpGen = account.toOTP(
                 cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
             )
             val timeNow = Clock.System.now().epochSeconds
-            val otpString: String = when (otpGen) {
-                is HOTP -> otpGen.generateOTP(otpGen.initialCounter)
-                is TOTP -> otpGen.generateOTP(timeNow)
+
+            val currentCode: String
+            var nextCode: String? = null
+            var nextCodeAt = 0L
+
+            when (otpGen) {
+                is HOTP -> {
+                    currentCode = otpGen.generateOTP(otpGen.initialCounter)
+                }
+
+                is TOTP -> {
+                    currentCode = otpGen.generateOTP(timeNow)
+                    nextCodeAt = otpGen.nextCodeAt(timeNow)
+                    nextCode = otpGen.generateOTP(nextCodeAt)
+
+                }
+
                 else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
             }
-            val nextCodeAt = when (otpGen) {
-                is HOTP -> 0L // HOTP does not have a next code time
-                is TOTP -> otpGen.nextCodeAt(timeNow)
-                else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
-            }
+
+
             return@map Pair(
                 account.forDisplay(
                     accountLabel = otpGen.accountName,
                     nextCodeAt = nextCodeAt,
                     issuer = otpGen.issuer,
                 ),
-                otpString,
+                OtpCodes(currentOTP = currentCode, nextOTP = nextCode),
             )
         }
     }
@@ -226,6 +242,7 @@ class TwoFacLib private constructor(
                     )
                 }
             }
+
             is ImportResult.Failure -> parseResult
         }
     }
@@ -240,7 +257,8 @@ class TwoFacLib private constructor(
     suspend fun exportAccountsPlaintext(): List<String> {
         checkUnlockedOrThrow()
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
-        val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+        val accounts = accountList
+            ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
             account.toDecryptedURI(
                 cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString())
@@ -253,7 +271,8 @@ class TwoFacLib private constructor(
      */
     suspend fun exportAccountsEncrypted(): List<StoredAccount> {
         checkUnlockedOrThrow()
-        return accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
+        return accountList
+            ?: error("Account list is not loaded. This should not happen when unlocked.")
     }
 
     private fun lockedStateMessage(): String =

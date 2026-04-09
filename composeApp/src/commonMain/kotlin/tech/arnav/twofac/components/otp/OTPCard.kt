@@ -1,11 +1,21 @@
 package tech.arnav.twofac.components.otp
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +57,7 @@ import kotlin.time.ExperimentalTime
 fun OTPCard(
     account: StoredAccount.DisplayAccount,
     otpCode: String,
+    nextOtp: String?,
     timeInterval: Long = 30L,
     onCopyOtp: (String) -> Unit = {},
     modifier: Modifier = Modifier
@@ -67,7 +79,10 @@ fun OTPCard(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = (timeInterval * 1000).toInt(), easing = LinearEasing),
+            animation = tween(
+                durationMillis = (timeInterval * 1000).toInt(),
+                easing = LinearEasing
+            ),
             repeatMode = RepeatMode.Restart
         ),
         label = "progress"
@@ -84,17 +99,32 @@ fun OTPCard(
         }
     }
 
+    val timeRemaining = timeInterval - (currentTime % timeInterval)
+    val timerState = timerStateByElapsedProgress(progress)
+    val extendedColors = TwoFacTheme.extendedColors
+    
+    val progressColor by animateColorAsState(
+        targetValue = when (timerState) {
+            TimerState.Healthy -> extendedColors.timerHealthy
+            TimerState.Warning -> extendedColors.timerWarning
+            TimerState.Critical -> extendedColors.timerCritical
+        },
+        animationSpec = tween(durationMillis = 500),
+        label = "progressColor"
+    )
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onCopyOtp(otpCode) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.large
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -102,7 +132,7 @@ fun OTPCard(
             ) {
                 IssuerBrandIcon(
                     issuer = account.issuer,
-                    size = 24.dp,
+                    size = 32.dp,
                     tint = MaterialTheme.colorScheme.primary,
                 )
 
@@ -111,54 +141,133 @@ fun OTPCard(
                 ) {
                     account.issuer?.takeIf { it.isNotBlank() }?.let { issuer ->
                         Text(
-                            text = issuer,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            text = issuer.uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            letterSpacing = 1.sp
                         )
                     }
                     Text(
                         text = account.accountLabel,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            // OTP Code
+            // OTP Code Area
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = formatOTPCode(otpCode),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Sync pulse for both current and next OTP
+                    val syncPulse by infiniteTransition.animateFloat(
+                        initialValue = 0.7f,
+                        targetValue = 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1200, easing = LinearEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "syncPulse"
+                    )
 
-                // Time remaining
-                val timeRemaining = timeInterval - (currentTime % timeInterval)
-                Text(
-                    text = stringResource(Res.string.otp_time_remaining, timeRemaining.toString()),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    // Progressive fade calculation
+                    // Current fades out slightly in the last 15% of the interval
+                    val currentFadeScale = (1f - (progress - 0.85f).coerceAtLeast(0f) * 2f).coerceIn(0.6f, 1f)
+                    // Next fades in progressively starting from 30% remaining time
+                    val nextFadeScale = ((progress - 0.7f) / 0.2f).coerceIn(0f, 1f)
+
+                    // Current OTP with Swap Animation
+                    AnimatedContent(
+                        targetState = otpCode,
+                        transitionSpec = {
+                            (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                                slideOutVertically { height -> -height } + fadeOut())
+                        },
+                        label = "otpAnimation"
+                    ) { targetCode ->
+                        Text(
+                            text = formatOTPCode(targetCode),
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 32.sp,
+                                letterSpacing = 2.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.graphicsLayer { 
+                                alpha = currentFadeScale * syncPulse 
+                            }
+                        )
+                    }
+
+                    // Next OTP hint (visible in last configured seconds)
+                    AnimatedVisibility(
+                        visible = nextOtp != null && timeRemaining in 1..10,
+                        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+                        exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
+                    ) {
+                        nextOtp?.let {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier
+                                    .padding(top = 2.dp)
+                                    .graphicsLayer { 
+                                        alpha = nextFadeScale * syncPulse 
+                                    }
+                            ) {
+                                Text(
+                                    text = "NEXT",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Black,
+                                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
+                                )
+                                Text(
+                                    text = formatOTPCode(it),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontFamily = FontFamily.Monospace,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Time remaining Countdown
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = timeRemaining.toString(),
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            fontFamily = FontFamily.Monospace
+                        ),
+                        color = progressColor
+                    )
+                    Text(
+                        text = "SEC",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    )
+                }
             }
 
             // Progress bar
-            val timerState = timerStateByElapsedProgress(progress)
-            val extendedColors = TwoFacTheme.extendedColors
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth(),
-                color = when (timerState) {
-                    TimerState.Healthy -> extendedColors.timerHealthy
-                    TimerState.Warning -> extendedColors.timerWarning
-                    TimerState.Critical -> extendedColors.timerCritical
-                },
+                color = progressColor,
                 trackColor = extendedColors.timerTrack ?: MaterialTheme.colorScheme.surfaceVariant
             )
         }
@@ -178,15 +287,16 @@ fun OTPCardPreview() {
                 issuer = "Google",
             ),
             otpCode = "123456",
+            nextOtp = "987654"
         )
     }
 }
 
 private fun formatOTPCode(code: String): String {
-    return if (code.length == 6) {
-        "${code.substring(0, 3)} ${code.substring(3)}"
-    } else {
-        code
+    return when (code.length) {
+        6 -> "${code.substring(0, 3)} ${code.substring(3)}"
+        8 -> "${code.substring(0, 4)} ${code.substring(4)}"
+        else -> code
     }
 }
 

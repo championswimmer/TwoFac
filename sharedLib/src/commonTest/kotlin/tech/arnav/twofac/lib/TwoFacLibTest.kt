@@ -1,11 +1,9 @@
 package tech.arnav.twofac.lib
 
 import kotlinx.coroutines.test.runTest
-import tech.arnav.twofac.lib.presentation.issuer.IssuerIconCatalog
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -186,8 +184,9 @@ class TwoFacLibTest {
         val ex = assertFailsWithSuspend<IllegalStateException> {
             lib.getAllAccounts()
         }
-        assertTrue(
-            ex.message?.contains("Secrets store is locked. Enter password to unlock it.") == true
+        assertEquals(
+            ex.message?.contains("Secrets store is locked. Enter password to unlock it."),
+            true
         )
 
         // Now we know it has accounts

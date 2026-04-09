@@ -11,6 +11,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.ClipboardQRCodeReader
@@ -31,8 +32,8 @@ class AccountsViewModel(
     private val _accounts = MutableStateFlow<List<StoredAccount.DisplayAccount>>(emptyList())
     val accounts: StateFlow<List<StoredAccount.DisplayAccount>> = _accounts.asStateFlow()
 
-    private val _accountOtps = MutableStateFlow<List<Pair<StoredAccount.DisplayAccount, String>>>(emptyList())
-    val accountOtps: StateFlow<List<Pair<StoredAccount.DisplayAccount, String>>> = _accountOtps.asStateFlow()
+    private val _accountOtps = MutableStateFlow<List<Pair<StoredAccount.DisplayAccount, OtpCodes>>>(emptyList())
+    val accountOtps: StateFlow<List<Pair<StoredAccount.DisplayAccount, OtpCodes>>> = _accountOtps.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -185,7 +186,7 @@ class AccountsViewModel(
         }
     }
 
-    fun getOtpForAccount(accountId: String): String? {
+    fun getOtpForAccount(accountId: String): OtpCodes? {
         if (!twoFacLibUnlocked) {
             _error.value = "Accounts are not loaded. Please unlock accounts first"
             return null
@@ -193,7 +194,7 @@ class AccountsViewModel(
         return _accountOtps.value.find { it.first.accountID == accountId }?.second
     }
 
-    suspend fun getFreshOtpForAccount(accountId: String): String? {
+    suspend fun getFreshOtpForAccount(accountId: String): OtpCodes? {
         if (!twoFacLibUnlocked) {
             _error.value = "Accounts are not loaded. Please unlock accounts first"
             return null
