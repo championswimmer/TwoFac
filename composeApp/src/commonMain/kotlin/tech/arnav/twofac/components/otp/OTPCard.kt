@@ -196,7 +196,6 @@ fun OTPCard(
                     }
 
                     // Next OTP hint (visible in last configured seconds)
-                    
                     Column(modifier = Modifier.height(32.dp)) {
                         AnimatedVisibility(
                             visible = nextOtp != null && timeRemaining in 1..elapsedDuration,
