@@ -181,7 +181,7 @@ class ImportIntegrationTest {
         assertTrue(importResult is ImportResult.Success, "Import should succeed")
 
         // Verify we can generate OTPs
-        val accountOTPs = lib.getAllAccountOTPs(nextOtpShownDuration = 20)
+        val accountOTPs = lib.getAllAccountOTPs(nextOtpShownDuration = 60)
         println(accountOTPs)
         assertEquals(1, accountOTPs.size, "Should have 1 account with OTP")
 
