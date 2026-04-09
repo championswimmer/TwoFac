@@ -36,6 +36,8 @@ Watch OS is explicitly out of scope: it recovers via companion phone sync, not b
 | Android | `androidApp/src/main/assets/google-cloud-credentials.json` | `1015542852833-8l3u5il0o35qhb5noc3281uppqjpq00l` |
 | Desktop | `composeApp/src/desktopMain/google-cloud-credentials.json` | `1015542852833-jglc153im0j68gptkdlai0dkf1ri458q` |
 | iOS     | `iosApp/google-cloud-credentials.plist`                    | `1015542852833-fdda6v6e4v5mmif8s7npk9p66413c58r` |
+| Web/Wasm | `composeApp/src/webMain/resources/google-cloud-credentials.json` | `1015542852833-860bnc30lappoict61lbtv3m9p17glrt` |
+| CLI     | `cliApp/src/commonMain/resources/google-cloud-credentials.json` | `1015542852833-v2l5pbv85aus436ccv73q27ploaqo78c` |
 
 All share GCP project `twofac-490000`.
 
@@ -51,17 +53,11 @@ However, deep research into the Google Drive API documentation confirms that **t
 
 ### Action items for credentials
 
-1. 🧑 **HUMAN — GCP Console**: Ensure all platform-specific client IDs exist under the same `twofac-490000` GCP Project.
-   - Keep the existing Android client (`...8l3...`).
-   - Keep the existing Desktop client (`...jgl...`).
-   - Keep the existing iOS client (`...fdda...`).
-   - Enable the Device Authorization Grant on the Desktop/CLI client if you want CLI support.
-
-2. 🧑 **HUMAN — GCP Console**: Create a separate **Web application** type OAuth client under the same project `twofac-490000`, with the PWA's origin(s) set as authorized JavaScript origins (e.g. `https://twofac.app`). Note down the resulting web `client_id`.
-
-3. 🤖 **AGENT**: Add the web `client_id` to the appropriate Wasm/web config location (e.g. a new `composeApp/src/wasmJsMain/google-cloud-credentials.json` or hardcoded constant in the TypeScript bridge).
-
-4. 🤖 **AGENT**: Document the client IDs and the cross-platform sharing capabilities in `AGENTS.md`.
+1. ✅ **DONE**: All platform-specific client IDs exist under the same `twofac-490000` GCP Project (Android, iOS, Desktop, Web, CLI).
+2. ✅ **DONE**: Web application type OAuth client is created and its credentials exist at `composeApp/src/webMain/resources/google-cloud-credentials.json`.
+3. ✅ **DONE**: CLI native application OAuth client is created and its credentials exist at `cliApp/src/commonMain/resources/google-cloud-credentials.json`.
+4. 🤖 **AGENT**: Verify the Device Authorization Grant is enabled on the CLI client (by testing the flow). If not, inform the human to enable it in the GCP Console.
+5. 🤖 **AGENT**: Document the client IDs and the cross-platform sharing capabilities in `AGENTS.md`.
 
 ---
 
@@ -121,9 +117,9 @@ No Google Drive credentials or implementation exist for the web target.
 
 **Required work:**
 
-1. 🧑 **HUMAN — GCP Console**: Create a **Web application** type OAuth client under project `twofac-490000`. Set the PWA's origin(s) as authorized JavaScript origins (e.g. `https://twofac.app`). Note down the resulting `client_id`.
+1. ✅ **DONE**: Web application type OAuth client is created. Credentials are in `composeApp/src/webMain/resources/google-cloud-credentials.json`.
 
-2. 🤖 **AGENT**: Add the web `client_id` to a new TypeScript config or constant file in `composeApp/src/wasmJsMain/typescript/src/`.
+2. 🤖 **AGENT**: Read the web `client_id` from `composeApp/src/webMain/resources/google-cloud-credentials.json` during the web build process and expose it to the application (e.g. generate a TypeScript config or copy it).
 
 3. 🤖 **AGENT**: Implement a `google-auth.mts` TypeScript bridge that loads the Google Identity Services (GIS) library and exposes `requestDriveToken(): Promise<string>` via a `@JsModule` interop — same pattern as `backup.mts`, `crypto.mts`, etc.
 
@@ -143,9 +139,11 @@ The CLI is a native binary (Kotlin/Native, no GMS, no browser API).
 
 **Required work:**
 
-1. 🧑 **HUMAN — GCP Console**: Confirm the Device Authorization Grant is enabled on the Desktop installed-app OAuth client (or whichever client is designated for CLI). In the GCP Console → OAuth client → edit → check "Enable Device Authorization Grant" (this is separate from the regular authorization code flow).
+1. ✅ **DONE**: CLI native application OAuth client is created. Credentials are in `cliApp/src/commonMain/resources/google-cloud-credentials.json`.
 
-2. 🤖 **AGENT**: Implement the Device Authorization Grant polling flow in `cliApp/src/commonMain/`:
+2. 🤖 **AGENT**: Verify if the Device Authorization Grant is enabled on the CLI OAuth client by making a request to the device code endpoint. If not, inform the human to enable it in the GCP Console.
+
+3. 🤖 **AGENT**: Implement the Device Authorization Grant polling flow in `cliApp/src/commonMain/`:
    - POST to `https://oauth2.googleapis.com/device/code` → receive `device_code` + `user_code` + `verification_url`.
    - Print to terminal: `Open https://google.com/device and enter code XXXX-XXXX`
    - Poll `https://oauth2.googleapis.com/token` until the user approves or timeout.
@@ -215,10 +213,9 @@ Before implementing any new Google Drive transports, the following must be resol
 
 ### Must-do before any cross-platform Drive work
 
-- 🧑 **HUMAN — GCP Console**: Ensure all platform-specific client IDs exist under the same `twofac-490000` GCP Project.
-- 🧑 **HUMAN — GCP Console**: Enable Device Authorization Grant on the Desktop/CLI client (needed for CLI).
-- 🧑 **HUMAN — GCP Console**: Create the Web application OAuth client for Web/Wasm.
+- ✅ **DONE**: All platform-specific client IDs exist under the same `twofac-490000` GCP Project (Android, iOS, Desktop, Web, CLI).
 - 🤖 **AGENT**: Extract shared `GoogleDriveRestClient` into `composeApp/src/commonMain/` (do this first, before any per-platform work).
+- 🤖 **AGENT**: Test if Device Authorization Grant is enabled for CLI, if not ask human to enable it.
 
 ### Must-do per platform (in recommended order)
 
