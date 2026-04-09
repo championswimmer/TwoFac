@@ -12,7 +12,13 @@ useSEO({
 
 const activeTab = ref<'ios' | 'android' | 'watch'>('ios')
 
-const screenshots = {
+interface Screenshot {
+  src: string
+  title: string
+  platform?: 'ios' | 'android' | 'watchos' | 'wearos'
+}
+
+const screenshots: Record<'ios' | 'android' | 'watch', Screenshot[]> = {
   ios: [
     { src: '/images/screenshots/ios-01-lock-screen.png', title: 'Lock Screen' },
     { src: '/images/screenshots/ios-02-passkey-entered.png', title: 'Passkey Auth' },
@@ -84,7 +90,7 @@ const screenshots = {
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 justify-items-center">
           <div v-for="shot in screenshots[activeTab]" :key="shot.src" class="flex flex-col items-center">
-            <DeviceMockup :platform="shot.platform || activeTab" :screenshotSrc="shot.src" :altText="shot.title" class="w-64 sm:w-72" />
+            <DeviceMockup :platform="(shot.platform || (activeTab === 'watch' ? 'watchos' : activeTab)) as any" :screenshotSrc="shot.src" :altText="shot.title" class="w-64 sm:w-72" />
             <p class="mt-6 text-lg font-semibold text-secondary-900 dark:text-white">
               {{ shot.title }}
             </p>
