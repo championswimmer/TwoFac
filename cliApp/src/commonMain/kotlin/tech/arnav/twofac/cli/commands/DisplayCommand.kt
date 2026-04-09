@@ -18,6 +18,7 @@ import org.koin.core.component.inject
 import tech.arnav.twofac.cli.theme.CliTheme
 import tech.arnav.twofac.cli.theme.CliThemeStyles
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.lib.theme.timerStateByRemainingProgress
 import kotlin.time.Clock
@@ -25,7 +26,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-typealias DisplayAccountsStatic = List<Pair<StoredAccount.DisplayAccount, String>>
+typealias DisplayAccountsStatic = List<Pair<StoredAccount.DisplayAccount, OtpCodes>>
 
 class DisplayCommand : CliktCommand(), KoinComponent {
     override fun help(context: Context): String {
@@ -92,7 +93,7 @@ class DisplayCommand : CliktCommand(), KoinComponent {
                 val timerStyle = styles.timer(timerStateByRemainingProgress(remainingProgress))
                 row {
                     cell(account.accountLabel)
-                    cell(otp.split("").joinToString(" "))
+                    cell(otp.currentOTP.split("").joinToString(" "))
                     cell(
                         ProgressBar(
                             total = 30L,

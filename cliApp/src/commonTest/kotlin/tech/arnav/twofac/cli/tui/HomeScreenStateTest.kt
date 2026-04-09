@@ -1,14 +1,15 @@
 package tech.arnav.twofac.cli.tui
 
+import tech.arnav.twofac.lib.otp.OtpCodes
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class HomeScreenStateTest {
 
     private val accounts = listOf(
-        TuiOtpEntry("1", "alice@example.com", "GitHub", "123456", 30),
-        TuiOtpEntry("2", "bob@example.com", "Google", "654321", 30),
-        TuiOtpEntry("3", "team@example.com", "GitLab", "111111", 30),
+        TuiOtpEntry("1", "alice@example.com", "GitHub", OtpCodes("123456"), 30),
+        TuiOtpEntry("2", "bob@example.com", "Google", OtpCodes("654321"), 30),
+        TuiOtpEntry("3", "team@example.com", "GitLab", OtpCodes("111111"), 30),
     )
 
     private val navigator = TuiNavigator()

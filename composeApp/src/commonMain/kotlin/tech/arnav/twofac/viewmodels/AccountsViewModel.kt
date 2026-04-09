@@ -257,8 +257,11 @@ class AccountsViewModel(
                     .filter { it > 0L }
                     .minOrNull()
 
-                if (nextTotpCodeAt != null && nowEpochSeconds >= nextTotpCodeAt) {
-                    refreshOtpsInternal()
+                if (nextTotpCodeAt != null) {
+                    val timeToNext = nextTotpCodeAt - nowEpochSeconds
+                    if (timeToNext <= 0 || (timeToNext <= 10 && _accountOtps.value.any { it.second.nextOTP == null })) {
+                        refreshOtpsInternal()
+                    }
                 }
 
                 delay(1000)

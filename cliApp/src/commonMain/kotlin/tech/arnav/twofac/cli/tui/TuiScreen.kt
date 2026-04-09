@@ -4,6 +4,7 @@ import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.rendering.Widget
 import tech.arnav.twofac.cli.storage.CliStorageBackend
 import tech.arnav.twofac.cli.theme.CliThemeStyles
+import tech.arnav.twofac.lib.otp.OtpCodes
 
 enum class TuiScreenId {
     HOME,
@@ -21,7 +22,7 @@ data class TuiOtpEntry(
     val accountId: String,
     val accountLabel: String,
     val issuer: String?,
-    val otp: String,
+    val otp: OtpCodes,
     val nextCodeAt: Long,
 )
 

@@ -26,7 +26,7 @@ class AccountScreen : TuiScreen {
             row(styles.label("issuer"), selectedAccount?.issuer ?: "-")
             row(
                 styles.label("otp"),
-                styles.otp(selectedAccount?.otp?.chunked(3)?.joinToString(" ") ?: "-"),
+                styles.otp(selectedAccount?.otp?.currentOTP?.chunked(3)?.joinToString(" ") ?: "-"),
             )
         }
 
