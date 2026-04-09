@@ -20,6 +20,8 @@ const STATIC_ROUTES = [
   ['/screenshots',                       'monthly', '0.7'],
   ['/faq',                               'monthly', '0.7'],
   ['/blog',                              'weekly',  '0.8'],
+  ['/privacy',                           'monthly', '0.5'],
+  ['/terms',                             'monthly', '0.5'],
   ['/compare/google-authenticator',      'monthly', '0.7'],
   ['/compare/microsoft-authenticator',   'monthly', '0.7'],
   ['/compare/ente-auth',                 'monthly', '0.7'],
