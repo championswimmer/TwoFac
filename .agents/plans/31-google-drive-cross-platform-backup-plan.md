@@ -41,64 +41,39 @@ All share GCP project `twofac-490000`.
 
 ---
 
-## 🚨 Critical Blocker: appDataFolder is scoped per OAuth client_id, NOT per GCP project
+## ✅ Good News: appDataFolder is scoped per GCP Project
 
-This is the most important finding. Google Drive's `appDataFolder` is **isolated per OAuth client ID**.
-A file uploaded by the Android client (`...8l3...`) is invisible to the Desktop client (`...jgl...`), and vice versa — even though they belong to the same GCP project.
+Initial research suggested that Google Drive's `appDataFolder` might be isolated per OAuth Client ID, which would have forced us to use a single shared Client ID across all platforms.
 
-**Consequence**: If we deploy Google Drive backup on Desktop and iOS using their current separate client IDs, users will not be able to restore on a different platform. Each platform will see only its own backups in Drive — defeating the purpose entirely.
+However, deep research into the Google Drive API documentation confirms that **the `appDataFolder` is shared across all OAuth clients as long as they belong to the same Google Cloud Project ID.**
 
-### Resolution: Use a single shared OAuth client ID across all platforms
+**Consequence**: We **can and must** use separate OAuth client IDs for iOS, Android, Desktop, and Web (as required by Google's OAuth policies for native apps/origins), while still being able to seamlessly read and write to the exact same `appDataFolder` for a given user.
 
-All platforms that use `appDataFolder` must authenticate using the **same OAuth client ID**. There are two approaches:
+### Action items for credentials
 
-#### Option A — Adopt a single "Desktop/installed app" client for all non-web platforms ✅ (Recommended)
-- Create (or designate an existing) "Desktop App" type OAuth client in GCP console.
-- Use this single client ID in `google-cloud-credentials.json` / `.plist` for Android, Desktop, iOS, and CLI.
-- Android's `GoogleDriveAppDataBackupTransport` uses standard REST + access token — it is not tied to a specific client type.
-- All platforms share one `appDataFolder` and see each other's backups.
-- The client_secret in installed-app credentials is not truly secret per RFC 6749 §2.1 (public clients); this is accepted practice for open-source native apps.
+1. 🧑 **HUMAN — GCP Console**: Ensure all platform-specific client IDs exist under the same `twofac-490000` GCP Project.
+   - Keep the existing Android client (`...8l3...`).
+   - Keep the existing Desktop client (`...jgl...`).
+   - Keep the existing iOS client (`...fdda...`).
+   - Enable the Device Authorization Grant on the Desktop/CLI client if you want CLI support.
 
-#### Option B — Use `drive.file` scope with a named shared folder
-- Switch from the hidden `appDataFolder` to a user-visible Drive folder named e.g. `TwoFac Backups`.
-- Use `https://www.googleapis.com/auth/drive.file` scope.
-- Any client ID can create/read files visible to any other client ID that the user grants.
-- Downside: Backups are user-visible/editable and can be accidentally deleted. Requires user consent for a broader scope. Not recommended unless `appDataFolder` cross-platform isolation is unfixable.
+2. 🧑 **HUMAN — GCP Console**: Create a separate **Web application** type OAuth client under the same project `twofac-490000`, with the PWA's origin(s) set as authorized JavaScript origins (e.g. `https://twofac.app`). Note down the resulting web `client_id`.
 
-**Decision: Pursue Option A.** Consolidate to one shared "installed app" OAuth client ID across all native platforms. Create a separate "Web application" client for the Web/Wasm PWA target (required by Google for browser-based OAuth).
+3. 🤖 **AGENT**: Add the web `client_id` to the appropriate Wasm/web config location (e.g. a new `composeApp/src/wasmJsMain/google-cloud-credentials.json` or hardcoded constant in the TypeScript bridge).
 
-### Action items for credential consolidation
-
-1. 🧑 **HUMAN — GCP Console**: Decide which client ID becomes canonical.
-   - Check whether the Android client (`...8l3...`) has real production users with backups stored under it. If yes, it **must** become the canonical client (to avoid stranding their data).
-   - If no real production data yet, create a new "Desktop app" type OAuth client in [GCP Console → APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials) under project `twofac-490000`.
-   - Enable the Device Authorization Grant on this client if you want CLI support (check "Enable Device Authorization Grant" in the OAuth client settings).
-
-2. 🤖 **AGENT**: Update all credential files once the human provides the canonical `client_id` and optional `client_secret`:
-   - `androidApp/src/main/assets/google-cloud-credentials.json`
-   - `composeApp/src/desktopMain/google-cloud-credentials.json`
-   - `iosApp/google-cloud-credentials.plist`
-
-3. 🧑 **HUMAN — GCP Console**: Create a separate **Web application** type OAuth client under the same project, with the PWA's origin(s) set as authorized JavaScript origins (e.g. `https://twofac.app`). Note down the resulting web `client_id`.
-
-4. 🤖 **AGENT**: Add the web `client_id` to the appropriate Wasm/web config location (e.g. a new `composeApp/src/wasmJsMain/google-cloud-credentials.json` or hardcoded constant in the TypeScript bridge).
-
-5. 🤖 **AGENT**: Document the canonical client IDs and the "one shared installed-app client" rule in `AGENTS.md`.
+4. 🤖 **AGENT**: Document the client IDs and the cross-platform sharing capabilities in `AGENTS.md`.
 
 ---
 
 ## Platform-by-platform implementation plan
 
-### Android — Already implemented ✅ (needs client ID check)
+### Android — Already implemented ✅
 
 - `GoogleDriveAppDataBackupTransport` in `composeApp/src/androidMain/` is production-ready.
 - Uses `https://www.googleapis.com/auth/drive.appdata` scope via Google Identity `AuthorizationClient`.
 - Auth is GMS-backed (activity-based OAuth consent).
 
-**Action needed:**
-
-- 🤖 **AGENT**: If client ID changes as part of consolidation, update `androidApp/src/main/assets/google-cloud-credentials.json`.
-- 🧑 **HUMAN**: Smoke-test on a real Android device to confirm existing Drive backups are still accessible after any client ID change.
+**Action needed:** None. The existing client ID works.
 
 ### iOS — Needs new Google Drive transport
 
@@ -112,7 +87,7 @@ Currently iOS only has `ICloudBackupTransport`. It has Google credentials in `io
 
 3. 🧑 **HUMAN — Xcode**: Add the `GoogleSignIn` Swift package (or `ASWebAuthenticationSession` entitlement) to `iosApp`. Add the `REVERSED_CLIENT_ID` URL scheme to `iosApp/Info.plist` so the OAuth redirect is captured by the app.
 
-4. 🤖 **AGENT**: Update `iosApp/google-cloud-credentials.plist` with the canonical shared client ID once decided.
+4. 🤖 **AGENT**: Confirm `iosApp/google-cloud-credentials.plist` has the correct iOS client ID.
 
 5. 🤖 **AGENT**: Register `GOOGLE_DRIVE_APPDATA` transport in `composeApp/src/iosMain/kotlin/tech/arnav/twofac/di/IosModules.kt`.
 
@@ -168,7 +143,7 @@ The CLI is a native binary (Kotlin/Native, no GMS, no browser API).
 
 **Required work:**
 
-1. 🧑 **HUMAN — GCP Console**: Confirm the Device Authorization Grant is enabled on the canonical installed-app OAuth client. In the GCP Console → OAuth client → edit → check "Enable Device Authorization Grant" (this is separate from the regular authorization code flow).
+1. 🧑 **HUMAN — GCP Console**: Confirm the Device Authorization Grant is enabled on the Desktop installed-app OAuth client (or whichever client is designated for CLI). In the GCP Console → OAuth client → edit → check "Enable Device Authorization Grant" (this is separate from the regular authorization code flow).
 
 2. 🤖 **AGENT**: Implement the Device Authorization Grant polling flow in `cliApp/src/commonMain/`:
    - POST to `https://oauth2.googleapis.com/device/code` → receive `device_code` + `user_code` + `verification_url`.
@@ -217,7 +192,7 @@ Current backup file names: `twofac-backup-{epochSeconds}-{suffix}.json`
 - iOS (iCloud): uses `fileName` directly as backup ID.
 - CLI: filters by `twofac-backup-` prefix and `.json` suffix.
 
-The naming is already consistent. If all platforms use the same `appDataFolder` (same OAuth client), they will all see and correctly parse each other's backup files. No format change needed.
+The naming is already consistent. Since all platforms share the same `appDataFolder` (under the same GCP Project), they will all see and correctly parse each other's backup files. No format change needed.
 
 ---
 
@@ -240,12 +215,10 @@ Before implementing any new Google Drive transports, the following must be resol
 
 ### Must-do before any cross-platform Drive work
 
-- 🧑 **HUMAN**: Verify or establish the **canonical shared OAuth client ID** (see "Action items for credential consolidation" above).
-- 🧑 **HUMAN**: Confirm whether existing Android production users have Drive backups stored under the current Android client ID (check Google Play Console / crash-free user metrics as proxy; or just ask yourself if the feature was ever shipped externally).
-- 🧑 **HUMAN — GCP Console**: Enable Device Authorization Grant on the canonical client (needed for CLI).
+- 🧑 **HUMAN — GCP Console**: Ensure all platform-specific client IDs exist under the same `twofac-490000` GCP Project.
+- 🧑 **HUMAN — GCP Console**: Enable Device Authorization Grant on the Desktop/CLI client (needed for CLI).
 - 🧑 **HUMAN — GCP Console**: Create the Web application OAuth client for Web/Wasm.
 - 🤖 **AGENT**: Extract shared `GoogleDriveRestClient` into `composeApp/src/commonMain/` (do this first, before any per-platform work).
-- 🤖 **AGENT**: Update all three credential files to the canonical client ID once the human confirms it.
 
 ### Must-do per platform (in recommended order)
 
@@ -259,9 +232,9 @@ Before implementing any new Google Drive transports, the following must be resol
 
 ### Nice-to-have (hardening)
 
-- 🤖 **AGENT**: Add integration test that verifies two platform configurations sharing the same client ID can both list each other's backup files.
+- 🤖 **AGENT**: Add integration test that verifies two platform configurations with different client IDs (but same project) can both list each other's backup files.
 - 🤖 **AGENT**: Ensure `BackupProviderCapabilityRules` in sharedLib correctly marks `gdrive-appdata` as available on each platform when registered.
-- 🤖 **AGENT**: Document the credential file locations and the "one shared installed-app client ID" invariant in `AGENTS.md`.
+- 🤖 **AGENT**: Document the credential file locations and the "cross-platform appDataFolder sharing" invariant in `AGENTS.md`.
 - 🤖 **AGENT**: Verify/update CSP headers for Web/Wasm build to allow `accounts.google.com` and `googleapis.com`.
 - 🤖 **AGENT**: Handle Drive quota errors (429) and partial failures gracefully in all transport implementations.
 - 🧑 **HUMAN**: Cross-platform smoke test: create a backup on Android, restore it on Desktop and vice versa.
@@ -274,4 +247,4 @@ This plan narrows down and expands Phase 3 of `13-backup-transports-rollout-plan
 
 - Phase 3, item 20 ("Build a shared Drive transport core") → addressed by the shared `GoogleDriveRestClient` refactor above.
 - Phase 3, item 23 ("Roll out by platform") → each platform is broken out in detail here.
-- The critical `appDataFolder`-per-client-ID isolation issue is **new and not addressed in plan 13** — it must be resolved before Phase 3 begins.
+- The initial concern about `appDataFolder`-per-client-ID isolation has been resolved via research, confirming that clients within the same GCP project share the `appDataFolder`. We can proceed safely.
