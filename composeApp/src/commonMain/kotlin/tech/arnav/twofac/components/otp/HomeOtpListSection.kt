@@ -14,13 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import tech.arnav.twofac.lib.otp.OtpCodes
 import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
 fun HomeOtpListSection(
-    accountsWithOtps: List<Pair<StoredAccount.DisplayAccount, String>>,
+    accountsWithOtps: List<Pair<StoredAccount.DisplayAccount, OtpCodes>>,
     listState: LazyListState,
     onCopyOtp: (String) -> Unit = {},
     heading: String = stringResource(Res.string.home_otp_heading),
@@ -44,7 +45,8 @@ fun HomeOtpListSection(
         items(accountsWithOtps, key = { (account, _) -> account.accountID }) { (account, otpCode) ->
             OTPCard(
                 account = account,
-                otpCode = otpCode,
+                otpCode = otpCode.currentOTP,
+                nextOtp = otpCode.nextOTP,
                 timeInterval = 30L,
                 onCopyOtp = onCopyOtp,
             )
@@ -68,14 +70,14 @@ private val previewAccountsWithOtps = listOf(
         accountID = "google",
         accountLabel = "arnav@gmail.com",
         issuer = "Google",
-    ) to "123456",
+    ) to OtpCodes(currentOTP = "123456"),
     StoredAccount.DisplayAccount(
         accountID = "github",
         accountLabel = "championswimmer",
         issuer = "GitHub",
-    ) to "654321",
+    ) to OtpCodes(currentOTP = "654321"),
     StoredAccount.DisplayAccount(
         accountID = "unknown",
         accountLabel = "team@example.com",
-    ) to "987654",
+    ) to OtpCodes(currentOTP = "987654", nextOTP = "0004568")
 )

@@ -48,6 +48,7 @@ import twofac.composeapp.generated.resources.action_delete
 import twofac.composeapp.generated.resources.action_cancel
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +59,7 @@ fun AccountDetailScreen(
     viewModel: AccountsViewModel = koinInject()
 ) {
     var passkeyText by remember { mutableStateOf("") }
-    var currentOtp by remember { mutableStateOf<String?>(null) }
+    var currentOtp by remember { mutableStateOf<OtpCodes?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var isDeleteInProgress by remember { mutableStateOf(false) }
 
@@ -128,7 +129,7 @@ fun AccountDetailScreen(
 
                 currentOtp?.let { otp ->
                     Text(
-                        text = stringResource(Res.string.account_detail_otp_display, otp),
+                        text = stringResource(Res.string.account_detail_otp_display, otp.currentOTP),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
