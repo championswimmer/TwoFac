@@ -18,9 +18,12 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -65,6 +68,8 @@ fun OTPCard(
     fun currentTimeMillis() = Clock.System.now().epochSeconds
     var currentTime by remember { mutableLongStateOf(currentTimeMillis()) }
 
+    var elapsedDuration by remember { mutableLongStateOf(10L) }
+
 
     // Calculate the starting progress and create a synchronized animation
     val startTime = remember { Clock.System.now().epochSeconds }
@@ -102,7 +107,7 @@ fun OTPCard(
     val timeRemaining = timeInterval - (currentTime % timeInterval)
     val timerState = timerStateByElapsedProgress(progress)
     val extendedColors = TwoFacTheme.extendedColors
-    
+
     val progressColor by animateColorAsState(
         targetValue = when (timerState) {
             TimerState.Healthy -> extendedColors.timerHealthy
@@ -164,26 +169,11 @@ fun OTPCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = 80.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    // Sync pulse for both current and next OTP
-                    val syncPulse by infiniteTransition.animateFloat(
-                        initialValue = 0.7f,
-                        targetValue = 1f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(1200, easing = LinearEasing),
-                            repeatMode = RepeatMode.Reverse
-                        ),
-                        label = "syncPulse"
-                    )
-
-                    // Progressive fade calculation
-                    // Current fades out slightly in the last 15% of the interval
-                    val currentFadeScale = (1f - (progress - 0.85f).coerceAtLeast(0f) * 2f).coerceIn(0.6f, 1f)
-                    // Next fades in progressively starting from 30% remaining time
-                    val nextFadeScale = ((progress - 0.7f) / 0.2f).coerceIn(0f, 1f)
-
                     // Current OTP with Swap Animation
                     AnimatedContent(
                         targetState = otpCode,
@@ -201,41 +191,37 @@ fun OTPCard(
                                 fontSize = 32.sp,
                                 letterSpacing = 2.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.graphicsLayer { 
-                                alpha = currentFadeScale * syncPulse 
-                            }
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
                     // Next OTP hint (visible in last configured seconds)
-                    AnimatedVisibility(
-                        visible = nextOtp != null && timeRemaining in 1..10,
-                        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
-                        exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
-                    ) {
-                        nextOtp?.let {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                modifier = Modifier
-                                    .padding(top = 2.dp)
-                                    .graphicsLayer { 
-                                        alpha = nextFadeScale * syncPulse 
-                                    }
-                            ) {
-                                Text(
-                                    text = "NEXT",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Black,
-                                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
-                                )
-                                Text(
-                                    text = formatOTPCode(it),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontFamily = FontFamily.Monospace,
-                                    color = MaterialTheme.colorScheme.outline
-                                )
+                    // Wrapped in a fixed-height Column to provide ColumnScope and keep card height constant
+                    Column(modifier = Modifier.height(32.dp)) {
+                        AnimatedVisibility(
+                            visible = nextOtp != null && timeRemaining in 1..elapsedDuration,
+                            enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+                            exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
+                        ) {
+                            nextOtp?.let {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                ) {
+                                    Text(
+                                        text = "NEXT",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Black,
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
+                                    )
+                                    Text(
+                                        text = formatOTPCode(it),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontFamily = FontFamily.Monospace,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.outline
+                                    )
+                                }
                             }
                         }
                     }
