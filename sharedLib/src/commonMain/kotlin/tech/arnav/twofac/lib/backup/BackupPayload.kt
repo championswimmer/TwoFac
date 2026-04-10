@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib.backup
 
 import kotlinx.serialization.Serializable
 import tech.arnav.twofac.lib.PublicApi
+import tech.arnav.twofac.lib.crypto.CryptoTools
 
 /**
  * Versioned payload format for TwoFac backups.
@@ -16,6 +17,7 @@ data class EncryptedAccountEntry(
     val accountLabel: String,
     val salt: String,
     val encryptedURI: String,
+    val iterations: Int = CryptoTools.LEGACY_HASH_ITERATIONS,
 )
 
 @PublicApi

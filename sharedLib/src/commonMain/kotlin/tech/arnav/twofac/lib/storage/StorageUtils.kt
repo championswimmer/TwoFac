@@ -18,7 +18,7 @@ object StorageUtils {
 
     private val cryptoTools = DefaultCryptoTools(CryptographyProvider.Default)
 
-    suspend fun OTP.toStoredAccount(signingKey: CryptoTools.SigningKey): StoredAccount {
+    suspend fun OTP.toStoredAccount(signingKey: CryptoTools.SigningKey, iterations: Int = CryptoTools.TARGET_HASH_ITERATIONS): StoredAccount {
         val accountID = Uuid.fromByteArray(signingKey.salt.toByteArray())
         val otpAuthUriByteString = OtpAuthURI.create(this).encodeToByteString()
 
@@ -27,7 +27,8 @@ object StorageUtils {
             accountID = accountID,
             accountLabel = "${issuer?.let { "$it:" } ?: ""}${accountName}",
             salt = signingKey.salt.toHexString(),
-            encryptedURI = encryptedURI.toHexString()
+            encryptedURI = encryptedURI.toHexString(),
+            iterations = iterations,
         )
     }
 
@@ -41,8 +42,8 @@ object StorageUtils {
         return decryptedURI.decodeToString()
     }
 
-    suspend fun decryptURI(encryptedURI: String, passKey: String, salt: String): String {
-        val signingKey = cryptoTools.createSigningKey(passKey, salt.toByteString())
+    suspend fun decryptURI(encryptedURI: String, passKey: String, salt: String, iterations: Int = CryptoTools.LEGACY_HASH_ITERATIONS): String {
+        val signingKey = cryptoTools.createSigningKey(passKey, salt.toByteString(), iterations)
         val decryptedURI = cryptoTools.decrypt(encryptedURI.toByteString(), signingKey.key)
         return decryptedURI.decodeToString()
     }

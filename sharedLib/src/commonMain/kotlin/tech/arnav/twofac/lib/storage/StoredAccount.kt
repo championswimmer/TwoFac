@@ -5,6 +5,7 @@ package tech.arnav.twofac.lib.storage
 import kotlinx.serialization.Serializable
 import tech.arnav.twofac.lib.PublicApi
 import kotlin.uuid.ExperimentalUuidApi
+import tech.arnav.twofac.lib.crypto.CryptoTools
 import kotlin.uuid.Uuid
 
 @PublicApi
@@ -14,6 +15,7 @@ data class StoredAccount constructor(
     val accountLabel: String,
     val salt: String,
     val encryptedURI: String,
+    val iterations: Int = CryptoTools.LEGACY_HASH_ITERATIONS,
 ) {
     data class DisplayAccount(
         val accountID: String,

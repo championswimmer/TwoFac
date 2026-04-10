@@ -1,8 +1,10 @@
 package tech.arnav.twofac.lib
 
 import dev.whyoleg.cryptography.CryptographyProvider
+import tech.arnav.twofac.lib.crypto.CryptoTools
 import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
 import tech.arnav.twofac.lib.crypto.Encoding.toByteString
+import tech.arnav.twofac.lib.crypto.Encoding.toHexString
 import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
 import tech.arnav.twofac.lib.backup.EncryptedAccountEntry
@@ -82,6 +84,7 @@ class TwoFacLib private constructor(
 
     /**
      * Unlocks the library with the provided passkey and loads accounts into memory
+     * Migrates any accounts using legacy PBKDF2 iteration counts to the current target.
      */
     suspend fun unlock(passKey: String) {
         require(passKey.isNotBlank()) { "Password key cannot be blank" }
@@ -90,6 +93,29 @@ class TwoFacLib private constructor(
         val accounts = storage.getAccountList()
         this.accountList = accounts
         this.storeHasAccounts = accounts.isNotEmpty()
+        migrateIterationsIfNeeded(passKey)
+    }
+
+    private suspend fun migrateIterationsIfNeeded(passKey: String){
+        val accounts = accountList ?: return
+        val needsMigration = accounts.filter { 
+            it.iterations < CryptoTools.TARGET_HASH_ITERATIONS
+        }
+        if (needsMigration.isEmpty()) return
+        
+        for (account in needsMigration){
+            val saltBytes = account.salt.toByteString()
+            val oldKey = cryptoTools.createSigningKey(passKey, saltBytes, account.iterations)
+            val decryptedURI = cryptoTools.decrypt(account.encryptedURI.toByteString(), oldKey.key)
+            val newKey = cryptoTools.createSigningKey(passKey, saltBytes, CryptoTools.TARGET_HASH_ITERATIONS)
+            val reEncryptedURI = cryptoTools.encrypt(newKey.key, decryptedURI)
+            val migrated = account.copy(
+                encryptedURI = reEncryptedURI.toHexString(),
+                iterations = CryptoTools.TARGET_HASH_ITERATIONS,
+            )
+            storage.saveAccount(migrated)
+        }
+        accountList = storage.getAccountList()
     }
 
     /**
@@ -105,7 +131,7 @@ class TwoFacLib private constructor(
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
             val otp = account.toOTP(
-                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
+                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString(), account.iterations),
             )
             account.forDisplay(
                 accountLabel = otp.accountName,
@@ -121,7 +147,7 @@ class TwoFacLib private constructor(
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
             val otpGen = account.toOTP(
-                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
+                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString(), account.iterations),
             )
             val timeNow = Clock.System.now().epochSeconds
             val otpString: String = when (otpGen) {
@@ -243,7 +269,7 @@ class TwoFacLib private constructor(
         val accounts = accountList ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
             account.toDecryptedURI(
-                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString())
+                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString(), account.iterations)
             )
         }
     }
@@ -268,6 +294,7 @@ class TwoFacLib private constructor(
             encryptedURI = entry.encryptedURI,
             passKey = passKey,
             salt = entry.salt,
+            iterations = entry.iterations,
         )
     }
 }

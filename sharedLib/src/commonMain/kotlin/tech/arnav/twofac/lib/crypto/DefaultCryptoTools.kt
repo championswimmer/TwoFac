@@ -17,8 +17,6 @@ class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools
     // TODO: make a CryptoConfig class to hold these constants and pass in
     companion object {
         const val SALT_LENGTH = 16 // 128 bits
-        const val HASH_ITERATIONS = 200 // Number of iterations for PBKDF2
-
     }
 
     val hmac = cryptoProvider.get(HMAC)
@@ -38,11 +36,11 @@ class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools
         return ByteString(signature)
     }
 
-    override suspend fun createSigningKey(passKey: String, salt: ByteString?): CryptoTools.SigningKey {
+    override suspend fun createSigningKey(passKey: String, salt: ByteString?, iterations:Int): CryptoTools.SigningKey {
         // generate a salt
         val saltBytes = salt?.toByteArray() ?: CryptographyRandom.nextBytes(SALT_LENGTH) // 128-bit salt
         // derive a key using PBKDF2
-        val secretDerivation = pbkdf2.secretDerivation(SHA256, HASH_ITERATIONS, 256.bits, saltBytes)
+        val secretDerivation = pbkdf2.secretDerivation(SHA256, iterations, 256.bits, saltBytes)
         val signingKey = secretDerivation.deriveSecretToByteArray(passKey.encodeToByteArray())
         return CryptoTools.SigningKey(key = ByteString(signingKey), salt = ByteString(saltBytes))
     }

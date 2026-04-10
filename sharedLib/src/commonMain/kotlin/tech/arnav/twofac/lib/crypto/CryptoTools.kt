@@ -54,14 +54,21 @@ interface CryptoTools {
      */
     suspend fun hmacSha(algorithm: Algo, key: ByteString, data: ByteString): ByteString
 
+    companion object {
+        const val LEGACY_HASH_ITERATIONS = 200
+        const val TARGET_HASH_ITERATIONS = 600_000
+    }
+
     /**
      * Derive a key from a password using PBKDF2
      *
      * @param passKey The password to derive the key from
      * @param salt The salt to use for key derivation. If null, a random salt will be generated
+     * @param iterations PBKDF2 iteration count. Defaults to [TARGET_HASH_ITERATIONS] for new keys
+     * Pass [LEGACY_HASH_ITERATIONS] when decrypting accounts created before the migration.
      * @return The derived signing key as a ByteString
      */
-    suspend fun createSigningKey(passKey: String, salt: ByteString? = null): SigningKey
+    suspend fun createSigningKey(passKey: String, salt: ByteString? = null, iterations: Int = TARGET_HASH_ITERATIONS): SigningKey
 
     /**
      * Create a hash of the passKey using the specified SHA algorithm

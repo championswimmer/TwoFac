@@ -38,6 +38,7 @@ class BackupService(
                         accountLabel = account.accountLabel,
                         salt = account.salt,
                         encryptedURI = account.encryptedURI,
+                        iterations = account.iterations,
                     )
                 }
                 BackupPayload(
