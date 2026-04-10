@@ -1,6 +1,6 @@
 ---
 name: Website SSG Prerender + Hydration Plan
-status: In Progress
+status: Completed
 progress:
   - "[x] Phase 0 - Lock architecture, route inventory, and acceptance criteria"
   - "[x] Phase 1 - Refactor app bootstrap for shared client/SSG entry"
@@ -9,7 +9,7 @@ progress:
   - "[x] Phase 4 - Render SEO/head tags into generated HTML"
   - "[x] Phase 5 - Integrate SSG into npm build and static hosting output"
   - "[x] Phase 6 - Validate output, hydration, and search-engine readiness"
-  - "[ ] Phase 7 - Rollout, docs, and deployment hardening"
+  - "[x] Phase 7 - Rollout, docs, and deployment hardening"
 ---
 
 # Website SSG Prerender + Hydration Plan
