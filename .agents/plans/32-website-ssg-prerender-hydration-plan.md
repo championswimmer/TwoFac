@@ -1,15 +1,15 @@
 ---
 name: Website SSG Prerender + Hydration Plan
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0 - Lock architecture, route inventory, and acceptance criteria"
-  - "[ ] Phase 1 - Refactor app bootstrap for shared client/SSG entry"
-  - "[ ] Phase 2 - Add deterministic prerender route generation"
-  - "[ ] Phase 3 - Make pages SSR-safe and hydration-safe"
-  - "[ ] Phase 4 - Render SEO/head tags into generated HTML"
-  - "[ ] Phase 5 - Integrate SSG into npm build and static hosting output"
-  - "[ ] Phase 6 - Validate output, hydration, and search-engine readiness"
-  - "[ ] Phase 7 - Rollout, docs, and deployment hardening"
+  - "[x] Phase 0 - Lock architecture, route inventory, and acceptance criteria"
+  - "[x] Phase 1 - Refactor app bootstrap for shared client/SSG entry"
+  - "[x] Phase 2 - Add deterministic prerender route generation"
+  - "[x] Phase 3 - Make pages SSR-safe and hydration-safe"
+  - "[x] Phase 4 - Render SEO/head tags into generated HTML"
+  - "[x] Phase 5 - Integrate SSG into npm build and static hosting output"
+  - "[x] Phase 6 - Validate output, hydration, and search-engine readiness"
+  - "[x] Phase 7 - Rollout, docs, and deployment hardening"
 ---
 
 # Website SSG Prerender + Hydration Plan
@@ -122,6 +122,40 @@ When users open a page directly:
   - `website/src/ssg/includedRoutes.ts`
   - `website/src/ssg/routeManifest.ts`
   - `website/scripts/generate-prerender-routes.js` or equivalent shared utility
+
+## Phase 0 Decisions Locked In
+
+### Final rendering architecture
+- Use **`vite-ssg`** for build-time prerendering plus Vue hydration.
+- Keep the site deployable as **static files only** with no runtime Node SSR server.
+- Keep `vite` as the local dev server for now; no separate SSG dev workflow is required for this rollout.
+
+### Prerender route inventory
+- Generate HTML for all current static marketing/legal pages:
+  - `/`
+  - `/features`
+  - `/download`
+  - `/getting-started`
+  - `/screenshots`
+  - `/faq`
+  - `/blog`
+  - `/privacy`
+  - `/terms`
+  - `/compare/2fas`
+  - `/compare/ente-auth`
+  - `/compare/bitwarden`
+  - `/compare/google-authenticator`
+  - `/compare/microsoft-authenticator`
+- Generate HTML for every blog post route discovered from `src/data/blogs.json` as `/blog/:slug`.
+- Generate an explicit `/404` page and copy its output to `dist/404.html` for static host fallback handling.
+- Do **not** prerender the catch-all matcher directly; it will continue routing to the same not-found page at runtime.
+
+### Acceptance criteria
+- Built HTML for representative routes contains meaningful page body content without requiring client execution.
+- Built HTML contains route-correct SEO output: `<title>`, description, canonical, Open Graph, and Twitter tags.
+- Hydration completes without mismatch warnings on representative pages.
+- Client-side navigation continues to behave like the current SPA after first load.
+- Sitemap generation stays aligned with the prerender route manifest so future blog routes cannot drift.
 
 ---
 

@@ -3,20 +3,13 @@ import { RouterLink } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
 import { useSEO } from '../composables/useSEO'
 import blogs from '../data/blogs.json'
+import { formatPublishedDate } from '../utils/formatting'
 
 useSEO({
   title: 'Blog',
   description: 'Read the latest articles about TwoFac, two-factor authentication, Kotlin Multiplatform, and security best practices.',
   canonicalPath: '/blog',
 })
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
 </script>
 
 <template>
@@ -49,7 +42,7 @@ function formatDate(dateString: string): string {
               :datetime="post.datePublished"
               class="text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wide"
             >
-              {{ formatDate(post.datePublished) }}
+              {{ formatPublishedDate(post.datePublished) }}
             </time>
 
             <!-- Title -->

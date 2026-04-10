@@ -7,8 +7,9 @@
     "prebuild": "node scripts/copy-assets.js && node scripts/build-blogs.js",
     "predev": "node scripts/copy-assets.js && node scripts/build-blogs.js",
     "dev": "vite",
-    "build": "vue-tsc -b && vite build && cp dist/index.html dist/404.html && node scripts/generate-sitemap.js",
-    "preview": "vite preview"
+    "build": "vue-tsc -b && vite-ssg build && node scripts/finalize-static-output.js && node scripts/generate-sitemap.js",
+    "preview": "vite preview",
+    "validate:ssg": "node scripts/validate-ssg-output.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.2.0",
@@ -27,6 +28,7 @@
     "marked": "^17.0.5",
     "typescript": "~5.9.3",
     "vite": "^8.0.1",
+    "vite-ssg": "^28.3.0",
     "vue-tsc": "^3.2.5"
   }
 }
