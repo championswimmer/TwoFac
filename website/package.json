@@ -7,7 +7,7 @@
     "prebuild": "node scripts/copy-assets.js && node scripts/build-blogs.js",
     "predev": "node scripts/copy-assets.js && node scripts/build-blogs.js",
     "dev": "vite",
-    "build": "vue-tsc -b && vite build && cp dist/index.html dist/404.html && node scripts/generate-sitemap.js",
+    "build": "vue-tsc -b && vite-ssg build && node scripts/finalize-static-output.js && node scripts/generate-sitemap.js",
     "preview": "vite preview"
   },
   "dependencies": {

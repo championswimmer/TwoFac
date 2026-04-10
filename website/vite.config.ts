@@ -5,6 +5,7 @@ import { getPrerenderRoutePaths } from './scripts/route-manifest.js'
 
 type ViteSSGConfig = UserConfig & {
   ssgOptions?: {
+    dirStyle?: 'flat' | 'nested'
     includedRoutes?: () => string[]
   }
 }
@@ -12,6 +13,7 @@ type ViteSSGConfig = UserConfig & {
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   ssgOptions: {
+    dirStyle: 'nested',
     includedRoutes() {
       return getPrerenderRoutePaths()
     },
