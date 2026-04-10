@@ -6,6 +6,7 @@ useSEO({
   title: 'Page Not Found',
   description: 'The page you are looking for does not exist.',
   canonicalPath: '/404',
+  noindex: true,
 })
 </script>
 
