@@ -7,7 +7,7 @@ progress:
   - "[x] Phase 2 - Add deterministic prerender route generation"
   - "[x] Phase 3 - Make pages SSR-safe and hydration-safe"
   - "[x] Phase 4 - Render SEO/head tags into generated HTML"
-  - "[ ] Phase 5 - Integrate SSG into npm build and static hosting output"
+  - "[x] Phase 5 - Integrate SSG into npm build and static hosting output"
   - "[ ] Phase 6 - Validate output, hydration, and search-engine readiness"
   - "[ ] Phase 7 - Rollout, docs, and deployment hardening"
 ---
