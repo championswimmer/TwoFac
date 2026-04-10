@@ -4,7 +4,7 @@ status: In Progress
 progress:
   - "[x] Phase 0 - Lock architecture, route inventory, and acceptance criteria"
   - "[x] Phase 1 - Refactor app bootstrap for shared client/SSG entry"
-  - "[ ] Phase 2 - Add deterministic prerender route generation"
+  - "[x] Phase 2 - Add deterministic prerender route generation"
   - "[ ] Phase 3 - Make pages SSR-safe and hydration-safe"
   - "[ ] Phase 4 - Render SEO/head tags into generated HTML"
   - "[ ] Phase 5 - Integrate SSG into npm build and static hosting output"

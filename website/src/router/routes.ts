@@ -81,6 +81,11 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../pages/compare/CompareMicrosoftAuthPage.vue'),
   },
   {
+    path: '/404',
+    name: '404',
+    component: () => import('../pages/NotFoundPage.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('../pages/NotFoundPage.vue'),
