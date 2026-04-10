@@ -8,7 +8,8 @@
     "predev": "node scripts/copy-assets.js && node scripts/build-blogs.js",
     "dev": "vite",
     "build": "vue-tsc -b && vite-ssg build && node scripts/finalize-static-output.js && node scripts/generate-sitemap.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate:ssg": "node scripts/validate-ssg-output.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.2.0",
