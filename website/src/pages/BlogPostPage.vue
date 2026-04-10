@@ -11,9 +11,12 @@ const post = computed(() => blogs.find((b) => b.slug === route.params.slug))
 const blogContent = ref<HTMLElement | null>(null)
 
 useSEO({
-  title: post.value?.title ?? 'Post Not Found',
-  description: post.value?.excerpt ?? 'The requested blog post could not be found.',
-  canonicalPath: post.value ? `/blog/${post.value.slug}` : undefined,
+  title: computed(() => post.value?.title ?? 'Post Not Found'),
+  description: computed(() => post.value?.excerpt ?? 'The requested blog post could not be found.'),
+  canonicalPath: computed(() => (post.value ? `/blog/${post.value.slug}` : undefined)),
+  noindex: computed(() => !post.value),
+  ogType: computed(() => (post.value ? 'article' : 'website')),
+  publishedTime: computed(() => post.value?.datePublished),
 })
 
 function getMermaidTheme(): 'default' | 'dark' {
