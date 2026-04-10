@@ -1,0 +1,17 @@
+Cover image
+Create a clean technical cover illustration for a blog post about cross-platform 2FA backups. Show an Android phone connected to Google Drive, an iPhone connected to iCloud, and a laptop saving a local JSON backup file. In the center, show a shared encrypted core represented as Kotlin code blocks and a small lock icon. Use a modern developer-tooling aesthetic, deep blue and teal palette, subtle glow, dark background, high detail, no text, no watermark, 16:9.
+
+Architecture overview
+Create an isometric technical illustration showing a layered backup architecture for a Kotlin Multiplatform app. The bottom layer is a shared core labeled only through visual cues like code modules and JSON payloads. Above it sits a registry and service layer. Around the edges are transport providers for local files, Google Drive, and iCloud. Show arrows flowing from a settings screen into the shared service layer and then out to provider endpoints. Clean lines, minimal UI chrome, no readable text, no watermark, 16:9.
+
+Plaintext vs encrypted backups
+Create a side-by-side comparison illustration for plaintext and encrypted 2FA backups. On the left, show a JSON document with visible otpauth style URI fragments and a warning color accent. On the right, show structured encrypted records with lock icons, salt crystals, and sealed data blocks. Keep it technical and visual, not cartoonish. Dark neutral background, cyan and amber accents, no text overlay, no watermark, 16:9.
+
+Local file backup flow
+Create a product-style illustration of local file backup for a multiplatform authenticator app. Show a file picker, a JSON backup file being saved to disk, and a restore flow where a user selects a backup file and the app imports accounts from it. Include subtle UI panels for desktop and mobile, but keep them abstract and text-free. Clean, modern, slightly futuristic, no watermark, 16:9.
+
+Google Drive and iCloud providers
+Create a split-scene illustration showing Android backups flowing into a hidden Google Drive app data container on one side and iOS backups flowing into an iCloud container on the other. Represent each provider with cloud storage visuals, auth tokens, and JSON backup files. Keep the scene grounded in mobile app architecture rather than generic cloud art. Dark background, cool blue palette, crisp lighting, no text, no watermark, 16:9.
+
+Future provider extensibility
+Create a technical concept illustration for adding new backup providers to an existing transport architecture. Show a central pluggable interface hub with provider modules snapping into place, including abstract icons suggesting WebDAV, Dropbox, and S3. Emphasize modularity, extension points, dependency injection, and reusable backup logic. Sleek software architecture style, dark background, teal and violet accents, no text, no watermark, 16:9.

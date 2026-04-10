@@ -1,0 +1,347 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/twofac-logo.svg">
+    <meta property="og:image" content="https://twofac.app/twofac_logo_512.png">
+    <meta property="og:type" content="article">
+    <title>How Backups Work in TwoFac: Google Drive, iCloud, Local Files, and Pluggable Transports | TwoFac</title>
+    <script type="module" crossorigin="" src="/assets/app-C-ZgfU8_.js"></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/app-L3I-2G66.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/BlogPostPage-CtHT5PpD.js"><link rel="stylesheet" href="/assets/BlogPostPage-DCd6wkF3.css"><link rel="modulepreload" crossorigin="" href="/assets/useSEO-CK3io4ek.js"><meta name="description" content="In the previous post, I talked about how TwoFac unlocks secrets once they are already sitting on a device. This post is about the part that, in practice, caused me a lot more architectural pacing arou"><meta name="robots" content="index, follow"><meta property="og:site_name" content="TwoFac"><meta property="og:title" content="How Backups Work in TwoFac: Google Drive, iCloud, Local Files, and Pluggable Transports | TwoFac"><meta property="og:description" content="In the previous post, I talked about how TwoFac unlocks secrets once they are already sitting on a device. This post is about the part that, in practice, caused me a lot more architectural pacing arou"><meta property="og:url" content="https://twofac.app/blog/how-backups-work-in-twofac-google-drive-icloud-local-files"><meta property="article:published_time" content="2026-04-10T16:32:24.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="How Backups Work in TwoFac: Google Drive, iCloud, Local Files, and Pluggable Transports | TwoFac"><meta name="twitter:description" content="In the previous post, I talked about how TwoFac unlocks secrets once they are already sitting on a device. This post is about the part that, in practice, caused me a lot more architectural pacing arou"><meta name="twitter:image" content="https://twofac.app/twofac_logo_512.png"><link rel="canonical" href="https://twofac.app/blog/how-backups-work-in-twofac-google-drive-icloud-local-files"></head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="min-h-screen flex flex-col" data-v-83a734da=""><header class="sticky top-0 z-50 w-full border-b border-secondary-200 bg-secondary-50 dark:border-secondary-800 dark:bg-secondary-950"><nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"><a href="/" class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-8 w-8"><span class="text-xl font-bold tracking-tight text-secondary-900 dark:text-white"> TwoFac </span></a><div class="hidden items-center gap-1 md:flex"><!--[--><a href="/features" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Features</a><a href="/screenshots" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Screenshots</a><a href="/download" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Download</a><a href="/blog" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Blog</a><a href="/faq" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">FAQ</a><!--]--></div><div class="hidden items-center gap-3 md:flex"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-secondary-300 bg-secondary-50 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg> GitHub </a></div><button type="button" class="inline-flex items-center justify-center rounded-lg p-2 text-secondary-500 transition-colors hover:bg-secondary-100 hover:text-secondary-700 md:hidden dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white" aria-expanded="false" aria-label="Toggle navigation menu"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5"></path></svg></button></nav><!----></header><main class="flex-1"><!--[--><article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16" data-v-83a734da=""><a href="/blog" class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline mb-8" data-v-83a734da=""> ← Back to Blog </a><header class="mb-8" data-v-83a734da=""><time datetime="2026-04-10T16:32:24.000Z" class="text-sm text-secondary-500 dark:text-secondary-400" data-v-83a734da="">April 10, 2026</time><h1 class="mt-2 text-3xl sm:text-4xl font-bold text-secondary-900 dark:text-white leading-tight" data-v-83a734da="">How Backups Work in TwoFac: Google Drive, iCloud, Local Files, and Pluggable Transports</h1><div class="mt-4 flex flex-wrap gap-2" data-v-83a734da=""><!--[--><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">backups</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">architecture</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">kotlin</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">multiplatform</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">android</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">ios</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">security</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">opensource</span><!--]--></div></header><div class="blog-content" data-v-83a734da=""><p><img src="/images/blogs/04-backups-cover.jpg" alt=""></p>
+<p>In the <a href="https://arnav.tech/secure-session-management-in-twofac-android-ios-webauthn">previous post</a>, I talked about how TwoFac unlocks secrets once they are already sitting on a device. This post is about the part that, in practice, caused me a lot more architectural pacing around the room: <strong>how those secrets leave one device, survive a backup trip through Google Drive or iCloud or a plain old local file, and then come back into another vault without the shared core turning into a landfill of platform-specific code</strong>.</p>
+<p>Backup features always look suspiciously small in screenshots. There is a row in Settings, maybe two buttons, maybe a dialog that asks whether you want plaintext or encrypted export, and that is about it. But once you start actually implementing it, the tiny UI opens up into a whole chain of annoying but interesting questions. What does the file look like? Who owns the serialization? What exactly does "encrypted backup" mean? How do you let Android speak Drive and iOS speak iCloud while keeping <code>sharedLib</code> blissfully unaware of either one? And if future me wakes up one day and wants WebDAV or Dropbox, how much of this whole thing am I going to regret?</p>
+<p>The shape I eventually settled on is pretty simple, and I mean that as a compliment. The shared library owns the <strong>backup model, encoding, validation, and restore orchestration</strong>. The app layer owns the <strong>transport providers</strong> that know how to push and pull bytes from a particular place. Once I arrived at that split, a lot of the rest of the design stopped fighting me.</p>
+<h2>The Layered Backup Architecture</h2>
+<p>The center of this lives in <code>sharedLib/backup</code>, which is where all the boring but important stuff sits. That package defines:</p>
+<ul>
+<li><code>BackupTransport</code></li>
+<li><code>BackupTransportRegistry</code></li>
+<li><code>BackupService</code></li>
+<li><code>BackupPayload</code> and <code>BackupPayloadCodec</code></li>
+<li><code>BackupDescriptor</code>, <code>BackupBlob</code>, <code>BackupProvider</code>, and <code>BackupResult</code></li>
+</ul>
+<p>Then <code>composeApp</code> steps in and contributes the concrete providers:</p>
+<ul>
+<li><code>LocalFileBackupTransport</code></li>
+<li><code>GoogleDriveAppDataBackupTransport</code> on Android</li>
+<li><code>ICloudBackupTransport</code> on iOS</li>
+</ul>
+<p>The handoff point between those two worlds is Koin. <code>composeApp/commonMain</code> defines a <code>backupModule</code> that builds a shared <code>BackupTransportRegistry</code> out of <code>getAll&lt;BackupTransport&gt;()</code>, and then each platform module quietly contributes whichever transport instances it knows how to provide. So the shared layer never has to know whether a transport is backed by a browser save dialog, a Drive API call, or an iCloud ubiquity container. It just gets a registry full of providers and carries on with its life.</p>
+<pre class="mermaid">graph TD
+    UI["SettingsScreen in composeApp/commonMain"]
+    Service["BackupService in sharedLib"]
+    Registry["BackupTransportRegistry in sharedLib"]
+    Local["LocalFileBackupTransport"]
+    Drive["GoogleDriveAppDataBackupTransport"]
+    ICloud["ICloudBackupTransport"]
+
+    UI --&gt; Service
+    Service --&gt; Registry
+    Registry --&gt; Local
+    Registry --&gt; Drive
+    Registry --&gt; ICloud</pre>
+<p>That seam is really the whole trick. <code>sharedLib</code> knows <strong>what</strong> a backup is, how to encode it, how to inspect it, and how to restore it safely. <code>composeApp</code> knows <strong>where</strong> a backup goes and how to get it back. Once you keep those two responsibilities from bleeding into each other, the code gets much calmer.</p>
+<h2>What a Backup Looks Like on Disk</h2>
+<p>I wanted the backup file itself to be boring JSON, because boring file formats age well and are pleasant to debug when something goes wrong. In TwoFac, the payload is versioned by <code>schemaVersion</code>, and the codec currently accepts version 1 and version 2. Version 2 is the one that matters now because it supports both plaintext and encrypted exports.</p>
+<p>At a high level, the payload carries:</p>
+<ul>
+<li><code>createdAt</code></li>
+<li><code>encrypted</code></li>
+<li><code>accounts: List&lt;String&gt;</code> for plaintext <code>otpauth://</code> URIs</li>
+<li><code>encryptedAccounts: List&lt;EncryptedAccountEntry&gt;</code> for encrypted account blobs</li>
+</ul>
+<p><code>BackupPayloadCodec</code> does more than turn objects into JSON and back again. It also validates the shape of the payload on the way in, which ends up mattering quite a bit because restore code is exactly the wrong place to be casual.</p>
+<ul>
+<li>version 1 backups cannot claim to be encrypted</li>
+<li>encrypted backups cannot also contain plaintext accounts</li>
+<li>plaintext backups cannot contain encrypted entries</li>
+</ul>
+<p>That means malformed or mixed payloads fail early, before the restore path has a chance to touch the vault, and I am very fond of that kind of boring defensive behavior in security-sensitive code.</p>
+<pre class="mermaid">flowchart LR
+    Vault["Unlocked vault"]
+    Plain["Plaintext payload&lt;br/&gt;accounts = otpauth:// URIs"]
+    Enc["Encrypted payload&lt;br/&gt;encryptedAccounts = accountLabel + salt + encryptedURI"]
+    Json["Versioned JSON backup file"]
+
+    Vault --&gt;|exportAccountsPlaintext()| Plain
+    Vault --&gt;|exportAccountsEncrypted()| Enc
+    Plain --&gt; Json
+    Enc --&gt; Json</pre>
+<p>Backup files are named like <code>twofac-backup-&lt;createdAt&gt;-&lt;sequence&gt;.json</code>, which gives every transport a stable logical filename without forcing the shared layer to care whether that eventually becomes a local file name, an iCloud document name, or a Drive object name.</p>
+<h2>Plaintext vs Encrypted Backups</h2>
+<p>This is the part users actually feel, and also the part where the internal design becomes visible in a nice way.</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What gets written</th>
+<th>Export requirement</th>
+<th>Restore requirement</th>
+<th>Tradeoff</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Plaintext</strong></td>
+<td>Decrypted <code>otpauth://</code> URIs</td>
+<td>Vault must be unlocked</td>
+<td>Vault must already be unlocked, or the current app passkey must be supplied</td>
+<td>Most portable, least safe if the file leaks</td>
+</tr>
+<tr>
+<td><strong>Encrypted</strong></td>
+<td>Existing encrypted account entries from storage</td>
+<td>Vault must be unlocked</td>
+<td>Needs the backup passkey and the current app passkey</td>
+<td>Safer in transit and at rest, slightly more ceremony on restore</td>
+</tr>
+</tbody></table>
+<p>The part I especially like here is how encrypted export works, because it would have been very easy to make this much messier than it needed to be.</p>
+<p>TwoFac does <strong>not</strong> decrypt every account and then invent a second, special-purpose export format that happens to also be encrypted. Instead, <code>TwoFacLib.exportAccountsEncrypted()</code> returns the encrypted entries that already live in the vault. Each one contains:</p>
+<ul>
+<li><code>accountLabel</code></li>
+<li><code>salt</code></li>
+<li><code>encryptedURI</code></li>
+</ul>
+<p>So an encrypted backup is, more or less, a structured export of the vault's encrypted account records as they already exist in storage, which keeps the model tidy and avoids a whole extra layer of backup-only crypto representation.</p>
+<p>Restore then becomes a two-step process:</p>
+<ol>
+<li>use the <strong>backup passkey</strong> to decrypt the encrypted backup entries into <code>otpauth://</code> URIs</li>
+<li>use the <strong>current app passkey</strong> to add those URIs back into the destination vault, where they are encrypted again with the destination vault's key material</li>
+</ol>
+<p>That is why encrypted restore can take accounts that were protected under one backup passkey and move them into a vault that uses another passkey, without ever needing to write the intermediate plaintext back out to disk.</p>
+<pre class="mermaid">flowchart TD
+    EncBackup["Encrypted backup JSON"]
+    BackupKey["Backup passkey"]
+    URIs["Decrypted otpauth:// URIs in memory"]
+    CurrentKey["Current app passkey"]
+    Vault["Destination vault"]
+
+    EncBackup --&gt; BackupKey
+    BackupKey --&gt; URIs
+    URIs --&gt; CurrentKey
+    CurrentKey --&gt; Vault</pre>
+<h2>Export Flow in the App</h2>
+<p>From the app's point of view, export starts in exactly the place you would expect: <code>SettingsScreen</code>. The user taps <strong>Export</strong>, picks plaintext or encrypted mode in <code>BackupExportModeDialog</code>, and then the screen calls <code>BackupService.createBackup(providerId, encrypted = ...)</code>.</p>
+<p>If the vault is locked, the UI asks for the current vault passkey first, which is a nice reminder that even backup is ultimately just another read of secret material. Once the vault is open, the shared layer takes over:</p>
+<pre class="mermaid">sequenceDiagram
+    participant User
+    participant Settings as SettingsScreen
+    participant Service as BackupService
+    participant Lib as TwoFacLib
+    participant Codec as BackupPayloadCodec
+    participant Transport as BackupTransport
+
+    User-&gt;&gt;Settings: Tap Export
+    Settings-&gt;&gt;User: Choose plaintext or encrypted
+    alt vault locked
+        Settings-&gt;&gt;User: Ask for current vault passkey
+        User-&gt;&gt;Settings: Submit passkey
+        Settings-&gt;&gt;Lib: unlock(passkey)
+    end
+    Settings-&gt;&gt;Service: createBackup(providerId, encrypted)
+    alt plaintext
+        Service-&gt;&gt;Lib: exportAccountsPlaintext()
+    else encrypted
+        Service-&gt;&gt;Lib: exportAccountsEncrypted()
+    end
+    Service-&gt;&gt;Codec: encode(payload)
+    Service-&gt;&gt;Transport: upload(bytes, descriptor)
+    Transport--&gt;&gt;Settings: success or failure</pre>
+<p>What I like about this flow is how little the screen has to know. <code>SettingsScreen</code> does not care whether the destination is Google Drive, iCloud, or a local JSON file the user picked five seconds ago. That entire concern disappears behind <code>BackupTransport</code>, which is exactly where I wanted it.</p>
+<h2>How Local File Backup Works</h2>
+<p>The local provider is the simplest one to explain, but it is also a really nice example of how Kotlin Multiplatform lets you keep the shared code small without pretending every platform has the same file UI.</p>
+<p><code>LocalFileBackupTransport</code> itself lives in <code>composeApp/commonMain</code>, and its job is almost comically straightforward:</p>
+<ul>
+<li>export means "ask the platform to save these bytes somewhere"</li>
+<li>import means "ask the platform to pick a JSON file and return its bytes"</li>
+</ul>
+<p>The actual picker behavior is delegated through <code>expect/actual</code> functions:</p>
+<ul>
+<li><code>saveBackupFileWithPicker(...)</code></li>
+<li><code>pickBackupFileWithPicker()</code></li>
+</ul>
+<p>Which means the common transport stays tiny, while Android, iOS, Desktop, and Web each get to do their own native version of "please save this file somewhere sensible" without dragging those details back into common code.</p>
+<pre class="mermaid">graph TD
+    Local["LocalFileBackupTransport&lt;br/&gt;commonMain"]
+    Picker["expect save/pick functions"]
+    Android["Android actual&lt;br/&gt;File saver + file picker"]
+    Apple["iOS/Desktop actual&lt;br/&gt;FileKit pickers"]
+    Web["Wasm actual&lt;br/&gt;browser picker / download fallback"]
+
+    Local --&gt; Picker
+    Picker --&gt; Android
+    Picker --&gt; Apple
+    Picker --&gt; Web</pre>
+<p>There is one little detail in the import path that I think is especially cute. <code>LocalFileBackupTransport.listBackups()</code> does not scan a folder at all. It just opens the picker immediately, reads the selected file into memory, and exposes that one file as a one-item backup list. Which sounds a bit odd the first time you describe it out loud, but it means the rest of the restore pipeline can stay identical to the cloud providers.</p>
+<p>So once the bytes are in memory, local file import effectively looks the same as "download a backup blob from some remote source", and the shared restore code gets to remain blissfully uninterested in where those bytes originally came from.</p>
+<p><img src="/images/blogs/04-backups-ios-v-android.png" alt=""></p>
+<h2>How Android Uses Google Drive</h2>
+<p>On Android, the concrete provider is <code>GoogleDriveAppDataBackupTransport</code>.</p>
+<p>I chose to back this with <strong>Google Drive <code>appDataFolder</code></strong>, not the user's visible Drive folders, mostly because that felt like the least obnoxious user experience. It has a few nice side effects too:</p>
+<ul>
+<li>backup files do not clutter the user's regular Drive UI</li>
+<li>the app only needs the narrow <code>drive.appdata</code> scope</li>
+<li>the stored files remain app-scoped from a product point of view</li>
+</ul>
+<p>The transport itself does three broad things:</p>
+<ol>
+<li>checks availability by verifying Google Play Services and local OAuth config</li>
+<li>authorizes through Google Identity's <code>AuthorizationClient</code></li>
+<li>performs list, upload, download, and delete through the Drive REST API</li>
+</ol>
+<p>Upload uses multipart metadata plus the JSON content. The metadata marks the file as a child of <code>appDataFolder</code> and stores some app properties alongside it. Listing queries Drive for files under <code>appDataFolder</code>, filters down to TwoFac backup filenames, and turns the result into <code>BackupDescriptor</code>s that the shared layer knows how to work with.</p>
+<p>And that is really the point: from the shared layer's perspective, Google Drive is just another thing that satisfies this interface:</p>
+<pre><code class="language-kotlin">interface BackupTransport {
+    suspend fun listBackups(): BackupResult&lt;List&lt;BackupDescriptor&gt;&gt;
+    suspend fun upload(content: ByteArray, descriptor: BackupDescriptor): BackupResult&lt;BackupDescriptor&gt;
+    suspend fun download(backupId: String): BackupResult&lt;BackupBlob&gt;
+    suspend fun delete(backupId: String): BackupResult&lt;Unit&gt;
+}
+</code></pre>
+<p>All the Android-specific weirdness lives in <code>androidMain</code>, which is where it belongs. The shared code never has to learn about Play Services, consent flows, pending intents, or Drive request details, and I think that is a pretty good bargain.</p>
+<h2>How iOS Uses iCloud</h2>
+<p>On iOS, the equivalent provider is <code>ICloudBackupTransport</code>.</p>
+<p>This one is more direct, almost pleasantly so. It writes backup files into the app's iCloud ubiquity container, specifically under:</p>
+<p><code>Documents/TwoFacBackups</code></p>
+<p>Once the file lands there, iCloud Drive takes care of syncing it around.</p>
+<p>The transport first checks whether:</p>
+<ul>
+<li>there is an active iCloud identity token</li>
+<li>the ubiquity container can be resolved</li>
+</ul>
+<p>After that, it behaves like a filesystem-backed provider:</p>
+<ul>
+<li><code>listBackups()</code> enumerates JSON files in the iCloud backup directory</li>
+<li><code>upload()</code> writes the JSON bytes to the container URL</li>
+<li><code>download()</code> reads the file back into memory</li>
+<li><code>delete()</code> removes it</li>
+</ul>
+<p>There is one practical wrinkle here, which will be familiar to anyone who has dealt with cloud-backed files on Apple platforms. A listed iCloud file may exist as a placeholder and not actually be downloaded locally yet. In that case the transport nudges iCloud to start downloading it and, if the bytes are still not ready, returns a clear failure instead of bluffing its way forward. I prefer that kind of honesty in transport code because it keeps the shared restore layer from making assumptions the platform cannot currently satisfy.</p>
+<p>At the project level, the Xcode entitlements already declare the iCloud container and CloudDocuments support, so this transport fits pretty naturally into the existing iOS capability setup.</p>
+<h2>How Import from Backups Works</h2>
+<p>The restore path is intentionally provider-agnostic, and that is probably the part I am happiest with because it means all the transport diversity collapses down into one shared flow once the bytes arrive.</p>
+<p>In the current Settings UI, import goes roughly like this:</p>
+<ol>
+<li>call <code>listBackups(providerId)</code></li>
+<li>pick the latest backup by <code>createdAt</code></li>
+<li>call <code>inspectBackup(...)</code> to decode and validate the payload before mutating the vault</li>
+<li>if encrypted, ask for the backup passkey first</li>
+<li>restore with <code>restoreBackup(...)</code></li>
+</ol>
+<p>For local files, "list backups" really means "open the picker right now and treat the selected file as the available backup", which sounds slightly funny but keeps the rest of the flow completely uniform.</p>
+<pre class="mermaid">sequenceDiagram
+    participant User
+    participant Settings as SettingsScreen
+    participant Service as BackupService
+    participant Transport as BackupTransport
+    participant Lib as TwoFacLib
+
+    User-&gt;&gt;Settings: Tap Import
+    Settings-&gt;&gt;Service: listBackups(providerId)
+    Service-&gt;&gt;Transport: listBackups()
+    Transport--&gt;&gt;Service: descriptors
+    Service--&gt;&gt;Settings: descriptors
+    Settings-&gt;&gt;Service: inspectBackup(latest.id)
+    alt encrypted payload
+        Settings-&gt;&gt;User: Ask for backup passkey
+        Settings-&gt;&gt;User: Ask for current app passkey
+    else plaintext payload and locked vault
+        Settings-&gt;&gt;User: Ask for current app passkey
+    end
+    Settings-&gt;&gt;Service: restoreBackup(...)
+    Service-&gt;&gt;Lib: addAccount(uri) for each new account
+    Lib--&gt;&gt;Settings: imported count</pre>
+<p>Before <code>restoreBackup()</code> writes anything, it does a few useful bits of housekeeping:</p>
+<ul>
+<li>validates the payload</li>
+<li>parses all URIs first</li>
+<li>unlocks the destination vault if <code>currentPasskey</code> was supplied</li>
+<li>loads existing accounts</li>
+<li>skips accounts that are already equivalent</li>
+</ul>
+<p>That last bit matters a lot in real life. If someone restores into a vault that already has some overlapping accounts, the experience should feel like a merge, not like a careless append operation that sprays duplicates everywhere.</p>
+<h2>A Note on Automatic Restore</h2>
+<p>If you read through the shared backup package, you will notice an extra layer that is not fully visible from the current Settings UI yet: <code>BackupPreferences</code>, <code>BackupRemoteMarker</code>, and <code>BackupRestorePolicy</code>.</p>
+<p>Those types model a future automatic-restore decision system:</p>
+<ul>
+<li>which provider is selected for automatic restore</li>
+<li>which remote marker was last observed</li>
+<li>which marker was already consumed by a successful restore</li>
+<li>whether a non-empty vault requires user confirmation</li>
+</ul>
+<p>So the architecture is already leaning a little beyond manual export and import, even though the shipping flow in <code>SettingsScreen</code> is manual today. I like that the policy is already modeled in shared code because it gives future backup providers a clean place to plug into if I decide to make restore more proactive later on.</p>
+<h2>Why This Architecture Makes New Providers Easy to Add</h2>
+<p><img src="/images/blogs/04-backup-extendable.png" alt=""></p>
+<p>This is probably my favorite part of the whole design, mostly because it feels kind to future me.</p>
+<p>If I want to add WebDAV, Dropbox, S3, or something else later, I do not have to reopen the payload model, rewrite restore semantics, or thread provider-specific conditionals through the UI. I just need to supply a new transport and register it with the appropriate DI module.</p>
+<p>The shape is refreshingly small:</p>
+<pre><code class="language-kotlin">class WebDavBackupTransport(...) : BackupTransport {
+    override val id: String = "webdav"
+    override val displayName: String = "WebDAV"
+    override val supportsAutomaticRestore: Boolean = true
+    override val requiresAuthentication: Boolean = true
+
+    override suspend fun isAvailable(): Boolean = ...
+    override suspend fun listBackups(): BackupResult&lt;List&lt;BackupDescriptor&gt;&gt; = ...
+    override suspend fun upload(content: ByteArray, descriptor: BackupDescriptor): BackupResult&lt;BackupDescriptor&gt; = ...
+    override suspend fun download(backupId: String): BackupResult&lt;BackupBlob&gt; = ...
+    override suspend fun delete(backupId: String): BackupResult&lt;Unit&gt; = ...
+}
+</code></pre>
+<p>Then register it:</p>
+<pre><code class="language-kotlin">val webDavBackupModule = module {
+    single&lt;BackupTransport&gt;(named("webdav")) {
+        WebDavBackupTransport(...)
+    }
+}
+</code></pre>
+<p>Because <code>BackupTransportRegistry</code> is built from <code>getAll&lt;BackupTransport&gt;()</code>, the new provider becomes discoverable to the shared backup service automatically, which is exactly the kind of thing dependency injection ought to make easy.</p>
+<p>So the checklist for a new provider is pleasantly short:</p>
+<ol>
+<li>implement <code>BackupTransport</code></li>
+<li>choose a stable provider ID</li>
+<li>map remote objects to <code>BackupDescriptor</code> and <code>BackupBlob</code></li>
+<li>handle provider-specific auth inside the platform layer</li>
+<li>register the transport in the relevant Koin module</li>
+<li>optionally integrate <code>BackupRestorePolicy</code> if the provider wants automatic restore semantics</li>
+</ol>
+<pre class="mermaid">flowchart LR
+    Provider["New provider idea&lt;br/&gt;WebDAV / Dropbox / S3"]
+    Transport["Implement BackupTransport"]
+    Register["Register in platform Koin module"]
+    Registry["BackupTransportRegistry discovers it"]
+    Service["BackupService can use it"]
+    UI["SettingsScreen shows it as a provider"]
+
+    Provider --&gt; Transport
+    Transport --&gt; Register
+    Register --&gt; Registry
+    Registry --&gt; Service
+    Service --&gt; UI</pre>
+<p>That is the kind of abstraction boundary I always hope to end up with and do not always manage to get on the first try. The shared core stays focused on correctness and security. Platform modules stay focused on APIs, auth flows, and file transport. And future providers fit into the same slot instead of barging in and demanding a redesign.</p>
+<h2>Closing Thoughts</h2>
+<p>TwoFac's backup system ended up being a really good example, at least for me, of the kind of problem Kotlin Multiplatform handles well when you let each layer stay honest about what it should own.</p>
+<p>The shared core owns the things that genuinely should be uniform everywhere:</p>
+<ul>
+<li>payload schema</li>
+<li>validation</li>
+<li>restore semantics</li>
+<li>duplicate detection</li>
+<li>encryption-aware flow control</li>
+</ul>
+<p>The platform layer owns the things that are unavoidably specific to the place the app is running:</p>
+<ul>
+<li>Google authorization</li>
+<li>iCloud container access</li>
+<li>file save and open dialogs</li>
+<li>browser save APIs</li>
+</ul>
+<p>That separation is what makes the current set of providers feel clean today, and it is also what should make the next provider straightforward to add when I get around to it.</p>
+<p>If you are building a cross-platform security app, this has felt like the right trade to me so far: centralize the data model and the policy, keep the transport edge thin and replaceable, and resist the temptation to let every provider drag its platform assumptions back into the shared core.</p>
+</div></article><!--]--></main><footer class="bg-secondary-900 text-secondary-300 dark:bg-secondary-950"><div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16"><div class="grid grid-cols-2 gap-8 md:grid-cols-4"><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Product</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/features" class="text-sm text-secondary-400 transition-colors hover:text-white">Features</a></li><li><a href="/screenshots" class="text-sm text-secondary-400 transition-colors hover:text-white">Screenshots</a></li><li><a href="/download" class="text-sm text-secondary-400 transition-colors hover:text-white">Download</a></li><li><a href="/getting-started" class="text-sm text-secondary-400 transition-colors hover:text-white">Getting Started</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Resources</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/blog" class="text-sm text-secondary-400 transition-colors hover:text-white">Blog</a></li><li><a href="/faq" class="text-sm text-secondary-400 transition-colors hover:text-white">FAQ</a></li><li><a href="/privacy" class="text-sm text-secondary-400 transition-colors hover:text-white">Privacy Policy</a></li><li><a href="/terms" class="text-sm text-secondary-400 transition-colors hover:text-white">Terms of Service</a></li><!--]--><!--[--><li><a href="/getting-started" class="text-sm text-secondary-400 transition-colors hover:text-white">Documentation</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Compare</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/compare/google-authenticator" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Google Authenticator</a></li><li><a href="/compare/microsoft-authenticator" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Microsoft Authenticator</a></li><li><a href="/compare/2fas" class="text-sm text-secondary-400 transition-colors hover:text-white">vs 2FAS</a></li><li><a href="/compare/ente-auth" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Ente Auth</a></li><li><a href="/compare/bitwarden" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Bitwarden</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Community</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="text-sm text-secondary-400 transition-colors hover:text-white">GitHub</a></li><!--]--></ul></div></div></div><div class="border-t border-secondary-800"><div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6 lg:px-8"><div class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-6 w-6"><p class="text-sm text-secondary-500"> © TwoFac. Open source under MIT License. </p></div><div class="flex items-center gap-4"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="text-secondary-500 transition-colors hover:text-white" aria-label="GitHub"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg></a></div></div></div></footer></div></div>
+  
+
+</body></html>

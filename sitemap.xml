@@ -85,6 +85,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://twofac.app/blog/how-backups-work-in-twofac-google-drive-icloud-local-files</loc>
+    <lastmod>2026-04-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://twofac.app/blog/secure-session-management-in-twofac-android-ios-webauthn</loc>
     <lastmod>2026-03-23</lastmod>
     <changefreq>monthly</changefreq>
