@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import mermaid from 'mermaid'
 import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
 import { useSEO } from '../composables/useSEO'
 import blogs from '../data/blogs.json'
+import { formatPublishedDate } from '../utils/formatting'
 
 const route = useRoute()
 const post = computed(() => blogs.find((b) => b.slug === route.params.slug))
@@ -16,20 +16,16 @@ useSEO({
   canonicalPath: post.value ? `/blog/${post.value.slug}` : undefined,
 })
 
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
 function getMermaidTheme(): 'default' | 'dark' {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return 'default'
+  }
+
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default'
 }
 
 async function renderMermaidDiagrams(): Promise<void> {
-  if (!blogContent.value) {
+  if (import.meta.env.SSR || !blogContent.value) {
     return
   }
 
@@ -38,6 +34,8 @@ async function renderMermaidDiagrams(): Promise<void> {
   if (mermaidBlocks.length === 0) {
     return
   }
+
+  const mermaid = (await import('mermaid')).default
 
   mermaid.initialize({
     startOnLoad: false,
@@ -50,6 +48,10 @@ async function renderMermaidDiagrams(): Promise<void> {
 }
 
 function queueMermaidRender(): void {
+  if (import.meta.env.SSR) {
+    return
+  }
+
   void renderMermaidDiagrams().catch((error: unknown) => {
     console.error('Failed to render Mermaid diagrams for blog post content.', error)
   })
@@ -85,7 +87,7 @@ watch(
           :datetime="post.datePublished"
           class="text-sm text-secondary-500 dark:text-secondary-400"
         >
-          {{ formatDate(post.datePublished) }}
+          {{ formatPublishedDate(post.datePublished) }}
         </time>
 
         <h1 class="mt-2 text-3xl sm:text-4xl font-bold text-secondary-900 dark:text-white leading-tight">
