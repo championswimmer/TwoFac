@@ -1,13 +1,16 @@
-import { createApp } from 'vue'
-import { createHead } from '@unhead/vue/client'
+import { ViteSSG } from 'vite-ssg'
 import App from './App.vue'
-import router from './router'
+import { routes, scrollBehavior } from './router'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import './style.css'
 
-const app = createApp(App)
-const head = createHead()
-
-app.use(router)
-app.use(head)
-app.mount('#app')
+export const createApp = ViteSSG(
+  App,
+  {
+    routes,
+    scrollBehavior,
+  },
+  () => {
+    // Shared app setup lives here for both client hydration and SSG.
+  },
+)
