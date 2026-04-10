@@ -8,6 +8,16 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import tech.arnav.twofac.lib.crypto.CryptoTools
+import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
+import dev.whyoleg.cryptography.CryptographyProvider
+import tech.arnav.twofac.lib.crypto.Encoding.toByteString
+import tech.arnav.twofac.lib.crypto.Encoding.toHexString
+import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.otp.HOTP
+import tech.arnav.twofac.lib.otp.TOTP
+import kotlinx.io.bytestring.encodeToByteString
+import kotlin.uuid.Uuid
 
 class TwoFacLibTest {
 
@@ -167,6 +177,69 @@ class TwoFacLibTest {
 
         assertEquals("alice@example.com", account.accountLabel)
         assertEquals("GitHub", account.issuer)
+    }
+
+
+    @Test
+    fun testUnlockMigratesLegacyIterationAccounts() = runTest {
+        val storage = MemoryStorage()
+        val passkey = "testpasskey"
+        val tools = DefaultCryptoTools(CryptographyProvider.Default)
+
+        // 1. Manually create a legacy account in storage
+        val salt = "000102030405060708090a0b0c0d0e0f"
+        val legacyKey = tools.createSigningKey(passkey, salt.toByteString(), CryptoTools.LEGACY_HASH_ITERATIONS)
+        val uriData = "otpauth://totp/Legacy:user@example.com?secret=JBSWY3DPEHPK3PXP".encodeToByteString()
+        val encryptedURI = tools.encrypt(legacyKey.key, uriData)
+
+        val legacyAccount = StoredAccount(
+            accountID = Uuid.random(),
+            accountLabel = "Legacy",
+            salt = salt,
+            encryptedURI = encryptedURI.toHexString(),
+            iterations = CryptoTools.LEGACY_HASH_ITERATIONS
+        )
+        storage.saveAccount(legacyAccount)
+
+        // 2. Initialise lib and unlock - should trigger migration
+        val lib = TwoFacLib.initialise(storage = storage)
+        lib.unlock(passkey)
+
+        // 3. Verify it was migrated
+        val migratedAccount = storage.getAccountList().single()
+        assertEquals(
+            CryptoTools.TARGET_HASH_ITERATIONS,
+            migratedAccount.iterations,
+            "Account should be migrated to target iterations"
+        )
+
+        // 4. Verify it's still decryptable and generates correct codes
+        val otps = lib.getAllAccountOTPs()
+        assertEquals(1, otps.size)
+        assertEquals("Legacy", otps[0].first.accountLabel)
+        assertTrue(otps[0].second.isNotEmpty())
+    }
+
+    @Test
+    fun testAccountsAreDecryptableAfterIterationMigration() = runTest {
+        val storage = MemoryStorage()
+        val passkey = "testpasskey"
+
+        val lib = TwoFacLib.initialise(storage = storage)
+        lib.unlock(passkey)
+        assertTrue(
+            lib.addAccount(
+                "otpauth://totp/GitHub:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"
+            )
+        )
+
+        val otps = lib.getAllAccountOTPs()
+        assertEquals(1, otps.size)
+        assertTrue(otps[0].second.isNotEmpty(), "OTP code should be generated after migration")
+
+        val accounts = lib.getAllAccounts()
+        assertEquals(1, accounts.size)
+        assertEquals("GitHub", accounts[0].issuer)
     }
 
     @Test
