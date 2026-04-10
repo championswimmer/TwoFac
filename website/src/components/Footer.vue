@@ -11,6 +11,8 @@ const productLinks = [
 const resourceRouterLinks = [
   { name: 'Blog', to: '/blog' },
   { name: 'FAQ', to: '/faq' },
+  { name: 'Privacy Policy', to: '/privacy' },
+  { name: 'Terms of Service', to: '/terms' },
 ]
 
 const resourceExternalLinks = [

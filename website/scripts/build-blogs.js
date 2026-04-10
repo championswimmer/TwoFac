@@ -90,7 +90,11 @@ for (const file of mdFiles) {
   };
 
   if (frontmatter.cover) {
-    blog.cover = frontmatter.cover;
+    if (frontmatter.cover.startsWith('./img/')) {
+      blog.cover = frontmatter.cover.replace('./img/', '/images/blogs/');
+    } else {
+      blog.cover = frontmatter.cover;
+    }
   }
 
   blogs.push(blog);

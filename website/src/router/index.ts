@@ -47,6 +47,16 @@ const router = createRouter({
       component: () => import('../pages/BlogPostPage.vue'),
     },
     {
+      path: '/privacy',
+      name: 'privacy',
+      component: () => import('../pages/PrivacyPage.vue'),
+    },
+    {
+      path: '/terms',
+      name: 'terms',
+      component: () => import('../pages/TermsPage.vue'),
+    },
+    {
       path: '/compare/2fas',
       name: 'compare-2fas',
       component: () => import('../pages/compare/Compare2FASPage.vue'),
