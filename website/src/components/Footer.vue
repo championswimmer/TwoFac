@@ -117,7 +117,7 @@ const communityLinks = [
         <div class="flex items-center gap-2.5">
           <img src="/twofac-logo.svg" alt="TwoFac logo" class="h-6 w-6" />
           <p class="text-sm text-secondary-500">
-            &copy; {{ new Date().getFullYear() }} TwoFac. Open source under MIT License.
+            &copy; TwoFac. Open source under MIT License.
           </p>
         </div>
 
