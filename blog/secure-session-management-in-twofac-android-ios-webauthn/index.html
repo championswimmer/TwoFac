@@ -1,0 +1,487 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/twofac-logo.svg">
+    <meta property="og:image" content="https://twofac.app/twofac_logo_512.png">
+    <meta property="og:type" content="article">
+    <title>Secure Session Management in TwoFac: Android Biometrics, iOS Local Auth, and WebAuthn | TwoFac</title>
+    <script type="module" crossorigin="" src="/assets/app-BqGfpUbj.js"></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/app-L3I-2G66.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/BlogPostPage-BpeaQ4sw.js"><link rel="stylesheet" href="/assets/BlogPostPage-DCd6wkF3.css"><link rel="modulepreload" crossorigin="" href="/assets/useSEO-BRP-hXqu.js"><meta name="description" content="In the previous post, I focused on how TwoFac generates OTPs once it already has the secret material it needs. But that naturally leads to the next question: how do we unlock that secret material safe"><meta name="robots" content="index, follow"><meta property="og:site_name" content="TwoFac"><meta property="og:title" content="Secure Session Management in TwoFac: Android Biometrics, iOS Local Auth, and WebAuthn | TwoFac"><meta property="og:description" content="In the previous post, I focused on how TwoFac generates OTPs once it already has the secret material it needs. But that naturally leads to the next question: how do we unlock that secret material safe"><meta property="og:url" content="https://twofac.app/blog/secure-session-management-in-twofac-android-ios-webauthn"><meta property="article:published_time" content="2026-03-23T03:17:26.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Secure Session Management in TwoFac: Android Biometrics, iOS Local Auth, and WebAuthn | TwoFac"><meta name="twitter:description" content="In the previous post, I focused on how TwoFac generates OTPs once it already has the secret material it needs. But that naturally leads to the next question: how do we unlock that secret material safe"><meta name="twitter:image" content="https://twofac.app/twofac_logo_512.png"><link rel="canonical" href="https://twofac.app/blog/secure-session-management-in-twofac-android-ios-webauthn"></head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="min-h-screen flex flex-col" data-v-83a734da=""><header class="sticky top-0 z-50 w-full border-b border-secondary-200 bg-secondary-50 dark:border-secondary-800 dark:bg-secondary-950"><nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"><a href="/" class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-8 w-8"><span class="text-xl font-bold tracking-tight text-secondary-900 dark:text-white"> TwoFac </span></a><div class="hidden items-center gap-1 md:flex"><!--[--><a href="/features" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Features</a><a href="/screenshots" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Screenshots</a><a href="/download" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Download</a><a href="/blog" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Blog</a><a href="/faq" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">FAQ</a><!--]--></div><div class="hidden items-center gap-3 md:flex"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-secondary-300 bg-secondary-50 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg> GitHub </a></div><button type="button" class="inline-flex items-center justify-center rounded-lg p-2 text-secondary-500 transition-colors hover:bg-secondary-100 hover:text-secondary-700 md:hidden dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white" aria-expanded="false" aria-label="Toggle navigation menu"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5"></path></svg></button></nav><!----></header><main class="flex-1"><!--[--><article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16" data-v-83a734da=""><a href="/blog" class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline mb-8" data-v-83a734da=""> ← Back to Blog </a><header class="mb-8" data-v-83a734da=""><time datetime="2026-03-23T03:17:26.000Z" class="text-sm text-secondary-500 dark:text-secondary-400" data-v-83a734da="">March 23, 2026</time><h1 class="mt-2 text-3xl sm:text-4xl font-bold text-secondary-900 dark:text-white leading-tight" data-v-83a734da="">Secure Session Management in TwoFac: Android Biometrics, iOS Local Auth, and WebAuthn</h1><div class="mt-4 flex flex-wrap gap-2" data-v-83a734da=""><!--[--><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">security</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">biometrics</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">webauthn</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">android</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">ios</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">kotlin</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">multiplatform</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">opensource</span><!--]--></div></header><div class="blog-content" data-v-83a734da=""><p>In the <a href="https://arnav.tech/under-the-hood-how-totp-works-and-how-twofac-generates-your-2fa-codes">previous post</a>, I focused on how TwoFac generates OTPs once it already has the secret material it needs. But that naturally leads to the next question: <strong>how do we unlock that secret material safely without asking the user to type their vault passkey every single time?</strong></p>
+<p>This post is about that layer: <strong>secure session management</strong>.</p>
+<p>In TwoFac, the user still has a normal alphanumeric vault passkey that protects the encrypted account store. The secure-session layer does <strong>not</strong> replace that passkey. Instead, it decides whether the passkey can be:</p>
+<ol>
+<li>remembered at all,</li>
+<li>stored in a platform-protected way, and</li>
+<li>recovered only after device verification such as biometrics or a platform passkey / hardware authenticator.</li>
+</ol>
+<p>That distinction matters, especially on the web, where the word <strong>passkey</strong> can mean a WebAuthn/FIDO credential rather than the user’s own vault-unlock string.</p>
+<blockquote>
+<p>In this article, I’ll call the user-entered alphanumeric secret the <strong>vault passkey</strong>, and I’ll call WebAuthn / biometric device credentials the <strong>platform credential</strong>.</p>
+</blockquote>
+<h2>The Core Abstractions: <code>SessionManager</code> and <code>SecureSessionManager</code></h2>
+<p>The secure-session story starts in <code>composeApp/commonMain</code>, where the app defines platform-agnostic contracts:</p>
+<ul>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/session/SessionManager.kt"><code>SessionManager.kt</code></a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/session/SecureSessionManager.kt"><code>SecureSessionManager.kt</code></a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/session/BiometricSessionManager.kt"><code>BiometricSessionManager.kt</code></a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/session/WebAuthnSessionManager.kt"><code>WebAuthnSessionManager.kt</code></a></li>
+</ul>
+<p>At a high level:</p>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SessionManager</code></td>
+<td>Generic “remember / retrieve / clear the vault passkey” contract</td>
+</tr>
+<tr>
+<td><code>SecureSessionManager</code></td>
+<td>Adds “is secure unlock available?” and “enroll the passkey into protected storage”</td>
+</tr>
+<tr>
+<td><code>BiometricSessionManager</code></td>
+<td>Secure unlock driven by mobile biometrics</td>
+</tr>
+<tr>
+<td><code>WebAuthnSessionManager</code></td>
+<td>Secure unlock driven by a WebAuthn credential</td>
+</tr>
+</tbody></table>
+<p>Here is the type hierarchy:</p>
+<pre class="mermaid">classDiagram
+    class SessionManager {
+        +isAvailable() Boolean
+        +isRememberPasskeyEnabled() Boolean
+        +setRememberPasskey(enabled)
+        +getSavedPasskey() String?
+        +savePasskey(passkey)
+        +clearPasskey()
+    }
+
+    class SecureSessionManager {
+        +isSecureUnlockAvailable() Boolean
+        +isSecureUnlockEnabled() Boolean
+        +setSecureUnlockEnabled(enabled)
+        +enrollPasskey(passkey) Boolean
+    }
+
+    class BiometricSessionManager {
+        +isBiometricAvailable() Boolean
+        +isBiometricEnabled() Boolean
+        +setBiometricEnabled(enabled)
+    }
+
+    class WebAuthnSessionManager {
+        +isPasskeyEnrolled() Boolean
+    }
+
+    SessionManager &lt;|-- SecureSessionManager
+    SecureSessionManager &lt;|-- BiometricSessionManager
+    SecureSessionManager &lt;|-- WebAuthnSessionManager</pre>
+<p>This is a nice KMP design choice: the shared UI doesn’t have to know whether the secure unlock mechanism is backed by Android Keystore, Apple Keychain, or WebAuthn. It just talks to the contract.</p>
+<h2>Where the Session Manager Gets Used</h2>
+<p>The runtime wiring happens through Koin modules:</p>
+<ul>
+<li>Android: <a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/androidMain/kotlin/tech/arnav/twofac/di/AndroidModules.kt"><code>AndroidModules.kt</code></a></li>
+<li>iOS: <a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/iosMain/kotlin/tech/arnav/twofac/di/IosModules.kt"><code>IosModules.kt</code></a></li>
+<li>Web/Wasm: <a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/di/WasmModules.kt"><code>WasmModules.kt</code></a></li>
+</ul>
+<p>Each platform binds a concrete implementation to the shared <code>SessionManager</code> interface:</p>
+<pre class="mermaid">graph TD
+    Common["commonMain UI + viewmodels"]
+    Session["SessionManager / SecureSessionManager"]
+    Android["AndroidBiometricSessionManager"]
+    IOS["IosBiometricSessionManager"]
+    Web["BrowserSessionManager"]
+    Home["HomeScreen"]
+    Settings["SettingsScreen"]
+    VM["AccountsViewModel"]
+
+    Common --&gt; Home
+    Common --&gt; Settings
+    Common --&gt; VM
+
+    Home --&gt; Session
+    Settings --&gt; Session
+    VM --&gt; Session
+
+    Session --&gt; Android
+    Session --&gt; IOS
+    Session --&gt; Web</pre>
+<p>And those shared callers are:</p>
+<ul>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/SettingsScreen.kt"><code>SettingsScreen.kt</code></a>, where the user enables “Remember Passkey”, “Biometric Unlock”, or “Secure Unlock”</li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/HomeScreen.kt"><code>HomeScreen.kt</code></a>, where the app tries auto-unlock</li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/viewmodels/AccountsViewModel.kt"><code>AccountsViewModel.kt</code></a>, which asks for the saved passkey and persists it after successful unlock</li>
+</ul>
+<h2>The End-to-End Flow</h2>
+<p>There are really two important flows:</p>
+<ol>
+<li><strong>Enrollment</strong>: user opts into secure unlock and the platform stores the vault passkey in a protected form.</li>
+<li><strong>Unlock</strong>: app starts, asks the platform manager for the saved passkey, and uses it to unlock <code>TwoFacLib</code>.</li>
+</ol>
+<h3>Enrollment Flow</h3>
+<pre class="mermaid">sequenceDiagram
+    participant User
+    participant Settings as SettingsScreen
+    participant Lib as TwoFacLib
+    participant SM as SecureSessionManager
+    participant Platform as Android / iOS / Web platform APIs
+
+    User-&gt;&gt;Settings: Enable secure unlock / biometrics
+    Settings-&gt;&gt;User: Ask for vault passkey
+    User-&gt;&gt;Settings: Submit vault passkey
+    Settings-&gt;&gt;Lib: unlock(passkey)
+    Lib--&gt;&gt;Settings: passkey verified
+    Settings-&gt;&gt;SM: enable secure unlock
+    Settings-&gt;&gt;SM: enrollPasskey(passkey)
+    SM-&gt;&gt;Platform: Create or use platform credential
+    Platform--&gt;&gt;SM: authentication / key material / secure storage granted
+    SM--&gt;&gt;Settings: enrollment success
+    Settings--&gt;&gt;User: Secure unlock enabled</pre>
+<h3>Auto-Unlock Flow</h3>
+<pre class="mermaid">sequenceDiagram
+    participant User
+    participant Home as HomeScreen
+    participant VM as AccountsViewModel
+    participant SM as SessionManager
+    participant Lib as TwoFacLib
+
+    User-&gt;&gt;Home: Open app / extension
+    Home-&gt;&gt;VM: getSavedPasskey()
+    VM-&gt;&gt;SM: getSavedPasskey()
+    SM--&gt;&gt;VM: passkey or null
+    alt passkey recovered
+        VM-&gt;&gt;Lib: unlock(passkey)
+        Lib--&gt;&gt;VM: unlocked
+        VM--&gt;&gt;Home: load accounts and OTPs
+    else recovery cancelled / unavailable
+        Home--&gt;&gt;User: show manual passkey dialog
+    end</pre>
+<p>That fallback behavior is deliberate. Secure unlock is a convenience feature, not the only way in.</p>
+<h2>Android: AES-GCM + Android Keystore + <code>BiometricPrompt</code></h2>
+<p>The Android implementation lives in <a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/androidMain/kotlin/tech/arnav/twofac/session/AndroidBiometricSessionManager.kt"><code>AndroidBiometricSessionManager.kt</code></a>.</p>
+<p>This is the strongest of the current native mobile implementations because it genuinely uses the Android platform’s secure key APIs:</p>
+<ul>
+<li><code>AndroidKeyStore</code></li>
+<li><code>KeyGenParameterSpec</code></li>
+<li><code>BiometricPrompt</code></li>
+<li>AES/GCM encryption</li>
+<li>a key marked with <code>setUserAuthenticationRequired(true)</code></li>
+<li><code>setInvalidatedByBiometricEnrollment(true)</code></li>
+</ul>
+<h3>How the Android Implementation Works</h3>
+<ol>
+<li>TwoFac creates or reuses an AES key inside <strong>Android Keystore</strong> under the alias <code>twofac_biometric_key</code>.</li>
+<li>That key is configured so it can only be used after strong biometric authentication.</li>
+<li>During enrollment, the app shows a <code>BiometricPrompt</code>.</li>
+<li>After successful authentication, the app encrypts the <strong>vault passkey</strong> with AES-GCM.</li>
+<li>The ciphertext and IV are stored in <code>SharedPreferences</code>.</li>
+<li>On unlock, the app shows another biometric prompt, uses the keystore key to decrypt the ciphertext, and returns the plaintext passkey to the shared layer.</li>
+</ol>
+<p>That looks like this:</p>
+<pre class="mermaid">flowchart TD
+    Passkey["Vault passkey (plaintext in app memory)"]
+    Prompt["BiometricPrompt"]
+    Key["AES key in Android Keystore"]
+    Encrypt["AES-GCM encrypt"]
+    Prefs["SharedPreferences&lt;br/&gt;ciphertext + IV"]
+    Decrypt["AES-GCM decrypt"]
+    Unlock["Return passkey to AccountsViewModel"]
+
+    Passkey --&gt; Prompt
+    Prompt --&gt; Key
+    Key --&gt; Encrypt
+    Passkey --&gt; Encrypt
+    Encrypt --&gt; Prefs
+    Prefs --&gt; Decrypt
+    Key --&gt; Decrypt
+    Prompt --&gt; Decrypt
+    Decrypt --&gt; Unlock</pre>
+<h3>Why This Is a Good Pattern on Android</h3>
+<p>This is closely aligned with Android’s own security guidance:</p>
+<ul>
+<li>The <a href="https://developer.android.com/privacy-and-security/keystore">Android Keystore system</a> exists so keys can remain device-bound and, where available, hardware-backed.</li>
+<li>Android’s <a href="https://developer.android.com/privacy-and-security/cryptography">cryptography guidance</a> recommends authenticated encryption modes like AES-GCM for local secret protection.</li>
+<li><code>BiometricPrompt</code> is Android’s standard user-verification API for strong biometric flows.</li>
+<li><a href="https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setInvalidatedByBiometricEnrollment(boolean)"><code>setInvalidatedByBiometricEnrollment(true)</code></a> ensures that if device biometrics change, the previously enrolled key can be invalidated.</li>
+</ul>
+<p>So on Android, TwoFac is doing the classic pattern correctly:</p>
+<blockquote>
+<p>store the <strong>data</strong> in app storage, but store the <strong>key</strong> in platform secure storage, and require biometric authentication before the key is usable.</p>
+</blockquote>
+<p>That is much better than storing the plaintext passkey directly in preferences.</p>
+<h2>iOS: Current TwoFac Flow vs Apple’s Recommended Secure Storage Model</h2>
+<p>The iOS implementation lives in <a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/iosMain/kotlin/tech/arnav/twofac/session/IosBiometricSessionManager.kt"><code>IosBiometricSessionManager.kt</code></a>.</p>
+<p>There’s an important nuance here:</p>
+<ul>
+<li>the <strong>contract comments</strong> describe a Keychain-style biometric secure-storage model,</li>
+<li>but the <strong>current implementation</strong> stores the vault passkey in <code>NSUserDefaults</code>,</li>
+<li>and uses <code>LAContext</code> only as a gate before reading it back.</li>
+</ul>
+<p>That means the current iOS implementation is <strong>not equivalent</strong> to the Android Keystore design, and it is <strong>not</strong> what Apple recommends for storing secrets.</p>
+<h3>What the Current iOS Code Actually Does</h3>
+<ol>
+<li>Checks biometric availability with <code>LAContext.canEvaluatePolicy(...)</code>.</li>
+<li>Stores booleans like <code>twofac_biometric_enabled</code> in <code>NSUserDefaults</code>.</li>
+<li>Stores the actual vault passkey as <code>twofac_saved_passkey</code> in <code>NSUserDefaults</code>.</li>
+<li>On retrieval, presents biometric auth using <code>evaluatePolicy(...)</code>.</li>
+<li>If auth succeeds, reads the passkey from <code>NSUserDefaults</code>.</li>
+</ol>
+<p>That runtime flow looks like this:</p>
+<pre class="mermaid">flowchart TD
+    Passkey["Vault passkey"]
+    Defaults["NSUserDefaults&lt;br/&gt;twofac_saved_passkey"]
+    LA["LAContext biometric prompt"]
+    Read["Read passkey from NSUserDefaults"]
+    Unlock["Return passkey to shared layer"]
+
+    Passkey --&gt; Defaults
+    LA --&gt; Read
+    Defaults --&gt; Read
+    Read --&gt; Unlock</pre>
+<p>This gives the app a biometric <strong>UX gate</strong>, but not true iOS secure secret storage. If the secret is sitting in <code>NSUserDefaults</code>, it is not protected with Keychain access-control flags, not tied to the device passcode policy, and not using the Keychain / Secure Enclave integration Apple expects for sensitive material.</p>
+<h3>What Apple Recommends Instead</h3>
+<p>Apple’s official guidance is:</p>
+<ul>
+<li>use <a href="https://developer.apple.com/documentation/security/keychain-services">Keychain Services</a> for secrets,</li>
+<li>combine it with <a href="https://developer.apple.com/documentation/localauthentication/">LocalAuthentication</a> or Keychain access control flags,</li>
+<li>and, when appropriate, use <a href="https://developer.apple.com/documentation/localauthentication/accessing-keychain-items-with-face-id-or-touch-id">“Accessing Keychain Items with Face ID or Touch ID”</a>.</li>
+</ul>
+<p>In other words, the recommended pattern on iOS is:</p>
+<pre class="mermaid">flowchart TD
+    Passkey["Vault passkey"]
+    Keychain["Keychain item"]
+    Access["SecAccessControl&lt;br/&gt;userPresence / biometry"]
+    LA["Face ID / Touch ID / device passcode"]
+    Unlock["Return passkey only after auth"]
+
+    Passkey --&gt; Keychain
+    Access --&gt; Keychain
+    LA --&gt; Keychain
+    Keychain --&gt; Unlock</pre>
+<p>The secure-storage difference is the key point:</p>
+<table>
+<thead>
+<tr>
+<th>iOS approach</th>
+<th>Security properties</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>NSUserDefaults</code></td>
+<td>Preferences storage; not appropriate for secrets</td>
+</tr>
+<tr>
+<td>Keychain + access control</td>
+<td>Encrypted system secret storage, optionally tied to Face ID / Touch ID / passcode</td>
+</tr>
+</tbody></table>
+<p>So the honest state of the codebase today is:</p>
+<blockquote>
+<p>TwoFac’s iOS secure-session <strong>API shape</strong> is ready for the Keychain model, but the <strong>current implementation</strong> is still a simpler biometric-gated <code>NSUserDefaults</code> approach.</p>
+</blockquote>
+<p>That’s a valuable distinction for anyone reviewing the security posture of the project.</p>
+<h2>Web / Wasm: WebAuthn PRF + HKDF + AES-GCM + Encrypted Browser Storage</h2>
+<p>The browser implementation is the most interesting one architecturally.</p>
+<p>Relevant files:</p>
+<ul>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/session/BrowserSessionManager.kt"><code>BrowserSessionManager.kt</code></a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/session/interop/WebAuthnClient.kt"><code>WebAuthnClient.kt</code></a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/session/interop/WebCryptoClient.kt"><code>WebCryptoClient.kt</code></a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/typescript/src/webauthn.mts"><code>webauthn.mts</code></a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/typescript/src/crypto.mts"><code>crypto.mts</code></a></li>
+</ul>
+<p>This implementation does <strong>not</strong> persist the plaintext vault passkey in browser storage.</p>
+<p>Instead, it does something smarter:</p>
+<ol>
+<li>Create or authenticate a WebAuthn credential.</li>
+<li>Ask the authenticator for <strong>PRF output</strong>.</li>
+<li>Feed that PRF output into HKDF.</li>
+<li>Derive an AES-GCM key in Web Crypto.</li>
+<li>Encrypt the vault passkey.</li>
+<li>Store only the encrypted blob and credential metadata in local storage.</li>
+<li>Keep the decrypted passkey only in memory for the current browser session.</li>
+</ol>
+<h3>Enrollment Flow on the Web</h3>
+<pre class="mermaid">flowchart TD
+    Passkey["Vault passkey"]
+    WebAuthn["navigator.credentials.create()"]
+    PRF["WebAuthn PRF output"]
+    HKDF["HKDF-SHA-256"]
+    AES["Derived AES-GCM key"]
+    Encrypt["Encrypt vault passkey"]
+    Blob["Encrypted blob&lt;br/&gt;salt + nonce + ciphertext + credentialId"]
+    Storage["Persistent browser storage"]
+
+    Passkey --&gt; Encrypt
+    WebAuthn --&gt; PRF
+    PRF --&gt; HKDF
+    HKDF --&gt; AES
+    AES --&gt; Encrypt
+    Encrypt --&gt; Blob
+    Blob --&gt; Storage</pre>
+<h3>Unlock Flow on the Web</h3>
+<pre class="mermaid">flowchart TD
+    Storage["Encrypted passkey blob"]
+    Get["navigator.credentials.get()"]
+    PRF["PRF output from same credential"]
+    HKDF["HKDF-SHA-256"]
+    AES["Derived AES-GCM key"]
+    Decrypt["Decrypt stored blob"]
+    Memory["Session-only plaintext passkey in memory"]
+    Unlock["Unlock TwoFacLib"]
+
+    Storage --&gt; Decrypt
+    Get --&gt; PRF
+    PRF --&gt; HKDF
+    HKDF --&gt; AES
+    AES --&gt; Decrypt
+    Decrypt --&gt; Memory
+    Memory --&gt; Unlock</pre>
+<h3>Why This Web Design Is Strong</h3>
+<p>This matches the capabilities of the modern web platform surprisingly well:</p>
+<ul>
+<li>WebAuthn only works in a <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API">secure context</a>, meaning HTTPS / trusted browser contexts.</li>
+<li>TwoFac checks for user-verifying platform authenticator support before enabling secure unlock.</li>
+<li>The implementation requests the <a href="https://www.w3.org/TR/webauthn-3/#sctn-prf-extension">WebAuthn PRF extension</a>, which is exactly the extension designed for deriving symmetric secrets from an authenticator-backed credential.</li>
+<li>The derived key is then used with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto API</a> for AES-GCM encryption and decryption.</li>
+</ul>
+<p>The important design property is this:</p>
+<blockquote>
+<p>the browser never needs to persist the vault passkey in plaintext if it can persist only an encrypted blob and recover the decryption key via a successful WebAuthn ceremony.</p>
+</blockquote>
+<p>That makes the web design conceptually closer to Android’s “data outside, key inside secure platform primitive” model than people might expect.</p>
+<h3>A Small But Important Detail: Session vs Persistent Storage</h3>
+<p>The browser implementation intentionally separates:</p>
+<ul>
+<li><strong>persistent</strong> state: encrypted blob + credential id</li>
+<li><strong>session</strong> state: decrypted passkey in memory only</li>
+</ul>
+<p>That means:</p>
+<ul>
+<li><code>enrollPasskey()</code> is the method that creates durable encrypted persistence,</li>
+<li><code>savePasskey()</code> mainly refreshes the in-memory session copy,</li>
+<li><code>clearPasskey()</code> removes both the session plaintext and persisted encrypted blob.</li>
+</ul>
+<p>So the secure web flow is not “remember the passkey forever in localStorage.” It is “remember only an encrypted vault that can be reopened with the same device credential.”</p>
+<h2>Comparing the Platforms</h2>
+<p>Here’s the current state of secure-session storage across the codebase:</p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Implementation</th>
+<th>Where the secret lives</th>
+<th>What protects it</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Android</td>
+<td><code>AndroidBiometricSessionManager</code></td>
+<td>AES-GCM ciphertext in <code>SharedPreferences</code></td>
+<td>Android Keystore key + <code>BiometricPrompt</code></td>
+<td>Strongest native implementation today</td>
+</tr>
+<tr>
+<td>iOS</td>
+<td><code>IosBiometricSessionManager</code></td>
+<td><code>NSUserDefaults</code></td>
+<td><code>LAContext</code> prompt before read</td>
+<td>Biometric-gated UX, but not true secure secret storage yet</td>
+</tr>
+<tr>
+<td>Web/Wasm</td>
+<td><code>BrowserSessionManager</code></td>
+<td>Encrypted blob in browser storage</td>
+<td>WebAuthn PRF-derived AES-GCM key</td>
+<td>Plaintext is session-only</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>none</td>
+<td>n/a</td>
+<td>n/a</td>
+<td>manual passkey entry</td>
+</tr>
+<tr>
+<td>CLI</td>
+<td>none</td>
+<td>n/a</td>
+<td>n/a</td>
+<td>manual passkey entry</td>
+</tr>
+</tbody></table>
+<p>If you wanted to summarize the architecture in one sentence, it would be:</p>
+<blockquote>
+<p>TwoFac uses a stable cross-platform <strong>session contract</strong>, but lets each platform decide how to bind the vault passkey to the strongest device credential it can offer.</p>
+</blockquote>
+<h2>The Security Model in Plain English</h2>
+<p>There are three layers here:</p>
+<ol>
+<li><strong>The vault passkey is still the root secret</strong> for unlocking the encrypted OTP/account store.</li>
+<li><strong>The session manager decides whether that passkey can be remembered.</strong></li>
+<li><strong>The secure session manager decides whether the passkey can be recovered only after device verification.</strong></li>
+</ol>
+<p>That means secure session management is not about replacing encryption of the vault itself. It is about replacing “type the passkey every time” with “prove you are the device owner, then recover the same passkey safely.”</p>
+<p>In practice:</p>
+<ul>
+<li>Android does this with a biometric-bound Keystore key.</li>
+<li>iOS currently does it with a biometric gate around a weaker storage location, though Apple’s proper model is Keychain-based.</li>
+<li>Web does it with a WebAuthn credential that helps derive the key used to open the encrypted blob.</li>
+</ul>
+<h2>What I’d Improve Next</h2>
+<p>If I were prioritizing security follow-up work in this area, it would be:</p>
+<ol>
+<li><strong>Move iOS from <code>NSUserDefaults</code> to Keychain</strong> with <code>SecAccessControl</code> and Face ID / Touch ID integration.</li>
+<li>Preserve the current <code>SessionManager</code> / <code>SecureSessionManager</code> interfaces, because they already model the right responsibilities.</li>
+<li>Continue treating browser plaintext as session-only memory, not durable storage.</li>
+</ol>
+<p>That would make the iOS path match the intent already captured in the shared interfaces and bring the native mobile implementations into much closer alignment.</p>
+<hr>
+<h3>Links and References</h3>
+<h4>TwoFac implementation</h4>
+<ol>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/session/SessionManager.kt">SessionManager.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/session/SecureSessionManager.kt">SecureSessionManager.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/session/BiometricSessionManager.kt">BiometricSessionManager.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/session/WebAuthnSessionManager.kt">WebAuthnSessionManager.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/viewmodels/AccountsViewModel.kt">AccountsViewModel.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/HomeScreen.kt">HomeScreen.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/commonMain/kotlin/tech/arnav/twofac/screens/SettingsScreen.kt">SettingsScreen.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/androidMain/kotlin/tech/arnav/twofac/session/AndroidBiometricSessionManager.kt">AndroidBiometricSessionManager.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/iosMain/kotlin/tech/arnav/twofac/session/IosBiometricSessionManager.kt">IosBiometricSessionManager.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/session/BrowserSessionManager.kt">BrowserSessionManager.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/typescript/src/webauthn.mts">webauthn.mts</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/typescript/src/crypto.mts">crypto.mts</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/androidMain/kotlin/tech/arnav/twofac/di/AndroidModules.kt">AndroidModules.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/iosMain/kotlin/tech/arnav/twofac/di/IosModules.kt">IosModules.kt</a></li>
+<li><a href="https://github.com/championswimmer/TwoFac/blob/main/composeApp/src/wasmJsMain/kotlin/tech/arnav/twofac/di/WasmModules.kt">WasmModules.kt</a></li>
+</ol>
+<h4>Platform documentation</h4>
+<ol start="16">
+<li><a href="https://developer.android.com/privacy-and-security/keystore">Android Keystore system</a></li>
+<li><a href="https://developer.android.com/privacy-and-security/cryptography">Android cryptography recommendations</a></li>
+<li><a href="https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setInvalidatedByBiometricEnrollment(boolean)">KeyGenParameterSpec.Builder#setInvalidatedByBiometricEnrollment</a></li>
+<li><a href="https://developer.android.com/identity/sign-in/biometric-auth">BiometricPrompt overview</a></li>
+<li><a href="https://developer.apple.com/documentation/security/keychain-services">Keychain Services</a></li>
+<li><a href="https://developer.apple.com/documentation/security/using-the-keychain-to-manage-user-secrets">Using the keychain to manage user secrets</a></li>
+<li><a href="https://developer.apple.com/documentation/localauthentication/">Local Authentication</a></li>
+<li><a href="https://developer.apple.com/documentation/localauthentication/accessing-keychain-items-with-face-id-or-touch-id">Accessing Keychain Items with Face ID or Touch ID</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API">MDN: Web Authentication API</a></li>
+<li><a href="https://www.w3.org/TR/webauthn-3/#sctn-prf-extension">W3C WebAuthn Level 3: PRF extension</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">MDN: Web Crypto API</a></li>
+</ol>
+</div></article><!--]--></main><footer class="bg-secondary-900 text-secondary-300 dark:bg-secondary-950"><div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16"><div class="grid grid-cols-2 gap-8 md:grid-cols-4"><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Product</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/features" class="text-sm text-secondary-400 transition-colors hover:text-white">Features</a></li><li><a href="/screenshots" class="text-sm text-secondary-400 transition-colors hover:text-white">Screenshots</a></li><li><a href="/download" class="text-sm text-secondary-400 transition-colors hover:text-white">Download</a></li><li><a href="/getting-started" class="text-sm text-secondary-400 transition-colors hover:text-white">Getting Started</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Resources</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/blog" class="text-sm text-secondary-400 transition-colors hover:text-white">Blog</a></li><li><a href="/faq" class="text-sm text-secondary-400 transition-colors hover:text-white">FAQ</a></li><li><a href="/privacy" class="text-sm text-secondary-400 transition-colors hover:text-white">Privacy Policy</a></li><li><a href="/terms" class="text-sm text-secondary-400 transition-colors hover:text-white">Terms of Service</a></li><!--]--><!--[--><li><a href="/getting-started" class="text-sm text-secondary-400 transition-colors hover:text-white">Documentation</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Compare</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/compare/google-authenticator" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Google Authenticator</a></li><li><a href="/compare/microsoft-authenticator" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Microsoft Authenticator</a></li><li><a href="/compare/2fas" class="text-sm text-secondary-400 transition-colors hover:text-white">vs 2FAS</a></li><li><a href="/compare/ente-auth" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Ente Auth</a></li><li><a href="/compare/bitwarden" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Bitwarden</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Community</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="text-sm text-secondary-400 transition-colors hover:text-white">GitHub</a></li><!--]--></ul></div></div></div><div class="border-t border-secondary-800"><div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6 lg:px-8"><div class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-6 w-6"><p class="text-sm text-secondary-500"> © TwoFac. Open source under MIT License. </p></div><div class="flex items-center gap-4"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="text-secondary-500 transition-colors hover:text-white" aria-label="GitHub"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg></a></div></div></div></footer></div></div>
+  
+
+</body></html>

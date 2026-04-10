@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/twofac-logo.svg">
+    <meta property="og:image" content="https://twofac.app/twofac_logo_512.png">
+    <meta property="og:type" content="article">
+    <title>Architecting TwoFac: My Journey into Kotlin Multiplatform Module Structure | TwoFac</title>
+    <script type="module" crossorigin="" src="/assets/app-BqGfpUbj.js"></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/app-L3I-2G66.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/BlogPostPage-BpeaQ4sw.js"><link rel="stylesheet" href="/assets/BlogPostPage-DCd6wkF3.css"><link rel="modulepreload" crossorigin="" href="/assets/useSEO-BRP-hXqu.js"><meta name="description" content="In my previous post, I talked about why I&amp;#39;m building TwoFac. The short version? I got tired of proprietary &amp;quot;digital cages&amp;quot; like Authy and wanted an authenticator that was open, secure, a"><meta name="robots" content="index, follow"><meta property="og:site_name" content="TwoFac"><meta property="og:title" content="Architecting TwoFac: My Journey into Kotlin Multiplatform Module Structure | TwoFac"><meta property="og:description" content="In my previous post, I talked about why I&amp;#39;m building TwoFac. The short version? I got tired of proprietary &amp;quot;digital cages&amp;quot; like Authy and wanted an authenticator that was open, secure, a"><meta property="og:url" content="https://twofac.app/blog/architecting-twofac-kotlin-multiplatform-module-structure"><meta property="article:published_time" content="2026-03-02T10:00:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Architecting TwoFac: My Journey into Kotlin Multiplatform Module Structure | TwoFac"><meta name="twitter:description" content="In my previous post, I talked about why I&amp;#39;m building TwoFac. The short version? I got tired of proprietary &amp;quot;digital cages&amp;quot; like Authy and wanted an authenticator that was open, secure, a"><meta name="twitter:image" content="https://twofac.app/twofac_logo_512.png"><link rel="canonical" href="https://twofac.app/blog/architecting-twofac-kotlin-multiplatform-module-structure"></head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="min-h-screen flex flex-col" data-v-83a734da=""><header class="sticky top-0 z-50 w-full border-b border-secondary-200 bg-secondary-50 dark:border-secondary-800 dark:bg-secondary-950"><nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"><a href="/" class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-8 w-8"><span class="text-xl font-bold tracking-tight text-secondary-900 dark:text-white"> TwoFac </span></a><div class="hidden items-center gap-1 md:flex"><!--[--><a href="/features" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Features</a><a href="/screenshots" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Screenshots</a><a href="/download" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Download</a><a href="/blog" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Blog</a><a href="/faq" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">FAQ</a><!--]--></div><div class="hidden items-center gap-3 md:flex"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-secondary-300 bg-secondary-50 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg> GitHub </a></div><button type="button" class="inline-flex items-center justify-center rounded-lg p-2 text-secondary-500 transition-colors hover:bg-secondary-100 hover:text-secondary-700 md:hidden dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white" aria-expanded="false" aria-label="Toggle navigation menu"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5"></path></svg></button></nav><!----></header><main class="flex-1"><!--[--><article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16" data-v-83a734da=""><a href="/blog" class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline mb-8" data-v-83a734da=""> ← Back to Blog </a><header class="mb-8" data-v-83a734da=""><time datetime="2026-03-02T10:00:00.000Z" class="text-sm text-secondary-500 dark:text-secondary-400" data-v-83a734da="">March 2, 2026</time><h1 class="mt-2 text-3xl sm:text-4xl font-bold text-secondary-900 dark:text-white leading-tight" data-v-83a734da="">Architecting TwoFac: My Journey into Kotlin Multiplatform Module Structure</h1><div class="mt-4 flex flex-wrap gap-2" data-v-83a734da=""><!--[--><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">kotlin</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">kmp</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">architecture</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">opensource</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">multiplatform</span><!--]--></div></header><div class="blog-content" data-v-83a734da=""><p><img src="/images/blogs/01-kmp-hero-image.png" alt=""></p>
+<p>In my <a href="https://arnav.tech/my-next-project-building-the-open-source-cross-platform-authenticator-i-always-wanted">previous post</a>, I talked about why I'm building <strong>TwoFac</strong>. The short version? I got tired of proprietary "digital cages" like Authy and wanted an authenticator that was open, secure, and—most importantly—everywhere I am.</p>
+<p>When I started sketching out the project, I knew I wanted it to run on everything from my Android phone and Apple Watch to my Linux terminal and Chrome browser. But as usually happens during such "yak shaving sessions," I spent a good chunk of time just thinking about the architecture. How do you share code between a SwiftUI Watch app, a Wasm-based browser extension, and a native Linux CLI without losing your mind?</p>
+<p>Today, I want to walk you through the technical decisions and the module structure that makes TwoFac possible.</p>
+<h2>The Core Philosophy: Logic as a Library</h2>
+<p><img src="/images/blogs/01-kmp-architecture.jpg" alt=""></p>
+<p>A mistake I see often in cross-platform development is trying to force a single UI framework onto every device. While Compose Multiplatform is amazing (and we use it!), sometimes you just want a native experience—like on the tiny circular screen of a watch.</p>
+<p>I decided that the "brain" of TwoFac—the part that handles TOTP/HOTP generation, <code>otpauth://</code> parsing, and encryption—should be a pure, logic-only library. It shouldn't know or care about buttons, screens, or viewmodels.</p>
+<p>This became our <code>sharedLib</code> module.</p>
+<h3>How the Platforms Connect to the Core</h3>
+<p>Because <code>sharedLib</code> is pure Kotlin Multiplatform, it gets exported in formats native to every ecosystem we target. But how do the actual applications consume it? This is where the module structure gets interesting.</p>
+<p><strong>The <code>composeApp</code> Bridge:</strong>
+Most of our visual applications—Android, Desktop, and Web—reside in the <code>composeApp</code> module. This module depends directly on <code>sharedLib</code> as a standard Kotlin library. It acts as the shared UI layer, using Compose Multiplatform to draw the screens.</p>
+<ul>
+<li><strong>Desktop:</strong> The <code>composeApp</code> can be compiled into native desktop GUI applications, packaged as standard installers (<code>.dmg</code> for macOS, <code>.msi</code> for Windows, <code>.deb</code> for Linux).</li>
+<li><strong>Web (WasmJS):</strong> For the web, <code>composeApp</code> uses the new <code>wasmJs</code> target. This allows us to deploy the app as a downloadable Progressive Web App (PWA) running via an <code>index.html</code>. Incredibly, we use the exact same compiled Wasm binary to power the <code>popup.html</code> and <code>sidepanel.html</code> of our Chrome and Firefox browser extensions!</li>
+</ul>
+<p><strong>Thin Wrappers for Mobile:</strong>
+If <code>composeApp</code> holds the UI, how do the mobile apps work? We have very thin <code>androidApp</code> and <code>iosApp</code> modules that essentially just "boot up" the shared UI.</p>
+<ul>
+<li>For Android, <code>androidApp</code> just contains the <code>MainActivity</code> that calls the Compose content. With the recent Android Gradle Plugin (AGP) 9.0 updates, keeping the Android application plugin (<code>com.android.application</code>) separate from the Kotlin Multiplatform plugin (<code>org.jetbrains.kotlin.multiplatform</code>) is actually mandated, making this thin wrapper pattern not just good architecture, but a requirement.</li>
+<li>Similarly, <code>iosApp</code> is just a standard Xcode project with a Swift entry point that delegates to the shared Compose UI framework.</li>
+</ul>
+<p><strong>The Pure Native CLI (<code>cliApp</code>):</strong></p>
+<p><img src="/images/blogs/01-kmp-cli.jpg" alt=""></p>
+<p>Our CLI tool is completely separate from <code>composeApp</code>. It depends directly on <code>sharedLib</code>. But here is the cool part: <code>cliApp</code> uses Kotlin/Native to compile into a pure native binary for Mac, Windows, and Linux. There is zero JVM involved when you run <code>2fac</code> in your terminal; it links against <code>sharedLib</code> as a native <code>klib</code>, making it incredibly fast.</p>
+<p><strong>Why the Watches Stand Alone:</strong>
+You might notice we have separate <code>watchApp</code> (Android Wear) and iOS watch modules. Why not use <code>composeApp</code>?
+A full-blown Compose Multiplatform UI is heavy, and on a tiny circular screen, the UI needs are fundamentally different. I didn't want the watch apps to inherit the bloat of the main application. Instead, they are designed to be thin clients that simply display synced accounts. Therefore, they bypass <code>composeApp</code> entirely and depend directly on <code>sharedLib</code> to handle the decryption and TOTP generation locally, using native UI frameworks (like SwiftUI for the Apple Watch) for the best possible performance and look.</p>
+<h3>Desktop and CLI Applications</h3>
+<p>Our desktop and command-line interfaces are tailored for each major operating system. The CLI links directly to the <code>sharedLib</code> for instant native execution, while the graphical desktop apps use <code>composeApp</code> to render the UI.</p>
+<pre class="mermaid">graph TD
+    sharedLib["sharedLib&lt;br/&gt;(Pure KMP Logic)"]
+    composeApp["composeApp&lt;br/&gt;(Compose Multiplatform)"]
+    
+    sharedLib --&gt;|api| composeApp
+
+    subgraph Desktop Applications
+        deskMac["macOS (.dmg)"]
+        deskWin["Windows (.msi)"]
+        deskLin["Linux (.deb)"]
+    end
+
+    subgraph Native CLI Applications
+        cliMac["macOS (2fac)"]
+        cliWin["Windows (2fac.exe)"]
+        cliLin["Linux (2fac)"]
+    end
+    
+    composeApp --&gt;|nativeDistributions| deskMac
+    composeApp --&gt;|nativeDistributions| deskWin
+    composeApp --&gt;|nativeDistributions| deskLin
+    
+    sharedLib --&gt;|implementation| cliMac
+    sharedLib --&gt;|implementation| cliWin
+    sharedLib --&gt;|implementation| cliLin</pre>
+<h3>Mobile and Watch Applications</h3>
+<p>For mobile devices, <code>composeApp</code> acts as the shared UI layer wrapped by very thin native application projects. However, the watch apps bypass the shared UI layer entirely, directly consuming <code>sharedLib</code> and using platform-native UIs (Compose for WearOS and SwiftUI for Apple Watch).</p>
+<pre class="mermaid">graph TD
+    sharedLib["sharedLib&lt;br/&gt;(Pure KMP Logic)"]
+    composeApp["composeApp&lt;br/&gt;(Compose Multiplatform)"]
+    
+    sharedLib --&gt;|api| composeApp
+
+    subgraph Mobile Apps
+        androidApp["androidApp&lt;br/&gt;(Android)"]
+        iosApp["iosApp&lt;br/&gt;(iOS)"]
+    end
+
+    subgraph Standalone Watch Apps
+        wearApp["watchApp&lt;br/&gt;(Android WearOS)"]
+        appleWatch["watchApp&lt;br/&gt;(Apple watchOS)"]
+    end
+
+    composeApp --&gt;|implementation| androidApp
+    composeApp --&gt;|TwoFacUIKit.framework| iosApp
+    
+    sharedLib --&gt;|implementation| wearApp
+    sharedLib --&gt;|TwoFacKit.framework| appleWatch</pre>
+<h3>Web App and Browser Extensions</h3>
+<p>Leveraging the power of Wasm, the exact same <code>composeApp</code> output is used to generate our Progressive Web App as well as our browser extensions, ensuring complete feature parity across the web ecosystem.</p>
+<pre class="mermaid">graph TD
+    sharedLib["sharedLib&lt;br/&gt;(Pure KMP Logic)"]
+    composeApp["composeApp&lt;br/&gt;(Compose Multiplatform)"]
+    
+    sharedLib --&gt;|api| composeApp
+
+    subgraph Web Targets
+        webPwa["Web PWA&lt;br/&gt;(index.html)"]
+        chromeExt["Chrome Extension&lt;br/&gt;(Manifest V3)"]
+        firefoxExt["Firefox Extension&lt;br/&gt;(Manifest V2/V3)"]
+    end
+
+    composeApp --&gt;|wasmJsBrowserDistribution| webPwa
+    composeApp --&gt;|wasmJsBrowserDistribution| chromeExt
+    composeApp --&gt;|wasmJsBrowserDistribution| firefoxExt</pre>
+<h2>The "Terminal First" Experience</h2>
+<p>I use CLI tools extensively (lately, I've been living in tools like Claude Code), and I wanted TwoFac to feel like a native citizen of the terminal. </p>
+<p>Since <code>sharedLib</code> can compile to native binaries, our <code>cliApp</code> is a lightning-fast tool with zero JVM overhead. I'm using <a href="https://ajalt.github.io/clikt/">Clikt</a> for command parsing and <a href="https://github.com/ajalt/mordant">Mordant</a> for those pretty terminal colors we all love.</p>
+<p>When I run <code>2fac generate github</code>, I don't want to wait for a runtime to boot up. I want my code, and I want it now.</p>
+<h2>Managing the Chaos with Version Catalogs</h2>
+<p>If you've followed my blog for a while, you know <a href="https://arnav.tech/managing-libraries-and-dependencies-in-android-projects-with-gradle-version-catalog">I'm a big fan of Gradle Version Catalogs</a>. With 10+ targets and multiple modules, trying to keep versions in sync manually would be a nightmare.</p>
+<p>Every single dependency in TwoFac is managed in <code>gradle/libs.versions.toml</code>. Whether it's the Kotlin version or a specific crypto provider, it's defined once.</p>
+<pre><code class="language-toml">[versions]
+kotlin = "2.3.10"
+kstore = "2.0.4"
+crypto-kt = "0.5.0"
+
+[libraries]
+kstore-core = { module = "tech.arnav:kstore", version.ref = "kstore" }
+crypto-core = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "crypto-kt" }
+</code></pre>
+<h2>Data Persistence: Enter KStore</h2>
+<p><img src="/images/blogs/01-kmp-kstore.jpg" alt=""></p>
+<p>One problem I faced early on was how to handle data storage. A browser extension uses <code>localStorage</code>, a mobile app uses files (or DataStore), and a CLI tool might use a hidden folder in <code>$HOME</code>.</p>
+<p>I absolutely love <a href="https://github.com/championswimmer/KStore">KStore</a> for this. It provides a unified, coroutine-based API for storage across all platforms. In TwoFac, we use it to save our <code>accounts.json</code>—the encrypted store for all your 2FA secrets—regardless of whether we're on a watch, a phone, or a server.</p>
+<h3>Finding the "Right" Directory with AppDirs</h3>
+<p>But where exactly should <code>accounts.json</code> live? On Windows, it should be in <code>AppData/Roaming</code>. On macOS, it's <code>Library/Application Support</code>. On Linux, it's usually <code>$HOME/.local/share</code>. </p>
+<p>To handle this, I used the <a href="https://github.com/Syer123/kotlin-multiplatform-appdirs">Kotlin Multiplatform AppDirs</a> library. It's a KMP rewrite of the classic Java <code>AppDirs</code> library that helps you find these platform-specific directories without writing a single line of <code>expect/actual</code> code.</p>
+<h3>A Fork for the Modern Age</h3>
+<p>You might notice in our <code>libs.versions.toml</code> that we're using my own fork of KStore (<code>tech.arnav:kstore</code>). </p>
+<p>While the original <a href="https://github.com/xxfast/KStore">xxfast/KStore</a> is excellent, it hadn't been updated to use the latest <strong>Kotlin Multiplatform Hierarchy Template</strong>. This new internal structure in Kotlin 1.9.20+ makes it much easier to share code between intermediate targets (like <code>appleMain</code> or <code>nativeMain</code>). I forked it to ensure TwoFac could benefit from the most modern Gradle setups and to add support for the <code>wasmJs</code> targets we need for our browser extensions.</p>
+<h2>What's Next?</h2>
+<p>By keeping the core logic decoupled from the UI, we've built an architecture that is both flexible and robust. The same security audits that apply to the CLI tool automatically apply to the Apple Watch app, because they are running the exact same code.</p>
+<p>In the next post, I'll dive into the <strong>Cryptography</strong> side of things—how we use <code>cryptography-kotlin</code> to keep your secrets safe while making them accessible across all your devices.</p>
+<hr>
+<h3>Links and References</h3>
+<ul>
+<li><a href="https://github.com/championswimmer/TwoFac">TwoFac GitHub Repository</a></li>
+<li><a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform Documentation</a></li>
+<li><a href="https://kotlinlang.org/docs/multiplatform.html">Kotlin Multiplatform Official Guide</a></li>
+</ul>
+</div></article><!--]--></main><footer class="bg-secondary-900 text-secondary-300 dark:bg-secondary-950"><div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16"><div class="grid grid-cols-2 gap-8 md:grid-cols-4"><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Product</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/features" class="text-sm text-secondary-400 transition-colors hover:text-white">Features</a></li><li><a href="/screenshots" class="text-sm text-secondary-400 transition-colors hover:text-white">Screenshots</a></li><li><a href="/download" class="text-sm text-secondary-400 transition-colors hover:text-white">Download</a></li><li><a href="/getting-started" class="text-sm text-secondary-400 transition-colors hover:text-white">Getting Started</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Resources</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/blog" class="text-sm text-secondary-400 transition-colors hover:text-white">Blog</a></li><li><a href="/faq" class="text-sm text-secondary-400 transition-colors hover:text-white">FAQ</a></li><li><a href="/privacy" class="text-sm text-secondary-400 transition-colors hover:text-white">Privacy Policy</a></li><li><a href="/terms" class="text-sm text-secondary-400 transition-colors hover:text-white">Terms of Service</a></li><!--]--><!--[--><li><a href="/getting-started" class="text-sm text-secondary-400 transition-colors hover:text-white">Documentation</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Compare</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/compare/google-authenticator" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Google Authenticator</a></li><li><a href="/compare/microsoft-authenticator" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Microsoft Authenticator</a></li><li><a href="/compare/2fas" class="text-sm text-secondary-400 transition-colors hover:text-white">vs 2FAS</a></li><li><a href="/compare/ente-auth" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Ente Auth</a></li><li><a href="/compare/bitwarden" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Bitwarden</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Community</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="text-sm text-secondary-400 transition-colors hover:text-white">GitHub</a></li><!--]--></ul></div></div></div><div class="border-t border-secondary-800"><div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6 lg:px-8"><div class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-6 w-6"><p class="text-sm text-secondary-500"> © TwoFac. Open source under MIT License. </p></div><div class="flex items-center gap-4"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="text-secondary-500 transition-colors hover:text-white" aria-label="GitHub"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg></a></div></div></div></footer></div></div>
+  
+
+</body></html>

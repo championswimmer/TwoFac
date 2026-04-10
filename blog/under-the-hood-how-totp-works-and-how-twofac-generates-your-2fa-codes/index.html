@@ -1,0 +1,670 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/twofac-logo.svg">
+    <meta property="og:image" content="https://twofac.app/twofac_logo_512.png">
+    <meta property="og:type" content="article">
+    <title>Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes | TwoFac</title>
+    <script type="module" crossorigin="" src="/assets/app-BqGfpUbj.js"></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/app-L3I-2G66.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/BlogPostPage-BpeaQ4sw.js"><link rel="stylesheet" href="/assets/BlogPostPage-DCd6wkF3.css"><link rel="modulepreload" crossorigin="" href="/assets/useSEO-BRP-hXqu.js"><meta name="description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta name="robots" content="index, follow"><meta property="og:site_name" content="TwoFac"><meta property="og:title" content="Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes | TwoFac"><meta property="og:description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta property="og:url" content="https://twofac.app/blog/under-the-hood-how-totp-works-and-how-twofac-generates-your-2fa-codes"><meta property="article:published_time" content="2026-03-08T10:00:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes | TwoFac"><meta name="twitter:description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta name="twitter:image" content="https://twofac.app/twofac_logo_512.png"><link rel="canonical" href="https://twofac.app/blog/under-the-hood-how-totp-works-and-how-twofac-generates-your-2fa-codes"></head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="min-h-screen flex flex-col" data-v-83a734da=""><header class="sticky top-0 z-50 w-full border-b border-secondary-200 bg-secondary-50 dark:border-secondary-800 dark:bg-secondary-950"><nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"><a href="/" class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-8 w-8"><span class="text-xl font-bold tracking-tight text-secondary-900 dark:text-white"> TwoFac </span></a><div class="hidden items-center gap-1 md:flex"><!--[--><a href="/features" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Features</a><a href="/screenshots" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Screenshots</a><a href="/download" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Download</a><a href="/blog" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Blog</a><a href="/faq" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">FAQ</a><!--]--></div><div class="hidden items-center gap-3 md:flex"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-secondary-300 bg-secondary-50 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg> GitHub </a></div><button type="button" class="inline-flex items-center justify-center rounded-lg p-2 text-secondary-500 transition-colors hover:bg-secondary-100 hover:text-secondary-700 md:hidden dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white" aria-expanded="false" aria-label="Toggle navigation menu"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5"></path></svg></button></nav><!----></header><main class="flex-1"><!--[--><article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16" data-v-83a734da=""><a href="/blog" class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline mb-8" data-v-83a734da=""> ← Back to Blog </a><header class="mb-8" data-v-83a734da=""><time datetime="2026-03-08T10:00:00.000Z" class="text-sm text-secondary-500 dark:text-secondary-400" data-v-83a734da="">March 8, 2026</time><h1 class="mt-2 text-3xl sm:text-4xl font-bold text-secondary-900 dark:text-white leading-tight" data-v-83a734da="">Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes</h1><div class="mt-4 flex flex-wrap gap-2" data-v-83a734da=""><!--[--><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">kotlin</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">cryptography</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">totp</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">hotp</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">security</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">2fa</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">opensource</span><!--]--></div></header><div class="blog-content" data-v-83a734da=""><p>In the <a href="https://arnav.tech/architecting-twofac-my-journey-into-kotlin-multiplatform-module-structure">previous article</a>, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the shared core: OTP generation itself. When you open an authenticator app and watch a 6-digit code ticking down, it's easy to treat it as magic and move on. But there's some genuinely elegant cryptography behind that little countdown. In this post, I'm going to pop the hood on <strong>TOTP</strong> — Time-based One-Time Passwords — unpack the math, walk through the RFCs, and then show how we implement it in TwoFac.</p>
+<blockquote>
+<p><strong>Note:</strong> This post focuses only on OTP generation — how we take a shared secret and turn it into those familiar 6-digit codes. How we <em>store</em> secrets securely (PBKDF2, AES-GCM, the <code>accounts.json</code> file) is a story for the next post.</p>
+</blockquote>
+<p><img src="/images/blogs/02-cover-image.png" alt="Cover Image"></p>
+<h2>Why Do We Even Need a "Second Factor"?</h2>
+<p>Passwords on their own are brittle. People reuse them, attackers phish them, data breaches leak them, and brute-force attacks are still very real. The whole point of two-factor authentication (2FA) is to pair <strong>something you know</strong> (your password) with <strong>something you have</strong> (your phone or authenticator app).</p>
+<p>So even if an attacker gets your password, they still need physical access to your device to produce the current OTP. And since that OTP rotates every 30 seconds, a stolen code has a very short shelf life.</p>
+<p>What makes TOTP-based 2FA especially nice is that it works <strong>offline</strong>. Your authenticator app doesn't have to call home to some server. The app and the server both compute the same code independently from a shared secret and the current time. No SMS, no push, no network dependency. Just math.</p>
+<h2>Starting from the Foundation: HOTP</h2>
+<p>To understand TOTP properly, we first need HOTP — HMAC-based One-Time Password — defined in <a href="https://datatracker.ietf.org/doc/html/rfc4226">RFC 4226</a>.</p>
+<p>At a high level, HOTP is simple. You take a <strong>shared secret</strong> and a <strong>counter</strong>, run them through HMAC, and then squeeze the result into a number a human can actually type.</p>
+<h3>The HOTP Algorithm Step-by-Step</h3>
+<p>Here's the formula:</p>
+<pre><code>HOTP(K, C) = Truncate(HMAC-SHA1(K, C)) mod 10^d
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><strong>K</strong> = the shared secret key (a byte array)</li>
+<li><strong>C</strong> = an 8-byte counter value (big-endian)</li>
+<li><strong>d</strong> = the number of digits in the output (usually 6)</li>
+</ul>
+<p>Let's walk through that one piece at a time.</p>
+<h4>Step 1: Counter to Bytes</h4>
+<p>The counter is a 64-bit integer, and the RFC wants it encoded as an 8-byte array in big-endian order. So if the counter is <code>5</code>, the bytes look like this:</p>
+<pre><code>[0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05]
+</code></pre>
+<h4>Step 2: HMAC-SHA1</h4>
+<p>Next we compute <a href="https://datatracker.ietf.org/doc/html/rfc2104">HMAC</a>, using the shared secret as the key and the counter bytes as the message. With SHA-1 underneath, that gives us a <strong>20-byte</strong> (160-bit) output.</p>
+<p>Formally, HMAC is defined as:</p>
+<pre><code>HMAC(K, text) = H((K' ⊕ opad) || H((K' ⊕ ipad) || text))
+</code></pre>
+<p>Here, <code>ipad</code> is <code>0x36</code> repeated, <code>opad</code> is <code>0x5c</code> repeated, and <code>K'</code> is the key padded to the hash function's block size (64 bytes for SHA-1). If that formula looks a bit hostile, that's normal; in real code you let a crypto library handle it.</p>
+<h4>Step 3: Dynamic Truncation</h4>
+<p>This is the neat part. We have a 20-byte HMAC output, but what we actually want is a 6-digit code. RFC 4226 solves that with <strong>dynamic truncation</strong>:</p>
+<ol>
+<li>Take the <strong>last byte</strong> of the HMAC and look at its lowest 4 bits. That gives you an <strong>offset</strong> (0–15).</li>
+<li>Starting at that offset, grab <strong>4 consecutive bytes</strong>.</li>
+<li>Mask off the most significant bit (to avoid sign issues), which leaves you with a <strong>31-bit unsigned integer</strong>.</li>
+</ol>
+<pre><code>offset = hmac[19] &amp; 0x0F
+
+code = ((hmac[offset]     &amp; 0x7F) &lt;&lt; 24)
+     | ((hmac[offset + 1] &amp; 0xFF) &lt;&lt; 16)
+     | ((hmac[offset + 2] &amp; 0xFF) &lt;&lt; 8)
+     |  (hmac[offset + 3] &amp; 0xFF)
+</code></pre>
+<h4>Step 4: Modulo</h4>
+<p>From there, it's straightforward: take that 31-bit integer modulo <code>10^digits</code>, then pad with leading zeros if needed:</p>
+<pre><code>otp = code % 1000000  →  "038314"
+</code></pre>
+<h3>Visualizing the HOTP Flow</h3>
+<p><img src="/images/blogs/02-hotp-flow.jpg" alt="HOTP Flow"></p>
+<details>
+    <summary>Diagram: HOTP Flow</summary>
+
+<pre class="mermaid">flowchart LR
+    K["🔑 Secret Key&lt;br/&gt;(Base32 decoded)"]
+    C["🔢 Counter&lt;br/&gt;(8 bytes, big-endian)"]
+    HMAC["HMAC-SHA1(K, C)&lt;br/&gt;→ 20 bytes"]
+    DT["Dynamic Truncation&lt;br/&gt;→ 31-bit integer"]
+    MOD["mod 10^6&lt;br/&gt;→ 6-digit OTP"]
+
+    K --&gt; HMAC
+    C --&gt; HMAC
+    HMAC --&gt; DT
+    DT --&gt; MOD</pre>
+</details>
+
+
+<h3>HOTP's Limitation: The Counter Sync Problem</h3>
+<p>HOTP works, but it comes with an annoying operational problem: both the client and the server have to keep a synchronized counter. Every time you generate a code, that counter moves forward. If you generate a code and <em>don't</em> use it, your device advances but the server doesn't. Now the two sides disagree.</p>
+<p>Servers usually paper over this with a "look-ahead window" — they'll try <code>C</code>, <code>C+1</code>, <code>C+2</code>, and so on up to some limit. That works, but it's a little fragile. And a stolen HOTP code stays valid until it's used or the counter moves past it.</p>
+<p>TOTP exists to get rid of exactly this headache.</p>
+<h2>Enter TOTP: Time as the Counter</h2>
+<p><strong>TOTP</strong> (<a href="https://datatracker.ietf.org/doc/html/rfc6238">RFC 6238</a>) is really just HOTP with one very good idea layered on top: instead of maintaining a counter, we <strong>derive the counter from the current time</strong>.</p>
+<pre><code>T = floor((CurrentUnixTime - T0) / TimeStep)
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><strong>CurrentUnixTime</strong> = seconds since the Unix epoch (1970-01-01 00:00:00 UTC)</li>
+<li><strong>T0</strong> = the reference time (usually 0, i.e., the epoch itself)</li>
+<li><strong>TimeStep</strong> = how often the code changes (usually <strong>30 seconds</strong>)</li>
+</ul>
+<p>Once we have <code>T</code>, we just feed it into HOTP as the counter:</p>
+<pre><code>TOTP(K, T) = HOTP(K, T)
+</code></pre>
+<p>That's the whole trick. TOTP is basically "take HOTP, but make the counter come from time."</p>
+<h3>Why 30 Seconds?</h3>
+<p>Thirty seconds is a compromise between security and usability. Shorter windows, like 10 seconds, are stricter but don't leave humans much time to read and type the code. Longer windows, like 60 seconds, are friendlier but give an attacker more time to reuse a stolen code. <a href="https://datatracker.ietf.org/doc/html/rfc6238">RFC 6238</a> lands on 30 seconds because it's a pretty sensible middle ground.</p>
+<h3>Clock Drift Tolerance</h3>
+<p>Real devices don't keep perfect time, so a bit of clock drift is expected. To account for that, servers usually accept OTPs from the <strong>previous</strong>, <strong>current</strong>, and <strong>next</strong> time windows — effectively a 90-second acceptance window. That's usually enough to absorb minor drift without giving up much security.</p>
+<p><img src="/images/blogs/02-totp-flow.jpg" alt="TOTP Drift Tolerance"></p>
+<details>
+    <summary>Diagram: TOTP Drift Tolerance</summary>
+
+<pre class="mermaid">flowchart TD
+    TIME["⏱️ Current Unix Time&lt;br/&gt;e.g. 1741456539"]
+    CALC["T = floor(time / 30)&lt;br/&gt;= 58048551"]
+    HOTP["HOTP(Secret, T)&lt;br/&gt;(same algorithm as before)"]
+    OTP["🔢 6-digit OTP&lt;br/&gt;e.g. 483921"]
+
+    TIME --&gt; CALC
+    CALC --&gt; HOTP
+    HOTP --&gt; OTP
+
+    subgraph Server Validation
+        PREV["Check T-1 ✓"]
+        CURR["Check T ✓"]
+        NEXT["Check T+1 ✓"]
+    end
+
+    OTP -.-&gt;|"validate against"| PREV
+    OTP -.-&gt;|"validate against"| CURR
+    OTP -.-&gt;|"validate against"| NEXT</pre>
+</details>
+
+<h3>TOTP Supports More Hash Algorithms</h3>
+<p>While HOTP (RFC 4226) was specified with SHA-1 only, TOTP (RFC 6238) explicitly supports:</p>
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>HMAC Output</th>
+<th>RFC 6238 Test Vectors</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HMAC-SHA1</td>
+<td>20 bytes</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>HMAC-SHA256</td>
+<td>32 bytes</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>HMAC-SHA512</td>
+<td>64 bytes</td>
+<td>✅ Yes</td>
+</tr>
+</tbody></table>
+<p>The nice part is that dynamic truncation doesn't really care how large the hash output is. It still uses the last byte to find the offset, and it still extracts 4 bytes. The possible offset range also doesn't change: 4 bits means 0–15 whether the HMAC output is 20 bytes (SHA-1), 32 bytes (SHA-256), or 64 bytes (SHA-512).</p>
+<p>In practice, almost every service still uses SHA-1. A few more security-conscious services — some crypto exchanges are a common example — switch to SHA-256 or SHA-512 for the larger HMAC output.</p>
+<h2>How TOTP Provisioning Works: QR Codes and <code>otpauth://</code> URIs</h2>
+<p>When you turn on 2FA on a website, the flow usually looks like this under the hood:</p>
+<p><img src="/images/blogs/02-totp-registration-flow.jpg" alt=""></p>
+<details>
+    <summary>Diagram: TOTP Registration Flow</summary>
+
+<pre class="mermaid">sequenceDiagram
+    participant Server
+    participant Browser
+    participant App as Authenticator App
+
+    Server-&gt;&gt;Server: Generate random secret (e.g. 20 bytes)
+    Server-&gt;&gt;Server: Encode as otpauth:// URI
+    Server-&gt;&gt;Browser: Display QR code encoding the URI
+    Browser-&gt;&gt;App: User scans QR code
+    App-&gt;&gt;App: Parse otpauth:// URI, extract secret
+    App-&gt;&gt;App: Store secret locally
+    App-&gt;&gt;App: Generate TOTP code using secret + current time
+    App-&gt;&gt;Browser: User types the code
+    Browser-&gt;&gt;Server: Send code for verification
+    Server-&gt;&gt;Server: Generate TOTP with same secret + time
+    Server-&gt;&gt;Browser: Codes match → 2FA enabled ✅</pre>
+</details>
+
+<h3>Anatomy of an <code>otpauth://</code> URI</h3>
+<p>The QR code encodes a URI in the <a href="https://github.com/google/google-authenticator/wiki/Key-Uri-Format"><code>otpauth://</code> format</a>, formalized in the IETF draft <a href="https://datatracker.ietf.org/doc/draft-linuxgemini-otpauth-uri/">draft-linuxgemini-otpauth-uri</a>:</p>
+<pre><code>otpauth://totp/GitHub:alice@example.com?secret=JBSWY3DPEHPK3PXP&amp;issuer=GitHub&amp;algorithm=SHA1&amp;digits=6&amp;period=30
+</code></pre>
+<p>Here's what each piece is doing:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Example</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Scheme</strong></td>
+<td><code>otpauth://</code></td>
+<td>The URI scheme — tells the app this is an OTP credential</td>
+</tr>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>totp</code></td>
+<td>Either <code>totp</code> or <code>hotp</code></td>
+</tr>
+<tr>
+<td><strong>Label</strong></td>
+<td><code>GitHub:alice@example.com</code></td>
+<td>The issuer and account, separated by <code>:</code></td>
+</tr>
+<tr>
+<td><strong>secret</strong></td>
+<td><code>JBSWY3DPEHPK3PXP</code></td>
+<td>The shared secret, <a href="https://datatracker.ietf.org/doc/html/rfc4648">Base32</a>-encoded (no padding)</td>
+</tr>
+<tr>
+<td><strong>issuer</strong></td>
+<td><code>GitHub</code></td>
+<td>The service name (displayed in the app)</td>
+</tr>
+<tr>
+<td><strong>algorithm</strong></td>
+<td><code>SHA1</code></td>
+<td>Hash algorithm: <code>SHA1</code>, <code>SHA256</code>, or <code>SHA512</code> (default: SHA1)</td>
+</tr>
+<tr>
+<td><strong>digits</strong></td>
+<td><code>6</code></td>
+<td>Number of digits: 6 or 8 (default: 6)</td>
+</tr>
+<tr>
+<td><strong>period</strong></td>
+<td><code>30</code></td>
+<td>TOTP time step in seconds (default: 30)</td>
+</tr>
+<tr>
+<td><strong>counter</strong></td>
+<td><em>(HOTP only)</em></td>
+<td>Initial counter value for HOTP</td>
+</tr>
+</tbody></table>
+<p>The <code>secret</code> parameter is the bit that really matters. It's the shared secret that both the server and your authenticator app use to independently generate matching codes. It's Base32-encoded because Base32 sticks to uppercase letters and digits 2–7, which makes it much less annoying to display and type by hand if QR scanning fails.</p>
+<h2>How Do Other Authenticator Apps Store Secrets?</h2>
+<p>While researching this post, I went down a fun rabbit hole on how different authenticator apps store OTP secrets and backups. The range is <strong>wild</strong> — everything from "barely encrypted" to "actually pretty solid":</p>
+<h3>Google Authenticator</h3>
+<p>Google Authenticator's history here is... not great. On Android, it originally stored secrets in a <strong>plaintext SQLite database</strong> with no encryption at all. If a device was rooted, anyone with access could read all the 2FA secrets directly. When Google added cloud sync in 2023, it <a href="https://www.androidauthority.com/google-authenticator-e2e-encryption-3317498/">initially transferred secrets without end-to-end encryption</a>, which meant Google's servers could theoretically read them. They later <a href="https://security.googleblog.com/2023/04/google-authenticator-now-supports.html">added E2EE to cloud sync</a>, but local storage on Android still depends on OS-level sandboxing rather than app-level encryption.</p>
+<h3>Microsoft Authenticator</h3>
+<p>Microsoft Authenticator is more serious about this stuff. On iOS, secrets live in the <a href="https://developer.apple.com/documentation/security/keychain-services">Keychain</a>, and on Android they use <a href="https://developer.android.com/reference/androidx/security/crypto/EncryptedSharedPreferences">encrypted shared preferences</a>. Cloud backups are encrypted too: iCloud backups inherit Keychain protection, and Android backups go to Microsoft's servers with account-based encryption.</p>
+<h3>Authy (Twilio)</h3>
+<p>Authy was one of the first authenticator apps to offer cloud backup. Before upload, it encrypted secrets with a user-provided "backups password" (run through <a href="https://datatracker.ietf.org/doc/html/rfc2898">PBKDF2</a> or a similar KDF). The downside is that the app was proprietary and <a href="https://www.twilio.com/docs/authy">was sunset in 2024</a>, with users told to migrate away. Also in 2024, Twilio <a href="https://techcrunch.com/2024/07/03/twilio-says-hackers-identified-cell-phone-numbers-of-two-factor-app-authy-users/">disclosed a breach</a> where phone numbers tied to Authy accounts were leaked, though not the secrets themselves.</p>
+<h3>1Password &amp; Bitwarden</h3>
+<p>Both 1Password and Bitwarden treat TOTP secrets as just another field inside the encrypted vault. They use <a href="https://csrc.nist.gov/publications/detail/sp/800-38d/final">AES-256-GCM</a>, with keys derived from your master password via <a href="https://datatracker.ietf.org/doc/html/rfc2898">PBKDF2</a> in Bitwarden and <a href="https://www.rfc-editor.org/rfc/rfc9106.html">Argon2</a> in 1Password. So the OTP secret ends up protected the same way the rest of your vault item is. Both have also been <a href="https://bitwarden.com/help/is-bitwarden-audited/">independently audited</a> and are open-source to varying degrees (Bitwarden fully, 1Password's crypto components partially).</p>
+<h3>2FAS</h3>
+<p><a href="https://2fas.com/">2FAS</a> is fully open-source and keeps secrets encrypted on-device. It uses a user-provided password to derive the encryption key. Backups are encrypted files that you control yourself, with no mandatory cloud component. Their <a href="https://github.com/twofas">source code is available on GitHub</a>, which is a big win for auditability.</p>
+<h3>Ente Auth</h3>
+<p><a href="https://ente.io/auth/">Ente Auth</a> is another strong open-source option. Their cloud sync uses end-to-end encryption with <a href="https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/xchacha20-poly1305_construction">XChaCha20-Poly1305</a>, and the keys come from the user's password via Argon2. Their code is <a href="https://github.com/ente-io/ente">fully open-source</a> and has been independently audited.</p>
+<h3>Summary Table</h3>
+<table>
+<thead>
+<tr>
+<th>App</th>
+<th>Encryption at Rest</th>
+<th>Cloud Backup</th>
+<th>Backup Encryption</th>
+<th>Open Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Google Authenticator</td>
+<td>OS sandbox only</td>
+<td>Optional (Google)</td>
+<td>E2EE (added later)</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Microsoft Authenticator</td>
+<td>Keychain / EncryptedPrefs</td>
+<td>iCloud/Microsoft</td>
+<td>Account-based</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Authy</td>
+<td>Encrypted</td>
+<td>Yes (Twilio)</td>
+<td>Password-based</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>1Password</td>
+<td>AES-256-GCM</td>
+<td>Yes (1Password)</td>
+<td>Master password</td>
+<td>Partial</td>
+</tr>
+<tr>
+<td>Bitwarden</td>
+<td>AES-256-GCM</td>
+<td>Yes (Bitwarden)</td>
+<td>Master password</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2FAS</td>
+<td>Encrypted</td>
+<td>Optional (file)</td>
+<td>Password-based</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Ente Auth</td>
+<td>XChaCha20-Poly1305</td>
+<td>Yes (Ente)</td>
+<td>E2EE (Argon2)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>TwoFac</strong></td>
+<td>AES-256-GCM</td>
+<td>Optional (file)</td>
+<td>Password-based (PBKDF2)</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<h2>Diving Into Our Codebase</h2>
+<p>With the theory out of the way, let's look at how TwoFac actually wires this up. All of the OTP logic lives in our <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib"><code>sharedLib</code></a> module — the pure Kotlin Multiplatform library shared by every platform we target (Android, iOS, Desktop, Web, CLI, and Wear OS).</p>
+<h3>The Crypto Layer: <code>cryptography-kotlin</code></h3>
+<p>We use <a href="https://github.com/whyoleg/cryptography-kotlin">cryptography-kotlin</a> by <a href="https://github.com/whyoleg">whyoleg</a> — specifically <code>dev.whyoleg.cryptography</code> v0.5.0 — for all of our cryptographic primitives. What I like about this library is that it wraps <strong>platform-native</strong> crypto providers instead of trying to reinvent them:</p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Crypto Provider</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JVM (Android, Desktop, Wear OS)</td>
+<td>JDK (<code>java.security</code> / <code>javax.crypto</code>)</td>
+</tr>
+<tr>
+<td>Native (iOS, macOS, Linux CLI)</td>
+<td>OpenSSL 3</td>
+</tr>
+<tr>
+<td>Web (Wasm)</td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto API</a></td>
+</tr>
+</tbody></table>
+<p>So we're not shipping some homegrown crypto implementation. On each platform, we delegate to the <strong>battle-tested, OS-level crypto</strong> that's already available there. Here's what that dependency setup looks like in <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/build.gradle.kts"><code>sharedLib/build.gradle.kts</code></a>:</p>
+<pre><code class="language-kotlin">// commonMain
+implementation(libs.crypto.kt.core)       // Core API
+
+// jvmMain
+implementation(libs.crypto.kt.jdk)        // → java.security / javax.crypto
+
+// nativeMain (iOS, macOS, Linux)
+implementation(libs.crypto.kt.openssl)    // → OpenSSL 3
+
+// wasmJsMain (Web, Browser Extension)
+implementation(libs.crypto.kt.web)        // → Web Crypto API
+</code></pre>
+<h3>The CryptoTools Interface</h3>
+<p>All of the cryptographic operations sit behind a <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/crypto/CryptoTools.kt"><code>CryptoTools</code></a> interface:</p>
+<pre><code class="language-kotlin">interface CryptoTools {
+    enum class Algo { SHA1, SHA256, SHA512 }
+
+    suspend fun hmacSha(algorithm: Algo, key: ByteString, data: ByteString): ByteString
+    suspend fun createSigningKey(passKey: String, salt: ByteString? = null): SigningKey
+    suspend fun encrypt(key: ByteString, secret: ByteString): ByteString
+    suspend fun decrypt(encryptedData: ByteString, key: ByteString): ByteString
+}
+</code></pre>
+<p>Notice that everything is a <code>suspend fun</code>. That's not just Kotlin style for the sake of style. On some platforms — WebCrypto being the obvious one — cryptographic operations are <strong>inherently asynchronous</strong>. Making the interface suspend-based lets us use those native async APIs cleanly without blocking.</p>
+<p>The <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/crypto/DefaultCryptoTools.kt"><code>DefaultCryptoTools</code></a> implementation then hooks that interface up to <code>cryptography-kotlin</code>:</p>
+<pre><code class="language-kotlin">class DefaultCryptoTools(val cryptoProvider: CryptographyProvider) : CryptoTools {
+
+    val hmac = cryptoProvider.get(HMAC)
+
+    override suspend fun hmacSha(
+        algorithm: CryptoTools.Algo,
+        key: ByteString,
+        data: ByteString
+    ): ByteString {
+        val keyDecoder = when (algorithm) {
+            CryptoTools.Algo.SHA1 -&gt; hmac.keyDecoder(SHA1)
+            CryptoTools.Algo.SHA256 -&gt; hmac.keyDecoder(SHA256)
+            CryptoTools.Algo.SHA512 -&gt; hmac.keyDecoder(SHA512)
+        }
+        val hmacKey = keyDecoder.decodeFromByteString(HMAC.Key.Format.RAW, key)
+        val signature = hmacKey.signatureGenerator().generateSignature(data.toByteArray())
+        return ByteString(signature)
+    }
+}
+</code></pre>
+<h3>The OTP Interface</h3>
+<p>Both HOTP and TOTP implement a shared <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/otp/OTP.kt"><code>OTP</code></a> interface:</p>
+<pre><code class="language-kotlin">interface OTP {
+    val digits: Int                      // 6 or 8
+    val algorithm: CryptoTools.Algo      // SHA1, SHA256, SHA512
+    val secret: String                   // Base32-encoded
+    val accountName: String              // e.g. "alice@example.com"
+    val issuer: String?                  // e.g. "GitHub"
+
+    suspend fun generateOTP(counter: Long): String
+    suspend fun validateOTP(otp: String, counter: Long): Boolean
+}
+</code></pre>
+<h3>Our HOTP Implementation</h3>
+<p>The <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/otp/HOTP.kt"><code>HOTP</code></a> class is, for the most part, a straight RFC 4226 implementation:</p>
+<pre><code class="language-kotlin">class HOTP(
+    override val digits: Int = 6,
+    override val algorithm: CryptoTools.Algo = CryptoTools.Algo.SHA1,
+    override val secret: String,
+    override val accountName: String,
+    override val issuer: String?,
+) : OTP {
+
+    private val cryptoTools = DefaultCryptoTools(CryptographyProvider.Default)
+
+    override suspend fun generateOTP(counter: Long): String {
+        // 1. Counter → 8 bytes (big-endian)
+        val counterBytes = ByteArray(8) { i -&gt;
+            ((counter shr ((7 - i) * 8)) and 0xFF).toByte()
+        }
+
+        // 2. Decode the Base32 secret
+        val secretBytes = Encoding.decodeBase32(secret)
+
+        // 3. HMAC
+        val hmac = cryptoTools.hmacSha(
+            algorithm,
+            ByteString(secretBytes),
+            ByteString(counterBytes)
+        )
+
+        // 4. Dynamic Truncation
+        val fourBytes = dynamicTruncate(hmac)
+
+        // 5. Modulo → pad with zeros
+        val otp = fourBytes % 10.0.pow(digits.toDouble()).toInt()
+        return otp.toString().padStart(digits, '0')
+    }
+}
+</code></pre>
+<p>The dynamic truncation helper mirrors the RFC directly:</p>
+<pre><code class="language-kotlin">internal fun dynamicTruncate(hmac: ByteString): Int {
+    // Last byte's lowest 4 bits = offset (0-15)
+    val offset = (hmac.get(hmac.size - 1) and 0x0F).toInt()
+
+    // Extract 4 bytes, mask the MSB for a 31-bit unsigned int
+    return ((hmac.get(offset).toInt() and 0x7F) shl 24) or
+           ((hmac.get(offset + 1).toInt() and 0xFF) shl 16) or
+           ((hmac.get(offset + 2).toInt() and 0xFF) shl 8) or
+            (hmac.get(offset + 3).toInt() and 0xFF)
+}
+</code></pre>
+<p>One detail worth calling out: our <code>dynamicTruncate</code> uses <code>hmac.size - 1</code> instead of hardcoding <code>19</code> the way many SHA-1-only examples do. That small choice is what makes the same implementation work correctly for SHA-256 (32 bytes) and SHA-512 (64 bytes) as well.</p>
+<h3>Our TOTP Implementation</h3>
+<p>The <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/otp/TOTP.kt"><code>TOTP</code></a> class ends up being refreshingly small because it mostly wraps HOTP:</p>
+<pre><code class="language-kotlin">class TOTP(
+    override val digits: Int = 6,
+    override val algorithm: CryptoTools.Algo = CryptoTools.Algo.SHA1,
+    override val secret: String,
+    override val accountName: String,
+    override val issuer: String?,
+    private val baseTime: Long = 0,    // Unix epoch
+    val timeInterval: Long = 30        // 30 seconds
+) : OTP {
+
+    // Reuse HOTP internally!
+    private val hotp = HOTP(digits, algorithm, secret, accountName, issuer)
+
+    private fun timeToCounter(currentTime: Long): Long {
+        return (currentTime - baseTime) / timeInterval
+    }
+
+    override suspend fun generateOTP(currentTime: Long): String {
+        val counter = timeToCounter(currentTime)
+        return hotp.generateOTP(counter)
+    }
+
+    override suspend fun validateOTP(otp: String, currentTime: Long): Boolean {
+        val counter = timeToCounter(currentTime)
+        // Check previous, current, and next windows (±1)
+        return hotp.validateOTP(otp, counter - 1) ||
+               hotp.validateOTP(otp, counter) ||
+               hotp.validateOTP(otp, counter + 1)
+    }
+}
+</code></pre>
+<p>This is one of my favorite bits of the codebase. <code>TOTP</code> doesn't reimplement any crypto logic; it just turns time into a counter and hands the real work to <code>HOTP</code>. The <code>validateOTP</code> method then checks the ±1 time windows, which is the standard tolerance for clock drift.</p>
+<p><img src="/images/blogs/02-totp-hotp-class-diagram.jpg" alt="TOTP HOTP Class Diagram"></p>
+<details>
+    <summary>Diagram: TOTP and HOTP Class Structure</summary>
+
+<pre class="mermaid">classDiagram
+    class OTP {
+        &lt;&lt;interface&gt;&gt;
+        +digits: Int
+        +algorithm: Algo
+        +secret: String
+        +accountName: String
+        +issuer: String?
+        +generateOTP(counter: Long) String
+        +validateOTP(otp: String, counter: Long) Boolean
+    }
+
+    class HOTP {
+        -cryptoTools: DefaultCryptoTools
+        +generateOTP(counter: Long) String
+        +validateOTP(otp: String, counter: Long) Boolean
+        -dynamicTruncate(hmac: ByteString) Int
+    }
+
+    class TOTP {
+        -hotp: HOTP
+        -baseTime: Long
+        +timeInterval: Long
+        -timeToCounter(currentTime: Long) Long
+        +nextCodeAt(currentTime: Long) Long
+        +generateOTP(currentTime: Long) String
+        +validateOTP(otp: String, currentTime: Long) Boolean
+    }
+
+    OTP &lt;|.. HOTP
+    OTP &lt;|.. TOTP
+    TOTP --&gt; HOTP : delegates to</pre>
+</details>
+
+<h3>Parsing <code>otpauth://</code> URIs</h3>
+<p>When you scan a QR code, the app needs to parse the <code>otpauth://</code> URI and instantiate the right OTP object. That's what <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/uri/OtpAuthURI.kt"><code>OtpAuthURI</code></a> does:</p>
+<pre><code class="language-kotlin">object OtpAuthURI {
+    fun parse(uri: String): OTP {
+        require(uri.startsWith("otpauth://"))
+
+        // Extract type: "totp" or "hotp"
+        val typeStr = uri.substring(10, uri.indexOf("/", 10))
+
+        // Extract label: "GitHub:alice@example.com"
+        val label = uri.substring(uri.indexOf("/", 10) + 1, uri.indexOf("?"))
+        val labelIssuer = label.substringBefore(":", "")
+        val accountName = label.substringAfter(":", label).trim()
+
+        // Parse query parameters
+        val params = paramsStr.split("&amp;").associate { /* ... */ }
+
+        val secret = params["secret"]!!
+        val algorithm = when (params["algorithm"]?.uppercase()) {
+            "SHA256" -&gt; CryptoTools.Algo.SHA256
+            "SHA512" -&gt; CryptoTools.Algo.SHA512
+            else -&gt; CryptoTools.Algo.SHA1  // Default
+        }
+
+        return when (type) {
+            Type.TOTP -&gt; TOTP(
+                digits = params["digits"]?.toIntOrNull() ?: 6,
+                algorithm = algorithm,
+                secret = secret,
+                timeInterval = params["period"]?.toLongOrNull() ?: 30L,
+                accountName = accountName,
+                issuer = issuer
+            )
+            Type.HOTP -&gt; HOTP(/* ... */)
+        }
+    }
+}
+</code></pre>
+<p>The parser also has a <code>Builder</code> that does the reverse job: given an <code>OTP</code> object, it reconstructs the <code>otpauth://</code> URI. We use that path when exporting or backing up accounts.</p>
+<h3>Base32 Encoding</h3>
+<p>OTP secrets inside the <code>otpauth://</code> URI are Base32-encoded per <a href="https://datatracker.ietf.org/doc/html/rfc4648">RFC 4648</a>. We have our own Base32 encoder/decoder in <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/crypto/Encoding.kt"><code>Encoding.kt</code></a>:</p>
+<pre><code class="language-kotlin">object Encoding {
+    const val ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+
+    fun decodeBase32(base32: String): ByteArray {
+        val cleanInput = base32.replace("=", "").uppercase()
+        // Each Base32 character represents 5 bits
+        // We accumulate bits in a buffer and emit bytes when we have 8+
+        var buffer = 0
+        var bitsLeft = 0
+        /* ... */
+    }
+}
+</code></pre>
+<p>Why Base32 and not Base64? Because Base32 stays in uppercase letters and digits 2–7, so you avoid messy visual ambiguity like <code>0</code>/<code>O</code>, <code>1</code>/<code>l</code>/<code>I</code>, and you also avoid symbols like <code>+</code> and <code>/</code>. That matters when a user has to type the secret manually because QR scanning failed.</p>
+<h3>How We Store OTP Accounts</h3>
+<p>Each OTP account is persisted as a <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/storage/StoredAccount.kt"><code>StoredAccount</code></a>:</p>
+<pre><code class="language-kotlin">@Serializable
+data class StoredAccount(
+    val accountID: Uuid,          // Unique identifier
+    val accountLabel: String,     // Display name (e.g. "GitHub - alice")
+    val salt: String,             // Salt for key derivation
+    val encryptedURI: String,     // The otpauth:// URI, encrypted with AES-GCM
+)
+</code></pre>
+<p>The key thing to notice is that we store the <strong>encrypted</strong> <code>otpauth://</code> URI, not the raw secret. That entire URI — including the secret, algorithm, issuer, and other metadata — is encrypted with AES-256-GCM using a key derived from the user's password via PBKDF2. Each account gets its own salt.</p>
+<p>So even if someone gets hold of the storage file, they still can't read the OTP secrets without the user's password. The details of that pipeline deserve their own post, though, so we'll get into PBKDF2, AES-GCM, and the <code>accounts.json</code> format next time.</p>
+<h2>Verifying Against the RFCs</h2>
+<p>One thing I'm particularly happy with is that the test suite validates against the <strong>official RFC test vectors</strong>. Here's a snippet from our <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/otp/HOTPTest.kt">HOTP tests</a>:</p>
+<pre><code class="language-kotlin">// Secret: "12345678901234567890" (ASCII)
+// Base32: "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"
+val expectedOTPs = listOf(
+    "755224", // Counter = 0
+    "287082", // Counter = 1
+    "359152", // Counter = 2
+    "969429", // Counter = 3
+    "338314", // Counter = 4
+    "254676", // Counter = 5
+    "287922", // Counter = 6
+    "162583", // Counter = 7
+    "399871", // Counter = 8
+    "520489"  // Counter = 9
+)
+</code></pre>
+<p>Those are the exact test vectors from <a href="https://datatracker.ietf.org/doc/html/rfc4226#appendix-D">RFC 4226 Appendix D</a>. Our <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonTest/kotlin/tech/arnav/twofac/lib/otp/TOTPTest.kt">TOTP tests</a> go a step further and validate against <a href="https://datatracker.ietf.org/doc/html/rfc6238#appendix-B">RFC 6238's test vectors</a> for all three hash algorithms:</p>
+<pre><code class="language-kotlin">// RFC 6238 test vectors with 8-digit codes
+RFC6238TestVector(59, "1970-01-01 00:00:59", key_sha1, SHA1, "94287082"),
+RFC6238TestVector(59, "1970-01-01 00:00:59", key_sha256, SHA256, "46119246"),
+RFC6238TestVector(59, "1970-01-01 00:00:59", key_sha512, SHA512, "90693936"),
+// ... and more timestamps across decades
+</code></pre>
+<p>If the implementation matches the RFC test vectors on every platform we support (JVM, Native, and Wasm), we can be pretty confident we're computing OTPs correctly.</p>
+<h2>The Full Picture</h2>
+<p>Here's the end-to-end picture in TwoFac, from scanning a QR code all the way to showing the 6-digit code on screen:</p>
+<p><img src="/images/blogs/02-totp-e2e-flow.jpg" alt="Entire TwoFac flow"></p>
+<details>
+    <summary>Diagram: TwoFac End-to-End Flow</summary>
+
+<pre class="mermaid">flowchart TB
+    QR["📱 Scan QR Code"]
+    URI["otpauth://totp/GitHub:alice?secret=ABC123&amp;issuer=GitHub"]
+    PARSE["OtpAuthURI.parse()"]
+    TOTP_OBJ["TOTP Object&lt;br/&gt;secret, algorithm, digits, period"]
+    ENCRYPT["Encrypt with AES-GCM&lt;br/&gt;(PBKDF2-derived key)"]
+    STORE["StoredAccount&lt;br/&gt;in accounts.json"]
+    
+    QR --&gt; URI --&gt; PARSE --&gt; TOTP_OBJ
+    TOTP_OBJ --&gt; ENCRYPT --&gt; STORE
+    
+    STORE -.-&gt;|"When displaying codes"| DECRYPT["Decrypt URI"]
+    DECRYPT --&gt; TOTP_OBJ2["TOTP Object"]
+    TOTP_OBJ2 --&gt; GEN["generateOTP(currentTime)"]
+    
+    subgraph OTP Generation
+        GEN --&gt; TIME["time → counter&lt;br/&gt;floor(time / 30)"]
+        TIME --&gt; HMAC["HMAC-SHA1(secret, counter)"]
+        HMAC --&gt; TRUNC["Dynamic Truncation"]
+        TRUNC --&gt; MOD["mod 10^6"]
+        MOD --&gt; CODE["🔢 483921"]
+    end</pre>
+</details>
+
+<h2>What's Next?</h2>
+<p>In this post, we focused on the <em>generation</em> side of the problem — how a shared secret and the current time turn into those familiar 6-digit codes. But that's only half of the story.</p>
+<p>In the next post, we'll switch to the <em>storage</em> side: how TwoFac protects secrets at rest with <strong>PBKDF2</strong> for key derivation and <strong>AES-256-GCM</strong> for authenticated encryption. We'll walk through the <code>accounts.json</code> format, why we picked the iteration counts we did, and how the encryption pipeline works across all platforms.</p>
+<hr>
+<h3>Links and References</h3>
+<ul>
+<li><a href="https://github.com/championswimmer/TwoFac">TwoFac GitHub Repository</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc4226">RFC 4226 — HOTP: An HMAC-Based One-Time Password Algorithm</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc6238">RFC 6238 — TOTP: Time-Based One-Time Password Algorithm</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc2104">RFC 2104 — HMAC: Keyed-Hashing for Message Authentication</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc4648">RFC 4648 — Base Encodings (Base32)</a></li>
+<li><a href="https://datatracker.ietf.org/doc/draft-linuxgemini-otpauth-uri/">draft-linuxgemini-otpauth-uri — The otpauth URI Format</a></li>
+<li><a href="https://github.com/google/google-authenticator/wiki/Key-Uri-Format">Google Authenticator Key URI Format</a></li>
+<li><a href="https://github.com/whyoleg/cryptography-kotlin">cryptography-kotlin by whyoleg</a></li>
+<li><a href="https://csrc.nist.gov/publications/detail/sp/800-38d/final">NIST SP 800-38D — AES-GCM</a></li>
+</ul>
+</div></article><!--]--></main><footer class="bg-secondary-900 text-secondary-300 dark:bg-secondary-950"><div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16"><div class="grid grid-cols-2 gap-8 md:grid-cols-4"><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Product</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/features" class="text-sm text-secondary-400 transition-colors hover:text-white">Features</a></li><li><a href="/screenshots" class="text-sm text-secondary-400 transition-colors hover:text-white">Screenshots</a></li><li><a href="/download" class="text-sm text-secondary-400 transition-colors hover:text-white">Download</a></li><li><a href="/getting-started" class="text-sm text-secondary-400 transition-colors hover:text-white">Getting Started</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Resources</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/blog" class="text-sm text-secondary-400 transition-colors hover:text-white">Blog</a></li><li><a href="/faq" class="text-sm text-secondary-400 transition-colors hover:text-white">FAQ</a></li><li><a href="/privacy" class="text-sm text-secondary-400 transition-colors hover:text-white">Privacy Policy</a></li><li><a href="/terms" class="text-sm text-secondary-400 transition-colors hover:text-white">Terms of Service</a></li><!--]--><!--[--><li><a href="/getting-started" class="text-sm text-secondary-400 transition-colors hover:text-white">Documentation</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Compare</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="/compare/google-authenticator" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Google Authenticator</a></li><li><a href="/compare/microsoft-authenticator" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Microsoft Authenticator</a></li><li><a href="/compare/2fas" class="text-sm text-secondary-400 transition-colors hover:text-white">vs 2FAS</a></li><li><a href="/compare/ente-auth" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Ente Auth</a></li><li><a href="/compare/bitwarden" class="text-sm text-secondary-400 transition-colors hover:text-white">vs Bitwarden</a></li><!--]--></ul></div><div><h3 class="text-sm font-semibold uppercase tracking-wider text-white">Community</h3><ul class="mt-4 space-y-3"><!--[--><li><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="text-sm text-secondary-400 transition-colors hover:text-white">GitHub</a></li><!--]--></ul></div></div></div><div class="border-t border-secondary-800"><div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6 lg:px-8"><div class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-6 w-6"><p class="text-sm text-secondary-500"> © TwoFac. Open source under MIT License. </p></div><div class="flex items-center gap-4"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="text-secondary-500 transition-colors hover:text-white" aria-label="GitHub"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg></a></div></div></div></footer></div></div>
+  
+
+</body></html>
