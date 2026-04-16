@@ -3,8 +3,8 @@
 # Library-specific rules come from :composeApp/consumer-rules.pro automatically.
 
 # ── Keep application entry points ───────────────────────────────────────────
--keep class tech.arnav.twofac.TwoFacApplication { *; }
--keep class tech.arnav.twofac.MainActivity { *; }
+-keep class tech.arnav.twofac.app.TwoFacApplication { *; }
+-keep class tech.arnav.twofac.app.MainActivity { *; }
 
 # ── Kotlin reflection / metadata ────────────────────────────────────────────
 -keepattributes *Annotation*

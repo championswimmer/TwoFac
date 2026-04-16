@@ -42,11 +42,11 @@ if (requiresAndroidReleaseSigning && !hasAndroidSigning) {
 }
 
 android {
-    namespace = "tech.arnav.twofac"
+    namespace = "tech.arnav.twofac.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "tech.arnav.twofac"
+        applicationId = "tech.arnav.twofac.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = rootProject.extra["appVersionCode"] as Int

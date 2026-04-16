@@ -1,7 +1,8 @@
-package tech.arnav.twofac
+package tech.arnav.twofac.app
 
 import android.app.Application
 import ca.gosyer.appdirs.impl.attachAppDirs
+import tech.arnav.twofac.initKoin
 import tech.arnav.twofac.di.androidBackupModule
 import tech.arnav.twofac.di.androidBiometricModule
 import tech.arnav.twofac.di.androidOnboardingModule

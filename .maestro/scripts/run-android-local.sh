@@ -4,7 +4,7 @@ set -e
 # Default values
 SUITE="smoke"
 USE_EMULATOR=true
-APP_ID="tech.arnav.twofac"
+APP_ID="tech.arnav.twofac.app"
 AVD_NAME=""
 export APP_ID
 

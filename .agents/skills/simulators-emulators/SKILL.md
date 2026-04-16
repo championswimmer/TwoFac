@@ -32,8 +32,8 @@ It also supports clearing app data for a specific Android package or resetting a
 - Interactive pick: `node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs`
 - Pick and boot: `node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --boot`
 - Pick by AVD name: `node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --avd Pixel_8_API_34 --boot`
-- Clear app data for a package on the selected emulator: `node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --boot --clear-app-data tech.arnav.twofac`
-- Clear app data for a package on a specific AVD: `node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --avd Pixel_8_API_34 --clear-app-data tech.arnav.twofac`
+- Clear app data for a package on the selected emulator: `node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --boot --clear-app-data tech.arnav.twofac.app`
+- Clear app data for a package on a specific AVD: `node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --avd Pixel_8_API_34 --clear-app-data tech.arnav.twofac.app`
 
 ### Run app on selected emulator
 
@@ -42,7 +42,7 @@ Use shell output to set `ANDROID_SERIAL`:
 ```bash
 eval "$(node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs --boot --shell)"
 ANDROID_SERIAL="$ANDROID_SERIAL" ./gradlew :androidApp:installDebug
-adb -s "$ANDROID_SERIAL" shell am start -n tech.arnav.twofac/.MainActivity
+adb -s "$ANDROID_SERIAL" shell am start -n tech.arnav.twofac.app/.MainActivity
 adb -s "$ANDROID_SERIAL" shell dumpsys activity activities | rg 'Resumed: ActivityRecord|mCurrentFocus|mFocusedApp'
 ```
 
@@ -55,7 +55,7 @@ The Android script uses `adb shell pm clear <package>` against the selected emul
 ```bash
 node .agents/skills/simulators-emulators/scripts/android-emulator-picker.mjs \
   --avd Pixel_8_API_34 \
-  --clear-app-data tech.arnav.twofac
+  --clear-app-data tech.arnav.twofac.app
 ```
 
 Use `--boot` as well if you want the script to explicitly boot the emulator first; the script will also boot automatically when `--clear-app-data` targets a stopped emulator.
@@ -68,8 +68,8 @@ Use `--boot` as well if you want the script to explicitly boot the emulator firs
 - Interactive pick: `node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs`
 - Pick and boot: `node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs --boot`
 - Pick by UDID: `node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs --udid <UDID> --boot`
-- Clear app data for a bundle on the selected simulator: `node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs --clear-app-data tech.arnav.twofac`
-- Clear app data for a bundle on a specific simulator: `node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs --udid <UDID> --clear-app-data tech.arnav.twofac`
+- Clear app data for a bundle on the selected simulator: `node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs --clear-app-data tech.arnav.twofac.app`
+- Clear app data for a bundle on a specific simulator: `node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs --udid <UDID> --clear-app-data tech.arnav.twofac.app`
 
 ### Run app on selected simulator
 
@@ -92,7 +92,7 @@ For iOS Simulator, the script clears app data by uninstalling the selected app b
 ```bash
 node .agents/skills/simulators-emulators/scripts/ios-simulator-picker.mjs \
   --udid "$IOS_SIMULATOR_UDID" \
-  --clear-app-data tech.arnav.twofac
+  --clear-app-data tech.arnav.twofac.app
 ```
 
 ## Script behavior notes

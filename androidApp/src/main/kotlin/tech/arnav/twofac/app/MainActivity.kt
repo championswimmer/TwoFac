@@ -1,4 +1,4 @@
-package tech.arnav.twofac
+package tech.arnav.twofac.app
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
 import io.github.vinceglb.filekit.manualFileKitCoreInitialization
+import tech.arnav.twofac.App
 import java.lang.ref.WeakReference
 
 class MainActivity : FragmentActivity() {

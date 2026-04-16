@@ -1,4 +1,4 @@
-appId: tech.arnav.twofac
+appId: tech.arnav.twofac.app
 ---
 # Launch the app fresh (clear all state)
 - launchApp:

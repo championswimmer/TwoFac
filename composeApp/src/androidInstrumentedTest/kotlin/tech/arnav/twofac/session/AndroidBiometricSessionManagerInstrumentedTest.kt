@@ -9,7 +9,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import tech.arnav.twofac.MainActivity
+import tech.arnav.twofac.app.MainActivity
 
 @RunWith(AndroidJUnit4::class)
 class AndroidBiometricSessionManagerInstrumentedTest {

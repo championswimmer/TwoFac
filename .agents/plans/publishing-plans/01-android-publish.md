@@ -1,6 +1,6 @@
 # Publishing TwoFac to Google Play Store
 
-> Step-by-step guide for the first release of **TwoFac** (`tech.arnav.twofac`)
+> Step-by-step guide for the first release of **TwoFac** (`tech.arnav.twofac.app`)
 > on Google Play. Written for a human developer — links to official docs instead
 > of reproducing them.
 
@@ -11,14 +11,14 @@
 | Field | Value |
 |---|---|
 | App Name | TwoFac |
-| Application ID | `tech.arnav.twofac` |
+| Application ID | `tech.arnav.twofac.app` |
 | Version Name | 1.6.0 |
 | Version Code | 260401060 |
 | Min SDK | 30 (Android 11) |
 | Target / Compile SDK | 36 (Android 16) |
 | Category | Tools / Utilities |
 | Build type | AAB with R8 (minifyEnabled + shrinkResources) |
-| Companion | Wear OS (`tech.arnav.twofac` — watchApp module) |
+| Companion | Wear OS (`tech.arnav.twofac.app` — watchApp module) |
 
 ---
 
@@ -140,7 +140,7 @@ This is critical for a 2FA app. Declare the following:
 
 ## 7 — Wear OS Companion App
 
-TwoFac's Wear OS companion shares the same application ID (`tech.arnav.twofac`).
+TwoFac's Wear OS companion shares the same application ID (`tech.arnav.twofac.app`).
 
 **How it works with Google Play:**
 - The Wear OS APK/AAB is bundled into the **same listing** as the phone app when using the same package name.

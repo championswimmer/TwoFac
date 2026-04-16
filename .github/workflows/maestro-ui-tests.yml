@@ -49,7 +49,7 @@ jobs:
           script: |
             export ANDROID_SERIAL="emulator-5554"
             ./gradlew :androidApp:installDebug
-            maestro --device "$ANDROID_SERIAL" test -e APP_ID="tech.arnav.twofac" --include-tags="smoke" --exclude-tags="platform-ios" --format junit --output .maestro/outputs/report-android.xml .maestro/
+            maestro --device "$ANDROID_SERIAL" test -e APP_ID="tech.arnav.twofac.app" --include-tags="smoke" --exclude-tags="platform-ios" --format junit --output .maestro/outputs/report-android.xml .maestro/
             
       - name: Upload artifacts
         if: always()
