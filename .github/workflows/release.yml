@@ -6,6 +6,10 @@ on:
       - 'v*'
 
 env:
+  ANDROID_SIGNING_KEYSTORE_BASE64: ${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}
+  ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+  ANDROID_SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+  ANDROID_SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
   IOS_SIGNING_CERTIFICATE_P12_BASE64: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12_BASE64 }}
   IOS_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.IOS_SIGNING_CERTIFICATE_PASSWORD }}
   IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
@@ -33,6 +37,15 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
+
+      - name: Prepare Android signing keystore
+        run: |
+          if [ -z "$ANDROID_SIGNING_KEYSTORE_BASE64" ] || [ -z "$ANDROID_SIGNING_KEY_ALIAS" ] || [ -z "$ANDROID_SIGNING_KEY_PASSWORD" ] || [ -z "$ANDROID_SIGNING_STORE_PASSWORD" ]; then
+            echo "Missing Android signing secrets. Configure ANDROID_SIGNING_KEYSTORE_BASE64, ANDROID_SIGNING_KEY_ALIAS, ANDROID_SIGNING_KEY_PASSWORD, and ANDROID_SIGNING_STORE_PASSWORD."
+            exit 1
+          fi
+          echo "$ANDROID_SIGNING_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/android-keystore.jks"
+          echo "ANDROID_SIGNING_STORE_FILE=$RUNNER_TEMP/android-keystore.jks" >> "$GITHUB_ENV"
 
       - name: Build Android APK
         run: ./gradlew :androidApp:assembleRelease
