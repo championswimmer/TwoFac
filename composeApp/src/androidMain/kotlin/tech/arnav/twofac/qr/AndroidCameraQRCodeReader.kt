@@ -26,6 +26,14 @@ import java.util.concurrent.atomic.AtomicLong
 import kotlin.coroutines.resume
 
 class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
+    private sealed interface ScannerInitializationState {
+        data object Pending : ScannerInitializationState
+
+        data object Ready : ScannerInitializationState
+
+        data class Failed(val error: Throwable) : ScannerInitializationState
+    }
+
     private data class PendingScan(
         val id: Long,
         val continuation: kotlinx.coroutines.CancellableContinuation<QRCodeReadResult>,
@@ -57,15 +65,8 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
         val hasCameraPermission = remember(activeScan.id) {
             mutableStateOf(hasPermission(context))
         }
-        val scannerInitializationFailure = remember(activeScan.id) {
-            runCatching {
-                BarcodeScanning.getClient(
-                    BarcodeScannerOptions.Builder()
-                        .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-                        .build(),
-                ).close()
-                null
-            }.exceptionOrNull()
+        val scannerInitializationState = remember(activeScan.id) {
+            mutableStateOf<ScannerInitializationState>(ScannerInitializationState.Pending)
         }
 
         val permissionLauncher = rememberLauncherForActivityResult(
@@ -84,21 +85,37 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
         }
 
         if (!hasCameraPermission.value) return
-        if (scannerInitializationFailure != null) {
-            LaunchedEffect(activeScan.id, scannerInitializationFailure) {
-                finishScan(
-                    activeScan,
-                    QRCodeReadResult.DecodeFailure(
-                        scannerInitializationFailure.message ?: "Unable to initialize camera QR scanner",
-                    ),
-                )
+
+        LaunchedEffect(activeScan.id, hasCameraPermission.value) {
+            if (!hasCameraPermission.value) return@LaunchedEffect
+            scannerInitializationState.value =
+                runCatching {
+                    BarcodeScanning.getClient(createMlKitScannerOptions()).close()
+                    ScannerInitializationState.Ready
+                }.getOrElse { error ->
+                    ScannerInitializationState.Failed(error)
+                }
+        }
+
+        when (val initializationState = scannerInitializationState.value) {
+            ScannerInitializationState.Pending -> return
+            ScannerInitializationState.Ready -> Unit
+            is ScannerInitializationState.Failed -> {
+                LaunchedEffect(activeScan.id, initializationState.error) {
+                    finishScan(
+                        activeScan,
+                        QRCodeReadResult.DecodeFailure(
+                            initializationState.error.message ?: "Unable to initialize camera QR scanner",
+                        ),
+                    )
+                }
+                return
             }
-            return
         }
 
         ScannerView(
             modifier = modifier,
-            codeTypes = listOf(BarcodeFormat.FORMAT_QR_CODE),
+            codeTypes = qrCodeTypes,
         ) { result ->
             when (result) {
                 is BarcodeResult.OnSuccess ->
@@ -124,6 +141,16 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
         }
     }
 
+    private fun createMlKitScannerOptions(): BarcodeScannerOptions =
+        BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                when (qrCodeTypes.singleOrNull()) {
+                    BarcodeFormat.FORMAT_QR_CODE -> Barcode.FORMAT_QR_CODE
+                    else -> Barcode.FORMAT_ALL_FORMATS
+                },
+            )
+            .build()
+
     private fun finishScan(scan: PendingScan, result: QRCodeReadResult) {
         if (!pendingScan.compareAndSet(scan, null)) return
         if (scan.continuation.isActive) {
@@ -136,4 +163,8 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
             context,
             Manifest.permission.CAMERA,
         ) == PackageManager.PERMISSION_GRANTED
+
+    private companion object {
+        val qrCodeTypes = listOf(BarcodeFormat.FORMAT_QR_CODE)
+    }
 }
