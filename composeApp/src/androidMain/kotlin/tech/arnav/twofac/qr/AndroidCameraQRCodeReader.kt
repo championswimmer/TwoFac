@@ -14,6 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.ncgroup.kscan.BarcodeFormat
@@ -55,7 +58,14 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
             mutableStateOf(hasPermission(context))
         }
         val scannerInitializationFailure = remember(activeScan.id) {
-            mutableStateOf<Exception?>(null)
+            runCatching {
+                BarcodeScanning.getClient(
+                    BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                        .build(),
+                ).close()
+                null
+            }.exceptionOrNull()
         }
 
         val permissionLauncher = rememberLauncherForActivityResult(
@@ -74,48 +84,43 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
         }
 
         if (!hasCameraPermission.value) return
-        val initializationFailure = scannerInitializationFailure.value
-        if (initializationFailure != null) {
-            LaunchedEffect(activeScan.id, initializationFailure) {
+        if (scannerInitializationFailure != null) {
+            LaunchedEffect(activeScan.id, scannerInitializationFailure) {
                 finishScan(
                     activeScan,
                     QRCodeReadResult.DecodeFailure(
-                        initializationFailure.message ?: "Unable to initialize camera QR scanner",
+                        scannerInitializationFailure.message ?: "Unable to initialize camera QR scanner",
                     ),
                 )
             }
             return
         }
 
-        try {
-            ScannerView(
-                modifier = modifier,
-                codeTypes = listOf(BarcodeFormat.FORMAT_QR_CODE),
-            ) { result ->
-                when (result) {
-                    is BarcodeResult.OnSuccess ->
-                        finishScan(
-                            activeScan,
-                            QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(
-                                primaryPayload = result.barcode.data,
-                                rawBytes = result.barcode.rawBytes,
-                            ),
-                        )
+        ScannerView(
+            modifier = modifier,
+            codeTypes = listOf(BarcodeFormat.FORMAT_QR_CODE),
+        ) { result ->
+            when (result) {
+                is BarcodeResult.OnSuccess ->
+                    finishScan(
+                        activeScan,
+                        QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(
+                            primaryPayload = result.barcode.data,
+                            rawBytes = result.barcode.rawBytes,
+                        ),
+                    )
 
-                    is BarcodeResult.OnFailed ->
-                        finishScan(
-                            activeScan,
-                            QRCodeReadResult.DecodeFailure(
-                                result.exception.message ?: "Failed to decode QR code",
-                            ),
-                        )
+                is BarcodeResult.OnFailed ->
+                    finishScan(
+                        activeScan,
+                        QRCodeReadResult.DecodeFailure(
+                            result.exception.message ?: "Failed to decode QR code",
+                        ),
+                    )
 
-                    BarcodeResult.OnCanceled ->
-                        finishScan(activeScan, QRCodeReadResult.Canceled)
-                }
+                BarcodeResult.OnCanceled ->
+                    finishScan(activeScan, QRCodeReadResult.Canceled)
             }
-        } catch (exception: Exception) {
-            scannerInitializationFailure.value = exception
         }
     }
 

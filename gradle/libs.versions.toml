@@ -54,6 +54,7 @@ kstore = "2.0.4"
 kover = "0.9.7"
 playServicesWearable = "19.0.0"
 playServicesAuth = "21.4.0"
+mlkit-barcode-scanning = "17.3.0"
 composeBom = "2026.02.01"
 kscan = "0.7.0"
 filekit = "0.10.0"
@@ -113,6 +114,7 @@ kstore-storage = { module = "tech.arnav:kstore-storage", version.ref = "kstore" 
 kstore-file = { module = "tech.arnav:kstore-file", version.ref = "kstore" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkit-barcode-scanning" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
