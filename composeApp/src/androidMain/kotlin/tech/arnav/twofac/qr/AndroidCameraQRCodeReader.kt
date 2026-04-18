@@ -27,7 +27,9 @@ import kotlin.coroutines.resume
 
 class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
     private sealed interface ScannerInitializationState {
-        data object Pending : ScannerInitializationState
+        data object Unknown : ScannerInitializationState
+
+        data object Probing : ScannerInitializationState
 
         data object Ready : ScannerInitializationState
 
@@ -40,6 +42,8 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
     )
 
     private val pendingScan = MutableStateFlow<PendingScan?>(null)
+    private val scannerInitializationState =
+        MutableStateFlow<ScannerInitializationState>(ScannerInitializationState.Unknown)
     private val scanIdGenerator = AtomicLong(0L)
 
     override suspend fun readQRCode(): QRCodeReadResult = suspendCancellableCoroutine { continuation ->
@@ -65,9 +69,7 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
         val hasCameraPermission = remember(activeScan.id) {
             mutableStateOf(hasPermission(context))
         }
-        val scannerInitializationState = remember(activeScan.id) {
-            mutableStateOf<ScannerInitializationState>(ScannerInitializationState.Pending)
-        }
+        val scannerState by scannerInitializationState.collectAsState()
 
         val permissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
@@ -86,8 +88,10 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
 
         if (!hasCameraPermission.value) return
 
-        LaunchedEffect(activeScan.id, hasCameraPermission.value) {
+        LaunchedEffect(hasCameraPermission.value, scannerState) {
             if (!hasCameraPermission.value) return@LaunchedEffect
+            if (scannerState != ScannerInitializationState.Unknown) return@LaunchedEffect
+            scannerInitializationState.value = ScannerInitializationState.Probing
             scannerInitializationState.value =
                 runCatching {
                     BarcodeScanning.getClient(createMlKitScannerOptions()).close()
@@ -97,8 +101,8 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
                 }
         }
 
-        when (val initializationState = scannerInitializationState.value) {
-            ScannerInitializationState.Pending -> return
+        when (val initializationState = scannerState) {
+            ScannerInitializationState.Unknown, ScannerInitializationState.Probing -> return
             ScannerInitializationState.Ready -> Unit
             is ScannerInitializationState.Failed -> {
                 LaunchedEffect(activeScan.id, initializationState.error) {
@@ -143,12 +147,7 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
 
     private fun createMlKitScannerOptions(): BarcodeScannerOptions =
         BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(
-                when (qrCodeTypes.singleOrNull()) {
-                    BarcodeFormat.FORMAT_QR_CODE -> Barcode.FORMAT_QR_CODE
-                    else -> Barcode.FORMAT_ALL_FORMATS
-                },
-            )
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
             .build()
 
     private fun finishScan(scan: PendingScan, result: QRCodeReadResult) {
