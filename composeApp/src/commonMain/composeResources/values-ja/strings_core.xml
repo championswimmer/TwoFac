@@ -11,6 +11,7 @@
     <!-- Common actions -->
     <string name="action_back">戻る</string>
     <string name="action_cancel">キャンセル</string>
+    <string name="action_close">閉じる</string>
     <string name="action_delete">削除</string>
     <string name="action_unlock">ロック解除</string>
     <string name="action_continue">続行</string>

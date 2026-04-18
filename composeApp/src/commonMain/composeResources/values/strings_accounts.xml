@@ -14,6 +14,11 @@
     <string name="account_detail_delete_dialog_title">Delete account?</string>
     <string name="account_detail_delete_dialog_message">This will permanently remove %1$s from your vault.</string>
 
+    <!-- QR code export -->
+    <string name="account_detail_show_qr">Show QR Code</string>
+    <string name="account_detail_show_qr_dialog_title">Export via QR Code</string>
+    <string name="account_detail_show_qr_warning">This QR code contains your secret key. Do not share or screenshot it in untrusted environments.</string>
+
     <!-- Add account screen -->
     <string name="add_account_title">Add Account</string>
     <string name="add_account_adding">Adding...</string>

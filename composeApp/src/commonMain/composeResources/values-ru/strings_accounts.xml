@@ -38,4 +38,9 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">Хранилище заблокировано. Разблокируйте его, чтобы управлять аккаунтами.</string>
     <string name="accounts_locked_unlock">Разблокировать хранилище</string>
+
+    <!-- QR code export -->
+    <string name="account_detail_show_qr">Показать QR-код</string>
+    <string name="account_detail_show_qr_dialog_title">Экспорт через QR-код</string>
+    <string name="account_detail_show_qr_warning">Этот QR-код содержит ваш секретный ключ. Не делитесь им и не делайте снимки экрана в ненадёжных средах.</string>
 </resources>

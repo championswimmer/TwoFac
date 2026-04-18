@@ -11,6 +11,7 @@
     <!-- Common actions -->
     <string name="action_back">Indietro</string>
     <string name="action_cancel">Annulla</string>
+    <string name="action_close">Chiudi</string>
     <string name="action_delete">Elimina</string>
     <string name="action_unlock">Sblocca</string>
     <string name="action_continue">Continua</string>

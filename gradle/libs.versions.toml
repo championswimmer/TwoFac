@@ -68,6 +68,7 @@ wearToolingPreview = "1.0.0"
 wear = "1.4.0"
 coreSplashscreen = "1.2.0"
 androidxWork = "2.11.1"
+qrose = "1.1.2"
 
 [libraries]
 
@@ -126,6 +127,7 @@ androidx-wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-
 androidx-wear = { group = "androidx.wear", name = "wear", version.ref = "wear" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidxWork" }
+qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }

@@ -11,6 +11,7 @@
     <!-- Common actions -->
     <string name="action_back">返回</string>
     <string name="action_cancel">取消</string>
+    <string name="action_close">关闭</string>
     <string name="action_delete">删除</string>
     <string name="action_unlock">解锁</string>
     <string name="action_continue">继续</string>

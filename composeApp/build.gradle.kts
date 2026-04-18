@@ -220,6 +220,7 @@ kotlin {
 
             implementation(libs.kstore)
             api(project(":sharedLib"))
+            implementation(libs.qrose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

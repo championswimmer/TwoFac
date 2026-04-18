@@ -38,4 +38,9 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">Le coffre est verrouille. Deverrouillez-le pour gerer les comptes.</string>
     <string name="accounts_locked_unlock">Deverrouiller le coffre</string>
+
+    <!-- QR code export -->
+    <string name="account_detail_show_qr">Afficher le code QR</string>
+    <string name="account_detail_show_qr_dialog_title">Exporter via code QR</string>
+    <string name="account_detail_show_qr_warning">Ce code QR contient votre clé secrète. Ne le partagez pas et ne faites pas de captures d’écran dans des environnements non fiables.</string>
 </resources>

@@ -211,6 +211,19 @@ class AccountsViewModel(
         }
     }
 
+    suspend fun getOtpAuthUriForAccount(accountId: String): String? {
+        if (!twoFacLibUnlocked) {
+            _error.value = "Accounts are not loaded. Please unlock accounts first"
+            return null
+        }
+        return try {
+            twoFacLib.getOtpAuthUri(accountId)
+        } catch (e: Exception) {
+            _error.value = e.message ?: "Failed to get OTP URI"
+            null
+        }
+    }
+
     /** Re-read accounts (and OTPs if unlocked) from TwoFacLib after external mutations. */
     fun reloadAccounts() {
         viewModelScope.launch {

@@ -38,4 +38,9 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">Tresor ist gesperrt. Entsperre ihn, um Konten zu verwalten.</string>
     <string name="accounts_locked_unlock">Tresor entsperren</string>
+
+    <!-- QR code export -->
+    <string name="account_detail_show_qr">QR-Code anzeigen</string>
+    <string name="account_detail_show_qr_dialog_title">Per QR-Code exportieren</string>
+    <string name="account_detail_show_qr_warning">Dieser QR-Code enthält Ihren geheimen Schlüssel. Teilen Sie ihn nicht und machen Sie keinen Screenshot in nicht vertrauenswürdigen Umgebungen.</string>
 </resources>

@@ -46,8 +46,10 @@ import twofac.composeapp.generated.resources.account_detail_delete_dialog_title
 import twofac.composeapp.generated.resources.account_detail_delete_dialog_message
 import twofac.composeapp.generated.resources.action_delete
 import twofac.composeapp.generated.resources.action_cancel
+import twofac.composeapp.generated.resources.account_detail_show_qr
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import tech.arnav.twofac.components.qr.QRCodeDialog
 import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
@@ -62,6 +64,8 @@ fun AccountDetailScreen(
     var currentOtp by remember { mutableStateOf<OtpCodes?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var isDeleteInProgress by remember { mutableStateOf(false) }
+    var showQrDialog by remember { mutableStateOf(false) }
+    var qrOtpAuthUri by remember { mutableStateOf<String?>(null) }
 
     val accounts by viewModel.accounts.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -135,6 +139,20 @@ fun AccountDetailScreen(
                 }
 
                 Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            qrOtpAuthUri = viewModel.getOtpAuthUriForAccount(accountId)
+                            if (qrOtpAuthUri != null) {
+                                showQrDialog = true
+                            }
+                        }
+                    },
+                    enabled = isLibUnlocked
+                ) {
+                    Text(stringResource(Res.string.account_detail_show_qr))
+                }
+
+                Button(
                     onClick = { showDeleteDialog = true },
                     enabled = !isDeleteInProgress && !isLoading,
                     colors = ButtonDefaults.buttonColors(
@@ -160,6 +178,16 @@ fun AccountDetailScreen(
             }
 
         }
+    }
+
+    if (showQrDialog && qrOtpAuthUri != null) {
+        QRCodeDialog(
+            otpAuthUri = qrOtpAuthUri!!,
+            onDismiss = {
+                showQrDialog = false
+                qrOtpAuthUri = null
+            },
+        )
     }
 
     if (showDeleteDialog && account != null) {

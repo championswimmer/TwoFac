@@ -10,6 +10,7 @@ public final class tech/arnav/twofac/lib/TwoFacLib {
 	public final fun getAllAccountOTPs (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getAllAccountOTPs$default (Ltech/arnav/twofac/lib/TwoFacLib;JLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getAllAccounts (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getOtpAuthUri (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getStorage ()Ltech/arnav/twofac/lib/storage/Storage;
 	public final fun importAccounts (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun importAccounts$default (Ltech/arnav/twofac/lib/TwoFacLib;Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;

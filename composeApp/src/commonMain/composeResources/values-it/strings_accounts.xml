@@ -38,4 +38,9 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">Il vault e bloccato. Sbloccalo per gestire gli account.</string>
     <string name="accounts_locked_unlock">Sblocca vault</string>
+
+    <!-- QR code export -->
+    <string name="account_detail_show_qr">Mostra codice QR</string>
+    <string name="account_detail_show_qr_dialog_title">Esporta tramite codice QR</string>
+    <string name="account_detail_show_qr_warning">Questo codice QR contiene la tua chiave segreta. Non condividerlo e non scattare screenshot in ambienti non attendibili.</string>
 </resources>

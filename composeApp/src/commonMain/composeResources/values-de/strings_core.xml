@@ -11,6 +11,7 @@
     <!-- Common actions -->
     <string name="action_back">Zurück</string>
     <string name="action_cancel">Abbrechen</string>
+    <string name="action_close">Schließen</string>
     <string name="action_delete">Löschen</string>
     <string name="action_unlock">Entsperren</string>
     <string name="action_continue">Weiter</string>

@@ -38,4 +38,9 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">保管庫はロックされています。アカウントを管理するにはロックを解除してください。</string>
     <string name="accounts_locked_unlock">保管庫のロックを解除</string>
+
+    <!-- QR code export -->
+    <string name="account_detail_show_qr">QRコードを表示</string>
+    <string name="account_detail_show_qr_dialog_title">QRコードでエクスポート</string>
+    <string name="account_detail_show_qr_warning">このQRコードには秘密鍵が含まれています。信頼できない環境では共有やスクリーンショットをしないでください。</string>
 </resources>
