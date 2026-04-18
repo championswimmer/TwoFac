@@ -38,4 +38,8 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">保管庫はロックされています。アカウントを管理するにはロックを解除してください。</string>
     <string name="accounts_locked_unlock">保管庫のロックを解除</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">アカウントを検索</string>
+    <string name="accounts_search_no_results">検索に一致するアカウントはありません</string>
 </resources>

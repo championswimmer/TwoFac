@@ -38,4 +38,8 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">Le coffre est verrouille. Deverrouillez-le pour gerer les comptes.</string>
     <string name="accounts_locked_unlock">Deverrouiller le coffre</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">Rechercher des comptes</string>
+    <string name="accounts_search_no_results">Aucun compte ne correspond à votre recherche</string>
 </resources>

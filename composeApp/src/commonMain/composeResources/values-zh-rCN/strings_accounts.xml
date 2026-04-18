@@ -38,4 +38,8 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">保管库已锁定。请先解锁后再管理账户。</string>
     <string name="accounts_locked_unlock">解锁保管库</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">搜索账户</string>
+    <string name="accounts_search_no_results">没有与您的搜索匹配的账户</string>
 </resources>
