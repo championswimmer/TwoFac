@@ -231,6 +231,7 @@ kotlin {
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.play.services.wearable)
             implementation(libs.play.services.auth)
+            implementation(libs.mlkit.barcode.scanning)
             implementation(libs.kstore.file)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.android)
