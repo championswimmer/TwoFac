@@ -19,6 +19,8 @@
     <string name="settings_remember_passkey_description">保存密钥口令，这样每次打开扩展时无需重复输入。仅在您信任的设备上启用此项。</string>
     <string name="settings_biometric_title">生物识别解锁</string>
     <string name="settings_biometric_description">使用指纹或面部识别解锁您的保管库</string>
+    <string name="settings_upcoming_code_title">显示即将生效的代码</string>
+    <string name="settings_upcoming_code_description">在下一个 TOTP 代码生效前几秒显示它。</string>
 
     <!-- Secure/biometric unlock snackbars -->
     <string name="settings_secure_unlock_unavailable">安全解锁不可用</string>

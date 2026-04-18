@@ -19,6 +19,8 @@
     <string name="settings_remember_passkey_description">拡張機能を開くたびに入力しなくて済むようにパスキーを保存します。信頼できるデバイスでのみ有効にしてください。</string>
     <string name="settings_biometric_title">生体認証でロック解除</string>
     <string name="settings_biometric_description">指紋または顔認証で保管庫のロックを解除します</string>
+    <string name="settings_upcoming_code_title">次のコードを表示</string>
+    <string name="settings_upcoming_code_description">次の TOTP コードが有効になる数秒前に表示します。</string>
 
     <!-- Secure/biometric unlock snackbars -->
     <string name="settings_secure_unlock_unavailable">セキュアロック解除は利用できません</string>

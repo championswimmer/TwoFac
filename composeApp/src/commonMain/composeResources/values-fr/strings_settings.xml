@@ -21,6 +21,8 @@ Un nouveau fichier de stockage sera créé lors de la prochaine exécution/utili
     <string name="settings_remember_passkey_description">Conserver la clé d'accès enregistrée pour ne pas avoir à la saisir à chaque ouverture de l'extension. Activez cette option uniquement sur des appareils de confiance.</string>
     <string name="settings_biometric_title">Déverrouillage biométrique</string>
     <string name="settings_biometric_description">Utilisez l'empreinte digitale ou la reconnaissance faciale pour déverrouiller votre coffre</string>
+    <string name="settings_upcoming_code_title">Afficher le code à venir</string>
+    <string name="settings_upcoming_code_description">Affiche le prochain code TOTP quelques secondes avant qu'il ne devienne actif.</string>
 
     <!-- Secure/biometric unlock snackbars -->
     <string name="settings_secure_unlock_unavailable">Le déverrouillage sécurisé n'est pas disponible</string>

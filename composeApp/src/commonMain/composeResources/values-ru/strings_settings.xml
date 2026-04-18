@@ -19,6 +19,8 @@
     <string name="settings_remember_passkey_description">Сохранять ключ доступа, чтобы не вводить его каждый раз при открытии расширения. Включайте это только на устройствах, которым доверяете.</string>
     <string name="settings_biometric_title">Биометрическая разблокировка</string>
     <string name="settings_biometric_description">Используйте отпечаток пальца или распознавание лица для разблокировки хранилища</string>
+    <string name="settings_upcoming_code_title">Показывать следующий код</string>
+    <string name="settings_upcoming_code_description">Показывает следующий код TOTP за несколько секунд до того, как он станет активным.</string>
 
     <!-- Secure/biometric unlock snackbars -->
     <string name="settings_secure_unlock_unavailable">Безопасная разблокировка недоступна</string>

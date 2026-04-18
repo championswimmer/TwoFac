@@ -19,6 +19,8 @@
     <string name="settings_remember_passkey_description">Keep the passkey saved so you don\'t have to enter it every time the extension is opened. Only enable this on devices you trust.</string>
     <string name="settings_biometric_title">Biometric Unlock</string>
     <string name="settings_biometric_description">Use fingerprint or face recognition to unlock your vault</string>
+    <string name="settings_upcoming_code_title">Show Upcoming Code</string>
+    <string name="settings_upcoming_code_description">Show the next TOTP code a few seconds before it becomes active.</string>
 
     <!-- Secure/biometric unlock snackbars -->
     <string name="settings_secure_unlock_unavailable">Secure unlock is unavailable</string>

@@ -23,6 +23,7 @@ import tech.arnav.twofac.theme.TwoFacTheme
 fun HomeOtpListSection(
     accountsWithOtps: List<Pair<StoredAccount.DisplayAccount, OtpCodes>>,
     listState: LazyListState,
+    showUpcomingCode: Boolean = true,
     onCopyOtp: (String) -> Unit = {},
     heading: String = stringResource(Res.string.home_otp_heading),
     modifier: Modifier = Modifier,
@@ -47,6 +48,7 @@ fun HomeOtpListSection(
                 account = account,
                 otpCode = otpCode.currentOTP,
                 nextOtp = otpCode.nextOTP,
+                showUpcomingCode = showUpcomingCode,
                 timeInterval = 30L,
                 onCopyOtp = onCopyOtp,
             )

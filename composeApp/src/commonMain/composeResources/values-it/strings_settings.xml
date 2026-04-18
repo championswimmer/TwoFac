@@ -19,6 +19,8 @@
     <string name="settings_remember_passkey_description">Mantieni la passkey salvata per non doverla inserire ogni volta che l'estensione viene aperta. Attiva questa opzione solo su dispositivi fidati.</string>
     <string name="settings_biometric_title">Sblocco biometrico</string>
     <string name="settings_biometric_description">Usa impronta digitale o riconoscimento facciale per sbloccare il tuo vault</string>
+    <string name="settings_upcoming_code_title">Mostra codice successivo</string>
+    <string name="settings_upcoming_code_description">Mostra il prossimo codice TOTP alcuni secondi prima che diventi attivo.</string>
 
     <!-- Secure/biometric unlock snackbars -->
     <string name="settings_secure_unlock_unavailable">Sblocco sicuro non disponibile</string>

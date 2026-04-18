@@ -61,6 +61,7 @@ fun OTPCard(
     account: StoredAccount.DisplayAccount,
     otpCode: String,
     nextOtp: String?,
+    showUpcomingCode: Boolean = true,
     timeInterval: Long = 30L,
     onCopyOtp: (String) -> Unit = {},
     modifier: Modifier = Modifier
@@ -69,7 +70,6 @@ fun OTPCard(
     var currentTime by remember { mutableLongStateOf(currentTimeMillis()) }
 
     var elapsedDuration by remember { mutableLongStateOf(10L) }
-
 
     // Calculate the starting progress and create a synchronized animation
     val startTime = remember { Clock.System.now().epochSeconds }
@@ -195,31 +195,33 @@ fun OTPCard(
                         )
                     }
 
-                    // Next OTP hint (visible in last configured seconds)
-                    Column(modifier = Modifier.height(32.dp)) {
-                        AnimatedVisibility(
-                            visible = nextOtp != null && timeRemaining in 1..elapsedDuration,
-                            enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
-                            exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
-                        ) {
-                            nextOtp?.let {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                ) {
-                                    Text(
-                                        text = "NEXT",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Black,
-                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
-                                    )
-                                    Text(
-                                        text = formatOTPCode(it),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontFamily = FontFamily.Monospace,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.outline
-                                    )
+                    // Next OTP hint (visible in the last configured seconds)
+                    if (showUpcomingCode) {
+                        Column(modifier = Modifier.height(32.dp)) {
+                            AnimatedVisibility(
+                                visible = nextOtp != null && timeRemaining in 1..elapsedDuration,
+                                enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+                                exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
+                            ) {
+                                nextOtp?.let {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    ) {
+                                        Text(
+                                            text = "NEXT",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Black,
+                                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
+                                        )
+                                        Text(
+                                            text = formatOTPCode(it),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontFamily = FontFamily.Monospace,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.outline
+                                        )
+                                    }
                                 }
                             }
                         }

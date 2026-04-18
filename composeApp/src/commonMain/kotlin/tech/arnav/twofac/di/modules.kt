@@ -19,6 +19,8 @@ import tech.arnav.twofac.onboarding.createOnboardingProgressStore
 import tech.arnav.twofac.lib.storage.Storage
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.ClipboardQRCodeReader
+import tech.arnav.twofac.settings.AppPreferencesRepository
+import tech.arnav.twofac.settings.createPlatformAppPreferencesRepository
 import tech.arnav.twofac.storage.FileStorage
 import tech.arnav.twofac.storage.createAccountsStore
 import tech.arnav.twofac.viewmodels.AccountsViewModel
@@ -34,6 +36,10 @@ val appModule = module {
     single<TwoFacLib> {
         TwoFacLib.initialise(storage = get())
     }
+}
+
+val settingsModule = module {
+    single<AppPreferencesRepository> { createPlatformAppPreferencesRepository() }
 }
 
 val backupModule = module {

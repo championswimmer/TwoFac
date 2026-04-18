@@ -19,6 +19,8 @@
     <string name="settings_remember_passkey_description">Guarda la clave de acceso para que no tengas que introducirla cada vez que abras la extension. Activalo solo en dispositivos de confianza.</string>
     <string name="settings_biometric_title">Desbloqueo biometrico</string>
     <string name="settings_biometric_description">Usa huella digital o reconocimiento facial para desbloquear tu boveda</string>
+    <string name="settings_upcoming_code_title">Mostrar codigo proximo</string>
+    <string name="settings_upcoming_code_description">Muestra el siguiente codigo TOTP unos segundos antes de que se active.</string>
 
     <!-- Secure/biometric unlock snackbars -->
     <string name="settings_secure_unlock_unavailable">El desbloqueo seguro no esta disponible</string>

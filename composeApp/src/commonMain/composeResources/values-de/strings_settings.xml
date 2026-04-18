@@ -19,6 +19,8 @@
     <string name="settings_remember_passkey_description">Passkey gespeichert lassen, damit er nicht bei jedem Öffnen der Erweiterung eingegeben werden muss. Aktiviere dies nur auf vertrauenswürdigen Geräten.</string>
     <string name="settings_biometric_title">Biometrisches Entsperren</string>
     <string name="settings_biometric_description">Zum Entsperren des Tresors Fingerabdruck oder Gesichtserkennung verwenden</string>
+    <string name="settings_upcoming_code_title">Nächsten Code anzeigen</string>
+    <string name="settings_upcoming_code_description">Zeigt den nächsten TOTP-Code einige Sekunden vor seiner Aktivierung an.</string>
 
     <!-- Secure/biometric unlock snackbars -->
     <string name="settings_secure_unlock_unavailable">Sicheres Entsperren ist nicht verfügbar</string>

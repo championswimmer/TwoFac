@@ -55,6 +55,8 @@ import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
+import tech.arnav.twofac.settings.AppPreferences
+import tech.arnav.twofac.settings.AppPreferencesRepository
 import tech.arnav.twofac.storage.getStoragePath
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 import tech.arnav.twofac.viewmodels.OnboardingViewModel
@@ -87,6 +89,7 @@ fun SettingsScreen(
     val twoFacLib = remember { koin.getOrNull<TwoFacLib>() }
     val companionSyncCoordinator = remember { koin.getOrNull<CompanionSyncCoordinator>() }
     val sessionManager = remember { koin.getOrNull<SessionManager>() }
+    val appPreferencesRepository = remember { koin.get<AppPreferencesRepository>() }
     val accountsViewModel = remember { koin.getOrNull<AccountsViewModel>() }
     val onboardingViewModel = remember { koin.getOrNull<OnboardingViewModel>() }
 
@@ -103,6 +106,7 @@ fun SettingsScreen(
     var isCompanionDiscoveryInProgress by remember { mutableStateOf(false) }
     val isCompanionActive by (companionSyncCoordinator?.companionActiveFlow
         ?: remember { MutableStateFlow(false) }).collectAsState()
+    val appPreferences by appPreferencesRepository.preferencesFlow.collectAsState(initial = AppPreferences())
     var companionDisplayName by remember {
         mutableStateOf(companionSyncCoordinator?.companionDisplayName ?: "")
     }
@@ -151,6 +155,8 @@ fun SettingsScreen(
     val msgRestoreUnavailable = stringResource(Res.string.backup_restore_unavailable)
     val msgIncorrectPasskey = stringResource(Res.string.backup_passkey_incorrect)
     val msgErrorUnknown = stringResource(Res.string.error_unknown)
+    val upcomingCodeTitle = stringResource(Res.string.settings_upcoming_code_title)
+    val upcomingCodeDescription = stringResource(Res.string.settings_upcoming_code_description)
 
     // Pre-resolve backup passkey dialog strings
     val msgUnlockTitle = stringResource(Res.string.backup_passkey_unlock_title)
@@ -327,6 +333,17 @@ fun SettingsScreen(
                     },
                 )
             }
+
+            RememberPasskeyCard(
+                title = upcomingCodeTitle,
+                description = upcomingCodeDescription,
+                isEnabled = appPreferences.showUpcomingCode,
+                onEnabledChanged = { enabled ->
+                    coroutineScope.launch {
+                        appPreferencesRepository.setShowUpcomingCode(enabled)
+                    }
+                },
+            )
 
             if (backupService != null) {
                 BackupProvidersCard(

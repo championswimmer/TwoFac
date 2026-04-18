@@ -29,6 +29,8 @@ import tech.arnav.twofac.components.home.HomeLockedState
 import tech.arnav.twofac.components.otp.HomeOtpListSection
 import tech.arnav.twofac.components.security.PasskeyDialog
 import tech.arnav.twofac.onboarding.OnboardingAutoShowDecision
+import tech.arnav.twofac.settings.AppPreferences
+import tech.arnav.twofac.settings.AppPreferencesRepository
 import tech.arnav.twofac.viewmodels.OnboardingViewModel
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
@@ -38,6 +40,7 @@ fun HomeScreen(
     onNavigateToOnboarding: (unseenOnly: Boolean) -> Unit,
     viewModel: AccountsViewModel = koinInject(),
     onboardingViewModel: OnboardingViewModel = koinInject(),
+    appPreferencesRepository: AppPreferencesRepository = koinInject(),
 ) {
     val accounts by viewModel.accounts.collectAsState()
     val accountOtps by viewModel.accountOtps.collectAsState()
@@ -86,6 +89,7 @@ fun HomeScreen(
     }
 
     val onboardingState by onboardingViewModel.uiState.collectAsState()
+    val appPreferences by appPreferencesRepository.preferencesFlow.collectAsState(initial = AppPreferences())
     LaunchedEffect(isUnlocked, isLoading, onboardingState.autoShowDecision, hasProcessedOnboardingAutoShow) {
         if (!isUnlocked || isLoading || hasProcessedOnboardingAutoShow) return@LaunchedEffect
         when (val decision = onboardingState.autoShowDecision) {
@@ -145,6 +149,7 @@ fun HomeScreen(
                     HomeOtpListSection(
                         accountsWithOtps = accountOtps,
                         listState = otpListState,
+                        showUpcomingCode = appPreferences.showUpcomingCode,
                         onCopyOtp = { otp ->
                             clipboardManager.setText(AnnotatedString(otp))
                             coroutineScope.launch {
