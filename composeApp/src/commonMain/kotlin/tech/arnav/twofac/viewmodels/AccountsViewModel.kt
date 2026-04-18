@@ -13,6 +13,8 @@ import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.storage.StoredTag
+import tech.arnav.twofac.lib.storage.TagColor
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.ClipboardQRCodeReader
 import tech.arnav.twofac.session.SecureSessionManager
@@ -41,6 +43,9 @@ class AccountsViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val _tags = MutableStateFlow<List<StoredTag>>(emptyList())
+    val tags: StateFlow<List<StoredTag>> = _tags.asStateFlow()
+
     val twoFacLibUnlocked: Boolean get() = twoFacLib.isUnlocked()
 
     /** Return a passkey previously persisted by the session manager, or null. */
@@ -68,6 +73,7 @@ class AccountsViewModel(
             try {
                 val accountList = twoFacLib.getAllAccounts()
                 _accounts.value = accountList
+                _tags.value = twoFacLib.getAllTags()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to load accounts"
             } finally {
@@ -104,6 +110,7 @@ class AccountsViewModel(
                 val accountOtpList = twoFacLib.getAllAccountOTPs()
                 _accountOtps.value = accountOtpList
                 _accounts.value = accountOtpList.map { it.first }
+                _tags.value = twoFacLib.getAllTags()
                 companionSyncCoordinator?.onAccountsUnlocked()
 
                 // Persist the passkey for session auto-unlock (if the user opted in)
@@ -217,6 +224,7 @@ class AccountsViewModel(
             try {
                 val accountList = twoFacLib.getAllAccounts()
                 _accounts.value = accountList
+                _tags.value = twoFacLib.getAllTags()
                 if (twoFacLibUnlocked) {
                     val accountOtpList = twoFacLib.getAllAccountOTPs()
                     _accountOtps.value = accountOtpList
@@ -280,6 +288,55 @@ class AccountsViewModel(
 
     fun clearError() {
         _error.value = null
+    }
+
+    // ─── Tag operations ───────────────────────────────────────────────────────
+
+    fun createTag(name: String, color: TagColor) {
+        viewModelScope.launch {
+            try {
+                twoFacLib.createTag(name, color)
+                _tags.value = twoFacLib.getAllTags()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to create tag"
+            }
+        }
+    }
+
+    fun updateTag(tagId: String, name: String, color: TagColor) {
+        viewModelScope.launch {
+            try {
+                twoFacLib.updateTag(tagId, name, color)
+                _tags.value = twoFacLib.getAllTags()
+                // Refresh accounts so tag chips reflect the updated name/color
+                reloadAccounts()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to update tag"
+            }
+        }
+    }
+
+    fun deleteTag(tagId: String) {
+        viewModelScope.launch {
+            try {
+                twoFacLib.deleteTag(tagId)
+                _tags.value = twoFacLib.getAllTags()
+                reloadAccounts()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to delete tag"
+            }
+        }
+    }
+
+    fun setTagsForAccount(accountId: String, tagIds: List<String>) {
+        viewModelScope.launch {
+            try {
+                twoFacLib.setTagsForAccount(accountId, tagIds)
+                reloadAccounts()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to update account tags"
+            }
+        }
     }
 }
 

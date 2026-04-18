@@ -23,12 +23,13 @@ import tech.arnav.twofac.settings.AppPreferencesRepository
 import tech.arnav.twofac.settings.createPlatformAppPreferencesRepository
 import tech.arnav.twofac.storage.FileStorage
 import tech.arnav.twofac.storage.createAccountsStore
+import tech.arnav.twofac.storage.createTagsStore
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 import tech.arnav.twofac.viewmodels.OnboardingViewModel
 
 val storageModule = module {
     single<Storage> {
-        FileStorage(createAccountsStore())
+        FileStorage(createAccountsStore(), createTagsStore())
     }
 }
 

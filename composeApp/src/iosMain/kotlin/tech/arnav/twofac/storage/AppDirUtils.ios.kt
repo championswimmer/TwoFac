@@ -8,6 +8,7 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.storage.StoredTag
 
 import tech.arnav.twofac.internal.getDocumentDirectory
 
@@ -15,6 +16,18 @@ actual fun createAccountsStore(): KStore<List<StoredAccount>> {
     val dir = getDocumentDirectory()
     SystemFileSystem.createDirectories(Path(dir))
     val filePath = Path(dir, ACCOUNTS_STORAGE_FILE)
+    ensureStorageFileExists(filePath)
+
+    return storeOf(
+        file = filePath,
+        default = emptyList()
+    )
+}
+
+actual fun createTagsStore(): KStore<List<StoredTag>> {
+    val dir = getDocumentDirectory()
+    SystemFileSystem.createDirectories(Path(dir))
+    val filePath = Path(dir, TAGS_STORAGE_FILE)
     ensureStorageFileExists(filePath)
 
     return storeOf(

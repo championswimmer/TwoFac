@@ -16,6 +16,8 @@ import tech.arnav.twofac.lib.storage.StorageUtils.toDecryptedURI
 import tech.arnav.twofac.lib.storage.StorageUtils.toOTP
 import tech.arnav.twofac.lib.storage.StorageUtils.toStoredAccount
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.storage.StoredTag
+import tech.arnav.twofac.lib.storage.TagColor
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.concurrent.Volatile
 import kotlin.time.Clock
@@ -105,13 +107,16 @@ class TwoFacLib private constructor(
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList
             ?: error("Account list is not loaded. This should not happen when unlocked.")
+        val allTags = storage.getTagList().associateBy { it.tagId }
         return accounts.map { account ->
             val otp = account.toOTP(
                 cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
             )
+            val tags = account.tagIds.mapNotNull { allTags[it] }
             account.forDisplay(
                 accountLabel = otp.accountName,
                 issuer = otp.issuer,
+                tags = tags,
             )
         }
     }
@@ -124,6 +129,7 @@ class TwoFacLib private constructor(
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList
             ?: error("Account list is not loaded. This should not happen when unlocked.")
+        val allTags = storage.getTagList().associateBy { it.tagId }
         return accounts.map { account ->
             val otpGen = account.toOTP(
                 cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString()),
@@ -150,12 +156,14 @@ class TwoFacLib private constructor(
                 else -> throw IllegalArgumentException("Unknown OTP type: ${otpGen::class.simpleName}")
             }
 
+            val tags = account.tagIds.mapNotNull { allTags[it] }
 
             return@map Pair(
                 account.forDisplay(
                     accountLabel = otpGen.accountName,
                     nextCodeAt = nextCodeAt,
                     issuer = otpGen.issuer,
+                    tags = tags,
                 ),
                 OtpCodes(currentOTP = currentCode, nextOTP = nextCode),
             )
@@ -278,6 +286,61 @@ class TwoFacLib private constructor(
 
     private fun lockedStateMessage(): String =
         if (isStoreInitialized) LOCKED_STORE_MESSAGE else MISSING_STORE_MESSAGE
+
+    // ─── Tag management ──────────────────────────────────────────────────────
+
+    suspend fun getAllTags(): List<StoredTag> = storage.getTagList()
+
+    suspend fun createTag(name: String, color: TagColor): StoredTag {
+        require(name.isNotBlank()) { "Tag name cannot be blank" }
+        @OptIn(ExperimentalUuidApi::class)
+        val tag = StoredTag(tagId = Uuid.random().toString(), name = name.trim(), color = color)
+        storage.saveTag(tag)
+        return tag
+    }
+
+    suspend fun updateTag(tagId: String, name: String, color: TagColor): Boolean {
+        require(name.isNotBlank()) { "Tag name cannot be blank" }
+        val existing = storage.getTag(tagId) ?: return false
+        return storage.saveTag(existing.copy(name = name.trim(), color = color))
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun deleteTag(tagId: String): Boolean {
+        val deleted = storage.deleteTag(tagId)
+        if (deleted) {
+            // Remove the tag from all accounts that reference it
+            val updated = (accountList ?: storage.getAccountList()).map { account ->
+                if (tagId in account.tagIds) {
+                    account.copy(tagIds = account.tagIds - tagId)
+                } else {
+                    account
+                }
+            }
+            updated.forEach { storage.saveAccount(it) }
+            accountList = storage.getAccountList()
+        }
+        return deleted
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun setTagsForAccount(accountId: String, tagIds: List<String>): Boolean {
+        checkUnlockedOrThrow()
+        val parsedId = Uuid.parse(accountId)
+        val account = storage.getAccount(parsedId) ?: return false
+        val updated = account.copy(tagIds = tagIds)
+        val success = storage.saveAccount(updated)
+        if (success) {
+            accountList = storage.getAccountList()
+        }
+        return success
+    }
+
+    /** Import a tag exactly as stored (used by backup restore). Skips if already exists. */
+    suspend fun importTag(tag: StoredTag): Boolean {
+        if (storage.getTag(tag.tagId) != null) return true
+        return storage.saveTag(tag)
+    }
 
     suspend fun decryptEncryptedBackupAccount(
         entry: EncryptedAccountEntry,

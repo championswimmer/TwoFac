@@ -38,18 +38,21 @@ class BackupService(
                         accountLabel = account.accountLabel,
                         salt = account.salt,
                         encryptedURI = account.encryptedURI,
+                        tagIds = account.tagIds,
                     )
                 }
                 BackupPayload(
                     createdAt = Clock.System.now().epochSeconds,
                     encrypted = true,
                     encryptedAccounts = encryptedAccounts,
+                    tags = twoFacLib.getAllTags(),
                 )
             } else {
                 val uris = twoFacLib.exportAccountsPlaintext()
                 BackupPayload(
                     createdAt = Clock.System.now().epochSeconds,
                     accounts = uris,
+                    tags = twoFacLib.getAllTags(),
                 )
             }
         } catch (e: Throwable) {
@@ -177,6 +180,12 @@ class BackupService(
                 // skip individual failures; caller can compare count to total
             }
         }
+
+        // Restore tag definitions (skips tags that already exist by ID)
+        payload.tags.forEach { tag ->
+            twoFacLib.importTag(tag)
+        }
+
         return BackupResult.Success(imported)
     }
 

@@ -2,20 +2,26 @@ public final class tech/arnav/twofac/lib/TwoFacLib {
 	public static final field Companion Ltech/arnav/twofac/lib/TwoFacLib$Companion;
 	public synthetic fun <init> (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Ljava/lang/Boolean;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun addAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun createTag (Ljava/lang/String;Ltech/arnav/twofac/lib/storage/TagColor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun decryptEncryptedBackupAccount (Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteAllAccountsFromStorage (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun deleteTag (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun exportAccountsEncrypted (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun exportAccountsPlaintext (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAllAccountOTPs (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getAllAccountOTPs$default (Ltech/arnav/twofac/lib/TwoFacLib;JLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getAllAccounts (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getAllTags (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getStorage ()Ltech/arnav/twofac/lib/storage/Storage;
 	public final fun importAccounts (Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun importAccounts$default (Ltech/arnav/twofac/lib/TwoFacLib;Ltech/arnav/twofac/lib/importer/ImportAdapter;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun importTag (Ltech/arnav/twofac/lib/storage/StoredTag;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun isStoreInitialized ()Z
 	public final fun isUnlocked ()Z
+	public final fun setTagsForAccount (Ljava/lang/String;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun unlock (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun updateTag (Ljava/lang/String;Ljava/lang/String;Ltech/arnav/twofac/lib/storage/TagColor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class tech/arnav/twofac/lib/backup/BackupBlob {
@@ -54,21 +60,23 @@ public final class tech/arnav/twofac/lib/backup/BackupDescriptor {
 
 public final class tech/arnav/twofac/lib/backup/BackupPayload {
 	public static final field Companion Ltech/arnav/twofac/lib/backup/BackupPayload$Companion;
-	public fun <init> (IJZLjava/util/List;Ljava/util/List;)V
-	public synthetic fun <init> (IJZLjava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (IJZLjava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (IJZLjava/util/List;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()I
 	public final fun component2 ()J
 	public final fun component3 ()Z
 	public final fun component4 ()Ljava/util/List;
 	public final fun component5 ()Ljava/util/List;
-	public final fun copy (IJZLjava/util/List;Ljava/util/List;)Ltech/arnav/twofac/lib/backup/BackupPayload;
-	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupPayload;IJZLjava/util/List;Ljava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupPayload;
+	public final fun component6 ()Ljava/util/List;
+	public final fun copy (IJZLjava/util/List;Ljava/util/List;Ljava/util/List;)Ltech/arnav/twofac/lib/backup/BackupPayload;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/BackupPayload;IJZLjava/util/List;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/BackupPayload;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAccounts ()Ljava/util/List;
 	public final fun getCreatedAt ()J
 	public final fun getEncrypted ()Z
 	public final fun getEncryptedAccounts ()Ljava/util/List;
 	public final fun getSchemaVersion ()I
+	public final fun getTags ()Ljava/util/List;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -230,16 +238,19 @@ public final class tech/arnav/twofac/lib/backup/BackupTransportRegistry {
 
 public final class tech/arnav/twofac/lib/backup/EncryptedAccountEntry {
 	public static final field Companion Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry$Companion;
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;
-	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/backup/EncryptedAccountEntry;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAccountLabel ()Ljava/lang/String;
 	public final fun getEncryptedURI ()Ljava/lang/String;
 	public final fun getSalt ()Ljava/lang/String;
+	public final fun getTagIds ()Ljava/util/List;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -319,30 +330,78 @@ public final class tech/arnav/twofac/lib/presentation/issuer/IssuerIconMatch {
 public abstract interface class tech/arnav/twofac/lib/storage/Storage {
 	public abstract fun deleteAccount (Lkotlin/uuid/Uuid;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun deleteAllAccounts (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun deleteTag (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getAccount (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getAccount (Lkotlin/uuid/Uuid;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getAccountList (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun getTag (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun getTagList (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun saveAccount (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun saveTag (Ltech/arnav/twofac/lib/storage/StoredTag;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class tech/arnav/twofac/lib/storage/Storage$DefaultImpls {
+	public static fun deleteTag (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun getTag (Ltech/arnav/twofac/lib/storage/Storage;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun getTagList (Ltech/arnav/twofac/lib/storage/Storage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun saveTag (Ltech/arnav/twofac/lib/storage/Storage;Ltech/arnav/twofac/lib/storage/StoredTag;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class tech/arnav/twofac/lib/storage/StoredAccount {
 	public static final field Companion Ltech/arnav/twofac/lib/storage/StoredAccount$Companion;
-	public fun <init> (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public synthetic fun <init> (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lkotlin/uuid/Uuid;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/lang/String;
 	public final fun component4 ()Ljava/lang/String;
-	public final fun copy (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount;
-	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount;
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ltech/arnav/twofac/lib/storage/StoredAccount;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Lkotlin/uuid/Uuid;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun forDisplay (Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
-	public static synthetic fun forDisplay$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
+	public final fun forDisplay (Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
+	public static synthetic fun forDisplay$default (Ltech/arnav/twofac/lib/storage/StoredAccount;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredAccount$DisplayAccount;
 	public final fun getAccountID ()Lkotlin/uuid/Uuid;
 	public final fun getAccountLabel ()Ljava/lang/String;
 	public final fun getEncryptedURI ()Ljava/lang/String;
 	public final fun getSalt ()Ljava/lang/String;
+	public final fun getTagIds ()Ljava/util/List;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class tech/arnav/twofac/lib/storage/StoredTag {
+	public static final field Companion Ltech/arnav/twofac/lib/storage/StoredTag$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ltech/arnav/twofac/lib/storage/TagColor;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ltech/arnav/twofac/lib/storage/TagColor;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ltech/arnav/twofac/lib/storage/TagColor;)Ltech/arnav/twofac/lib/storage/StoredTag;
+	public static synthetic fun copy$default (Ltech/arnav/twofac/lib/storage/StoredTag;Ljava/lang/String;Ljava/lang/String;Ltech/arnav/twofac/lib/storage/TagColor;ILjava/lang/Object;)Ltech/arnav/twofac/lib/storage/StoredTag;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getColor ()Ltech/arnav/twofac/lib/storage/TagColor;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getTagId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class tech/arnav/twofac/lib/storage/TagColor : java/lang/Enum {
+	public static final field AMBER Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field BLUE Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field Companion Ltech/arnav/twofac/lib/storage/TagColor$Companion;
+	public static final field GREEN Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field GREY Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field INDIGO Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field ORANGE Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field PINK Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field PURPLE Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field RED Ltech/arnav/twofac/lib/storage/TagColor;
+	public static final field TEAL Ltech/arnav/twofac/lib/storage/TagColor;
+	public final fun getArgb ()J
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ltech/arnav/twofac/lib/storage/TagColor;
+	public static fun values ()[Ltech/arnav/twofac/lib/storage/TagColor;
 }
 
 public final class tech/arnav/twofac/lib/theme/ThemeColor {

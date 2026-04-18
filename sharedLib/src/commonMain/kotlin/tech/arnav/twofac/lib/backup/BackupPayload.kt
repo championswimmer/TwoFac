@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib.backup
 
 import kotlinx.serialization.Serializable
 import tech.arnav.twofac.lib.PublicApi
+import tech.arnav.twofac.lib.storage.StoredTag
 
 /**
  * Versioned payload format for TwoFac backups.
@@ -9,6 +10,8 @@ import tech.arnav.twofac.lib.PublicApi
  * v1 format contains a list of plaintext otpauth:// URIs.
  * v2 adds support for carrying already-encrypted stored account entries.
  * Plaintext backups (v1 and v2 with encrypted=false) contain secrets in cleartext.
+ * v3 adds tag definitions; account-tag assignments are preserved in encryptedAccounts
+ *    (via StoredAccount.tagIds) for encrypted backups.
  */
 @PublicApi
 @Serializable
@@ -16,6 +19,7 @@ data class EncryptedAccountEntry(
     val accountLabel: String,
     val salt: String,
     val encryptedURI: String,
+    val tagIds: List<String> = emptyList(),
 )
 
 @PublicApi
@@ -26,4 +30,5 @@ data class BackupPayload(
     val encrypted: Boolean = false,
     val accounts: List<String> = emptyList(),
     val encryptedAccounts: List<EncryptedAccountEntry> = emptyList(),
+    val tags: List<StoredTag> = emptyList(),
 )

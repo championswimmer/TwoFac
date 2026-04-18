@@ -8,6 +8,7 @@ class MemoryStorage : Storage {
     // In a real application, you would implement the methods to store and retrieve accounts.
 
     private val accounts = mutableListOf<StoredAccount>()
+    private val tags = mutableListOf<StoredTag>()
 
     override suspend fun getAccountList(): List<StoredAccount> {
         // Return a copy of the list to prevent external modification
@@ -50,4 +51,23 @@ class MemoryStorage : Storage {
         accounts.clear()
         return true
     }
+
+    override suspend fun getTagList(): List<StoredTag> = tags.toList()
+
+    override suspend fun getTag(tagId: String): StoredTag? =
+        tags.find { it.tagId == tagId }
+
+    override suspend fun saveTag(tag: StoredTag): Boolean {
+        val idx = tags.indexOfFirst { it.tagId == tag.tagId }
+        return if (idx != -1) {
+            tags[idx] = tag
+            true
+        } else {
+            tags.add(tag)
+            true
+        }
+    }
+
+    override suspend fun deleteTag(tagId: String): Boolean =
+        tags.removeAll { it.tagId == tagId }
 }

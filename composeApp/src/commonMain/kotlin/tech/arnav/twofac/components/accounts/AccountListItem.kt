@@ -1,6 +1,9 @@
 package tech.arnav.twofac.components.accounts
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,12 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tech.arnav.twofac.components.icons.IssuerBrandIcon
+import tech.arnav.twofac.lib.storage.StoredTag
+import tech.arnav.twofac.lib.storage.TagColor
 import tech.arnav.twofac.theme.TwoFacTheme
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AccountListItem(
     accountLabel: String,
     issuer: String?,
+    tags: List<StoredTag> = emptyList(),
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -36,10 +43,22 @@ fun AccountListItem(
                 size = 28.dp,
                 tint = MaterialTheme.colorScheme.primary,
             )
-            Text(
-                text = accountLabel,
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = accountLabel,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                if (tags.isNotEmpty()) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        tags.forEach { tag ->
+                            TagChip(tag = tag)
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -47,6 +66,22 @@ fun AccountListItem(
 @Preview
 @Composable
 private fun AccountListItemPreview() {
+    TwoFacTheme {
+        AccountListItem(
+            accountLabel = "arnav@example.com",
+            issuer = "GitHub",
+            tags = listOf(
+                StoredTag("1", "Work", TagColor.BLUE),
+                StoredTag("2", "Finance", TagColor.GREEN),
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AccountListItemNoTagsPreview() {
     TwoFacTheme {
         AccountListItem(
             accountLabel = "arnav@example.com",

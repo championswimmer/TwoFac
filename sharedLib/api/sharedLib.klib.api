@@ -15,6 +15,19 @@ final enum class tech.arnav.twofac.lib.backup/BackupRestoreDecison : kotlin/Enum
     enum entry REQUIRES_USER_CONFIRMATION // tech.arnav.twofac.lib.backup/BackupRestoreDecison.REQUIRES_USER_CONFIRMATION|null[0]
 }
 
+final enum class tech.arnav.twofac.lib.storage/TagColor : kotlin/Enum<tech.arnav.twofac.lib.storage/TagColor> { // tech.arnav.twofac.lib.storage/TagColor|null[0]
+    enum entry AMBER // tech.arnav.twofac.lib.storage/TagColor.AMBER|null[0]
+    enum entry BLUE // tech.arnav.twofac.lib.storage/TagColor.BLUE|null[0]
+    enum entry GREEN // tech.arnav.twofac.lib.storage/TagColor.GREEN|null[0]
+    enum entry GREY // tech.arnav.twofac.lib.storage/TagColor.GREY|null[0]
+    enum entry INDIGO // tech.arnav.twofac.lib.storage/TagColor.INDIGO|null[0]
+    enum entry ORANGE // tech.arnav.twofac.lib.storage/TagColor.ORANGE|null[0]
+    enum entry PINK // tech.arnav.twofac.lib.storage/TagColor.PINK|null[0]
+    enum entry PURPLE // tech.arnav.twofac.lib.storage/TagColor.PURPLE|null[0]
+    enum entry RED // tech.arnav.twofac.lib.storage/TagColor.RED|null[0]
+    enum entry TEAL // tech.arnav.twofac.lib.storage/TagColor.TEAL|null[0]
+}
+
 final enum class tech.arnav.twofac.lib.theme/TimerState : kotlin/Enum<tech.arnav.twofac.lib.theme/TimerState> { // tech.arnav.twofac.lib.theme/TimerState|null[0]
     enum entry Critical // tech.arnav.twofac.lib.theme/TimerState.Critical|null[0]
     enum entry Healthy // tech.arnav.twofac.lib.theme/TimerState.Healthy|null[0]
@@ -58,6 +71,8 @@ final class tech.arnav.twofac.lib.importer.adapters/TwoFasImportAdapter : tech.a
 final class tech.arnav.twofac.lib.presentation.issuer/IssuerIconMatch // tech.arnav.twofac.lib.presentation.issuer/IssuerIconMatch|null[0]
 
 final class tech.arnav.twofac.lib.storage/StoredAccount // tech.arnav.twofac.lib.storage/StoredAccount|null[0]
+
+final class tech.arnav.twofac.lib.storage/StoredTag // tech.arnav.twofac.lib.storage/StoredTag|null[0]
 
 final class tech.arnav.twofac.lib.theme/ThemeColor // tech.arnav.twofac.lib.theme/ThemeColor|null[0]
 

@@ -3,11 +3,13 @@ package tech.arnav.twofac.storage
 import io.github.xxfast.kstore.KStore
 import tech.arnav.twofac.lib.storage.Storage
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.storage.StoredTag
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class FileStorage(
-    private val kstore: KStore<List<StoredAccount>>
+    private val kstore: KStore<List<StoredAccount>>,
+    private val tagStore: KStore<List<StoredTag>>,
 ) : Storage {
 
     override suspend fun getAccountList(): List<StoredAccount> {
@@ -59,5 +61,36 @@ class FileStorage(
 
     override suspend fun deleteAllAccounts(): Boolean {
         return deleteAccountsStorage()
+    }
+
+    // ─── Tag operations ───────────────────────────────────────────────────────
+
+    override suspend fun getTagList(): List<StoredTag> = tagStore.get() ?: emptyList()
+
+    override suspend fun getTag(tagId: String): StoredTag? =
+        getTagList().find { it.tagId == tagId }
+
+    override suspend fun saveTag(tag: StoredTag): Boolean {
+        return try {
+            val current = getTagList().toMutableList()
+            val idx = current.indexOfFirst { it.tagId == tag.tagId }
+            if (idx >= 0) current[idx] = tag else current.add(tag)
+            tagStore.set(current)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    override suspend fun deleteTag(tagId: String): Boolean {
+        return try {
+            val current = getTagList()
+            val updated = current.filterNot { it.tagId == tagId }
+            if (updated.size == current.size) return false
+            tagStore.set(updated)
+            true
+        } catch (_: Exception) {
+            false
+        }
     }
 }

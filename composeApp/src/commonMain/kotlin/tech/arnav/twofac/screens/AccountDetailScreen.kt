@@ -2,6 +2,8 @@ package tech.arnav.twofac.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,7 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import tech.arnav.twofac.components.accounts.ManageTagsDialog
+import tech.arnav.twofac.components.accounts.TagChip
+import tech.arnav.twofac.lib.otp.OtpCodes
+import tech.arnav.twofac.viewmodels.AccountsViewModel
 import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.account_detail_title
 import twofac.composeapp.generated.resources.action_back
@@ -46,12 +54,9 @@ import twofac.composeapp.generated.resources.account_detail_delete_dialog_title
 import twofac.composeapp.generated.resources.account_detail_delete_dialog_message
 import twofac.composeapp.generated.resources.action_delete
 import twofac.composeapp.generated.resources.action_cancel
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
-import tech.arnav.twofac.lib.otp.OtpCodes
-import tech.arnav.twofac.viewmodels.AccountsViewModel
+import twofac.composeapp.generated.resources.account_detail_manage_tags
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AccountDetailScreen(
     accountId: String,
@@ -62,10 +67,12 @@ fun AccountDetailScreen(
     var currentOtp by remember { mutableStateOf<OtpCodes?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var isDeleteInProgress by remember { mutableStateOf(false) }
+    var showManageTagsDialog by remember { mutableStateOf(false) }
 
     val accounts by viewModel.accounts.collectAsState()
     val error by viewModel.error.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val allTags by viewModel.tags.collectAsState()
     val isLibUnlocked = viewModel.twoFacLibUnlocked
     val coroutineScope = rememberCoroutineScope()
 
@@ -105,6 +112,23 @@ fun AccountDetailScreen(
                     text = stringResource(Res.string.account_detail_account_label, account.accountLabel),
                     style = MaterialTheme.typography.bodyLarge
                 )
+
+                // ── Tags row ────────────────────────────────────────────────
+                if (account.tags.isNotEmpty()) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        account.tags.forEach { tag ->
+                            TagChip(tag = tag)
+                        }
+                    }
+                }
+
+                TextButton(onClick = { showManageTagsDialog = true }) {
+                    Text(stringResource(Res.string.account_detail_manage_tags))
+                }
 
                 if (!isLibUnlocked) {
                     OutlinedTextField(
@@ -198,6 +222,32 @@ fun AccountDetailScreen(
                     Text(stringResource(Res.string.action_cancel))
                 }
             }
+        )
+    }
+
+    if (showManageTagsDialog) {
+        ManageTagsDialog(
+            allTags = allTags,
+            assignedTagIds = account?.tags?.map { it.tagId } ?: emptyList(),
+            onAssignmentChanged = { tagId, assigned ->
+                val currentTagIds = account?.tags?.map { it.tagId } ?: emptyList()
+                val newTagIds = if (assigned) {
+                    currentTagIds + tagId
+                } else {
+                    currentTagIds - tagId
+                }
+                viewModel.setTagsForAccount(accountId, newTagIds)
+            },
+            onCreateTag = { name, color ->
+                viewModel.createTag(name, color)
+            },
+            onUpdateTag = { tagId, name, color ->
+                viewModel.updateTag(tagId, name, color)
+            },
+            onDeleteTag = { tagId ->
+                viewModel.deleteTag(tagId)
+            },
+            onDismiss = { showManageTagsDialog = false },
         )
     }
 }

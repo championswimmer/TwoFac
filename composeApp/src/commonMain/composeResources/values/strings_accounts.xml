@@ -2,6 +2,7 @@
     <!-- Accounts screen -->
     <string name="accounts_title">Accounts</string>
     <string name="accounts_add_account">Add Account</string>
+    <string name="accounts_search_placeholder">Search accounts…</string>
 
     <!-- Account detail screen -->
     <string name="account_detail_title">Account Details</string>
@@ -13,6 +14,7 @@
     <string name="account_detail_not_found">Account not found</string>
     <string name="account_detail_delete_dialog_title">Delete account?</string>
     <string name="account_detail_delete_dialog_message">This will permanently remove %1$s from your vault.</string>
+    <string name="account_detail_manage_tags">Manage Tags</string>
 
     <!-- Add account screen -->
     <string name="add_account_title">Add Account</string>
@@ -38,4 +40,15 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">Vault is locked. Unlock to manage accounts.</string>
     <string name="accounts_locked_unlock">Unlock Vault</string>
+
+    <!-- Tags -->
+    <string name="tags_dialog_title">Tags</string>
+    <string name="tags_dialog_done">Done</string>
+    <string name="tags_empty_message">No tags yet. Create one below.</string>
+    <string name="tags_create_button">Create Tag</string>
+    <string name="tags_name_label">Tag name</string>
+    <string name="tags_name_placeholder">e.g. Work, Finance…</string>
+    <string name="tags_color_label">Color</string>
+    <string name="tags_delete_confirm_title">Delete tag?</string>
+    <string name="tags_delete_confirm_message">"%1$s" will be removed from all accounts.</string>
 </resources>

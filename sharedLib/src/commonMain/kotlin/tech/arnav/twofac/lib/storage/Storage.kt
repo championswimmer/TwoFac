@@ -21,4 +21,15 @@ interface Storage {
 
     suspend fun deleteAllAccounts(): Boolean
 
+    // Tag operations — default no-op implementations allow existing Storage
+    // implementations to compile without change.
+
+    suspend fun getTagList(): List<StoredTag> = emptyList()
+
+    suspend fun getTag(tagId: String): StoredTag? = null
+
+    suspend fun saveTag(tag: StoredTag): Boolean = false
+
+    suspend fun deleteTag(tagId: String): Boolean = false
+
 }
