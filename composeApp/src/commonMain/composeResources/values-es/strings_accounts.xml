@@ -38,4 +38,8 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">La boveda esta bloqueada. Desbloqueala para gestionar cuentas.</string>
     <string name="accounts_locked_unlock">Desbloquear boveda</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">Buscar cuentas</string>
+    <string name="accounts_search_no_results">Ninguna cuenta coincide con tu búsqueda</string>
 </resources>

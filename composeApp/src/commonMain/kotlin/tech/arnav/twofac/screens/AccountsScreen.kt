@@ -3,15 +3,18 @@ package tech.arnav.twofac.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -26,18 +29,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
-import twofac.composeapp.generated.resources.Res
-import twofac.composeapp.generated.resources.accounts_title
-import twofac.composeapp.generated.resources.action_back
-import twofac.composeapp.generated.resources.accounts_add_account
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import tech.arnav.twofac.components.accounts.AccountsErrorState
 import tech.arnav.twofac.components.accounts.AccountsListContent
 import tech.arnav.twofac.components.accounts.AccountsLockedState
 import tech.arnav.twofac.components.security.PasskeyDialog
 import tech.arnav.twofac.viewmodels.AccountsViewModel
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.accounts_add_account
+import twofac.composeapp.generated.resources.accounts_search_placeholder
+import twofac.composeapp.generated.resources.accounts_title
+import twofac.composeapp.generated.resources.action_back
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +58,7 @@ fun AccountsScreen(
     val requiresUnlock = !viewModel.twoFacLibUnlocked
     val isSecureUnlockReady = remember { viewModel.isSecureUnlockReady() }
     val coroutineScope = rememberCoroutineScope()
+    var searchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(requiresUnlock) {
         if (requiresUnlock && !isSecureUnlockReady) {
@@ -123,9 +128,20 @@ fun AccountsScreen(
                 }
 
                 else -> {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { Text(stringResource(Res.string.accounts_search_placeholder)) },
+                        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                    )
                     AccountsListContent(
                         accounts = accounts,
                         onAccountClick = onNavigateToAccountDetail,
+                        searchQuery = searchQuery,
                     )
                 }
             }

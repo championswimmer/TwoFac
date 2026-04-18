@@ -38,4 +38,8 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">Хранилище заблокировано. Разблокируйте его, чтобы управлять аккаунтами.</string>
     <string name="accounts_locked_unlock">Разблокировать хранилище</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">Поиск аккаунтов</string>
+    <string name="accounts_search_no_results">Ни один аккаунт не соответствует вашему запросу</string>
 </resources>
