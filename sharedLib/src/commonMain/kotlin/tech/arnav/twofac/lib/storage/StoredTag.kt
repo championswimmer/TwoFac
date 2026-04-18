@@ -27,7 +27,7 @@ enum class TagColor(val argb: Long) {
 }
 
 /**
- * A tag that can be assigned to one or more accounts for organisation.
+ * A tag that can be assigned to one or more accounts for organization.
  *
  * @param tagId   Unique identifier (UUID as string).
  * @param name    Human-readable tag label (e.g. "Work", "Finance").

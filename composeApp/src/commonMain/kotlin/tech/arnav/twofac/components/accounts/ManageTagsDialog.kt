@@ -108,7 +108,7 @@ fun ManageTagsDialog(
         showCreateForm = true
     }
 
-    // Confirm-delete dialog
+    // Confirm-delete dialog (shown on top of main dialog)
     if (pendingDeleteTagId != null) {
         val tagToDelete = allTags.find { it.tagId == pendingDeleteTagId }
         AlertDialog(
@@ -136,7 +136,6 @@ fun ManageTagsDialog(
                 }
             },
         )
-        return
     }
 
     AlertDialog(
