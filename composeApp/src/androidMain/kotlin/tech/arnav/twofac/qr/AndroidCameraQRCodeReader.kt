@@ -54,6 +54,9 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
         val hasCameraPermission = remember(activeScan.id) {
             mutableStateOf(hasPermission(context))
         }
+        val scannerInitializationFailure = remember(activeScan.id) {
+            mutableStateOf<Exception?>(null)
+        }
 
         val permissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
@@ -71,32 +74,48 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
         }
 
         if (!hasCameraPermission.value) return
-
-        ScannerView(
-            modifier = modifier,
-            codeTypes = listOf(BarcodeFormat.FORMAT_QR_CODE),
-        ) { result ->
-            when (result) {
-                is BarcodeResult.OnSuccess ->
-                    finishScan(
-                        activeScan,
-                        QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(
-                            primaryPayload = result.barcode.data,
-                            rawBytes = result.barcode.rawBytes,
-                        ),
-                    )
-
-                is BarcodeResult.OnFailed ->
-                    finishScan(
-                        activeScan,
-                        QRCodeReadResult.DecodeFailure(
-                            result.exception.message ?: "Failed to decode QR code",
-                        ),
-                    )
-
-                BarcodeResult.OnCanceled ->
-                    finishScan(activeScan, QRCodeReadResult.Canceled)
+        val initializationFailure = scannerInitializationFailure.value
+        if (initializationFailure != null) {
+            LaunchedEffect(activeScan.id, initializationFailure) {
+                finishScan(
+                    activeScan,
+                    QRCodeReadResult.DecodeFailure(
+                        initializationFailure.message ?: "Unable to initialize camera QR scanner",
+                    ),
+                )
             }
+            return
+        }
+
+        try {
+            ScannerView(
+                modifier = modifier,
+                codeTypes = listOf(BarcodeFormat.FORMAT_QR_CODE),
+            ) { result ->
+                when (result) {
+                    is BarcodeResult.OnSuccess ->
+                        finishScan(
+                            activeScan,
+                            QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(
+                                primaryPayload = result.barcode.data,
+                                rawBytes = result.barcode.rawBytes,
+                            ),
+                        )
+
+                    is BarcodeResult.OnFailed ->
+                        finishScan(
+                            activeScan,
+                            QRCodeReadResult.DecodeFailure(
+                                result.exception.message ?: "Failed to decode QR code",
+                            ),
+                        )
+
+                    BarcodeResult.OnCanceled ->
+                        finishScan(activeScan, QRCodeReadResult.Canceled)
+                }
+            }
+        } catch (exception: Exception) {
+            scannerInitializationFailure.value = exception
         }
     }
 
