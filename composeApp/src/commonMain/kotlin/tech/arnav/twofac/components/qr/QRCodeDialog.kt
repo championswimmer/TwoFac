@@ -1,5 +1,6 @@
 package tech.arnav.twofac.components.qr
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +24,6 @@ import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.action_close
 import twofac.composeapp.generated.resources.account_detail_show_qr_dialog_title
 import twofac.composeapp.generated.resources.account_detail_show_qr_warning
-import androidx.compose.foundation.Image
 
 @Composable
 fun QRCodeDialog(
