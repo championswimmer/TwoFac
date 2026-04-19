@@ -55,6 +55,9 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
             continuation.resume(QRCodeReadResult.Canceled)
             return@suspendCancellableCoroutine
         }
+        if (scannerInitializationState.value is ScannerInitializationState.Failed) {
+            scannerInitializationState.value = ScannerInitializationState.Unknown
+        }
 
         continuation.invokeOnCancellation {
             pendingScan.compareAndSet(scan, null)
