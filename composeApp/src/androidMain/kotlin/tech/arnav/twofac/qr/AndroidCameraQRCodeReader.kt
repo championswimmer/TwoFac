@@ -18,6 +18,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.ncgroup.kscan.BarcodeFormat
 import org.ncgroup.kscan.BarcodeResult
@@ -55,8 +56,12 @@ class AndroidCameraQRCodeReader : ComposableCameraQRCodeReader {
             continuation.resume(QRCodeReadResult.Canceled)
             return@suspendCancellableCoroutine
         }
-        if (scannerInitializationState.value is ScannerInitializationState.Failed) {
-            scannerInitializationState.value = ScannerInitializationState.Unknown
+        scannerInitializationState.update { initializationState ->
+            if (initializationState is ScannerInitializationState.Failed) {
+                ScannerInitializationState.Unknown
+            } else {
+                initializationState
+            }
         }
 
         continuation.invokeOnCancellation {
