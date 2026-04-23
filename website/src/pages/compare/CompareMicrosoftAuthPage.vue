@@ -72,8 +72,8 @@ const faqs: FAQEntry[] = [
     :faqs="faqs"
     cta-heading="Take Back Control of Your 2FA"
     cta-body="Open source, no telemetry, no vendor lock-in, and available on every platform — including the desktop and Linux that Microsoft forgot. Switch to TwoFac and experience 2FA done right."
-    guide-link="/features"
-    guide-link-text="Explore All Features →"
+    guide-link="/migrate/microsoft-authenticator"
+    guide-link-text="Migration Guide →"
   >
     <template #intro>
       <section class="bg-secondary-50 dark:bg-secondary-900 py-12 sm:py-16">

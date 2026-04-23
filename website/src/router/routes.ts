@@ -81,6 +81,36 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../pages/compare/CompareMicrosoftAuthPage.vue'),
   },
   {
+    path: '/migrate/2fas',
+    name: 'migrate-2fas',
+    component: () => import('../pages/migrate/Migrate2FASPage.vue'),
+  },
+  {
+    path: '/migrate/ente-auth',
+    name: 'migrate-ente-auth',
+    component: () => import('../pages/migrate/MigrateEnteAuthPage.vue'),
+  },
+  {
+    path: '/migrate/bitwarden',
+    name: 'migrate-bitwarden',
+    component: () => import('../pages/migrate/MigrateBitwardenPage.vue'),
+  },
+  {
+    path: '/migrate/google-authenticator',
+    name: 'migrate-google-authenticator',
+    component: () => import('../pages/migrate/MigrateGoogleAuthPage.vue'),
+  },
+  {
+    path: '/migrate/microsoft-authenticator',
+    name: 'migrate-microsoft-authenticator',
+    component: () => import('../pages/migrate/MigrateMicrosoftAuthPage.vue'),
+  },
+  {
+    path: '/migrate/authy',
+    name: 'migrate-authy',
+    component: () => import('../pages/migrate/MigrateAuthyPage.vue'),
+  },
+  {
     path: '/404',
     name: '404',
     component: () => import('../pages/NotFoundPage.vue'),

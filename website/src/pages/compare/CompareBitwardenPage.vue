@@ -69,8 +69,8 @@ const faqs: FAQEntry[] = [
     :faqs="faqs"
     cta-heading="Try the Dedicated 2FA Experience"
     cta-body="Purpose-built for 2FA. Free on every platform. No account, no subscription, no compromise. TwoFac pairs perfectly with any password manager — including Bitwarden."
-    guide-link="/getting-started"
-    guide-link-text="Getting Started Guide →"
+    guide-link="/migrate/bitwarden"
+    guide-link-text="Migration Guide →"
   >
     <template #intro>
       <section class="bg-secondary-50 dark:bg-secondary-900 py-12 sm:py-16">

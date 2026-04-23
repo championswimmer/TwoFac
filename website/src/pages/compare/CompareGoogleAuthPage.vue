@@ -70,7 +70,7 @@ const faqs: FAQEntry[] = [
     :faqs="faqs"
     cta-heading="Ready to Upgrade from Google Authenticator?"
     cta-body="Open source, cross-platform, and end-to-end encrypted. TwoFac is everything Google Authenticator should have been. Switch in minutes — your 2FA accounts come with you."
-    guide-link="/getting-started"
+    guide-link="/migrate/google-authenticator"
     guide-link-text="Migration Guide →"
   >
     <template #intro>

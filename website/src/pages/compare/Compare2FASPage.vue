@@ -68,8 +68,8 @@ const faqs: FAQEntry[] = [
     :faqs="faqs"
     cta-heading="Ready to Go Beyond Mobile?"
     cta-body="If you love 2FAS's open-source ethos but need desktop, CLI, and wearable support, TwoFac is the natural upgrade. Import your 2FAS accounts and get started in minutes."
-    guide-link="/getting-started"
-    guide-link-text="Getting Started Guide →"
+    guide-link="/migrate/2fas"
+    guide-link-text="Migration Guide →"
   >
     <template #intro>
       <section class="bg-secondary-50 dark:bg-secondary-900 py-12 sm:py-16">

@@ -68,8 +68,8 @@ const faqs: FAQEntry[] = [
     :faqs="faqs"
     cta-heading="Try TwoFac — The Complete 2FA Experience"
     cta-body="If you love Ente Auth's privacy-first approach but want CLI access, browser autofill, wearable apps, and native performance, TwoFac is the next step. Available on 11+ platforms, completely free."
-    guide-link="/features"
-    guide-link-text="Explore All Features →"
+    guide-link="/migrate/ente-auth"
+    guide-link-text="Migration Guide →"
   >
     <template #intro>
       <section class="bg-secondary-50 dark:bg-secondary-900 py-12 sm:py-16">
