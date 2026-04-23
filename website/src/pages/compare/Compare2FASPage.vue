@@ -4,7 +4,7 @@ import ComparePageLayout from '../../components/ComparePageLayout.vue'
 import type { GlanceStat, WhyChooseCard, FAQEntry, FeatureRow } from '../../components/ComparePageLayout.vue'
 
 useSEO({
-  title: 'TwoFac vs 2FAS — Open Source 2FA Apps Compared (2025)',
+  title: 'TwoFac vs 2FAS: Best Open Source 2FA Alternative (2026)',
   description: 'In-depth comparison of TwoFac and 2FAS authenticator apps. Both are open source, but TwoFac adds native desktop apps, CLI tools, Wear OS, watchOS, and a web PWA that 2FAS lacks.',
   canonicalPath: '/compare/2fas',
 })
@@ -40,12 +40,12 @@ const features: FeatureRow[] = [
 ]
 
 const whyChooseCards: WhyChooseCard[] = [
-  { icon: '🖥️', title: 'Native Desktop Apps', text: 'Standalone desktop apps for macOS, Windows, and Linux that work independently — no phone-to-browser bridge required. 2FAS has no standalone desktop app.' },
-  { icon: '💻', title: 'Powerful CLI Tool', text: 'Generate 2FA codes from your terminal — perfect for developers and system administrators. Scriptable, pipeable, and SSH-friendly. 2FAS offers nothing comparable.' },
-  { icon: '⌚', title: 'Wear OS + watchOS', text: 'Both apps support Apple Watch, but only TwoFac adds Wear OS support. View codes on your Android smartwatch without reaching for your phone.' },
-  { icon: '🌐', title: 'Web PWA', text: "Access your codes from any browser without installing an extension. TwoFac's progressive web app works on any device. 2FAS has no standalone web app." },
-  { icon: '🆓', title: '100% Free, No Tiers', text: 'Unlike 2FAS Pass ($9.99/yr), every TwoFac feature is free — unlimited extensions, full sync, all platforms included.' },
-  { icon: '🔄', title: 'True Cross-Platform Sync', text: 'TwoFac syncs end-to-end encrypted across Android, iOS, desktop, web, and wearables. 2FAS locks you to Google Drive (Android) or iCloud (iOS) on the free tier.' },
+  { icon: 'fa-solid fa-desktop', title: 'Native Desktop Apps', text: 'Standalone desktop apps for macOS, Windows, and Linux that work independently — no phone-to-browser bridge required. 2FAS has no standalone desktop app.' },
+  { icon: 'fa-solid fa-terminal', title: 'Powerful CLI Tool', text: 'Generate 2FA codes from your terminal — perfect for developers and system administrators. Scriptable, pipeable, and SSH-friendly. 2FAS offers nothing comparable.' },
+  { icon: 'fa-solid fa-clock', title: 'Wear OS + watchOS', text: 'Both apps support Apple Watch, but only TwoFac adds Wear OS support. View codes on your Android smartwatch without reaching for your phone.' },
+  { icon: 'fa-solid fa-globe', title: 'Web PWA', text: "Access your codes from any browser without installing an extension. TwoFac's progressive web app works on any device. 2FAS has no standalone web app." },
+  { icon: 'fa-solid fa-gift', title: '100% Free, No Tiers', text: 'Unlike 2FAS Pass ($9.99/yr), every TwoFac feature is free — unlimited extensions, full sync, all platforms included.' },
+  { icon: 'fa-solid fa-arrows-rotate', title: 'True Cross-Platform Sync', text: 'TwoFac syncs end-to-end encrypted across Android, iOS, desktop, web, and wearables. 2FAS locks you to Google Drive (Android) or iCloud (iOS) on the free tier.' },
 ]
 
 const faqs: FAQEntry[] = [

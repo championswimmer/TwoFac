@@ -4,7 +4,7 @@ import ComparePageLayout from '../../components/ComparePageLayout.vue'
 import type { GlanceStat, WhyChooseCard, FAQEntry, FeatureRow } from '../../components/ComparePageLayout.vue'
 
 useSEO({
-  title: 'TwoFac vs Google Authenticator — Open Source 2FA Alternative (2025)',
+  title: 'TwoFac vs Google Authenticator: Best Open Source 2FA Alternative (2026)',
   description: 'Detailed comparison of TwoFac and Google Authenticator. Discover why TwoFac is the open-source, cross-platform 2FA alternative with E2E encrypted sync, desktop apps, CLI tools, browser extensions, and wearable support.',
   canonicalPath: '/compare/google-authenticator',
 })
@@ -42,12 +42,12 @@ const features: FeatureRow[] = [
 ]
 
 const whyChooseCards: WhyChooseCard[] = [
-  { icon: '🔓', title: 'Fully Open Source', text: "Every line of TwoFac's code is publicly auditable on GitHub. Google Authenticator went proprietary in 2021 — you can't verify what it does with your secrets." },
-  { icon: '🌍', title: '11+ Platforms', text: 'Android, iOS, macOS, Windows, Linux, Web, CLI, browser extension, Wear OS, and watchOS. Google Authenticator only supports Android and iOS.' },
-  { icon: '🔐', title: 'E2E Encrypted Sync', text: "Your 2FA secrets are encrypted on your device before syncing. Google Authenticator's cloud sync does not use end-to-end encryption — Google holds the decryption keys." },
-  { icon: '💻', title: 'Developer-Friendly CLI', text: 'Generate 2FA codes from your terminal. Integrate with scripts, SSH workflows, and CI/CD pipelines. Perfect for developers and sysadmins.' },
-  { icon: '⌚', title: 'Wearable Support', text: "View 2FA codes on your Wear OS or Apple Watch without reaching for your phone. Google Authenticator doesn't offer any smartwatch companion." },
-  { icon: '📦', title: 'Easy Migration', text: 'Import your existing Google Authenticator accounts via QR scan or file import. The switch takes minutes and requires no reconfiguration of your online services.' },
+  { icon: 'fa-solid fa-lock-open', title: 'Fully Open Source', text: "Every line of TwoFac's code is publicly auditable on GitHub. Google Authenticator went proprietary in 2021 — you can't verify what it does with your secrets." },
+  { icon: 'fa-solid fa-globe', title: '11+ Platforms', text: 'Android, iOS, macOS, Windows, Linux, Web, CLI, browser extension, Wear OS, and watchOS. Google Authenticator only supports Android and iOS.' },
+  { icon: 'fa-solid fa-shield-halved', title: 'E2E Encrypted Sync', text: "Your 2FA secrets are encrypted on your device before syncing. Google Authenticator's cloud sync does not use end-to-end encryption — Google holds the decryption keys." },
+  { icon: 'fa-solid fa-terminal', title: 'Developer-Friendly CLI', text: 'Generate 2FA codes from your terminal. Integrate with scripts, SSH workflows, and CI/CD pipelines. Perfect for developers and sysadmins.' },
+  { icon: 'fa-solid fa-clock', title: 'Wearable Support', text: "View 2FA codes on your Wear OS or Apple Watch without reaching for your phone. Google Authenticator doesn't offer any smartwatch companion." },
+  { icon: 'fa-solid fa-box-open', title: 'Easy Migration', text: 'Import your existing Google Authenticator accounts via QR scan or file import. The switch takes minutes and requires no reconfiguration of your online services.' },
 ]
 
 const faqs: FAQEntry[] = [

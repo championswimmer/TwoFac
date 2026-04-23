@@ -3,6 +3,7 @@ import { RouterLink } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
 import ComparisonTable from './ComparisonTable.vue'
 import FAQItem from './FAQItem.vue'
+import { useHead } from '@unhead/vue'
 
 export interface GlanceStat {
   value: string
@@ -27,7 +28,7 @@ export interface FAQEntry {
   answer: string
 }
 
-defineProps<{
+const props = defineProps<{
   /** Competitor display name, e.g. "Google Authenticator" */
   competitorName: string
   /** Hero paragraph describing the comparison context */
@@ -51,6 +52,53 @@ defineProps<{
   /** Secondary CTA link text */
   guideLinkText: string
 }>()
+
+useHead(() => ({
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": props.faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      })
+    },
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://twofac.app/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Compare",
+            "item": "https://twofac.app/compare"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": `TwoFac vs ${props.competitorName}`,
+            "item": `https://twofac.app/compare/${props.competitorName.toLowerCase().replace(/\s+/g, '-')}`
+          }
+        ]
+      })
+    }
+  ]
+}))
 </script>
 
 <template>
@@ -128,7 +176,10 @@ defineProps<{
             :key="card.title"
             class="rounded-xl bg-white dark:bg-secondary-800 p-6 shadow-sm border border-secondary-200 dark:border-secondary-700"
           >
-            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2">{{ card.icon }} {{ card.title }}</h3>
+            <h3 class="font-semibold text-secondary-900 dark:text-white mb-2 flex items-center gap-2">
+              <i :class="card.icon" class="text-primary-600 dark:text-primary-400 w-5 text-center"></i>
+              <span>{{ card.title }}</span>
+            </h3>
             <p class="text-sm text-secondary-600 dark:text-secondary-400">{{ card.text }}</p>
           </div>
         </div>

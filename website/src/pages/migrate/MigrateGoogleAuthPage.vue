@@ -1,18 +1,27 @@
 <script setup lang="ts">
 import { useSEO } from '../../composables/useSEO'
 import MigratePageLayout from '../../components/MigratePageLayout.vue'
+import type { HowToStep } from '../../components/MigratePageLayout.vue'
 
 useSEO({
-  title: 'How to Migrate from Google Authenticator to TwoFac',
+  title: 'How to Migrate from Google Authenticator to TwoFac: 2026 Migration Guide',
   description: 'Step-by-step guide to migrate your 2FA accounts from Google Authenticator to TwoFac using the built-in QR export feature.',
   canonicalPath: '/migrate/google-authenticator',
 })
+
+const howToSteps: HowToStep[] = [
+  { name: 'Export from Google Authenticator', text: 'Open the Google Authenticator app on your current device. Tap the Menu icon in the top right corner. Select Transfer accounts or Transfer codes. Tap Export accounts. Select the accounts you wish to export and tap Next. A QR code will appear on your screen containing your 2FA secrets.' },
+  { name: 'Import into TwoFac', text: 'Open the TwoFac app on your target device. Click or tap the Add Account button. Select the Scan QR Code option. Scan the QR code displayed on your Google Authenticator app. TwoFac will instantly import your accounts.' },
+  { name: 'Secure Your New Setup', text: 'Head to Settings to enable Biometric Unlock and create an Encrypted Backup to protect your 2FA codes.' },
+  { name: 'Clean Up', text: 'Once you have verified that your codes are generating correctly in TwoFac, you can safely delete the accounts from Google Authenticator and uninstall it.' }
+]
 </script>
 
 <template>
   <MigratePageLayout
     app-name="Google Authenticator"
     hero-description="Migrating from Google Authenticator to TwoFac takes just a few minutes using Google's built-in QR export feature. No manual re-entry required."
+    :how-to-steps="howToSteps"
   >
     <h2>Step 1: Export from Google Authenticator</h2>
     <ol>

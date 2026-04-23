@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { useSEO } from '../../composables/useSEO'
 import MigratePageLayout from '../../components/MigratePageLayout.vue'
+import type { HowToStep } from '../../components/MigratePageLayout.vue'
 
 useSEO({
-  title: 'How to Migrate from 2FAS to TwoFac',
+  title: 'How to Migrate from 2FAS to TwoFac: 2026 Migration Guide',
   description: 'Step-by-step guide to migrate your 2FA accounts from 2FAS to TwoFac using the 2FAS export feature.',
   canonicalPath: '/migrate/2fas',
 })
+
+const howToSteps: HowToStep[] = [
+  { name: 'Export from 2FAS', text: 'Open the 2FAS app on your mobile device. Tap the Settings (gear icon) or the Menu button. Select 2FAS Backup. Tap Export to file. Choose to export without a password to create an unencrypted .2fas file. Save the file to your device\'s storage.' },
+  { name: 'Import into TwoFac', text: 'Open the TwoFac app on your device. Go to Settings. Under the Backup & Restore section, find the option to Import. Select the .2fas file you exported. TwoFac will instantly import your accounts.' },
+  { name: 'Clean Up and Secure Your New Setup', text: 'Delete the exported .2fas file from your device. Enable Biometric Unlock in TwoFac. Create an Encrypted Backup from TwoFac.' }
+]
 </script>
 
 <template>
   <MigratePageLayout
     app-name="2FAS"
     hero-description="Migrating from 2FAS to TwoFac is fast and fully supported. You can export your tokens from 2FAS and import them directly into TwoFac."
+    :how-to-steps="howToSteps"
   >
     <h2>Step 1: Export from 2FAS</h2>
     <ol>

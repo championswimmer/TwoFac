@@ -1,13 +1,67 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
+import { useHead } from '@unhead/vue'
 
-defineProps<{
+export interface HowToStep {
+  name: string
+  text: string
+}
+
+const props = defineProps<{
   /** App name being migrated from, e.g. "Google Authenticator" */
   appName: string
   /** Hero paragraph describing the migration context */
   heroDescription: string
+  /** Array of steps for the HowTo JSON-LD schema */
+  howToSteps?: HowToStep[]
 }>()
+
+useHead(() => ({
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://twofac.app/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Migrate",
+            "item": "https://twofac.app/migrate"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": `Migrate from ${props.appName}`,
+            "item": `https://twofac.app/migrate/${props.appName.toLowerCase().replace(/\s+/g, '-')}`
+          }
+        ]
+      })
+    },
+    ...(props.howToSteps?.length ? [{
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": `How to Migrate from ${props.appName} to TwoFac`,
+        "description": props.heroDescription,
+        "step": props.howToSteps.map((step) => ({
+          "@type": "HowToStep",
+          "name": step.name,
+          "text": step.text
+        }))
+      })
+    }] : [])
+  ]
+}))
 </script>
 
 <template>

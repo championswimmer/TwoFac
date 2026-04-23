@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { useSEO } from '../../composables/useSEO'
 import MigratePageLayout from '../../components/MigratePageLayout.vue'
+import type { HowToStep } from '../../components/MigratePageLayout.vue'
 
 useSEO({
-  title: 'How to Migrate from Ente Auth to TwoFac',
+  title: 'How to Migrate from Ente Auth to TwoFac: 2026 Migration Guide',
   description: 'Step-by-step guide to migrate your 2FA accounts from Ente Auth to TwoFac using Plain Text exports.',
   canonicalPath: '/migrate/ente-auth',
 })
+
+const howToSteps: HowToStep[] = [
+  { name: 'Export from Ente Auth', text: 'Open the Ente Auth app. Open the Navigation Menu and select Settings or Data. Click or tap on Export Codes. Choose the Plain Text Export format. Save the file to a secure location on your device.' },
+  { name: 'Import into TwoFac', text: 'Open the TwoFac app. Navigate to Settings and find the Import section. Select the plain text (.txt) file you exported from Ente Auth. TwoFac will parse the URIs and store your accounts.' },
+  { name: 'Secure Your Setup', text: 'Delete the plain text export file permanently. Enable Biometric Lock in TwoFac. Set up an Encrypted Backup directly from TwoFac.' }
+]
 </script>
 
 <template>
   <MigratePageLayout
     app-name="Ente Auth"
     hero-description="Migrating from Ente Auth to TwoFac is incredibly easy using the Ente Auth export functionality. TwoFac officially supports importing Ente Auth text exports."
+    :how-to-steps="howToSteps"
   >
     <h2>Step 1: Export from Ente Auth</h2>
     <p>You can export your secrets using either the Ente Auth mobile or desktop apps.</p>

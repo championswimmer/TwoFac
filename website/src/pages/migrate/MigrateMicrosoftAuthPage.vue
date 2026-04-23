@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { useSEO } from '../../composables/useSEO'
 import MigratePageLayout from '../../components/MigratePageLayout.vue'
+import type { HowToStep } from '../../components/MigratePageLayout.vue'
 
 useSEO({
-  title: 'How to Migrate from Microsoft Authenticator to TwoFac',
+  title: 'How to Migrate from Microsoft Authenticator to TwoFac: 2026 Migration Guide',
   description: 'Step-by-step guide to migrate your 2FA accounts from Microsoft Authenticator to TwoFac manually.',
   canonicalPath: '/migrate/microsoft-authenticator',
 })
+
+const howToSteps: HowToStep[] = [
+  { name: 'The Manual Method', text: 'Log in to each service using your current Microsoft Authenticator code. Go to the Security / 2FA Settings of that website. Disable 2FA temporarily, and then Re-enable it. When the website shows a new QR Code, scan it with the TwoFac app. Test the new code to make sure TwoFac is correctly registered. Delete the old entry from Microsoft Authenticator.' },
+  { name: 'Securing Your New TwoFac Setup', text: 'Enable Biometric Lock in TwoFac to ensure only you can access your codes. Create an Encrypted Backup of your accounts and store it securely.' }
+]
 </script>
 
 <template>
   <MigratePageLayout
     app-name="Microsoft Authenticator"
     hero-description="Microsoft Authenticator intentionally restricts exporting 2FA secrets. Because there is no official export button, standard migration requires manually transferring your accounts, service by service."
+    :how-to-steps="howToSteps"
   >
     <h2>Why is this manual?</h2>
     <p>

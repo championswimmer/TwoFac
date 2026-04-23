@@ -4,7 +4,7 @@ import ComparePageLayout from '../../components/ComparePageLayout.vue'
 import type { GlanceStat, WhyChooseCard, FAQEntry, FeatureRow } from '../../components/ComparePageLayout.vue'
 
 useSEO({
-  title: 'TwoFac vs Bitwarden Authenticator — Dedicated 2FA vs Password Manager Add-On (2025)',
+  title: 'TwoFac vs Bitwarden Authenticator: Best Open Source 2FA Alternative (2026)',
   description: 'Detailed comparison of TwoFac and Bitwarden Authenticator. TwoFac is a purpose-built, lightweight 2FA app with desktop, CLI, and wearable support — no account or subscription required.',
   canonicalPath: '/compare/bitwarden',
 })
@@ -41,12 +41,12 @@ const features: FeatureRow[] = [
 ]
 
 const whyChooseCards: WhyChooseCard[] = [
-  { icon: '🎯', title: 'Purpose-Built for 2FA', text: "TwoFac is a dedicated 2FA app — not a side feature of a password manager. It does one thing and does it exceptionally well across every platform." },
-  { icon: '🆓', title: '100% Free, All Platforms', text: 'No premium tier, no subscription. Desktop, CLI, browser extension, and wearable access are free. Bitwarden charges $10/year for TOTP in the password manager.' },
-  { icon: '🖥️', title: 'Native Desktop & CLI', text: "Standalone desktop apps for macOS, Windows, and Linux, plus a CLI tool for terminal workflows. Bitwarden's standalone authenticator is mobile-only." },
-  { icon: '⌚', title: 'Wearable Apps', text: 'View codes on your Wear OS or Apple Watch. Neither Bitwarden product offers wearable companion apps.' },
-  { icon: '🪶', title: 'Lightweight & Fast', text: 'No password vault, no credential management, no bloat. TwoFac starts fast, runs lean, and focuses entirely on generating and managing 2FA codes.' },
-  { icon: '🔓', title: 'No Account Required', text: "Start using TwoFac immediately — no sign-up, no email verification. Bitwarden's full-featured authenticator requires a Bitwarden account and Premium subscription." },
+  { icon: 'fa-solid fa-bullseye', title: 'Purpose-Built for 2FA', text: "TwoFac is a dedicated 2FA app — not a side feature of a password manager. It does one thing and does it exceptionally well across every platform." },
+  { icon: 'fa-solid fa-gift', title: '100% Free, All Platforms', text: 'No premium tier, no subscription. Desktop, CLI, browser extension, and wearable access are free. Bitwarden charges $10/year for TOTP in the password manager.' },
+  { icon: 'fa-solid fa-desktop', title: 'Native Desktop & CLI', text: "Standalone desktop apps for macOS, Windows, and Linux, plus a CLI tool for terminal workflows. Bitwarden's standalone authenticator is mobile-only." },
+  { icon: 'fa-solid fa-clock', title: 'Wearable Apps', text: 'View codes on your Wear OS or Apple Watch. Neither Bitwarden product offers wearable companion apps.' },
+  { icon: 'fa-solid fa-feather', title: 'Lightweight & Fast', text: 'No password vault, no credential management, no bloat. TwoFac starts fast, runs lean, and focuses entirely on generating and managing 2FA codes.' },
+  { icon: 'fa-solid fa-lock-open', title: 'No Account Required', text: "Start using TwoFac immediately — no sign-up, no email verification. Bitwarden's full-featured authenticator requires a Bitwarden account and Premium subscription." },
 ]
 
 const faqs: FAQEntry[] = [

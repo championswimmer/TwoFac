@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { useSEO } from '../../composables/useSEO'
 import MigratePageLayout from '../../components/MigratePageLayout.vue'
+import type { HowToStep } from '../../components/MigratePageLayout.vue'
 
 useSEO({
-  title: 'How to Migrate from Authy to TwoFac',
+  title: 'How to Migrate from Authy to TwoFac: 2026 Migration Guide',
   description: 'Step-by-step guide to migrate your 2FA accounts from Authy to TwoFac manually.',
   canonicalPath: '/migrate/authy',
 })
+
+const howToSteps: HowToStep[] = [
+  { name: 'The Manual Method', text: 'Log in to each service using your current Authy code. Go to the Security/2FA settings of that account. Disable 2FA temporarily. Re-enable 2FA, which will show you a new QR code. Scan this new QR code using the TwoFac app. Test the new code to make sure TwoFac is correctly registered.' },
+  { name: 'Verify Your New Setup', text: 'Do not delete your Authy account until you have verified that every single token works in TwoFac. Enable Biometric Lock in TwoFac and create an Encrypted Backup.' }
+]
 </script>
 
 <template>
   <MigratePageLayout
     app-name="Authy"
     hero-description="Authy famously blocks users from exporting their 2FA tokens. The official migration method requires manually moving your accounts, ensuring you're no longer trapped."
+    :how-to-steps="howToSteps"
   >
     <h2>Why is this manual?</h2>
     <p>

@@ -1,18 +1,27 @@
 <script setup lang="ts">
 import { useSEO } from '../../composables/useSEO'
 import MigratePageLayout from '../../components/MigratePageLayout.vue'
+import type { HowToStep } from '../../components/MigratePageLayout.vue'
 
 useSEO({
-  title: 'How to Migrate from Bitwarden Authenticator to TwoFac',
+  title: 'How to Migrate from Bitwarden Authenticator to TwoFac: 2026 Migration Guide',
   description: 'Step-by-step guide to migrate your 2FA accounts from Bitwarden Authenticator or Bitwarden Password Manager to TwoFac.',
   canonicalPath: '/migrate/bitwarden',
 })
+
+const howToSteps: HowToStep[] = [
+  { name: 'Exporting from the Standalone App', text: 'Open the Bitwarden Authenticator app. Tap the Settings (gear) icon. Tap Export. Select JSON as your preferred file format. Tap Export items and save the file.' },
+  { name: 'Exporting from the Bitwarden Password Manager', text: 'Log in to the Bitwarden Web Vault or Desktop app. Go to Tools > Export Vault. Select .json as the format. Enter your master password to confirm and download the JSON file.' },
+  { name: 'Import into TwoFac', text: 'Open the exported JSON file on a secure, offline computer. Locate the totp fields or otpauth:// URIs for your accounts. Open TwoFac and click Add Account. Manually paste the secret seeds or URIs to add each account.' },
+  { name: 'Secure Your New Setup', text: 'Delete the unencrypted export file from your computer and empty the trash. Enable Biometric Unlock in TwoFac. Generate an encrypted backup directly from TwoFac.' }
+]
 </script>
 
 <template>
   <MigratePageLayout
     app-name="Bitwarden Authenticator"
     hero-description="Migrating from Bitwarden Authenticator (or the Bitwarden Password Manager) to TwoFac involves exporting your vault data and transferring your TOTP seeds."
+    :how-to-steps="howToSteps"
   >
     <h2>Understanding Your Bitwarden Setup</h2>
     <p>
