@@ -19,7 +19,7 @@ cd "${REPO_ROOT}"
 ./gradlew --no-daemon :composeApp:wasmJsBrowserDevelopmentRun --console=plain
 ```
 
-In this environment it served the app at `http://localhost:8081/`.
+The dev server typically serves the app at `http://localhost:8081/`.
 
 Notes:
 
