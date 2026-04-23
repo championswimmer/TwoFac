@@ -43,9 +43,9 @@ useSEO({
       <li><strong>Create an Encrypted Backup:</strong> Export your accounts to an encrypted file so you never lose them if you lose your device.</li>
     </ul>
 
-    <h2>Step 4: Clean Up</h2>
+    <h2>Step 4: Clean Up (Optional)</h2>
     <p>
-      Once you have verified that your codes are generating correctly in TwoFac, you can safely delete the accounts from Google Authenticator.
+      Once you have verified that your codes are generating correctly in TwoFac, you can safely delete the accounts from Google Authenticator and uninstall it. Alternatively, since scanning the export QR code simply copies your secrets, you can also continue to use both authenticator apps simultaneously!
     </p>
   </MigratePageLayout>
 </template>
