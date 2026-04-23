@@ -8,12 +8,14 @@ For test-only passkey/password entry, always use `123456`.
 
 ## Build and Run the Browser App
 
+Assume `${REPO_ROOT}` is the repository root.
+
 ### Development server
 
 Run the Compose Wasm webpack dev server:
 
 ```bash
-cd /home/runner/work/TwoFac/TwoFac
+cd "${REPO_ROOT}"
 ./gradlew --no-daemon :composeApp:wasmJsBrowserDevelopmentRun --console=plain
 ```
 
@@ -29,19 +31,19 @@ Notes:
 Build the production browser bundle:
 
 ```bash
-cd /home/runner/work/TwoFac/TwoFac
+cd "${REPO_ROOT}"
 ./gradlew --no-daemon :composeApp:wasmJsBrowserProductionWebpack
 ./gradlew --no-daemon :composeApp:buildWasmAsPwa
 ```
 
 The production files are written to:
 
-`/home/runner/work/TwoFac/TwoFac/composeApp/build/dist/wasmJs/productionExecutable/`
+`${REPO_ROOT}/composeApp/build/dist/wasmJs/productionExecutable/`
 
 Serve that directory locally when you want to exercise the PWA/service-worker build:
 
 ```bash
-cd /home/runner/work/TwoFac/TwoFac/composeApp/build/dist/wasmJs/productionExecutable
+cd "${REPO_ROOT}/composeApp/build/dist/wasmJs/productionExecutable"
 python3 -m http.server 4173
 ```
 
