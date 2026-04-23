@@ -54,7 +54,7 @@ assertIncludes(homepageHtml, '<title>Open Source Cross-Platform 2FA | TwoFac</ti
 assertIncludes(homepageHtml, 'name="description"', 'homepage head')
 assertIncludes(homepageHtml, 'property="og:url" content="https://twofac.app/"', 'homepage head')
 
-assertIncludes(compareHtml, '<title>TwoFac vs Google Authenticator — Open Source 2FA Alternative (2025) | TwoFac</title>', 'compare page head')
+assertIncludes(compareHtml, '<title>TwoFac vs Google Authenticator: Best Open Source 2FA Alternative (2026) | TwoFac</title>', 'compare page head')
 assertIncludes(compareHtml, 'TwoFac vs Google Authenticator at a Glance', 'compare page HTML')
 assertIncludes(compareHtml, 'property="og:url" content="https://twofac.app/compare/google-authenticator"', 'compare page head')
 
