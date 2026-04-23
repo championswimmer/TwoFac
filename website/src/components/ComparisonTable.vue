@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
+
 defineProps<{
   features: Array<{
     name: string
@@ -6,6 +8,7 @@ defineProps<{
     competitor: boolean | string
   }>
   competitorName: string
+  guideLink?: string
 }>()
 
 function displayValue(value: boolean | string): string {
@@ -37,7 +40,14 @@ function cellClass(value: boolean | string, isTwoFac: boolean): string {
             TwoFac
           </th>
           <th class="px-6 py-4 text-center font-semibold text-secondary-600 dark:text-secondary-400">
-            {{ competitorName }}
+            <div>{{ competitorName }}</div>
+            <RouterLink
+              v-if="guideLink"
+              :to="guideLink"
+              class="mt-1 inline-block text-xs font-normal text-primary-600 hover:text-primary-700 hover:underline dark:text-primary-400 dark:hover:text-primary-300"
+            >
+              Migration Guide &rarr;
+            </RouterLink>
           </th>
         </tr>
       </thead>

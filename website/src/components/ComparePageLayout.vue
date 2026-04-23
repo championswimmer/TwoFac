@@ -110,7 +110,7 @@ defineProps<{
       <p class="text-secondary-600 dark:text-secondary-400 mb-6">
         {{ comparisonSubtitle ?? 'A detailed breakdown of every feature that matters.' }}
       </p>
-      <ComparisonTable :features="features" :competitor-name="competitorName" />
+      <ComparisonTable :features="features" :competitor-name="competitorName" :guide-link="guideLink" />
     </section>
 
     <!-- Platform / Security / Pricing and any other detail sections (per-page slot) -->
