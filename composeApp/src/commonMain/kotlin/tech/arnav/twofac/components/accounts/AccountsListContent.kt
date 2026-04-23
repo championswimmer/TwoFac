@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,17 +27,19 @@ fun AccountsListContent(
     searchQuery: String = "",
     modifier: Modifier = Modifier,
 ) {
-    val filteredAccounts = if (searchQuery.isBlank()) {
-        accounts
-    } else {
-        val query = searchQuery.trim().lowercase()
-        accounts.filter { account ->
-            account.accountLabel.lowercase().contains(query) ||
-                (account.issuer?.lowercase()?.contains(query) == true)
+    val query = searchQuery.trim()
+    val filteredAccounts = remember(accounts, query) {
+        if (query.isBlank()) {
+            accounts
+        } else {
+            accounts.filter { account ->
+                account.accountLabel.contains(query, ignoreCase = true) ||
+                    (account.issuer?.contains(query, ignoreCase = true) == true)
+            }
         }
     }
 
-    if (filteredAccounts.isEmpty() && searchQuery.isNotBlank()) {
+    if (filteredAccounts.isEmpty() && query.isNotBlank()) {
         Box(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
