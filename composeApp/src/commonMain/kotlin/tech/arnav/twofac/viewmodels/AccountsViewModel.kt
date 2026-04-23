@@ -2,6 +2,7 @@ package tech.arnav.twofac.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.otp.OtpCodes
@@ -217,7 +219,12 @@ class AccountsViewModel(
             return null
         }
         return try {
-            twoFacLib.getOtpAuthUri(accountId)
+            withContext(Dispatchers.Default) {
+                twoFacLib.getOtpAuthUri(accountId)
+            } ?: run {
+                _error.value = "Account not found"
+                null
+            }
         } catch (e: Exception) {
             _error.value = e.message ?: "Failed to get OTP URI"
             null

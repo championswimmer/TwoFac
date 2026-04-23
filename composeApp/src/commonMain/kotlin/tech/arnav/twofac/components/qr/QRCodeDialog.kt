@@ -30,6 +30,8 @@ fun QRCodeDialog(
     otpAuthUri: String,
     onDismiss: () -> Unit,
 ) {
+    QrCodeScreenshotProtectionEffect(enabled = true)
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.account_detail_show_qr_dialog_title)) },

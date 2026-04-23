@@ -8,6 +8,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -39,6 +40,19 @@ class AccountsViewModelTest {
         assertNotNull(refreshedOtp)
         assertNotEquals(firstOtp, refreshedOtp)
         assertEquals(refreshedOtp, viewModel.getOtpForAccount(accountId))
+    }
+
+    @Test
+    fun `getOtpAuthUriForAccount sets error when account is missing`() = runTest {
+        val passkey = "test-passkey"
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = passkey)
+        lib.unlock(passkey)
+        val viewModel = AccountsViewModel(twoFacLib = lib)
+
+        val uri = viewModel.getOtpAuthUriForAccount("missing-account-id")
+
+        assertNull(uri)
+        assertEquals("Account not found", viewModel.error.value)
     }
 
     @OptIn(ExperimentalTime::class)
