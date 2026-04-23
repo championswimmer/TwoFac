@@ -87,7 +87,7 @@ const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1200 } });
 
 await page.goto('http://127.0.0.1:8081/', { waitUntil: 'load' });
-await page.waitForTimeout(5000);
+await page.locator('canvas').waitFor();
 
 await page.locator('input').fill('123456', { force: true });
 await page.keyboard.press('Enter');
