@@ -66,9 +66,19 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../pages/compare/CompareEnteAuthPage.vue'),
   },
   {
+    path: '/compare/aegis-authenticator',
+    name: 'compare-aegis-authenticator',
+    component: () => import('../pages/compare/CompareAegisAuthPage.vue'),
+  },
+  {
     path: '/compare/bitwarden',
     name: 'compare-bitwarden',
     component: () => import('../pages/compare/CompareBitwardenPage.vue'),
+  },
+  {
+    path: '/compare/proton-authenticator',
+    name: 'compare-proton-authenticator',
+    component: () => import('../pages/compare/CompareProtonAuthPage.vue'),
   },
   {
     path: '/compare/google-authenticator',
@@ -91,9 +101,19 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../pages/migrate/MigrateEnteAuthPage.vue'),
   },
   {
+    path: '/migrate/aegis-authenticator',
+    name: 'migrate-aegis-authenticator',
+    component: () => import('../pages/migrate/MigrateAegisAuthPage.vue'),
+  },
+  {
     path: '/migrate/bitwarden',
     name: 'migrate-bitwarden',
     component: () => import('../pages/migrate/MigrateBitwardenPage.vue'),
+  },
+  {
+    path: '/migrate/proton-authenticator',
+    name: 'migrate-proton-authenticator',
+    component: () => import('../pages/migrate/MigrateProtonAuthPage.vue'),
   },
   {
     path: '/migrate/google-authenticator',
