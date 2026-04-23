@@ -27,6 +27,15 @@ const compareLinks = [
   { name: 'vs Bitwarden', to: '/compare/bitwarden' },
 ]
 
+const migrateLinks = [
+  { name: 'from Google Auth', to: '/migrate/google-authenticator' },
+  { name: 'from Microsoft Auth', to: '/migrate/microsoft-authenticator' },
+  { name: 'from 2FAS', to: '/migrate/2fas' },
+  { name: 'from Ente Auth', to: '/migrate/ente-auth' },
+  { name: 'from Bitwarden', to: '/migrate/bitwarden' },
+  { name: 'from Authy', to: '/migrate/authy' },
+]
+
 const communityLinks = [
   { name: 'GitHub', href: 'https://github.com/championswimmer/TwoFac' },
 ]
@@ -36,7 +45,7 @@ const communityLinks = [
   <footer class="bg-secondary-900 text-secondary-300 dark:bg-secondary-950">
     <!-- Main footer grid -->
     <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-      <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
+      <div class="grid grid-cols-2 gap-8 md:grid-cols-5">
         <!-- Product -->
         <div>
           <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Product</h3>
@@ -80,6 +89,21 @@ const communityLinks = [
           <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Compare</h3>
           <ul class="mt-4 space-y-3">
             <li v-for="link in compareLinks" :key="link.to">
+              <RouterLink
+                :to="link.to"
+                class="text-sm text-secondary-400 transition-colors hover:text-white"
+              >
+                {{ link.name }}
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Migrate -->
+        <div>
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Migrate</h3>
+          <ul class="mt-4 space-y-3">
+            <li v-for="link in migrateLinks" :key="link.to">
               <RouterLink
                 :to="link.to"
                 class="text-sm text-secondary-400 transition-colors hover:text-white"

@@ -22,6 +22,12 @@ export const INDEXABLE_STATIC_ROUTES = [
   { path: '/compare/bitwarden', changefreq: 'monthly', priority: '0.7' },
   { path: '/compare/google-authenticator', changefreq: 'monthly', priority: '0.7' },
   { path: '/compare/microsoft-authenticator', changefreq: 'monthly', priority: '0.7' },
+  { path: '/migrate/2fas', changefreq: 'monthly', priority: '0.6' },
+  { path: '/migrate/ente-auth', changefreq: 'monthly', priority: '0.6' },
+  { path: '/migrate/bitwarden', changefreq: 'monthly', priority: '0.6' },
+  { path: '/migrate/google-authenticator', changefreq: 'monthly', priority: '0.6' },
+  { path: '/migrate/microsoft-authenticator', changefreq: 'monthly', priority: '0.6' },
+  { path: '/migrate/authy', changefreq: 'monthly', priority: '0.6' },
 ]
 
 export const NON_INDEXABLE_STATIC_ROUTES = [

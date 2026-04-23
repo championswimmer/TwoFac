@@ -43,4 +43,8 @@
     <string name="account_detail_show_qr">QRコードを表示</string>
     <string name="account_detail_show_qr_dialog_title">QRコードでエクスポート</string>
     <string name="account_detail_show_qr_warning">このQRコードには秘密鍵が含まれています。信頼できない環境では共有やスクリーンショットをしないでください。</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">アカウントを検索</string>
+    <string name="accounts_search_no_results">検索に一致するアカウントはありません</string>
 </resources>

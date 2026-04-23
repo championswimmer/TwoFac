@@ -43,4 +43,8 @@
     <string name="account_detail_show_qr">QR-Code anzeigen</string>
     <string name="account_detail_show_qr_dialog_title">Per QR-Code exportieren</string>
     <string name="account_detail_show_qr_warning">Dieser QR-Code enthält Ihren geheimen Schlüssel. Teilen Sie ihn nicht und machen Sie keinen Screenshot in nicht vertrauenswürdigen Umgebungen.</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">Konten durchsuchen</string>
+    <string name="accounts_search_no_results">Keine Konten entsprechen deiner Suche</string>
 </resources>

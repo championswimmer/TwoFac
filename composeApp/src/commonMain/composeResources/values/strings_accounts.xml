@@ -43,4 +43,8 @@
     <!-- Accounts locked state -->
     <string name="accounts_locked_message">Vault is locked. Unlock to manage accounts.</string>
     <string name="accounts_locked_unlock">Unlock Vault</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">Search accounts</string>
+    <string name="accounts_search_no_results">No accounts match your search</string>
 </resources>

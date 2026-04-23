@@ -4,7 +4,7 @@ import ComparePageLayout from '../../components/ComparePageLayout.vue'
 import type { GlanceStat, WhyChooseCard, FAQEntry, FeatureRow } from '../../components/ComparePageLayout.vue'
 
 useSEO({
-  title: 'TwoFac vs Ente Auth — Privacy-First 2FA Apps Compared (2025)',
+  title: 'TwoFac vs Ente Auth: Best Open Source 2FA Alternative (2026)',
   description: 'In-depth comparison of TwoFac and Ente Auth. Both are open source with E2E encryption, but TwoFac adds a CLI tool, browser extensions, Wear OS, and watchOS — built natively with Kotlin Multiplatform.',
   canonicalPath: '/compare/ente-auth',
 })
@@ -40,12 +40,12 @@ const features: FeatureRow[] = [
 ]
 
 const whyChooseCards: WhyChooseCard[] = [
-  { icon: '💻', title: 'CLI for Developers', text: 'Generate 2FA codes from your terminal with auto-refresh, account management, and scriptable output. Ente Auth offers no interactive CLI.' },
-  { icon: '🧩', title: 'Browser Extension', text: "Autofill 2FA codes directly in your browser login forms. No app-switching, no manual code entry. Ente Auth doesn't have a browser extension." },
-  { icon: '⌚', title: 'Wearable Apps', text: 'View 2FA codes on your Wear OS or Apple Watch. Quick glance at your wrist beats reaching for your phone every time. Ente Auth has no wearable support.' },
-  { icon: '🔧', title: 'True Native Performance', text: 'Kotlin Multiplatform compiles to native code with platform-native UI frameworks — no Flutter rendering layer. Faster startup, better animations, and genuine platform behavior.' },
-  { icon: '🔒', title: 'Biometric Lock', text: 'Protect your 2FA codes with fingerprint or face recognition. Ente Auth lacks biometric lock, leaving codes accessible to anyone with device access.' },
-  { icon: '🆓', title: 'No Account Required', text: 'Use every TwoFac feature without creating any account. Ente Auth requires an Ente account for cloud sync and backup.' },
+  { icon: 'fa-solid fa-terminal', title: 'CLI for Developers', text: 'Generate 2FA codes from your terminal with auto-refresh, account management, and scriptable output. Ente Auth offers no interactive CLI.' },
+  { icon: 'fa-solid fa-puzzle-piece', title: 'Browser Extension', text: "Autofill 2FA codes directly in your browser login forms. No app-switching, no manual code entry. Ente Auth doesn't have a browser extension." },
+  { icon: 'fa-solid fa-clock', title: 'Wearable Apps', text: 'View 2FA codes on your Wear OS or Apple Watch. Quick glance at your wrist beats reaching for your phone every time. Ente Auth has no wearable support.' },
+  { icon: 'fa-solid fa-wrench', title: 'True Native Performance', text: 'Kotlin Multiplatform compiles to native code with platform-native UI frameworks — no Flutter rendering layer. Faster startup, better animations, and genuine platform behavior.' },
+  { icon: 'fa-solid fa-fingerprint', title: 'Biometric Lock', text: 'Protect your 2FA codes with fingerprint or face recognition. Ente Auth lacks biometric lock, leaving codes accessible to anyone with device access.' },
+  { icon: 'fa-solid fa-gift', title: 'No Account Required', text: 'Use every TwoFac feature without creating any account. Ente Auth requires an Ente account for cloud sync and backup.' },
 ]
 
 const faqs: FAQEntry[] = [
@@ -68,8 +68,8 @@ const faqs: FAQEntry[] = [
     :faqs="faqs"
     cta-heading="Try TwoFac — The Complete 2FA Experience"
     cta-body="If you love Ente Auth's privacy-first approach but want CLI access, browser autofill, wearable apps, and native performance, TwoFac is the next step. Available on 11+ platforms, completely free."
-    guide-link="/features"
-    guide-link-text="Explore All Features →"
+    guide-link="/migrate/ente-auth"
+    guide-link-text="Migration Guide →"
   >
     <template #intro>
       <section class="bg-secondary-50 dark:bg-secondary-900 py-12 sm:py-16">

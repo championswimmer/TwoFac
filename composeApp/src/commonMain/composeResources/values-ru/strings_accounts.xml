@@ -43,4 +43,8 @@
     <string name="account_detail_show_qr">Показать QR-код</string>
     <string name="account_detail_show_qr_dialog_title">Экспорт через QR-код</string>
     <string name="account_detail_show_qr_warning">Этот QR-код содержит ваш секретный ключ. Не делитесь им и не делайте снимки экрана в ненадёжных средах.</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">Поиск аккаунтов</string>
+    <string name="accounts_search_no_results">Ни один аккаунт не соответствует вашему запросу</string>
 </resources>

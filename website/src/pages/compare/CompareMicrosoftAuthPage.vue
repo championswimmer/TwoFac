@@ -4,7 +4,7 @@ import ComparePageLayout from '../../components/ComparePageLayout.vue'
 import type { GlanceStat, WhyChooseCard, FAQEntry, FeatureRow } from '../../components/ComparePageLayout.vue'
 
 useSEO({
-  title: 'TwoFac vs Microsoft Authenticator — Open Source Privacy-First Alternative (2025)',
+  title: 'TwoFac vs Microsoft Authenticator: Best Open Source 2FA Alternative (2026)',
   description: 'Detailed comparison of TwoFac and Microsoft Authenticator. TwoFac is the open-source, privacy-focused, lightweight 2FA alternative with desktop, Linux, CLI, and wearable support — no Microsoft account required.',
   canonicalPath: '/compare/microsoft-authenticator',
 })
@@ -44,12 +44,12 @@ const features: FeatureRow[] = [
 ]
 
 const whyChooseCards: WhyChooseCard[] = [
-  { icon: '🛡️', title: 'Privacy First', text: 'Zero telemetry, zero tracking. TwoFac is open source and collects no data. Microsoft Authenticator collects telemetry as part of the Microsoft ecosystem.' },
-  { icon: '🐧', title: 'Linux, Desktop & CLI', text: 'Native apps for macOS, Windows, and Linux plus a CLI tool. Microsoft Authenticator is mobile-only with no desktop or terminal support.' },
-  { icon: '🔓', title: 'Open Source', text: "Every line of code is on GitHub, auditable by anyone. Microsoft Authenticator is proprietary — you can't verify what it does with your data." },
-  { icon: '🪶', title: 'Lightweight & Focused', text: 'Purpose-built for 2FA only. No password manager, no payment cards, no bloat. Fast, clean, and focused on doing one thing exceptionally well.' },
-  { icon: '🔗', title: 'No Vendor Lock-In', text: 'No Microsoft account required. No ecosystem dependency. Export your data anytime in standard formats. TwoFac works with any service that supports TOTP.' },
-  { icon: '⌚', title: 'Wearable Support', text: "View 2FA codes on your Wear OS or Apple Watch. Microsoft Authenticator offers no wearable app — you always need your phone." },
+  { icon: 'fa-solid fa-shield-halved', title: 'Privacy First', text: 'Zero telemetry, zero tracking. TwoFac is open source and collects no data. Microsoft Authenticator collects telemetry as part of the Microsoft ecosystem.' },
+  { icon: 'fa-brands fa-linux', title: 'Linux, Desktop & CLI', text: 'Native apps for macOS, Windows, and Linux plus a CLI tool. Microsoft Authenticator is mobile-only with no desktop or terminal support.' },
+  { icon: 'fa-solid fa-lock-open', title: 'Open Source', text: "Every line of code is on GitHub, auditable by anyone. Microsoft Authenticator is proprietary — you can't verify what it does with your data." },
+  { icon: 'fa-solid fa-feather', title: 'Lightweight & Focused', text: 'Purpose-built for 2FA only. No password manager, no payment cards, no bloat. Fast, clean, and focused on doing one thing exceptionally well.' },
+  { icon: 'fa-solid fa-link-slash', title: 'No Vendor Lock-In', text: 'No Microsoft account required. No ecosystem dependency. Export your data anytime in standard formats. TwoFac works with any service that supports TOTP.' },
+  { icon: 'fa-solid fa-clock', title: 'Wearable Support', text: "View 2FA codes on your Wear OS or Apple Watch. Microsoft Authenticator offers no wearable app — you always need your phone." },
 ]
 
 const faqs: FAQEntry[] = [
@@ -72,8 +72,8 @@ const faqs: FAQEntry[] = [
     :faqs="faqs"
     cta-heading="Take Back Control of Your 2FA"
     cta-body="Open source, no telemetry, no vendor lock-in, and available on every platform — including the desktop and Linux that Microsoft forgot. Switch to TwoFac and experience 2FA done right."
-    guide-link="/features"
-    guide-link-text="Explore All Features →"
+    guide-link="/migrate/microsoft-authenticator"
+    guide-link-text="Migration Guide →"
   >
     <template #intro>
       <section class="bg-secondary-50 dark:bg-secondary-900 py-12 sm:py-16">

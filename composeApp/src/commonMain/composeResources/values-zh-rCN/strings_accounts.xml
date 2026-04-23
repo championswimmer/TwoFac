@@ -43,4 +43,8 @@
     <string name="account_detail_show_qr">显示二维码</string>
     <string name="account_detail_show_qr_dialog_title">通过二维码导出</string>
     <string name="account_detail_show_qr_warning">此二维码包含您的密钥。请勿在不受信任的环境中共享或截屏。</string>
+
+    <!-- Accounts search -->
+    <string name="accounts_search_placeholder">搜索账户</string>
+    <string name="accounts_search_no_results">没有与您的搜索匹配的账户</string>
 </resources>
