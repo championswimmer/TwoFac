@@ -51,9 +51,9 @@ useSEO({
       <li><strong>Create an Encrypted Backup:</strong> TwoFac offers natively encrypted backups that you can safely store anywhere.</li>
     </ul>
 
-    <h2>Step 4: Say Goodbye to 2FAS</h2>
+    <h2>Step 4: Say Goodbye to 2FAS (Or Don't!)</h2>
     <p>
-      Once you have verified that your codes are generating correctly in TwoFac across your devices, you can safely uninstall 2FAS.
+      Once you have verified that your codes are generating correctly in TwoFac across your devices, you can safely uninstall 2FAS. However, since exporting does not invalidate your current secrets, you can also choose to keep 2FAS installed and use both authenticator apps simultaneously!
     </p>
   </MigratePageLayout>
 </template>

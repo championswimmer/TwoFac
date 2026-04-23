@@ -51,9 +51,9 @@ useSEO({
       <li><strong>Set up an Encrypted Backup:</strong> Generate an encrypted backup directly from TwoFac so that your future backups are secured end-to-end with a passkey.</li>
     </ul>
 
-    <h2>Step 4: Uninstall Ente Auth</h2>
+    <h2>Step 4: Uninstall Ente Auth (Optional)</h2>
     <p>
-      After confirming that your codes are generating correctly in TwoFac, you can delete your Ente Auth account and uninstall the app.
+      After confirming that your codes are generating correctly in TwoFac, you can delete your Ente Auth account and uninstall the app. Alternatively, since this is a simple export, your codes will continue to work in Ente Auth. You can keep both authenticator apps installed and use them side-by-side if you prefer!
     </p>
   </MigratePageLayout>
 </template>

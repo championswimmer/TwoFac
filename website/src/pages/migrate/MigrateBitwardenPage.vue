@@ -66,5 +66,10 @@ useSEO({
       <li><strong>Enable Biometric Unlock</strong> in TwoFac to protect your codes.</li>
       <li><strong>Create an Encrypted Backup:</strong> Generate an encrypted backup directly from TwoFac so that your future backups are secured with a passkey.</li>
     </ul>
+
+    <h2>Step 4: Clean up or Keep Both</h2>
+    <p>
+      Once you have verified that your codes are generating correctly in TwoFac, you can uninstall Bitwarden Authenticator if you wish. Because exporting simply copies your secrets without re-registering them, you can also continue to use both authenticator apps simultaneously!
+    </p>
   </MigratePageLayout>
 </template>
