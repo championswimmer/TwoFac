@@ -5,76 +5,59 @@ import type { HowToStep } from '../../components/MigratePageLayout.vue'
 
 useSEO({
   title: 'How to Migrate from Proton Authenticator to TwoFac: 2026 Migration Guide',
-  description: 'Step-by-step guide to migrate your 2FA accounts from Proton Authenticator to TwoFac using the safest manual method.',
+  description: 'Step-by-step guide to migrate your 2FA accounts from Proton Authenticator to TwoFac using JSON exports.',
   canonicalPath: '/migrate/proton-authenticator',
 })
 
 const howToSteps: HowToStep[] = [
-  { name: 'Prepare Your Accounts', text: 'Keep Proton Authenticator installed and gather your recovery codes before changing anything. For each service, sign in and open its security or two-factor authentication settings.' },
-  { name: 'Add TwoFac Account-by-Account', text: 'Where a service allows multiple authenticator apps, add TwoFac as a second app first. Otherwise disable the old authenticator app method, re-enable it, and scan the new QR code with TwoFac.' },
-  { name: 'Verify and Remove Proton Later', text: 'Test every migrated account with a fresh code from TwoFac before removing it from Proton Authenticator. When everything is confirmed, create an encrypted backup in TwoFac and then remove Proton if you want.' },
+  { name: 'Export from Proton', text: 'Open Proton Authenticator or Proton Pass. Go to Settings and find the Export option. Choose to export your data in unencrypted JSON format and save the file securely to your device.' },
+  { name: 'Import into TwoFac', text: 'Open the TwoFac app on your device. Navigate to Settings and select the Import option. Choose the JSON file you just exported from Proton. TwoFac will parse the file and securely import all your 2FA accounts.' },
+  { name: 'Secure Your Setup', text: 'Delete the unencrypted JSON export file permanently to protect your secrets. Enable Biometric Lock in TwoFac and set up an Encrypted Backup.' },
 ]
 </script>
 
 <template>
   <MigratePageLayout
     app-name="Proton Authenticator"
-    hero-description="The safest way to migrate from Proton Authenticator to TwoFac today is to re-register each account one by one while keeping Proton installed until every login is verified."
+    hero-description="Migrating from Proton Authenticator to TwoFac is easy using Proton's JSON export functionality. You can quickly bring all your 2FA accounts into TwoFac's broader ecosystem."
     :how-to-steps="howToSteps"
   >
-    <h2>Why the Manual Method Is the Safest Option</h2>
+    <h2>Step 1: Export from Proton</h2>
     <p>
-      Proton Authenticator uses its own encrypted backup and restore flow. That is great for Proton-to-Proton restores, but it is not
-      a direct import path for TwoFac today. Because of that, the most reliable migration method is the classic one:
-      <strong>re-register each service with TwoFac</strong>.
-    </p>
-    <p>
-      It takes longer than importing a plain-text export, but it avoids format-conversion mistakes and guarantees that every service
-      is explicitly enrolled with your new authenticator.
-    </p>
-
-    <h2>Step 1: Prepare Before Changing Anything</h2>
-    <ol>
-      <li>Keep <strong>Proton Authenticator</strong> installed and working throughout the migration.</li>
-      <li>Collect any <strong>recovery codes</strong> the service gives you before you modify 2FA settings.</li>
-      <li>Make a shortlist of your most important accounts first: email, password manager, cloud storage, banking, GitHub, and work logins.</li>
-      <li>For each account, sign in and open its <strong>Security</strong> or <strong>Two-Factor Authentication</strong> settings.</li>
-    </ol>
-
-    <h2>Step 2: Add TwoFac One Service at a Time</h2>
-    <p>
-      Different services behave differently, so use the safest option each site offers:
+      Proton Authenticator and Proton Pass allow you to export your data in a standard format.
     </p>
     <ol>
-      <li>
-        <strong>If the service allows more than one authenticator app:</strong> add TwoFac as a second authenticator first, test it,
-        and only then remove Proton from that account.
-      </li>
-      <li>
-        <strong>If the service allows only one authenticator app:</strong> temporarily disable authenticator-app 2FA, re-enable it,
-        and scan the newly issued QR code using <strong>TwoFac</strong>.
-      </li>
-      <li>Immediately test the new code before leaving the security page.</li>
+      <li>Open <strong>Proton Authenticator</strong> or <strong>Proton Pass</strong> on your device.</li>
+      <li>Go to <strong>Settings</strong> (gear icon) and select <strong>Export</strong>.</li>
+      <li>Choose the <strong>unencrypted JSON</strong> format. This creates a file containing your 2FA secrets that TwoFac can read.</li>
+      <li>Save the file to a secure location on your device.</li>
     </ol>
     <p>
-      This slow-and-steady approach is especially important for email accounts and password managers, because those are the accounts
-      you need to recover everything else.
+      <em>Security Warning:</em> The unencrypted JSON export contains your raw 2FA secrets. Anyone with this file can generate your login codes. <strong>Keep it secure and delete it permanently</strong> once the import is complete.
     </p>
 
-    <h2>Step 3: Verify Everything Before Removing Proton</h2>
+    <h2>Step 2: Import into TwoFac</h2>
+    <ol>
+      <li>Open the <strong>TwoFac</strong> app.</li>
+      <li>Navigate to <strong>Settings</strong>.</li>
+      <li>Under the <em>Backup & Restore</em> section, choose the <strong>Import</strong> option.</li>
+      <li>Select the JSON file you exported from Proton.</li>
+      <li>TwoFac will parse the file and securely import all your 2FA accounts. Review your account list to ensure everything transferred correctly.</li>
+    </ol>
+
+    <h2>Step 3: Secure Your Setup</h2>
     <p>
-      Do not uninstall Proton Authenticator until every important service has been tested with a live login using a code from TwoFac.
+      Now that your accounts are safely in TwoFac, make sure to take advantage of its security features:
     </p>
     <ul>
-      <li><strong>Enable Biometric Lock</strong> in TwoFac.</li>
-      <li><strong>Create an Encrypted Backup</strong> in TwoFac once your accounts are migrated.</li>
-      <li><strong>Store new recovery codes securely</strong> if any service regenerated them during re-enrollment.</li>
+      <li><strong>Delete the JSON export file:</strong> Ensure the plain text export file is permanently removed from your computer or phone.</li>
+      <li><strong>Enable Biometric Lock:</strong> Protect TwoFac using fingerprint or face recognition.</li>
+      <li><strong>Create an Encrypted Backup:</strong> Generate an encrypted backup directly from TwoFac so future backups are secured end-to-end with a passkey.</li>
     </ul>
 
-    <h2>Step 4: Remove Proton Authenticator Only When Ready</h2>
+    <h2>Step 4: Keep Proton Until You Are Confident</h2>
     <p>
-      Once you have successfully used TwoFac for all critical services across your devices, you can remove the entries from Proton
-      Authenticator or uninstall it entirely. Until then, keeping Proton as a temporary fallback is the safest choice.
+      Exporting from Proton does not invalidate your tokens, so you can keep Proton Authenticator installed while you confirm everything works in TwoFac. Once you trust your new setup, you can remove Proton or keep it temporarily as a fallback.
     </p>
   </MigratePageLayout>
 </template>
