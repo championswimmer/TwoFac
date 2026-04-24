@@ -25,6 +25,8 @@ const compareLinks = [
   { name: 'vs 2FAS', to: '/compare/2fas' },
   { name: 'vs Ente Auth', to: '/compare/ente-auth' },
   { name: 'vs Bitwarden', to: '/compare/bitwarden' },
+  { name: 'vs Aegis Authenticator', to: '/compare/aegis-authenticator' },
+  { name: 'vs Proton Authenticator', to: '/compare/proton-authenticator' },
 ]
 
 const migrateLinks = [
@@ -34,6 +36,8 @@ const migrateLinks = [
   { name: 'from Ente Auth', to: '/migrate/ente-auth' },
   { name: 'from Bitwarden', to: '/migrate/bitwarden' },
   { name: 'from Authy', to: '/migrate/authy' },
+  { name: 'from Aegis', to: '/migrate/aegis-authenticator' },
+  { name: 'from Proton', to: '/migrate/proton-authenticator' },
 ]
 
 const communityLinks = [
