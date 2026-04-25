@@ -47,8 +47,8 @@ jobs:
           echo "$ANDROID_SIGNING_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/android-keystore.jks"
           echo "ANDROID_SIGNING_STORE_FILE=$RUNNER_TEMP/android-keystore.jks" >> "$GITHUB_ENV"
 
-      - name: Build Android APK
-        run: ./gradlew :androidApp:assembleRelease
+      - name: Build Android APKs
+        run: ./gradlew :androidApp:assembleRelease :watchApp:assembleRelease
 
       - name: Build Linux Desktop (Deb)
         run: ./gradlew :composeApp:packageDeb
@@ -64,6 +64,12 @@ jobs:
         with:
           name: android-apk
           path: androidApp/build/outputs/apk/release/*.apk
+
+      - name: Upload Watch APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: watch-apk
+          path: watchApp/build/outputs/apk/release/*.apk
 
       - name: Upload Linux Desktop (Deb)
         uses: actions/upload-artifact@v4
@@ -352,6 +358,7 @@ jobs:
           fail_on_unmatched_files: false
           files: |
             artifacts/android-apk/*.apk
+            artifacts/watch-apk/*.apk
             artifacts/linux-desktop-deb/*.deb
             artifacts/web-pwa-distribution.zip
             artifacts/chrome-extension/*.zip

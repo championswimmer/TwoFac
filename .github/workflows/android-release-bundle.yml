@@ -1,0 +1,61 @@
+name: Android Release Bundle
+
+on:
+  workflow_dispatch:
+
+env:
+  ANDROID_SIGNING_KEYSTORE_BASE64: ${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}
+  ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+  ANDROID_SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+  ANDROID_SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+
+jobs:
+  build-android-release-bundles:
+    name: "Build Android + Watch Release AABs"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Prepare Android signing keystore
+        run: |
+          if [ -z "$ANDROID_SIGNING_KEYSTORE_BASE64" ] || [ -z "$ANDROID_SIGNING_KEY_ALIAS" ] || [ -z "$ANDROID_SIGNING_KEY_PASSWORD" ] || [ -z "$ANDROID_SIGNING_STORE_PASSWORD" ]; then
+            echo "Missing Android signing secrets. Configure ANDROID_SIGNING_KEYSTORE_BASE64, ANDROID_SIGNING_KEY_ALIAS, ANDROID_SIGNING_KEY_PASSWORD, and ANDROID_SIGNING_STORE_PASSWORD."
+            exit 1
+          fi
+          echo "$ANDROID_SIGNING_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/android-keystore.jks"
+          echo "ANDROID_SIGNING_STORE_FILE=$RUNNER_TEMP/android-keystore.jks" >> "$GITHUB_ENV"
+
+      - name: Build Android release bundles
+        run: ./gradlew :androidApp:bundleRelease :watchApp:bundleRelease
+
+      - name: Upload Android AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: androidApp/build/outputs/bundle/release/*.aab
+
+      - name: Upload Watch AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: watch-aab
+          path: watchApp/build/outputs/bundle/release/*.aab
+
+      - name: Upload build logs on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-bundle-logs
+          if-no-files-found: ignore
+          path: |
+            build/reports/problems/**
