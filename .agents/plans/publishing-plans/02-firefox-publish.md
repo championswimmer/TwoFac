@@ -9,7 +9,7 @@
 | Name | TwoFac |
 | Add-on ID | `twofac@arnav.tech` |
 | Manifest Version | 3 |
-| Min Firefox Version | 120.0 |
+| Min Firefox Version | 128.0 |
 | Summary | Two-factor authentication codes in your browser |
 | Category | Security & Privacy |
 | Permissions | `storage` |
@@ -39,7 +39,7 @@
 ```
 
 Verify the output ZIP contains at minimum:
-- `manifest.json` (with `manifest_version: 3`, `browser_specific_settings.gecko.id` = `twofac@arnav.tech`, `browser_specific_settings.gecko.strict_min_version` = `120.0`)
+- `manifest.json` (with `manifest_version: 3`, `browser_specific_settings.gecko.id` = `twofac@arnav.tech`, `browser_specific_settings.gecko.strict_min_version` = `128.0`)
 - All `.wasm`, `.js`, `.html`, icon files
 - Background scripts (Firefox MV3 uses `"background": { "scripts": [...] }`, not `service_worker`)
 
@@ -112,6 +112,8 @@ composeApp/build/distributions/firefox-extension/twofac-firefox.zip
 (adjust path to actual output location)
 ```
 
+> ⚠️ **Lockfiles required**: Mozilla reviewers must reproduce the build exactly. Include `package-lock.json` (npm) or `yarn.lock` (yarn) at the root of the source ZIP. Missing lockfiles cause build mismatches and potential rejection.
+
 ### Notes to Reviewer (paste into the AMO reviewer notes field)
 
 > This extension is built with Kotlin Multiplatform, compiled to WebAssembly.
@@ -143,7 +145,7 @@ composeApp/build/distributions/firefox-extension/twofac-firefox.zip
 - **After approval**: The extension is publicly listed on AMO. Future updates follow the same upload → review cycle.
 
 📖 [Add-on review process](https://extensionworkshop.com/documentation/publish/add-on-policies/)
-📖 [Updated add-on policies (June 2025)](https://blog.mozilla.org/addons/2025/06/23/updated-add-on-policies-simplified-clarified/)
+📖 [Updated add-on policies (Aug 2025)](https://blog.mozilla.org/addons/2025/06/23/updated-add-on-policies-simplified-clarified/)
 
 ## 9. Post-Publish Checklist
 
@@ -151,3 +153,29 @@ composeApp/build/distributions/firefox-extension/twofac-firefox.zip
 - [ ] Test installing from AMO on a clean Firefox profile
 - [ ] Set up the AMO API key for future automated submissions ([API docs](https://addons-server.readthedocs.io/en/latest/topics/api/index.html))
 - [ ] Consider signing up for [AMO email notifications](https://addons.mozilla.org/developers/) for reviews and user feedback
+
+## 10. Aug 2025 Policy Updates (New)
+
+Mozilla published updated add-on policies effective **August 4, 2025**. Key changes relevant to TwoFac:
+
+### Closed-group extensions now allowed
+- Extensions for **internal or private use** among a small group are now permitted
+- Useful if TwoFac needs enterprise/organizational distribution
+- Previously prohibited — now lifts that restriction
+
+### Implicit consent for self-evident single-use features
+- If an extension's data transmission is **obviously required** for its functionality, explicit consent is implied
+- Examples: image search, file uploaders
+- For TwoFac: OTP secrets are stored locally via `storage` — no external transmission occurs, so this is not directly applicable but good to know
+
+### Privacy policy hosting
+- Privacy policies are **no longer required to be hosted on AMO**
+- Self-hosted privacy policy links are acceptable
+- Reduces update friction — no new version submission needed just for policy changes
+
+### Source code dependencies
+- All dependencies must be **included in the source ZIP** or downloaded **only via official package managers** during build
+- No web-based build tools allowed (must run locally on the reviewer's machine)
+- Reinforces the lockfile requirement in §6
+
+📖 [Full policy update blog post](https://blog.mozilla.org/addons/2025/06/23/updated-add-on-policies-simplified-clarified/)

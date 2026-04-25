@@ -44,7 +44,7 @@ In the **Store Listing** tab, provide:
 | Extension name | TwoFac |
 | Summary | Two-factor authentication codes in your browser |
 | Description | Detailed description of features (popup, side panel, OTP generation) |
-| Category | Productivity (or Developer Tools) |
+| Category | **Productivity** (not Developer Tools — TwoFac is a general-purpose authenticator) |
 | Language | English |
 | Icon | 128×128 PNG |
 | Screenshots | At least 1 screenshot (1280×800 or 640×400) |
@@ -73,6 +73,18 @@ You **must** justify each permission in the Developer Dashboard:
 - Keep justifications specific, mentioning the exact API used and why
 - Docs: [Declare permissions](https://developer.chrome.com/docs/extensions/develop/concepts/declare-permissions)
 
+## 6.5. Remote Code Declaration (NEW in Chrome Dashboard)
+
+Chrome's privacy tab now has a "Declare any remote code" field. TwoFac loads a **local** `.wasm` file from the extension package — this is **not remote code**.
+
+- Select **"No, I am not using remote code."**
+- The `.wasm` binary is bundled with the extension ZIP, not fetched from an external server
+- `wasm-unsafe-eval` in CSP allows instantiation but does not constitute remote code execution
+
+> ⚠️ **If TwoFac later adds cloud sync or remote feature flags**, this field would need to be updated to declare the remote code and its purpose.
+
+---
+
 ## 7. WebAssembly / `wasm-unsafe-eval` Considerations
 
 TwoFac uses Kotlin/Wasm compiled to WebAssembly, requiring `wasm-unsafe-eval` in the CSP.
@@ -93,7 +105,23 @@ TwoFac uses Kotlin/Wasm compiled to WebAssembly, requiring `wasm-unsafe-eval` in
 - If rejected: read the rejection reason, fix the issue, and resubmit
 - Docs: [Review process](https://developer.chrome.com/docs/webstore/review-process)
 
-## 9. Post-Publish
+## 9.5. Cross-Platform Manifest Notes (Firefox vs Chrome)
+
+If the extension is built for **both stores**, the manifest differs significantly:
+
+| Key | Firefox | Chrome |
+|---|---|---|
+| Browser-specific settings | `browser_specific_settings.gecko.id` + `gecko.strict_min_version` | Not used |
+| Background | `"background": { "scripts": [...] }` | `"background": { "service_worker": "..." }` |
+| Side panel | `"sidebar_action": { "default_panel": "..." }` | `"side_panel": { "default_path": "..." }` + `sidePanel` API |
+| Permissions | `"storage"` | `"storage"` + `"sidePanel"` |
+| CSP | `content_security_policy` (old format) | `content_security_policy` (new format) |
+
+The `packageFirefoxExtension` and `packageChromeExtension` Gradle tasks should handle these differences automatically.
+
+---
+
+## 10. Post-Publish
 
 - Monitor the Developer Dashboard for review status and user feedback
 - Use **deferred publishing** for future updates to control release timing
