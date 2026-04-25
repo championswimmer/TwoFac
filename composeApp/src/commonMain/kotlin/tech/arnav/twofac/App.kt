@@ -32,12 +32,14 @@ import androidx.navigation.toRoute
 import tech.arnav.twofac.navigation.AccountDetail
 import tech.arnav.twofac.navigation.Accounts
 import tech.arnav.twofac.navigation.AddAccount
+import tech.arnav.twofac.navigation.ExportAccountQr
 import tech.arnav.twofac.navigation.Home
 import tech.arnav.twofac.navigation.OnboardingGuide
 import tech.arnav.twofac.navigation.Settings
 import tech.arnav.twofac.screens.AccountDetailScreen
 import tech.arnav.twofac.screens.AccountsScreen
 import tech.arnav.twofac.screens.AddAccountScreen
+import tech.arnav.twofac.screens.ExportQrScreen
 import tech.arnav.twofac.screens.HomeScreen
 import tech.arnav.twofac.screens.OnboardingGuideScreen
 import tech.arnav.twofac.screens.SettingsScreen
@@ -121,7 +123,18 @@ fun App(onQuit: (() -> Unit)? = null) {
                     val accountDetail = backStackEntry.toRoute<AccountDetail>()
                     AccountDetailScreen(
                         accountId = accountDetail.accountId,
-                        onNavigateBack = { navController.popBackStack() }
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToExportQr = { accountId ->
+                            navController.navigate(ExportAccountQr(accountId))
+                        },
+                    )
+                }
+
+                composable<ExportAccountQr> { backStackEntry ->
+                    val route = backStackEntry.toRoute<ExportAccountQr>()
+                    ExportQrScreen(
+                        accountId = route.accountId,
+                        onNavigateBack = { navController.popBackStack() },
                     )
                 }
 

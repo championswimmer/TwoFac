@@ -10,9 +10,19 @@
     <string name="account_detail_generate_otp">Generer OTP</string>
     <string name="account_detail_otp_display">OTP : %1$s</string>
     <string name="account_detail_delete">Supprimer le compte</string>
+    <string name="account_detail_export_qr">Exporter en QR</string>
     <string name="account_detail_not_found">Compte introuvable</string>
     <string name="account_detail_delete_dialog_title">Supprimer le compte ?</string>
     <string name="account_detail_delete_dialog_message">Cela supprimera definitivement %1$s de votre coffre.</string>
+
+    <!-- Export QR screen -->
+    <string name="export_qr_title">Exporter le compte</string>
+    <string name="export_qr_warning_title">Gardez ce QR prive</string>
+    <string name="export_qr_warning_message">Ce code QR contient le secret de votre compte. Quiconque le scanne peut generer des codes pour ce compte. Ne le partagez pas et evitez les captures d'ecran dans des environnements non surs.</string>
+    <string name="export_qr_reveal">Afficher le QR</string>
+    <string name="export_qr_hide">Masquer le QR</string>
+    <string name="export_qr_scan_instruction">Scannez ce code avec une autre application d'authentification pour transferer ce compte.</string>
+    <string name="export_qr_vault_locked">Deverrouillez votre coffre pour exporter ce compte.</string>
 
     <!-- Add account screen -->
     <string name="add_account_title">Ajouter un compte</string>

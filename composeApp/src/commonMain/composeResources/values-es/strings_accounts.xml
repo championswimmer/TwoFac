@@ -10,9 +10,19 @@
     <string name="account_detail_generate_otp">Generar OTP</string>
     <string name="account_detail_otp_display">OTP: %1$s</string>
     <string name="account_detail_delete">Eliminar cuenta</string>
+    <string name="account_detail_export_qr">Exportar como QR</string>
     <string name="account_detail_not_found">No se encontro la cuenta</string>
     <string name="account_detail_delete_dialog_title">Eliminar cuenta?</string>
     <string name="account_detail_delete_dialog_message">Esto eliminara permanentemente %1$s de tu boveda.</string>
+
+    <!-- Export QR screen -->
+    <string name="export_qr_title">Exportar cuenta</string>
+    <string name="export_qr_warning_title">Mantén este QR en privado</string>
+    <string name="export_qr_warning_message">Este codigo QR contiene el secreto de tu cuenta. Cualquiera que lo escanee puede generar codigos para esta cuenta. No lo compartas y evita capturas de pantalla en entornos no confiables.</string>
+    <string name="export_qr_reveal">Mostrar codigo QR</string>
+    <string name="export_qr_hide">Ocultar codigo QR</string>
+    <string name="export_qr_scan_instruction">Escanea este codigo con otra app autenticadora para transferir esta cuenta.</string>
+    <string name="export_qr_vault_locked">Desbloquea tu boveda para exportar esta cuenta.</string>
 
     <!-- Add account screen -->
     <string name="add_account_title">Anadir cuenta</string>

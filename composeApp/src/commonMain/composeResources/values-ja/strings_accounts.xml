@@ -10,9 +10,19 @@
     <string name="account_detail_generate_otp">OTPを生成</string>
     <string name="account_detail_otp_display">OTP: %1$s</string>
     <string name="account_detail_delete">アカウントを削除</string>
+    <string name="account_detail_export_qr">QRとしてエクスポート</string>
     <string name="account_detail_not_found">アカウントが見つかりません</string>
     <string name="account_detail_delete_dialog_title">アカウントを削除しますか？</string>
     <string name="account_detail_delete_dialog_message">%1$s を保管庫から完全に削除します。</string>
+
+    <!-- Export QR screen -->
+    <string name="export_qr_title">アカウントのエクスポート</string>
+    <string name="export_qr_warning_title">このQRは非公開にしてください</string>
+    <string name="export_qr_warning_message">このQRコードにはアカウントのシークレットが含まれています。スキャンした人は誰でもこのアカウントのコードを生成できます。共有せず、信頼できない環境でのスクリーンショットは避けてください。</string>
+    <string name="export_qr_reveal">QRコードを表示</string>
+    <string name="export_qr_hide">QRコードを非表示</string>
+    <string name="export_qr_scan_instruction">別の認証アプリでこのコードをスキャンして、このアカウントを移行できます。</string>
+    <string name="export_qr_vault_locked">このアカウントをエクスポートするには、保管庫のロックを解除してください。</string>
 
     <!-- Add account screen -->
     <string name="add_account_title">アカウントを追加</string>

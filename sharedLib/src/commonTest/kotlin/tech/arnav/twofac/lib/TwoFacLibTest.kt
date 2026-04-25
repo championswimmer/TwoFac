@@ -5,6 +5,7 @@ import tech.arnav.twofac.lib.storage.MemoryStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class TwoFacLibTest {
@@ -191,5 +192,43 @@ class TwoFacLibTest {
 
         // Now we know it has accounts
         assertTrue(lib.isStoreInitialized)
+    }
+
+    @Test
+    fun testGetDecryptedUriForAccountReturnsOtpauthUri() = runTest {
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        lib.unlock("testpasskey")
+        assertTrue(
+            lib.addAccount(
+                "otpauth://totp/GitHub:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"
+            )
+        )
+
+        val account = lib.getAllAccounts().single()
+        val uri = lib.getDecryptedUriForAccount(account.accountID)
+
+        assertTrue(uri != null && uri.startsWith("otpauth://totp/"))
+        assertTrue(uri.contains("secret=JBSWY3DPEHPK3PXP"))
+        assertTrue(uri.contains("issuer=GitHub"))
+    }
+
+    @Test
+    fun testGetDecryptedUriForAccountReturnsNullForUnknownId() = runTest {
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        lib.unlock("testpasskey")
+
+        // Valid UUID shape but no such account
+        assertNull(lib.getDecryptedUriForAccount("00000000-0000-0000-0000-000000000000"))
+        // Malformed ID is also treated as not-found rather than crashing
+        assertNull(lib.getDecryptedUriForAccount("not-a-uuid"))
+    }
+
+    @Test
+    fun testGetDecryptedUriForAccountWhenLockedThrows() = runTest {
+        val lib = TwoFacLib.initialise()
+        assertFalse(lib.isUnlocked(), "Library should not be unlocked initially")
+        assertFailsWithSuspend<IllegalStateException> {
+            lib.getDecryptedUriForAccount("00000000-0000-0000-0000-000000000000")
+        }
     }
 }

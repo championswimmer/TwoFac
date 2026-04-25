@@ -213,6 +213,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.material.icons.extended)
+            implementation(libs.qrose)
 
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.compose)

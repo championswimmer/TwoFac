@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.QrCode2
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,6 +47,7 @@ import twofac.composeapp.generated.resources.account_detail_delete_dialog_title
 import twofac.composeapp.generated.resources.account_detail_delete_dialog_message
 import twofac.composeapp.generated.resources.action_delete
 import twofac.composeapp.generated.resources.action_cancel
+import twofac.composeapp.generated.resources.account_detail_export_qr
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import tech.arnav.twofac.lib.otp.OtpCodes
@@ -56,6 +58,7 @@ import tech.arnav.twofac.viewmodels.AccountsViewModel
 fun AccountDetailScreen(
     accountId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToExportQr: (String) -> Unit = {},
     viewModel: AccountsViewModel = koinInject()
 ) {
     var passkeyText by remember { mutableStateOf("") }
@@ -131,6 +134,20 @@ fun AccountDetailScreen(
                     Text(
                         text = stringResource(Res.string.account_detail_otp_display, otp.currentOTP),
                         style = MaterialTheme.typography.headlineSmall
+                    )
+                }
+
+                Button(
+                    onClick = { onNavigateToExportQr(accountId) },
+                    enabled = isLibUnlocked,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.QrCode2,
+                        contentDescription = null,
+                    )
+                    Text(
+                        text = stringResource(Res.string.account_detail_export_qr),
+                        modifier = Modifier.padding(start = 8.dp),
                     )
                 }
 

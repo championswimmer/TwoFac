@@ -10,9 +10,19 @@
     <string name="account_detail_generate_otp">Genera OTP</string>
     <string name="account_detail_otp_display">OTP: %1$s</string>
     <string name="account_detail_delete">Elimina account</string>
+    <string name="account_detail_export_qr">Esporta come QR</string>
     <string name="account_detail_not_found">Account non trovato</string>
     <string name="account_detail_delete_dialog_title">Eliminare l'account?</string>
     <string name="account_detail_delete_dialog_message">Questa operazione rimuovera in modo permanente %1$s dal tuo vault.</string>
+
+    <!-- Export QR screen -->
+    <string name="export_qr_title">Esporta account</string>
+    <string name="export_qr_warning_title">Mantieni privato questo QR</string>
+    <string name="export_qr_warning_message">Questo codice QR contiene il segreto del tuo account. Chiunque lo scansioni puo generare codici per questo account. Non condividerlo ed evita screenshot in ambienti non sicuri.</string>
+    <string name="export_qr_reveal">Mostra codice QR</string>
+    <string name="export_qr_hide">Nascondi codice QR</string>
+    <string name="export_qr_scan_instruction">Scansiona questo codice con un altro autenticatore per trasferire questo account.</string>
+    <string name="export_qr_vault_locked">Sblocca il tuo vault per esportare questo account.</string>
 
     <!-- Add account screen -->
     <string name="add_account_title">Aggiungi account</string>

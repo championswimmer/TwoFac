@@ -249,6 +249,29 @@ class TwoFacLib private constructor(
     }
 
     /**
+     * Returns the decrypted `otpauth://` URI for a single account by its ID.
+     *
+     * Requires the library to be unlocked so the secret can be decrypted.
+     * Returns `null` if no account with the given ID exists.
+     */
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun getDecryptedUriForAccount(accountId: String): String? {
+        checkUnlockedOrThrow()
+        val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
+        val accounts = accountList
+            ?: error("Account list is not loaded. This should not happen when unlocked.")
+        val parsedAccountId = try {
+            Uuid.parse(accountId)
+        } catch (_: IllegalArgumentException) {
+            return null
+        }
+        val account = accounts.find { it.accountID == parsedAccountId } ?: return null
+        return account.toDecryptedURI(
+            cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString())
+        )
+    }
+
+    /**
      * Exports all stored account URIs as decrypted otpauth:// strings.
      *
      * Requires the library to be unlocked so secrets can be decrypted.
