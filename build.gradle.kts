@@ -13,8 +13,8 @@ plugins {
 }
 
 // Centralized app versioning — all subprojects inherit from here
-extra["appVersionCode"] = 260401062 // eg: 2026 02(Feb) 01 00 3 (1.0.3)
-extra["appVersionName"] = "1.6.2"
+extra["appVersionCode"] = 260401070 // eg: 2026 02(Feb) 01 00 3 (1.0.3)
+extra["appVersionName"] = "1.7.0"
 
 subprojects {
     if (path !in setOf(":androidApp", ":watchApp")) {
