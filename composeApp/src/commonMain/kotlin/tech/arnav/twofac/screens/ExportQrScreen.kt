@@ -163,34 +163,36 @@ fun ExportQrScreen(
             }
 
             if (isRevealed && otpAuthUri != null) {
-                val uri = otpAuthUri!!
-                Box(
-                    modifier = Modifier
-                        .size(280.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White)
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    val painter = rememberQrCodePainter(data = uri)
-                    Image(
-                        painter = painter,
-                        contentDescription = stringResource(Res.string.export_qr_title),
-                        modifier = Modifier.fillMaxSize(),
+                val uri = otpAuthUri
+                if (uri != null) {
+                    Box(
+                        modifier = Modifier
+                            .size(280.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White)
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        val painter = rememberQrCodePainter(data = uri)
+                        Image(
+                            painter = painter,
+                            contentDescription = stringResource(Res.string.export_qr_title),
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
+                    Text(
+                        text = stringResource(Res.string.export_qr_scan_instruction),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
                     )
-                }
-                Text(
-                    text = stringResource(Res.string.export_qr_scan_instruction),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                )
-                Button(
-                    onClick = {
-                        isRevealed = false
-                        otpAuthUri = null
-                    },
-                ) {
-                    Text(stringResource(Res.string.export_qr_hide))
+                    Button(
+                        onClick = {
+                            isRevealed = false
+                            otpAuthUri = null
+                        },
+                    ) {
+                        Text(stringResource(Res.string.export_qr_hide))
+                    }
                 }
             } else {
                 Button(

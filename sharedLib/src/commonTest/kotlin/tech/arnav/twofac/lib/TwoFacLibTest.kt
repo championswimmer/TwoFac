@@ -226,6 +226,7 @@ class TwoFacLibTest {
     @Test
     fun testGetDecryptedUriForAccountWhenLockedThrows() = runTest {
         val lib = TwoFacLib.initialise()
+        assertFalse(lib.isUnlocked(), "Library should not be unlocked initially")
         assertFailsWithSuspend<IllegalStateException> {
             lib.getDecryptedUriForAccount("00000000-0000-0000-0000-000000000000")
         }
