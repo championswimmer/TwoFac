@@ -8,9 +8,59 @@ import com.github.ajalt.mordant.table.Borders
 import com.github.ajalt.mordant.table.ColumnWidth.Companion.Fixed
 import com.github.ajalt.mordant.table.table
 import tech.arnav.twofac.cli.theme.CliThemeStyles
+import com.github.ajalt.mordant.rendering.TextStyle
 
 class HomeScreen : TuiScreen {
     override val id: TuiScreenId = TuiScreenId.HOME
+
+    companion object {
+        private const val PROGRESS_BAR_WIDTH = 15
+        private const val TOTP_PERIOD = 30L
+
+        private fun renderProgressBar(
+            account: TuiOtpEntry,
+            nowEpochSeconds: Long,
+            styles: CliThemeStyles,
+        ): String {
+            val remaining = (account.nextCodeAt - nowEpochSeconds).coerceAtLeast(0)
+            val elapsed = (TOTP_PERIOD - remaining).coerceIn(0L, TOTP_PERIOD)
+
+            val sb = StringBuilder()
+            sb.append("[")
+            for (i in 0 until PROGRESS_BAR_WIDTH) {
+                val blockStart = i * 2L
+                val blockEnd = blockStart + 2L
+                when {
+                    blockEnd <= elapsed -> sb.append("█")  // completed, full
+                    blockStart > elapsed -> sb.append("░")  // future, lightest
+                    else -> {
+                        val secInBlock = elapsed - blockStart  // 0 or 1
+                        if (secInBlock == 0L) {
+                            // First second of this block: lightest shade
+                            sb.append("░")
+                        } else {
+                            // Second second of this block: medium shade
+                            sb.append("▒")
+                        }
+                    }
+                }
+            }
+            sb.append("]")
+
+            val timer = "${remaining}s"
+
+            return "${sb.toString()} $timer"
+        }
+
+        private fun progressStyle(
+            remaining: Long,
+            styles: CliThemeStyles,
+        ): TextStyle = when {
+            remaining <= 5 -> styles.timerCritical
+            remaining <= 10 -> styles.timerWarning
+            else -> styles.timerHealthy
+        }
+    }
 
     override fun render(state: TuiAppState, styles: CliThemeStyles) = table {
         borderType = BorderType.SQUARE_DOUBLE_SECTION_SEPARATOR
@@ -19,13 +69,18 @@ class HomeScreen : TuiScreen {
             cellBorders = Borders.NONE
         }
 
+        column(4) {
+            width = Fixed(24)
+            cellBorders = Borders.ALL
+        }
+
         header {
             row(
                 styles.header(" "),
                 styles.header("Account"),
                 styles.header("Issuer"),
                 styles.header("OTP"),
-                styles.header("TTL"),
+                styles.header("Timer"),
             )
         }
 
@@ -38,21 +93,14 @@ class HomeScreen : TuiScreen {
                     val isSelected = index == state.home.selectedIndex
                     val selectedMarker = if (isSelected) styles.key(">") else " "
                     val otp = account.otp.currentOTP.chunked(3).joinToString(" ")
-                    val ttl = if (account.nextCodeAt <= 0L) {
-                        styles.label("--")
-                    } else {
-                        val remaining = (account.nextCodeAt - state.nowEpochSeconds).coerceAtLeast(0)
-                        val timerStyle = when {
-                            remaining <= 5 -> styles.timerCritical
-                            remaining <= 10 -> styles.timerWarning
-                            else -> styles.timerHealthy
-                        }
-                        timerStyle("${remaining}s")
-                    }
+                    val otpFormatted = styles.otp(otp)
                     val accountLabel = if (isSelected) styles.key(account.accountLabel) else account.accountLabel
                     val issuerLabel = if (isSelected) styles.key(account.issuer ?: "-") else (account.issuer ?: "-")
-                    val otpFormatted = styles.otp(otp)
-                    row(selectedMarker, accountLabel, issuerLabel, otpFormatted, ttl)
+
+                    val remaining = (account.nextCodeAt - state.nowEpochSeconds).coerceAtLeast(0)
+                    val progressBar = renderProgressBar(account, state.nowEpochSeconds, styles)
+                    val progressCol = progressStyle(remaining, styles)(progressBar)
+                    row(selectedMarker, accountLabel, issuerLabel, otpFormatted, progressCol)
                 }
             }
         }

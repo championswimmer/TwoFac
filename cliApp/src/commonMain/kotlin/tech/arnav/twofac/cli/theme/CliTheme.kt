@@ -47,7 +47,7 @@ object CliTheme {
         header = TextStyles.bold + trueColor(tokens.brand),
         label = TextStyles.dim + trueColor(tokens.onSurfaceVariant),
         key = TextStyles.bold + trueColor(tokens.accent),
-        otp = TextStyles.bold + trueColor(tokens.onBackground),
+        otp = TextStyles.bold + trueColor(tokens.brand),
         footer = TextStyles.dim + trueColor(tokens.onSurfaceVariant),
         timerHealthy = trueColor(tokens.timer.healthy),
         timerWarning = trueColor(tokens.timer.warning),
@@ -61,7 +61,7 @@ object CliTheme {
         header = TextStyles.bold + ansi256(33), // xterm-256 #0087ff (azure blue)
         label = TextStyles.dim + ansi256(250),  // xterm-256 #bcbcbc (light gray)
         key = TextStyles.bold + ansi256(45), // xterm-256 #00d7ff (bright cyan)
-        otp = TextStyles.bold + ansi256(255), // xterm-256 #eeeeee (near-white)
+        otp = ansi256(33), // xterm-256 #87afff (brand blue equivalent)
         footer = TextStyles.dim + ansi256(250), // xterm-256 #bcbcbc (light gray)
         timerHealthy = ansi256(71), // xterm-256 #5faf5f (medium green)
         timerWarning = ansi256(214), // xterm-256 #ffaf00 (amber/orange)
@@ -75,7 +75,7 @@ object CliTheme {
         header = TextStyles.bold + TextColors.blue, // ANSI 34 blue
         label = TextStyles.dim + TextColors.white, // ANSI dim white
         key = TextStyles.bold + TextColors.cyan, // ANSI 36 cyan
-        otp = TextStyles.bold + TextColors.brightWhite, // ANSI bold bright white
+        otp = TextStyles.bold + TextColors.blue,
         footer = TextStyles.dim + TextColors.white, // ANSI dim white
         timerHealthy = TextColors.green, // ANSI 32 green
         timerWarning = TextColors.yellow, // ANSI 33 yellow
