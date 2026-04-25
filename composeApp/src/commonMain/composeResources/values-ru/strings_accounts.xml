@@ -10,9 +10,19 @@
     <string name="account_detail_generate_otp">Сгенерировать OTP-код</string>
     <string name="account_detail_otp_display">OTP: %1$s</string>
     <string name="account_detail_delete">Удалить аккаунт</string>
+    <string name="account_detail_export_qr">Экспортировать как QR</string>
     <string name="account_detail_not_found">Аккаунт не найден</string>
     <string name="account_detail_delete_dialog_title">Удалить аккаунт?</string>
     <string name="account_detail_delete_dialog_message">Аккаунт %1$s будет безвозвратно удален из хранилища.</string>
+
+    <!-- Export QR screen -->
+    <string name="export_qr_title">Экспорт аккаунта</string>
+    <string name="export_qr_warning_title">Держите этот QR в секрете</string>
+    <string name="export_qr_warning_message">Этот QR-код содержит секрет вашего аккаунта. Любой, кто его отсканирует, сможет генерировать коды для этого аккаунта. Не делитесь им и избегайте скриншотов в ненадежных окружениях.</string>
+    <string name="export_qr_reveal">Показать QR-код</string>
+    <string name="export_qr_hide">Скрыть QR-код</string>
+    <string name="export_qr_scan_instruction">Отсканируйте этот код другим приложением-аутентификатором, чтобы перенести этот аккаунт.</string>
+    <string name="export_qr_vault_locked">Разблокируйте хранилище, чтобы экспортировать этот аккаунт.</string>
 
     <!-- Add account screen -->
     <string name="add_account_title">Добавить аккаунт</string>

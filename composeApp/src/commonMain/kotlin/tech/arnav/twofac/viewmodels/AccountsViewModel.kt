@@ -211,6 +211,26 @@ class AccountsViewModel(
         }
     }
 
+    /**
+     * Returns the decrypted `otpauth://` URI for a single account, or `null`
+     * if the vault is locked or the account does not exist.
+     *
+     * This exposes the raw secret and should only be surfaced behind an
+     * auth-gated UI (e.g. the Export-as-QR screen).
+     */
+    suspend fun getDecryptedUriForAccount(accountId: String): String? {
+        if (!twoFacLibUnlocked) {
+            _error.value = "Accounts are not loaded. Please unlock accounts first"
+            return null
+        }
+        return try {
+            twoFacLib.getDecryptedUriForAccount(accountId)
+        } catch (e: Exception) {
+            _error.value = e.message ?: "Failed to read account URI"
+            null
+        }
+    }
+
     /** Re-read accounts (and OTPs if unlocked) from TwoFacLib after external mutations. */
     fun reloadAccounts() {
         viewModelScope.launch {

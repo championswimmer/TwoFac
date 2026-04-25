@@ -10,9 +10,19 @@
     <string name="account_detail_generate_otp">生成 OTP</string>
     <string name="account_detail_otp_display">OTP：%1$s</string>
     <string name="account_detail_delete">删除账户</string>
+    <string name="account_detail_export_qr">导出为二维码</string>
     <string name="account_detail_not_found">未找到账户</string>
     <string name="account_detail_delete_dialog_title">删除账户？</string>
     <string name="account_detail_delete_dialog_message">这将从您的保管库中永久移除 %1$s。</string>
+
+    <!-- Export QR screen -->
+    <string name="export_qr_title">导出账户</string>
+    <string name="export_qr_warning_title">请保密此二维码</string>
+    <string name="export_qr_warning_message">此二维码包含您账户的密钥。任何扫描它的人都可以生成此账户的验证码。请勿分享,并避免在不可信的环境中截屏。</string>
+    <string name="export_qr_reveal">显示二维码</string>
+    <string name="export_qr_hide">隐藏二维码</string>
+    <string name="export_qr_scan_instruction">用另一款身份验证器应用扫描此二维码以迁移此账户。</string>
+    <string name="export_qr_vault_locked">请解锁保管库以导出此账户。</string>
 
     <!-- Add account screen -->
     <string name="add_account_title">添加账户</string>

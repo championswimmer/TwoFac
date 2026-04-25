@@ -12,6 +12,9 @@ object Accounts
 data class AccountDetail(val accountId: String)
 
 @Serializable
+data class ExportAccountQr(val accountId: String)
+
+@Serializable
 object Settings
 
 @Serializable

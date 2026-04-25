@@ -10,9 +10,19 @@
     <string name="account_detail_generate_otp">OTP generieren</string>
     <string name="account_detail_otp_display">OTP: %1$s</string>
     <string name="account_detail_delete">Konto löschen</string>
+    <string name="account_detail_export_qr">Als QR exportieren</string>
     <string name="account_detail_not_found">Konto nicht gefunden</string>
     <string name="account_detail_delete_dialog_title">Konto löschen?</string>
     <string name="account_detail_delete_dialog_message">Dadurch wird %1$s dauerhaft aus deinem Tresor entfernt.</string>
+
+    <!-- Export QR screen -->
+    <string name="export_qr_title">Konto exportieren</string>
+    <string name="export_qr_warning_title">Halte diesen QR geheim</string>
+    <string name="export_qr_warning_message">Dieser QR-Code enthalt dein Kontogeheimnis. Wer ihn scannt, kann Codes fur dieses Konto erzeugen. Teile ihn nicht und vermeide Screenshots in unsicheren Umgebungen.</string>
+    <string name="export_qr_reveal">QR-Code anzeigen</string>
+    <string name="export_qr_hide">QR-Code ausblenden</string>
+    <string name="export_qr_scan_instruction">Scanne diesen Code mit einer anderen Authenticator-App, um dieses Konto zu ubertragen.</string>
+    <string name="export_qr_vault_locked">Entsperre deinen Tresor, um dieses Konto zu exportieren.</string>
 
     <!-- Add account screen -->
     <string name="add_account_title">Konto hinzufügen</string>

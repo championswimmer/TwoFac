@@ -59,6 +59,7 @@ composeBom = "2026.02.01"
 kscan = "0.7.0"
 filekit = "0.10.0"
 jsqr = "1.4.0"
+qrose = "1.1.2"
 zxing = "3.5.3"
 dorkbox-systemtray = "4.4"
 jna = "5.15.0"
@@ -142,6 +143,7 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }
+qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 dorkbox-systemtray = { module = "com.dorkbox:SystemTray", version.ref = "dorkbox-systemtray" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
