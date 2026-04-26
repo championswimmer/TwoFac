@@ -9,14 +9,16 @@ useSEO({
   canonicalPath: '/download',
 })
 
-interface DownloadCard {
-  icon: string
-  name: string
-  description: string
-  link: string
+ interface DownloadCard {
+   icon: string
+   name: string
+   description: string
+   link: string
   linkText: string
-  external?: boolean
-}
+   external?: boolean
+ }
+
+const cliInstallCommand = 'curl -fsSL https://twofac.app/install.sh | bash -s --'
 
 const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
   {
@@ -168,9 +170,45 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
       </div>
     </section>
 
-    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <!-- Download Categories -->
-      <div class="space-y-16">
+     <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+       <section
+         class="mb-16 rounded-2xl border border-primary-200 bg-primary-50 p-6 shadow-sm dark:border-primary-900 dark:bg-primary-950/40"
+       >
+         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+           <div class="max-w-3xl">
+             <p class="text-sm font-semibold uppercase tracking-wide text-primary-700 dark:text-primary-300">
+               CLI installer
+             </p>
+             <h2 class="mt-2 text-2xl font-bold tracking-tight text-secondary-900 dark:text-white">
+               Install the TwoFac CLI in one command
+             </h2>
+             <p class="mt-3 text-secondary-700 dark:text-secondary-300">
+               For macOS (Apple Silicon and Intel) and Linux x86_64, use the hosted installer to
+               fetch the latest CLI release automatically.
+             </p>
+           </div>
+           <a
+             href="https://github.com/championswimmer/TwoFac/releases"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="inline-flex items-center justify-center rounded-lg border border-primary-300 px-4 py-2 text-sm font-semibold text-primary-700 transition-colors hover:bg-primary-100 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/60"
+           >
+             Manual downloads
+           </a>
+         </div>
+
+         <div class="mt-5 rounded-xl bg-secondary-950 px-4 py-4 text-sm text-secondary-50">
+           <code class="block overflow-x-auto font-mono">{{ cliInstallCommand }}</code>
+         </div>
+
+         <p class="mt-3 text-sm text-secondary-600 dark:text-secondary-400">
+           Windows CLI binaries are still available from GitHub Releases as direct `.exe`
+           downloads.
+         </p>
+       </section>
+
+       <!-- Download Categories -->
+       <div class="space-y-16">
         <section v-for="category in categories" :key="category.title">
           <h2
             class="text-2xl font-bold tracking-tight text-secondary-900 dark:text-white sm:text-3xl"

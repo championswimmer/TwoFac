@@ -110,6 +110,20 @@ TwoFac/
 
 When `2fac` is run without subcommands in a non-interactive terminal, it prints help and exits.
 
+#### Install the CLI
+
+For macOS (Apple Silicon and Intel) and Linux x86_64, install the latest CLI release with:
+
+```bash
+curl -fsSL https://twofac.app/install.sh | bash -s --
+```
+
+The installer downloads the right asset from the latest GitHub Release and installs it as
+`2fac` into `/usr/local/bin` when writable, or `~/.local/bin` otherwise.
+
+Windows CLI builds remain available as direct downloads from
+[GitHub Releases](https://github.com/championswimmer/TwoFac/releases).
+
 ```text
 2fac
   display
@@ -131,4 +145,3 @@ When `2fac` is run without subcommands in a non-interactive terminal, it prints 
 
 - Root-level commands `2fac add ...` and `2fac backup ...` were removed.
 - Use `2fac accounts add ...` and `2fac storage backup ...` instead.
-
