@@ -1,13 +1,13 @@
 ---
 name: CLI Installer Script Plan
-status: Planned
+status: Completed
 progress:
-  - "[ ] Phase 0 - Confirm release asset contract and hosting path"
-  - "[ ] Phase 1 - Add website-hosted installer entrypoint"
-  - "[ ] Phase 2 - Implement OS/arch detection and release resolution"
-  - "[ ] Phase 3 - Implement download, extract, and install flow"
-  - "[ ] Phase 4 - Document installer usage in website and repo docs"
-  - "[ ] Phase 5 - Validate static publishing and installer behavior"
+  - "[x] Phase 0 - Confirm release asset contract and hosting path"
+  - "[x] Phase 1 - Add website-hosted installer entrypoint"
+  - "[x] Phase 2 - Implement OS/arch detection and release resolution"
+  - "[x] Phase 3 - Implement download, extract, and install flow"
+  - "[x] Phase 4 - Document installer usage in website and repo docs"
+  - "[x] Phase 5 - Validate static publishing and installer behavior"
 ---
 
 # CLI Installer Script Plan
