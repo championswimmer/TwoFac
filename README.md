@@ -20,128 +20,45 @@
 
 ![two-fac-demo](https://github.com/user-attachments/assets/b95f3bc8-b27b-42c7-8dce-041ea9465dcb)
 
+## What is TwoFac?
 
-## ROADMAP
+TwoFac is a free, open-source, cross-platform 2FA app for generating one-time codes on the devices you already use. It is built with Kotlin Multiplatform and ships native experiences for mobile, desktop, wearables, web, browser extensions, and the command line.
 
-- [ ] Common functionality
-    - [x] Add new accounts
-    - [x] Display accounts with 2FA codes
-    - [x] Save accounts to a storage
-    - [x] Delete account storage
-    - [ ] Backup & Restore via a backup transport
-    - [ ] Export & Import accounts (encrypted with passkey)
-    - [x] QR Account Scanning (Camera + Clipboard)
-    - [x] Import from other 2FA apps
-        - [x] Authy (JSON format)
-        - [x] 2FAS (JSON format)
-        - [x] Ente (plaintext otpauth:// URIs)
-- [ ] Mobile Apps (Android & iOS)
-    - [x] Biometric Authentication
-    - [ ] Home / Accounts / Settings Bottom Tabs
-- [x] Wearable Apps
-    - [x] Wear OS companion app with offline sync
-    - [x] watchOS companion app with offline sync
-- [ ] Desktop App
-    - [ ] System Tray / Menu Bar Application
-- [x] Web & Browser Extensions
-    - [x] Progressive Web App (PWA)
-    - [x] Chrome Extension
-    - [x] Firefox Extension
-    - [x] WebAuthn / Device-Credential Unlock
-- [ ] CLI App
-    - [x] Add new accounts
-    - [x] Display 2FA codes with auto-refresh
-    - [x] Delete account storage
+It is designed to be practical and privacy-friendly: local code generation, biometric protection on supported platforms, encrypted backups, and no ads or tracking.
 
-## Documentation
+## Features
 
-- **[Importing from Other Apps](docs/IMPORTING.md)** - Guide to importing 2FA secrets from Authy, 2FAS, Ente Auth, and other authenticator apps
-- **[Development Guide](#development)** - Setup, building, and running the project
-- **[GitHub Copilot Setup](.github/workflows/copilot-setup-steps.yml)** - Pre-configured environment with Java 21, Node.js 22, and Gradle caching
+- Native apps for Android, iOS, macOS, Windows, Linux, Wear OS, watchOS, web, browser extensions, and CLI
+- End-to-end encryption and zero-knowledge handling for secrets and backups
+- Biometric unlock on Android and iOS
+- Import support for Authy, 2FAS, Ente Auth, and Google Authenticator exports
+- Companion watch apps with offline access and browser/CLI workflows for fast access
 
-## Development
+## Download
 
-### Prerequisites
+**Start here:** [twofac.app/download](https://twofac.app/download)
 
-- **JDK 17+** (recommended: JDK 21)
-- **Android SDK** (if building Android targets)
-- **Xcode** (if building iOS targets on macOS)
-- **Native toolchains** for your platform (GCC/Clang for Linux, MSVC for Windows)
+[![Get it on Google Play](docs/google-play-badge.png)](https://play.google.com/store/apps/details?id=tech.arnav.twofac.app)
 
-### Project structure
+- **Website:** [twofac.app](https://twofac.app)
+- **Web app:** [web.twofac.app](https://web.twofac.app)
+- **Desktop and CLI releases:** [GitHub Releases](https://github.com/championswimmer/TwoFac/releases)
 
-See [AGENTS.md](AGENTS.md) for the full module map, dependency direction, and
-platform-to-module routing — it is the single source of truth for contributor
-guidance.
-
-```
-TwoFac/
-├── sharedLib/    # Shared 2FA library (TOTP/HOTP, crypto, storage)
-├── cliApp/       # CLI application (Clikt-based, native binaries)
-├── composeApp/   # Compose Multiplatform UI application
-├── watchApp/     # Wear OS app
-└── iosApp/       # iOS application wrapper
-```
-
-### Common commands
-
-```bash
-# Baseline checks
-./gradlew check
-
-# Module tests
-./gradlew :sharedLib:test
-./gradlew :cliApp:allTests
-./gradlew :composeApp:test
-
-# Run desktop app
-./gradlew :composeApp:run
-
-# Run web app
-./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-```
-
-### CLI usage (dual mode)
-
-`2fac` now supports two run modes:
-
-- **Interactive TUI mode**: run `2fac` in an interactive terminal
-- **One-shot CLI mode**: run explicit subcommands
-
-When `2fac` is run without subcommands in a non-interactive terminal, it prints help and exits.
-
-#### Install the CLI
-
-For macOS (Apple Silicon and Intel) and Linux x86_64, install the latest CLI release with:
+For macOS and Linux, the CLI can also be installed with:
 
 ```bash
 curl -fsSL https://twofac.app/install.sh | bash -s --
 ```
 
-The installer downloads the right asset from the latest GitHub Release and installs it as
-`2fac` into `/usr/local/bin` when writable, or `~/.local/bin` otherwise.
+## Learn more
 
-Windows CLI builds remain available as direct downloads from
-[GitHub Releases](https://github.com/championswimmer/TwoFac/releases).
+- **Features:** [twofac.app/features](https://twofac.app/features)
+- **Getting started:** [twofac.app/getting-started](https://twofac.app/getting-started)
+- **FAQ:** [twofac.app/faq](https://twofac.app/faq)
+- **Import guide:** [docs/IMPORTING.md](docs/IMPORTING.md)
 
-```text
-2fac
-  display
-  info
-  accounts
-    add
-    remove
-  storage
-    --use-backend <standalone|common>
-    clean
-    delete
-    reinitialize
-    backup
-      export
-      import
-```
+## Development
 
-#### Migration notes
+Clone the repo, install the toolchains for the targets you want to work on, and run Gradle tasks from the repository root.
 
-- Root-level commands `2fac add ...` and `2fac backup ...` were removed.
-- Use `2fac accounts add ...` and `2fac storage backup ...` instead.
+For the current module map, build guidance, and platform routing, read [AGENTS.md](AGENTS.md). It is written to make AI-driven development work smoothly, and it is also the most up-to-date reference for how this codebase is organized.
