@@ -22,54 +22,7 @@ import tech.arnav.twofac.session.SecureSessionManager
 import tech.arnav.twofac.session.SessionManager
 import tech.arnav.twofac.settings.AppPreferences
 import tech.arnav.twofac.settings.AppPreferencesRepository
-import twofac.composeapp.generated.resources.Res
-import twofac.composeapp.generated.resources.action_continue
-import twofac.composeapp.generated.resources.action_save
-import twofac.composeapp.generated.resources.action_unlock
-import twofac.composeapp.generated.resources.backup_export_encrypted_success
-import twofac.composeapp.generated.resources.backup_export_failed
-import twofac.composeapp.generated.resources.backup_export_plaintext_success
-import twofac.composeapp.generated.resources.backup_import_exception
-import twofac.composeapp.generated.resources.backup_import_failed
-import twofac.composeapp.generated.resources.backup_import_success
-import twofac.composeapp.generated.resources.backup_no_backups_found
-import twofac.composeapp.generated.resources.backup_no_files_found
-import twofac.composeapp.generated.resources.backup_passkey_import_description
-import twofac.composeapp.generated.resources.backup_passkey_import_title
-import twofac.composeapp.generated.resources.backup_passkey_incorrect
-import twofac.composeapp.generated.resources.backup_passkey_plaintext_export_description
-import twofac.composeapp.generated.resources.backup_passkey_required_description
-import twofac.composeapp.generated.resources.backup_passkey_required_title
-import twofac.composeapp.generated.resources.backup_passkey_sync_description
-import twofac.composeapp.generated.resources.backup_passkey_unlock_title
-import twofac.composeapp.generated.resources.backup_passkey_encrypted_export_description
-import twofac.composeapp.generated.resources.backup_restore_unavailable
-import twofac.composeapp.generated.resources.error_operation_failed
-import twofac.composeapp.generated.resources.error_unknown
-import twofac.composeapp.generated.resources.settings_account_all_deleted
-import twofac.composeapp.generated.resources.settings_account_delete_exception
-import twofac.composeapp.generated.resources.settings_account_delete_failed
-import twofac.composeapp.generated.resources.settings_account_deleted_sync_error
-import twofac.composeapp.generated.resources.settings_account_deletion_unavailable
-import twofac.composeapp.generated.resources.settings_biometric_enrollment_cancelled
-import twofac.composeapp.generated.resources.settings_biometric_title
-import twofac.composeapp.generated.resources.settings_biometric_description
-import twofac.composeapp.generated.resources.settings_biometric_unlock_enabled
-import twofac.composeapp.generated.resources.settings_companion_default_name
-import twofac.composeapp.generated.resources.settings_companion_discovered
-import twofac.composeapp.generated.resources.settings_companion_no_accounts
-import twofac.composeapp.generated.resources.settings_companion_not_discovered
-import twofac.composeapp.generated.resources.settings_companion_sync_failed
-import twofac.composeapp.generated.resources.settings_companion_sync_sent
-import twofac.composeapp.generated.resources.settings_companion_sync_unavailable
-import twofac.composeapp.generated.resources.settings_remember_passkey_description
-import twofac.composeapp.generated.resources.settings_remember_passkey_title
-import twofac.composeapp.generated.resources.settings_secure_enrollment_cancelled
-import twofac.composeapp.generated.resources.settings_secure_enrollment_unavailable
-import twofac.composeapp.generated.resources.settings_secure_unlock_description
-import twofac.composeapp.generated.resources.settings_secure_unlock_enabled
-import twofac.composeapp.generated.resources.settings_secure_unlock_title
-import twofac.composeapp.generated.resources.settings_verify_passkey_failed
+import twofac.composeapp.generated.resources.*
 
 enum class SettingsUnlockMode {
     BIOMETRIC,
@@ -464,7 +417,7 @@ class SettingsViewModel(
             val lib = twoFacLib
             if (lib == null) {
                 _uiState.update {
-                    it.copy(enrollmentError = getString(Res.string.settings_secure_enrollment_unavailable))
+                            it.copy(enrollmentError = getString(Res.string.settings_secure_unlock_unavailable))
                 }
                 return@runLoadingAction
             }

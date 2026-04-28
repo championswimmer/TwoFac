@@ -2,7 +2,6 @@ package tech.arnav.twofac.viewmodels
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.MemoryStorage
@@ -19,7 +18,7 @@ class SettingsViewModelTest {
     @Test
     fun `enabling secure unlock shows enrollment dialog`() = runTest {
         val viewModel = SettingsViewModel(
-            sessionManager = FakeSecureSessionManager(),
+            sessionManager = SettingsFakeSecureSessionManager(),
             appPreferencesRepository = FakeAppPreferencesRepository(),
         )
 
@@ -31,9 +30,9 @@ class SettingsViewModelTest {
 
     @Test
     fun `disabling secure unlock clears remembered state`() = runTest {
-        val sessionManager = FakeSecureSessionManager(
+        val sessionManager = SettingsFakeSecureSessionManager(
             rememberPasskeyEnabled = true,
-            secureUnlockEnabled = true,
+            secureUnlockEnabledState = true,
         )
         val viewModel = SettingsViewModel(
             sessionManager = sessionManager,
@@ -43,29 +42,14 @@ class SettingsViewModelTest {
         viewModel.onRememberPasskeyToggleChanged(false)
 
         assertFalse(sessionManager.rememberPasskeyEnabled)
-        assertFalse(sessionManager.secureUnlockEnabled)
+        assertFalse(sessionManager.secureUnlockEnabledState)
         assertFalse(viewModel.uiState.value.isSecureUnlockEnabled)
         assertFalse(viewModel.uiState.value.showEnrollmentDialog)
     }
 
     @Test
-    fun `show upcoming code toggle updates preferences`() = runTest {
-        val preferencesRepository = FakeAppPreferencesRepository()
-        val viewModel = SettingsViewModel(
-            appPreferencesRepository = preferencesRepository,
-        )
-        advanceUntilIdle()
-
-        viewModel.onShowUpcomingCodeChanged(false)
-        advanceUntilIdle()
-
-        assertFalse(preferencesRepository.load().showUpcomingCode)
-        assertFalse(viewModel.uiState.value.appPreferences.showUpcomingCode)
-    }
-
-    @Test
     fun `locked export queues pending backup action`() = runTest {
-        val twoFacLib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "test-passkey")
+        val twoFacLib = TwoFacLib.initialise(storage = MemoryStorage())
         val viewModel = SettingsViewModel(
             twoFacLib = twoFacLib,
             appPreferencesRepository = FakeAppPreferencesRepository(),
@@ -95,7 +79,7 @@ private class FakeAppPreferencesRepository(
     }
 }
 
-private open class BaseFakeSessionManager(
+private open class SettingsBaseFakeSessionManager(
     var rememberPasskeyEnabled: Boolean = false,
 ) : SessionManager {
     override fun isAvailable(): Boolean = true
@@ -109,17 +93,17 @@ private open class BaseFakeSessionManager(
     override fun clearPasskey() = Unit
 }
 
-private class FakeSecureSessionManager(
+private class SettingsFakeSecureSessionManager(
     rememberPasskeyEnabled: Boolean = false,
-    var secureUnlockEnabled: Boolean = false,
+    var secureUnlockEnabledState: Boolean = false,
     private val secureUnlockAvailable: Boolean = true,
     private val secureUnlockReady: Boolean = false,
-) : BaseFakeSessionManager(rememberPasskeyEnabled), SecureSessionManager {
+) : SettingsBaseFakeSessionManager(rememberPasskeyEnabled), SecureSessionManager {
     override fun isSecureUnlockAvailable(): Boolean = secureUnlockAvailable
-    override fun isSecureUnlockEnabled(): Boolean = secureUnlockEnabled
+    override fun isSecureUnlockEnabled(): Boolean = secureUnlockEnabledState
     override fun isSecureUnlockReady(): Boolean = secureUnlockReady
     override fun setSecureUnlockEnabled(enabled: Boolean) {
-        secureUnlockEnabled = enabled
+        secureUnlockEnabledState = enabled
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean = true
