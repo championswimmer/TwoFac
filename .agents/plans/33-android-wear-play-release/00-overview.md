@@ -40,7 +40,7 @@ References:
 - `watchApp/build.gradle.kts`
 - `build.gradle.kts` (root — `appVersionCode`, `appVersionName`)
 - `.github/workflows/release.yml`
-- `.agents/plans/publishing-plans/01-android-publish.md`
+- `.agents/plans/38-publishing-plans/01-android-publish.md`
 
 ---
 
@@ -122,7 +122,7 @@ settled before implementation:
 
 1. 🧑 **Play Console account**: confirm developer account is active and the
    app listing `tech.arnav.twofac.app` has been created per
-   `.agents/plans/publishing-plans/01-android-publish.md`.
+   `.agents/plans/38-publishing-plans/01-android-publish.md`.
 2. 🧑 **Service account for automation**: create a GCP service account with
    "Service Account User" + grant it access in Play Console under
    *Users & permissions → Invite new users → Service Account* with the roles
