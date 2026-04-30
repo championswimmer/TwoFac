@@ -29,7 +29,7 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
         icon: 'fa-brands fa-android',
         name: 'Android',
         description: 'Full-featured 2FA app with biometric lock and Wear OS companion.',
-        link: '#',
+        link: 'https://play.google.com/store/apps/details?id=tech.arnav.twofac.app',
         linkText: 'Google Play',
         external: true,
       },
@@ -154,6 +154,9 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
     ],
   },
 ]
+
+const mobileCategory = categories.find((category) => category.title === 'Mobile')
+const remainingCategories = categories.filter((category) => category.title !== 'Mobile')
 </script>
 
 <template>
@@ -171,6 +174,42 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
     </section>
 
      <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+       <!-- Mobile Apps -->
+       <section v-if="mobileCategory" class="mb-16">
+         <h2
+           class="text-2xl font-bold tracking-tight text-secondary-900 dark:text-white sm:text-3xl"
+         >
+           <i :class="mobileCategory.icon" class="mr-2" aria-hidden="true" />{{ mobileCategory.title }}
+         </h2>
+
+         <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+           <div
+             v-for="card in mobileCategory.cards"
+             :key="card.name"
+             class="flex flex-col rounded-xl border border-secondary-200 bg-secondary-50 p-6 transition-colors hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:hover:bg-secondary-800"
+           >
+             <div class="text-4xl text-primary-600 dark:text-primary-400"><i :class="card.icon" aria-hidden="true" /></div>
+             <h3
+               class="mt-3 text-lg font-semibold text-secondary-900 dark:text-white"
+             >
+               {{ card.name }}
+             </h3>
+             <p class="mt-1 flex-1 text-sm text-secondary-600 dark:text-secondary-400">
+               {{ card.description }}
+             </p>
+             <a
+               :href="card.link"
+               :target="card.external ? '_blank' : undefined"
+               :rel="card.external ? 'noopener noreferrer' : undefined"
+               class="mt-4 inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+               :class="{ 'pointer-events-none opacity-60': card.link === '#' }"
+             >
+               {{ card.linkText }}
+             </a>
+           </div>
+         </div>
+       </section>
+
        <section
          class="mb-16 rounded-2xl border border-primary-200 bg-primary-50 p-6 shadow-sm dark:border-primary-900 dark:bg-primary-950/40"
        >
@@ -207,9 +246,9 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
          </p>
        </section>
 
-       <!-- Download Categories -->
+       <!-- Remaining Download Categories -->
        <div class="space-y-16">
-        <section v-for="category in categories" :key="category.title">
+        <section v-for="category in remainingCategories" :key="category.title">
           <h2
             class="text-2xl font-bold tracking-tight text-secondary-900 dark:text-white sm:text-3xl"
           >
@@ -220,7 +259,7 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
             <div
               v-for="card in category.cards"
               :key="card.name"
-              class="flex flex-col rounded-xl border border-secondary-200 dark:border-secondary-700 bg-secondary-50 dark:bg-secondary-900 p-6 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-800"
+              class="flex flex-col rounded-xl border border-secondary-200 bg-secondary-50 p-6 transition-colors hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:hover:bg-secondary-800"
             >
               <div class="text-4xl text-primary-600 dark:text-primary-400"><i :class="card.icon" aria-hidden="true" /></div>
               <h3
@@ -235,7 +274,7 @@ const categories: { title: string; icon: string; cards: DownloadCard[] }[] = [
                 :href="card.link"
                 :target="card.external ? '_blank' : undefined"
                 :rel="card.external ? 'noopener noreferrer' : undefined"
-                class="mt-4 inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
+                class="mt-4 inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
                 :class="{ 'pointer-events-none opacity-60': card.link === '#' }"
               >
                 {{ card.linkText }}
