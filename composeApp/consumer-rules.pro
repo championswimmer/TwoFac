@@ -41,3 +41,27 @@
 -keepattributes RuntimeInvisibleAnnotations
 -keepattributes Signature
 -keepattributes Exceptions
+
+# ── Google ML Kit (barcode-scanning) ─────────────────────────────────────────
+# AGP 9 enables R8 strict full mode by default. ML Kit's barcode-scanning AAR
+# does not ship consumer keep rules for its internal reflective classes, which
+# causes BarcodeScanning.getClient(...) to throw NullPointerException at
+# com.google.mlkit.vision.barcode.internal.zzg.zzb on release builds.
+# See: https://github.com/googlesamples/mlkit/issues/1007
+#      https://github.com/googlesamples/mlkit/issues/1018
+-keep class com.google.mlkit.** { *; }
+-keep class com.google.android.gms.internal.mlkit_vision_barcode.** { *; }
+-keep class com.google.android.gms.internal.mlkit_vision_barcode_bundled.** { *; }
+-keep class com.google.android.gms.internal.mlkit_vision_common.** { *; }
+-keep class com.google.android.gms.internal.mlkit_common.** { *; }
+
+# Generated proto fields are accessed via reflection by ML Kit at runtime.
+-keepclassmembers class * extends com.google.android.gms.internal.mlkit_vision_barcode_bundled.zzeh {
+    <fields>;
+}
+
+# Native methods (libbarhopper_v3.so) — preserve names to avoid
+# UnsatisfiedLinkError after obfuscation.
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
