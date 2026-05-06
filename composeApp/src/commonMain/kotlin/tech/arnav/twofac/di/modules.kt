@@ -25,6 +25,7 @@ import tech.arnav.twofac.storage.FileStorage
 import tech.arnav.twofac.storage.createAccountsStore
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 import tech.arnav.twofac.viewmodels.OnboardingViewModel
+import tech.arnav.twofac.viewmodels.SettingsViewModel
 
 val storageModule = module {
     single<Storage> {
@@ -96,6 +97,17 @@ val viewModelModule = module {
             guideRegistry = get(),
             progressStore = get(),
             autoShowResolver = get(),
+        )
+    }
+    single<SettingsViewModel> {
+        SettingsViewModel(
+            backupService = getOrNull(),
+            twoFacLib = getOrNull(),
+            companionSyncCoordinator = getOrNull(),
+            sessionManager = getOrNull(),
+            appPreferencesRepository = get(),
+            accountsViewModel = getOrNull(),
+            onboardingViewModel = getOrNull(),
         )
     }
 }
