@@ -15,18 +15,13 @@
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.2",
-    "@unhead/vue": "^3.1.1",
+    "@unhead/vue": "^2.1.15",
     "mermaid": "^11.13.0",
     "tailwindcss": "^4.2.2",
     "vue": "^3.5.30",
     "vue-router": "^5.1.0"
   },
-  "overrides": {
-    "@unhead/dom": "^3.1.1",
-    "@unhead/vue": "^3.1.1"
-  },
   "devDependencies": {
-    "@unhead/dom": "^3.1.1",
     "@types/node": "^25.9.1",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vue/tsconfig": "^0.9.0",
