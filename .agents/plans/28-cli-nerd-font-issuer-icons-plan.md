@@ -1,13 +1,13 @@
 ---
 name: CLI Nerd Font Issuer Icons Plan
-status: In Progress
+status: Completed
 progress:
   - "[x] Phase 0 - Research and Confirm Nerd Font Unicode Mapping"
   - "[x] Phase 1 - Expose and Resolve Issuer Metadata in CLI"
   - "[x] Phase 2 - Implement CLI-Specific Nerd Font Glyph Resolution"
-  - "[ ] Phase 3 - Update `DisplayCommand` UI (Mordant Table)"
-  - "[ ] Phase 4 - Add CLI Toggle / Environment Detection for Icons"
-  - "[ ] Phase 5 - Testing and Validation"
+  - "[x] Phase 3 - Update `DisplayCommand` UI (Mordant Table)"
+  - "[x] Phase 4 - Add CLI Toggle / Environment Detection for Icons"
+  - "[x] Phase 5 - Testing and Validation"
 ---
 
 # CLI Nerd Font Issuer Icons Plan
@@ -100,6 +100,11 @@ Enhance the `cliApp` terminal output by prefixing account labels with their resp
    - Test an account with an unknown issuer to verify the fallback key/lock icon appears.
 3. **Automated Tests:**
    - Update `DisplayCommandTest.kt` to verify that the table output contains the expected unicode glyphs when `noIcons` is false, and excludes them when true.
+
+## Implementation Notes
+- `DisplayCommand` now prefixes the account column with Nerd Font glyphs via `CliIssuerIcons.formatAccountLabel(...)`.
+- Icon rendering defaults to interactive-capable output, can be disabled with `--no-icons`, and can be forced or disabled explicitly via `TWOFAC_CLI_ICONS=1|0`.
+- Validation completed with `./gradlew :cliApp:check`, `./gradlew :cliApp:macosArm64Test`, and a manual `cliApp/build/bin/macosArm64/debugExecutable/2fac.kexe display --help` check confirming the new flag is exposed.
 
 ## Files Likely Touched
 - `cliApp/src/commonMain/kotlin/tech/arnav/twofac/cli/commands/DisplayCommand.kt`
