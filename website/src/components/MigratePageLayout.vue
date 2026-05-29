@@ -17,49 +17,48 @@ const props = defineProps<{
   howToSteps?: HowToStep[]
 }>()
 
+const jsonLdScript = (value: unknown) => ({
+  type: 'application/ld+json' as const,
+  innerHTML: JSON.stringify(value)
+})
+
 useHead(() => ({
   script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://twofac.app/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Migrate",
-            "item": "https://twofac.app/migrate"
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": `Migrate from ${props.appName}`,
-            "item": `https://twofac.app/migrate/${props.appName.toLowerCase().replace(/\s+/g, '-')}`
-          }
-        ]
-      })
-    },
-    ...(props.howToSteps?.length ? [{
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "HowTo",
-        "name": `How to Migrate from ${props.appName} to TwoFac`,
-        "description": props.heroDescription,
-        "step": props.howToSteps.map((step) => ({
-          "@type": "HowToStep",
-          "name": step.name,
-          "text": step.text
-        }))
-      })
-    }] : [])
+    jsonLdScript({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://twofac.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Migrate",
+          "item": "https://twofac.app/migrate"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": `Migrate from ${props.appName}`,
+          "item": `https://twofac.app/migrate/${props.appName.toLowerCase().replace(/\s+/g, '-')}`
+        }
+      ]
+    }),
+    ...(props.howToSteps?.length ? [jsonLdScript({
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": `How to Migrate from ${props.appName} to TwoFac`,
+      "description": props.heroDescription,
+      "step": props.howToSteps.map((step) => ({
+        "@type": "HowToStep",
+        "name": step.name,
+        "text": step.text
+      }))
+    })] : [])
   ]
 }))
 </script>
