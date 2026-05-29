@@ -1,10 +1,10 @@
 ---
 name: CLI Nerd Font Issuer Icons Plan
-status: Planned
+status: In Progress
 progress:
-  - "[ ] Phase 0 - Research and Confirm Nerd Font Unicode Mapping"
-  - "[ ] Phase 1 - Expose and Resolve Issuer Metadata in CLI"
-  - "[ ] Phase 2 - Implement CLI-Specific Nerd Font Glyph Resolution"
+  - "[x] Phase 0 - Research and Confirm Nerd Font Unicode Mapping"
+  - "[x] Phase 1 - Expose and Resolve Issuer Metadata in CLI"
+  - "[x] Phase 2 - Implement CLI-Specific Nerd Font Glyph Resolution"
   - "[ ] Phase 3 - Update `DisplayCommand` UI (Mordant Table)"
   - "[ ] Phase 4 - Add CLI Toggle / Environment Detection for Icons"
   - "[ ] Phase 5 - Testing and Validation"
@@ -21,8 +21,9 @@ Enhance the `cliApp` terminal output by prefixing account labels with their resp
    - It maps these keys to Font Awesome Brands unicodes (`iconGlyphs`).
 2. **Nerd Font Compatibility:**
    - Nerd Fonts patch many icon sets. Font Awesome (FA) and Material Design Icons (MDI) are prominent. 
-   - While `IssuerIconCatalog.kt` has unicodes for FA Brands (e.g., Github `\uF09B`), the exact unicode point in a Nerd Font environment might sometimes match perfectly (especially for legacy FA icons), but for newer FA 6 Brands, Nerd Fonts typically places them in specific ranges or relies on Devicons (e.g., `\uE700` range) or Font Logos (`\uF300` - `\uF32F`).
-   - We need to define a CLI-specific glyph map that specifically targets known Nerd Font unicodes, falling back to a generic lock/key symbol (`\uF023`  or `\uF084` ) for unknown issuers.
+   - The Nerd Fonts cheat sheet confirms that many older FA brand glyphs used by the shared catalog still render unchanged (`github` `\uF09B`, `google` `\uF1A0`, `dropbox` `\uF16B`, `slack` `\uF198`), while newer brands need CLI-specific overrides (`atlassian` `\uEF32`, `cloudflare` `\uE792`, `discord` `\uF1FF`, `microsoft` `\uED04`, `stripe` `\uED53`).
+   - Some issuer brands are still not first-class Nerd Font entries (`meta`, `shopify`, `x_twitter`), so the CLI layer uses the closest widely-available Nerd Font glyph instead of risking missing-glyph tofu boxes.
+   - We need a CLI-specific glyph map that targets known Nerd Font unicodes, falling back to a generic key icon (`\uF084` ) for unknown issuers.
 3. **Mordant Integration:**
    - Mordant (used in `cliApp`) supports rendering standard unicode characters.
    - We can concatenate the icon and the `accountLabel` inside the `cell()` definition of the table body.
