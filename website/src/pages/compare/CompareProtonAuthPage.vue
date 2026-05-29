@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import { useSEO } from '../../composables/useSEO'
 import ComparePageLayout from '../../components/ComparePageLayout.vue'
 import type { GlanceStat, WhyChooseCard, FAQEntry, FeatureRow } from '../../components/ComparePageLayout.vue'
@@ -144,6 +145,28 @@ const faqs: FAQEntry[] = [
               TwoFac is the better fit if you want the same privacy posture but need more reach: browser autofill, terminal access,
               smartwatch companions, web installability, and a single toolchain that adapts to how you actually log in throughout the day.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-12 sm:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-4">Compare Proton Authenticator Against More Alternatives</h2>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <RouterLink
+              to="/compare/ente-auth-vs-proton-authenticator-vs-twofac"
+              class="rounded-xl border border-secondary-200 dark:border-secondary-700 p-5 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
+            >
+              <span class="font-semibold text-secondary-900 dark:text-white">Ente Auth vs Proton Authenticator vs TwoFac</span>
+              <span class="mt-2 block text-sm text-secondary-600 dark:text-secondary-400">Compare privacy-focused Ente and Proton with TwoFac's browser, web, CLI, and wearable access.</span>
+            </RouterLink>
+            <RouterLink
+              to="/compare/2fas-vs-proton-authenticator-vs-twofac"
+              class="rounded-xl border border-secondary-200 dark:border-secondary-700 p-5 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
+            >
+              <span class="font-semibold text-secondary-900 dark:text-white">2FAS vs Proton Authenticator vs TwoFac</span>
+              <span class="mt-2 block text-sm text-secondary-600 dark:text-secondary-400">See how Proton Authenticator stacks up against 2FAS and TwoFac for daily 2FA workflows.</span>
+            </RouterLink>
           </div>
         </div>
       </section>
