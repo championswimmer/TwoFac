@@ -45,7 +45,7 @@ kotlinx-serialization = "1.11.0"
 runner = "1.7.0"
 core = "1.7.0"
 koin-bom = "4.2.1"
-crypto-kt = "0.5.0"
+crypto-kt = "0.6.0"
 clikt = "5.1.0"
 dokka = "2.2.0"
 mordant = "3.0.2"
@@ -63,8 +63,8 @@ qrose = "1.1.2"
 zxing = "3.5.4"
 dorkbox-systemtray = "4.4"
 jna = "5.18.1"
-composeMaterial = "1.5.6"
-composeFoundation = "1.5.6"
+composeMaterial = "1.6.2"
+composeFoundation = "1.6.2"
 uiTooling = "1.10.1"
 wearToolingPreview = "1.0.0"
 wear = "1.4.0"
@@ -147,6 +147,3 @@ qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 dorkbox-systemtray = { module = "com.dorkbox:SystemTray", version.ref = "dorkbox-systemtray" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
-
-
-
