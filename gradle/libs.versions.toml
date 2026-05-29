@@ -47,11 +47,11 @@ core = "1.7.0"
 koin-bom = "4.1.1"
 crypto-kt = "0.5.0"
 clikt = "5.1.0"
-dokka = "2.1.0"
+dokka = "2.2.0"
 mordant = "3.0.2"
 kmp-appdirs = "2.0.0"
 kstore = "2.0.4"
-kover = "0.9.7"
+kover = "0.9.8"
 playServicesWearable = "19.0.0"
 playServicesAuth = "21.4.0"
 mlkit-barcode-scanning = "17.3.0"
@@ -60,16 +60,16 @@ kscan = "0.7.0"
 filekit = "0.10.0"
 jsqr = "1.4.0"
 qrose = "1.1.2"
-zxing = "3.5.3"
+zxing = "3.5.4"
 dorkbox-systemtray = "4.4"
-jna = "5.15.0"
+jna = "5.18.1"
 composeMaterial = "1.5.6"
 composeFoundation = "1.5.6"
 uiTooling = "1.10.1"
 wearToolingPreview = "1.0.0"
 wear = "1.4.0"
 coreSplashscreen = "1.2.0"
-androidxWork = "2.11.1"
+androidxWork = "2.11.2"
 
 [libraries]
 
@@ -147,3 +147,4 @@ qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 dorkbox-systemtray = { module = "com.dorkbox:SystemTray", version.ref = "dorkbox-systemtray" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
+
