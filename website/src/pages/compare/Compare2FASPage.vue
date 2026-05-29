@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import { useSEO } from '../../composables/useSEO'
 import ComparePageLayout from '../../components/ComparePageLayout.vue'
 import type { GlanceStat, WhyChooseCard, FAQEntry, FeatureRow } from '../../components/ComparePageLayout.vue'
@@ -148,6 +149,28 @@ const faqs: FAQEntry[] = [
               TwoFac provides end-to-end encrypted sync across all devices regardless of platform — Android, iOS, desktop, web, and
               wearables all stay in sync automatically. There is no premium tier. Every sync and backup feature is free on day one.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-12 sm:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-4">Compare 2FAS Against More Alternatives</h2>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <RouterLink
+              to="/compare/ente-auth-vs-2fas-vs-twofac"
+              class="rounded-xl border border-secondary-200 dark:border-secondary-700 p-5 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
+            >
+              <span class="font-semibold text-secondary-900 dark:text-white">Ente Auth vs 2FAS vs TwoFac</span>
+              <span class="mt-2 block text-sm text-secondary-600 dark:text-secondary-400">See how 2FAS compares with Ente Auth and TwoFac across sync, desktop, browser, and wearable workflows.</span>
+            </RouterLink>
+            <RouterLink
+              to="/compare/2fas-vs-proton-authenticator-vs-twofac"
+              class="rounded-xl border border-secondary-200 dark:border-secondary-700 p-5 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
+            >
+              <span class="font-semibold text-secondary-900 dark:text-white">2FAS vs Proton Authenticator vs TwoFac</span>
+              <span class="mt-2 block text-sm text-secondary-600 dark:text-secondary-400">Compare mobile-first 2FAS against Proton's privacy app and TwoFac's wider platform coverage.</span>
+            </RouterLink>
           </div>
         </div>
       </section>

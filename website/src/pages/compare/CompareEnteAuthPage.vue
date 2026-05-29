@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import { useSEO } from '../../composables/useSEO'
 import ComparePageLayout from '../../components/ComparePageLayout.vue'
 import type { GlanceStat, WhyChooseCard, FAQEntry, FeatureRow } from '../../components/ComparePageLayout.vue'
@@ -150,6 +151,28 @@ const faqs: FAQEntry[] = [
               <strong class="text-secondary-900 dark:text-white">Wearable apps</strong> for both Wear OS and Apple Watch round out
               TwoFac's advantage — view codes on your wrist without reaching for your phone. Ente Auth has no wearable support.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-12 sm:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-4">Compare Ente Auth Against More Alternatives</h2>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <RouterLink
+              to="/compare/ente-auth-vs-2fas-vs-twofac"
+              class="rounded-xl border border-secondary-200 dark:border-secondary-700 p-5 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
+            >
+              <span class="font-semibold text-secondary-900 dark:text-white">Ente Auth vs 2FAS vs TwoFac</span>
+              <span class="mt-2 block text-sm text-secondary-600 dark:text-secondary-400">Compare Ente Auth with 2FAS and TwoFac across mobile, desktop, browser, CLI, and wearable support.</span>
+            </RouterLink>
+            <RouterLink
+              to="/compare/ente-auth-vs-proton-authenticator-vs-twofac"
+              class="rounded-xl border border-secondary-200 dark:border-secondary-700 p-5 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
+            >
+              <span class="font-semibold text-secondary-900 dark:text-white">Ente Auth vs Proton Authenticator vs TwoFac</span>
+              <span class="mt-2 block text-sm text-secondary-600 dark:text-secondary-400">See how privacy-focused Ente and Proton compare with TwoFac's wider workflow coverage.</span>
+            </RouterLink>
           </div>
         </div>
       </section>

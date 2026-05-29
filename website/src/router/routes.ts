@@ -81,6 +81,21 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../pages/compare/CompareProtonAuthPage.vue'),
   },
   {
+    path: '/compare/ente-auth-vs-2fas-vs-twofac',
+    name: 'compare-ente-auth-vs-2fas-vs-twofac',
+    component: () => import('../pages/compare/CompareEnte2FASTwoFacPage.vue'),
+  },
+  {
+    path: '/compare/ente-auth-vs-proton-authenticator-vs-twofac',
+    name: 'compare-ente-auth-vs-proton-authenticator-vs-twofac',
+    component: () => import('../pages/compare/CompareEnteProtonTwoFacPage.vue'),
+  },
+  {
+    path: '/compare/2fas-vs-proton-authenticator-vs-twofac',
+    name: 'compare-2fas-vs-proton-authenticator-vs-twofac',
+    component: () => import('../pages/compare/Compare2FASProtonTwoFacPage.vue'),
+  },
+  {
     path: '/compare/google-authenticator',
     name: 'compare-google-authenticator',
     component: () => import('../pages/compare/CompareGoogleAuthPage.vue'),

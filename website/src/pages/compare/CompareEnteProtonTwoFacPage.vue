@@ -1,0 +1,101 @@
+<script setup lang="ts">
+import { useSEO } from '../../composables/useSEO'
+import ThreeWayComparePageLayout from '../../components/ThreeWayComparePageLayout.vue'
+import type { DecisionCard, ThreeWayFAQEntry, ThreeWayFeatureRow, ThreeWayGlanceStat } from '../../components/ThreeWayComparePageLayout.vue'
+
+const canonicalPath = '/compare/ente-auth-vs-proton-authenticator-vs-twofac'
+
+useSEO({
+  title: 'Ente vs Proton Authenticator vs TwoFac: 2FA App Comparison (2026)',
+  description: 'Compare Ente Auth, Proton Authenticator, and TwoFac for encrypted sync, desktop apps, browser support, CLI access, web access, wearables, and pricing.',
+  canonicalPath,
+})
+
+const heroDescription = `Ente Auth, Proton Authenticator, and TwoFac are modern privacy-focused authenticators with open-source roots and encrypted sync stories. The choice comes down to ecosystem preference, workflow reach, and whether you need browser, web, CLI, and wearable access in addition to phone and desktop apps.`
+
+const glanceStats: [ThreeWayGlanceStat, ThreeWayGlanceStat, ThreeWayGlanceStat] = [
+  { value: 'Encrypted', label: 'Sync story across all three', note: 'Each option prioritizes protected vault data' },
+  { value: 'CLI', label: 'TwoFac developer advantage', note: 'Terminal code generation is first-class in TwoFac' },
+  { value: 'Watches', label: 'TwoFac wearable support', note: 'Wear OS and Apple Watch coverage' },
+]
+
+const features: ThreeWayFeatureRow[] = [
+  { name: 'Open Source', appOne: 'Yes', appTwo: 'Yes', twofac: 'Yes' },
+  { name: 'Android App', appOne: 'Yes', appTwo: 'Yes', twofac: 'Yes' },
+  { name: 'iOS App', appOne: 'Yes', appTwo: 'Yes', twofac: 'Yes' },
+  { name: 'Desktop App', appOne: 'Yes', appTwo: 'Yes', twofac: 'Yes' },
+  { name: 'Web App / PWA', appOne: 'Yes', appTwo: 'No', twofac: 'Yes' },
+  { name: 'Browser Extension', appOne: 'No', appTwo: 'No', twofac: 'Yes' },
+  { name: 'CLI for Code Generation', appOne: 'No interactive CLI', appTwo: 'No', twofac: 'Yes' },
+  { name: 'Wear OS', appOne: 'No', appTwo: 'No', twofac: 'Yes' },
+  { name: 'Apple Watch', appOne: 'No', appTwo: 'No', twofac: 'Yes' },
+  { name: 'TOTP / HOTP', appOne: 'Yes', appTwo: 'TOTP', twofac: 'Yes' },
+  { name: 'End-to-End Encrypted Sync', appOne: 'Yes', appTwo: 'Yes', twofac: 'Yes' },
+  { name: 'No Account Required', appOne: 'Local-only mode', appTwo: 'Local-only mode', twofac: 'Yes' },
+  { name: 'Biometric / PIN Lock', appOne: 'Limited', appTwo: 'Yes', twofac: 'Yes' },
+  { name: 'Completely Free', appOne: 'Free tier', appTwo: 'Yes', twofac: 'Yes' },
+]
+
+const decisionCards: DecisionCard[] = [
+  { icon: 'fa-solid fa-cloud', title: 'Ente favors Ente users', text: 'Ente Auth makes sense if you already like Ente services and want a simple encrypted authenticator in that ecosystem.' },
+  { icon: 'fa-solid fa-shield-halved', title: 'Proton favors Proton users', text: 'Proton Authenticator is compelling if you trust Proton and mainly need encrypted mobile and desktop access.' },
+  { icon: 'fa-solid fa-globe', title: 'TwoFac adds more endpoints', text: 'TwoFac goes beyond phone and desktop with a web PWA, browser extensions, CLI workflows, and smartwatch clients.' },
+  { icon: 'fa-solid fa-puzzle-piece', title: 'Browser workflow matters', text: 'Neither Ente Auth nor Proton Authenticator has a dedicated browser extension, while TwoFac supports browser-based autofill workflows.' },
+  { icon: 'fa-solid fa-terminal', title: 'CLI workflow matters', text: 'TwoFac is the best fit if you need codes inside terminal sessions, scripts, SSH workflows, or developer tooling.' },
+  { icon: 'fa-solid fa-clock', title: 'Wearables matter', text: 'TwoFac includes Wear OS and Apple Watch support, which gives it a convenience layer Ente and Proton do not currently match.' },
+]
+
+const faqs: ThreeWayFAQEntry[] = [
+  { question: 'Are Ente Auth and Proton Authenticator both good privacy choices?', answer: 'Yes. Both are strong privacy-focused authenticators. TwoFac is positioned for users who want similar privacy values with more ways to access codes.' },
+  { question: 'Which app is best if I already use Proton or Ente?', answer: 'If you strongly prefer one ecosystem, Ente Auth or Proton Authenticator may feel familiar. If you want the authenticator to be independent from those ecosystems and available across more surfaces, TwoFac is the broader option.' },
+  { question: 'Why compare TwoFac if Ente and Proton already have desktop apps?', answer: 'Desktop apps are only one part of the workflow. TwoFac also adds browser extensions, web access, a CLI, and smartwatch apps, which can matter more than another desktop window.' },
+  { question: 'Can TwoFac import from Ente or Proton?', answer: 'Yes. TwoFac supports migration paths for Ente Auth and Proton Authenticator exports.' },
+]
+</script>
+
+<template>
+  <ThreeWayComparePageLayout
+    app-one-name="Ente Auth"
+    app-two-name="Proton Authenticator"
+    :canonical-path="canonicalPath"
+    :hero-description="heroDescription"
+    :glance-stats="glanceStats"
+    :features="features"
+    :decision-cards="decisionCards"
+    :faqs="faqs"
+    cta-heading="Keep the Privacy, Expand the Workflow"
+    cta-body="TwoFac gives privacy-focused users encrypted 2FA across mobile, desktop, browser, web, terminal, and wearable workflows in one open-source app family."
+  >
+    <template #intro>
+      <section class="bg-secondary-50 dark:bg-secondary-900 py-12 sm:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-4">Quick Summary</h2>
+          <div class="space-y-4 text-secondary-600 dark:text-secondary-400 leading-relaxed">
+            <p>
+              Ente Auth and Proton Authenticator are both credible modern alternatives to legacy authenticator apps. They focus on encrypted sync, cross-platform access, and privacy-first product design.
+            </p>
+            <p>
+              TwoFac belongs in the same privacy-focused shortlist, but its differentiator is workflow coverage: browser extension, PWA, CLI, Wear OS, and Apple Watch access are all part of the product surface.
+            </p>
+          </div>
+        </div>
+      </section>
+    </template>
+
+    <template #details>
+      <section class="py-12 sm:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-2xl font-bold text-secondary-900 dark:text-white mb-4">Privacy Is Table Stakes</h2>
+          <div class="space-y-4 text-secondary-600 dark:text-secondary-400 leading-relaxed">
+            <p>
+              This comparison is not about one app caring about privacy and the others ignoring it. Ente, Proton, and TwoFac all target users who care about control, transparency, and secure backups.
+            </p>
+            <p>
+              The practical question is where you need your codes. TwoFac is strongest if your answer includes browser popups, terminals, web installs, and watches as well as traditional phone and desktop apps.
+            </p>
+          </div>
+        </div>
+      </section>
+    </template>
+  </ThreeWayComparePageLayout>
+</template>
