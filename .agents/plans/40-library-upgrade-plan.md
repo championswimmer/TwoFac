@@ -1,13 +1,13 @@
 ---
 name: Library Upgrade Plan
-status: Planned
+status: Completed
 progress:
   - "[x] Generate baseline dependency audit report with dependency-updates skill"
-  - "[ ] Review and stage low-risk npm wanted updates"
-  - "[ ] Review and stage stable Gradle/KMP dependency updates in small batches"
-  - "[ ] Re-test Android, Desktop, Web, CLI, and Apple framework smoke builds after each batch"
-  - "[ ] Evaluate major-version and pre-release candidates separately"
-  - "[ ] Land upgrades with rollback notes and follow-up issues for deferred items"
+  - "[x] Review and stage low-risk npm wanted updates"
+  - "[x] Review and stage stable Gradle/KMP dependency updates in small batches"
+  - "[x] Re-test Android, Desktop, Web, CLI, and Apple framework smoke builds after each batch"
+  - "[x] Evaluate major-version and pre-release candidates separately"
+  - "[x] Land upgrades with rollback notes and follow-up issues for deferred items"
 ---
 
 # Library Upgrade Plan
@@ -26,7 +26,7 @@ node .agents/skills/dependency-updates/scripts/dependency-updates.mjs
 
 Current report:
 
-- `.agents/plans/dependency-update-reports/dependency-update-report-20260529-214140.md`
+- `.agents/plans/dependency-update-reports/dependency-update-report-20260529-221818.md`
 
 ## Dependency surfaces
 
@@ -203,12 +203,12 @@ Validation:
 
 These are out of scope for routine maintenance and require explicit user approval.
 
-Open a separate follow-up task or PR for:
+Status after this upgrade pass:
 
-- `vue-router` 5.x
-- `@unhead/vue` 3.x
-- TypeScript 6.x in website and wasm interop
-- any alpha/beta/RC AndroidX, Compose, Kotlin, or Gradle wrapper candidates
+- `vue-router` 5.x: upgraded successfully
+- TypeScript 6.x in website and wasm interop: upgraded successfully
+- `@unhead/vue` 3.x: **deferred**; latest `vite-ssg` (`28.3.0`) still uses and documents `@unhead/vue` v2, and the website lost SSR/SSG head output when tested against v3
+- alpha/beta/RC AndroidX, Compose, Kotlin, and Gradle wrapper candidates: still intentionally deferred
 
 These should be done only after reviewing release notes and checking for API migrations.
 
@@ -236,7 +236,8 @@ Optional follow-up:
 
 - `agp`, `kotlin`, and `composeMultiplatform` are coupled and should be upgraded together
 - `filekit`, `kscan`, and Google Play Services changes may affect platform integrations and permissions flows
-- `vue-router` 5 and TypeScript 6 are likely to require code changes; do not batch them with routine wanted updates
+- `vue-router` 5 and TypeScript 6 required code/config changes and should not be batched with routine wanted updates
+- `@unhead/vue` 3 is currently blocked by `vite-ssg` v2-based head integration in this repo and should be revisited only with an upstream-compatible path
 - pre-release Gradle/AndroidX/Compose updates should remain out of the default maintenance pass
 
 ## Done criteria
@@ -246,4 +247,4 @@ This plan is complete when:
 - stable npm wanted updates are merged
 - stable Gradle updates are merged in validated batches
 - deferred major/pre-release candidates are either upgraded in follow-up work or explicitly documented as postponed
-- a fresh dependency report shows no remaining intended stable/wanted updates for the completed scope
+- a fresh dependency report shows no remaining intended stable/wanted updates for the completed scope, except `@unhead/vue` 3.x which is intentionally deferred for upstream compatibility
