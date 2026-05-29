@@ -6,9 +6,9 @@
     <meta property="og:image" content="https://twofac.app/twofac_logo_512.png">
     <meta property="og:type" content="article">
     <title>Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes | TwoFac</title>
-    <script type="module" crossorigin="" src="/assets/app-B_WmzASb.js"></script>
-    <link rel="stylesheet" crossorigin="" href="/assets/app-DrUurv4r.css">
-  <link rel="modulepreload" crossorigin="" href="/assets/BlogPostPage-5LDX1nBF.js"><link rel="stylesheet" href="/assets/BlogPostPage-DCd6wkF3.css"><link rel="modulepreload" crossorigin="" href="/assets/useSEO-zc6SmV63.js"><meta name="description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta name="robots" content="index, follow"><meta property="og:site_name" content="TwoFac"><meta property="og:title" content="Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes | TwoFac"><meta property="og:description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta property="og:url" content="https://twofac.app/blog/under-the-hood-how-totp-works-and-how-twofac-generates-your-2fa-codes"><meta property="article:published_time" content="2026-03-08T10:00:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes | TwoFac"><meta name="twitter:description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta name="twitter:image" content="https://twofac.app/twofac_logo_512.png"><link rel="canonical" href="https://twofac.app/blog/under-the-hood-how-totp-works-and-how-twofac-generates-your-2fa-codes"></head>
+    <script type="module" crossorigin="" src="/assets/app-DtgniamA.js"></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/app-DUVa7CS_.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/BlogPostPage-B3MMaCyn.js"><link rel="stylesheet" href="/assets/BlogPostPage-DCd6wkF3.css"><link rel="modulepreload" crossorigin="" href="/assets/useSEO-wm-YQ3Wz.js"><meta name="description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta name="robots" content="index, follow"><meta property="og:site_name" content="TwoFac"><meta property="og:title" content="Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes | TwoFac"><meta property="og:description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta property="og:url" content="https://twofac.app/blog/under-the-hood-how-totp-works-and-how-twofac-generates-your-2fa-codes"><meta property="article:published_time" content="2026-03-08T10:00:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes | TwoFac"><meta name="twitter:description" content="In the previous article, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the sha"><meta name="twitter:image" content="https://twofac.app/twofac_logo_512.png"><link rel="canonical" href="https://twofac.app/blog/under-the-hood-how-totp-works-and-how-twofac-generates-your-2fa-codes"></head>
   <body>
     <div id="app" data-server-rendered="true"><div class="min-h-screen flex flex-col" data-v-83a734da=""><header class="sticky top-0 z-50 w-full border-b border-secondary-200 bg-secondary-50 dark:border-secondary-800 dark:bg-secondary-950"><nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"><a href="/" class="flex items-center gap-2.5"><img src="/twofac-logo.svg" alt="TwoFac logo" class="h-8 w-8"><span class="text-xl font-bold tracking-tight text-secondary-900 dark:text-white"> TwoFac </span></a><div class="hidden items-center gap-1 md:flex"><!--[--><a href="/features" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Features</a><a href="/screenshots" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Screenshots</a><a href="/download" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Download</a><a href="/blog" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">Blog</a><a href="/faq" class="rounded-lg px-3.5 py-2 text-sm font-medium text-secondary-600 transition-colors hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white [&amp;.router-link-active]:text-primary-600 dark:[&amp;.router-link-active]:text-primary-400">FAQ</a><!--]--></div><div class="hidden items-center gap-3 md:flex"><a href="https://github.com/championswimmer/TwoFac" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-secondary-300 bg-secondary-50 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg> GitHub </a></div><button type="button" class="inline-flex items-center justify-center rounded-lg p-2 text-secondary-500 transition-colors hover:bg-secondary-100 hover:text-secondary-700 md:hidden dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white" aria-expanded="false" aria-label="Toggle navigation menu"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5"></path></svg></button></nav><!----></header><main class="flex-1"><!--[--><article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16" data-v-83a734da=""><a href="/blog" class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline mb-8" data-v-83a734da=""> ← Back to Blog </a><header class="mb-8" data-v-83a734da=""><time datetime="2026-03-08T10:00:00.000Z" class="text-sm text-secondary-500 dark:text-secondary-400" data-v-83a734da="">March 8, 2026</time><h1 class="mt-2 text-3xl sm:text-4xl font-bold text-secondary-900 dark:text-white leading-tight" data-v-83a734da="">Under the Hood: How TOTP Works and How TwoFac Generates Your 2FA Codes</h1><div class="mt-4 flex flex-wrap gap-2" data-v-83a734da=""><!--[--><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">kotlin</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">cryptography</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">totp</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">hotp</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">security</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">2fa</span><span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300" data-v-83a734da="">opensource</span><!--]--></div></header><div class="blog-content" data-v-83a734da=""><p>In the <a href="https://arnav.tech/architecting-twofac-my-journey-into-kotlin-multiplatform-module-structure">previous article</a>, I walked through how TwoFac is structured as a Kotlin Multiplatform project. With that groundwork out of the way, we can zoom in on one of the most important pieces in the shared core: OTP generation itself. When you open an authenticator app and watch a 6-digit code ticking down, it's easy to treat it as magic and move on. But there's some genuinely elegant cryptography behind that little countdown. In this post, I'm going to pop the hood on <strong>TOTP</strong> — Time-based One-Time Passwords — unpack the math, walk through the RFCs, and then show how we implement it in TwoFac.</p>
 <blockquote>
@@ -64,9 +64,7 @@ code = ((hmac[offset]     &amp; 0x7F) &lt;&lt; 24)
 <h3>Visualizing the HOTP Flow</h3>
 <p><img src="/images/blogs/02-hotp-flow.jpg" alt="HOTP Flow"></p>
 <details>
-    <summary>Diagram: HOTP Flow</summary>
-
-<pre class="mermaid">flowchart LR
+    <summary>Diagram: HOTP Flow</summary><pre class="mermaid">flowchart LR
     K["🔑 Secret Key&lt;br/&gt;(Base32 decoded)"]
     C["🔢 Counter&lt;br/&gt;(8 bytes, big-endian)"]
     HMAC["HMAC-SHA1(K, C)&lt;br/&gt;→ 20 bytes"]
@@ -77,10 +75,7 @@ code = ((hmac[offset]     &amp; 0x7F) &lt;&lt; 24)
     C --&gt; HMAC
     HMAC --&gt; DT
     DT --&gt; MOD</pre>
-</details>
-
-
-<h3>HOTP's Limitation: The Counter Sync Problem</h3>
+</details><h3>HOTP's Limitation: The Counter Sync Problem</h3>
 <p>HOTP works, but it comes with an annoying operational problem: both the client and the server have to keep a synchronized counter. Every time you generate a code, that counter moves forward. If you generate a code and <em>don't</em> use it, your device advances but the server doesn't. Now the two sides disagree.</p>
 <p>Servers usually paper over this with a "look-ahead window" — they'll try <code>C</code>, <code>C+1</code>, <code>C+2</code>, and so on up to some limit. That works, but it's a little fragile. And a stolen HOTP code stays valid until it's used or the counter moves past it.</p>
 <p>TOTP exists to get rid of exactly this headache.</p>
@@ -104,9 +99,7 @@ code = ((hmac[offset]     &amp; 0x7F) &lt;&lt; 24)
 <p>Real devices don't keep perfect time, so a bit of clock drift is expected. To account for that, servers usually accept OTPs from the <strong>previous</strong>, <strong>current</strong>, and <strong>next</strong> time windows — effectively a 90-second acceptance window. That's usually enough to absorb minor drift without giving up much security.</p>
 <p><img src="/images/blogs/02-totp-flow.jpg" alt="TOTP Drift Tolerance"></p>
 <details>
-    <summary>Diagram: TOTP Drift Tolerance</summary>
-
-<pre class="mermaid">flowchart TD
+    <summary>Diagram: TOTP Drift Tolerance</summary><pre class="mermaid">flowchart TD
     TIME["⏱️ Current Unix Time&lt;br/&gt;e.g. 1741456539"]
     CALC["T = floor(time / 30)&lt;br/&gt;= 58048551"]
     HOTP["HOTP(Secret, T)&lt;br/&gt;(same algorithm as before)"]
@@ -125,9 +118,7 @@ code = ((hmac[offset]     &amp; 0x7F) &lt;&lt; 24)
     OTP -.-&gt;|"validate against"| PREV
     OTP -.-&gt;|"validate against"| CURR
     OTP -.-&gt;|"validate against"| NEXT</pre>
-</details>
-
-<h3>TOTP Supports More Hash Algorithms</h3>
+</details><h3>TOTP Supports More Hash Algorithms</h3>
 <p>While HOTP (RFC 4226) was specified with SHA-1 only, TOTP (RFC 6238) explicitly supports:</p>
 <table>
 <thead>
@@ -159,9 +150,7 @@ code = ((hmac[offset]     &amp; 0x7F) &lt;&lt; 24)
 <p>When you turn on 2FA on a website, the flow usually looks like this under the hood:</p>
 <p><img src="/images/blogs/02-totp-registration-flow.jpg" alt=""></p>
 <details>
-    <summary>Diagram: TOTP Registration Flow</summary>
-
-<pre class="mermaid">sequenceDiagram
+    <summary>Diagram: TOTP Registration Flow</summary><pre class="mermaid">sequenceDiagram
     participant Server
     participant Browser
     participant App as Authenticator App
@@ -177,9 +166,7 @@ code = ((hmac[offset]     &amp; 0x7F) &lt;&lt; 24)
     Browser-&gt;&gt;Server: Send code for verification
     Server-&gt;&gt;Server: Generate TOTP with same secret + time
     Server-&gt;&gt;Browser: Codes match → 2FA enabled ✅</pre>
-</details>
-
-<h3>Anatomy of an <code>otpauth://</code> URI</h3>
+</details><h3>Anatomy of an <code>otpauth://</code> URI</h3>
 <p>The QR code encodes a URI in the <a href="https://github.com/google/google-authenticator/wiki/Key-Uri-Format"><code>otpauth://</code> format</a>, formalized in the IETF draft <a href="https://datatracker.ietf.org/doc/draft-linuxgemini-otpauth-uri/">draft-linuxgemini-otpauth-uri</a>:</p>
 <pre><code>otpauth://totp/GitHub:alice@example.com?secret=JBSWY3DPEHPK3PXP&amp;issuer=GitHub&amp;algorithm=SHA1&amp;digits=6&amp;period=30
 </code></pre>
@@ -490,9 +477,7 @@ implementation(libs.crypto.kt.web)        // → Web Crypto API
 <p>This is one of my favorite bits of the codebase. <code>TOTP</code> doesn't reimplement any crypto logic; it just turns time into a counter and hands the real work to <code>HOTP</code>. The <code>validateOTP</code> method then checks the ±1 time windows, which is the standard tolerance for clock drift.</p>
 <p><img src="/images/blogs/02-totp-hotp-class-diagram.jpg" alt="TOTP HOTP Class Diagram"></p>
 <details>
-    <summary>Diagram: TOTP and HOTP Class Structure</summary>
-
-<pre class="mermaid">classDiagram
+    <summary>Diagram: TOTP and HOTP Class Structure</summary><pre class="mermaid">classDiagram
     class OTP {
         &lt;&lt;interface&gt;&gt;
         +digits: Int
@@ -524,9 +509,7 @@ implementation(libs.crypto.kt.web)        // → Web Crypto API
     OTP &lt;|.. HOTP
     OTP &lt;|.. TOTP
     TOTP --&gt; HOTP : delegates to</pre>
-</details>
-
-<h3>Parsing <code>otpauth://</code> URIs</h3>
+</details><h3>Parsing <code>otpauth://</code> URIs</h3>
 <p>When you scan a QR code, the app needs to parse the <code>otpauth://</code> URI and instantiate the right OTP object. That's what <a href="https://github.com/championswimmer/TwoFac/tree/main/sharedLib/src/commonMain/kotlin/tech/arnav/twofac/lib/uri/OtpAuthURI.kt"><code>OtpAuthURI</code></a> does:</p>
 <pre><code class="language-kotlin">object OtpAuthURI {
     fun parse(uri: String): OTP {
@@ -622,9 +605,7 @@ RFC6238TestVector(59, "1970-01-01 00:00:59", key_sha512, SHA512, "90693936"),
 <p>Here's the end-to-end picture in TwoFac, from scanning a QR code all the way to showing the 6-digit code on screen:</p>
 <p><img src="/images/blogs/02-totp-e2e-flow.jpg" alt="Entire TwoFac flow"></p>
 <details>
-    <summary>Diagram: TwoFac End-to-End Flow</summary>
-
-<pre class="mermaid">flowchart TB
+    <summary>Diagram: TwoFac End-to-End Flow</summary><pre class="mermaid">flowchart TB
     QR["📱 Scan QR Code"]
     URI["otpauth://totp/GitHub:alice?secret=ABC123&amp;issuer=GitHub"]
     PARSE["OtpAuthURI.parse()"]
@@ -646,9 +627,7 @@ RFC6238TestVector(59, "1970-01-01 00:00:59", key_sha512, SHA512, "90693936"),
         TRUNC --&gt; MOD["mod 10^6"]
         MOD --&gt; CODE["🔢 483921"]
     end</pre>
-</details>
-
-<h2>What's Next?</h2>
+</details><h2>What's Next?</h2>
 <p>In this post, we focused on the <em>generation</em> side of the problem — how a shared secret and the current time turn into those familiar 6-digit codes. But that's only half of the story.</p>
 <p>In the next post, we'll switch to the <em>storage</em> side: how TwoFac protects secrets at rest with <strong>PBKDF2</strong> for key derivation and <strong>AES-256-GCM</strong> for authenticated encryption. We'll walk through the <code>accounts.json</code> format, why we picked the iteration counts we did, and how the encryption pipeline works across all platforms.</p>
 <hr>
