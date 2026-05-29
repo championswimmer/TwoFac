@@ -12,6 +12,12 @@ on:
       - 'cliApp/**'
       - 'sharedLib/**'
   workflow_dispatch: # For manual triggering
+    inputs:
+      disable_linux_native_cache:
+        description: "Disable Kotlin/Native compiler cache for the Linux CLI run"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   detect-apple-changes:
@@ -95,4 +101,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Run Linux CLI App
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.disable_linux_native_cache) }}
         run: ./gradlew :cliApp:runDebugExecutableLinuxX64 -PrunArgs="--help -v"
+
+      - name: Run Linux CLI App (native cache disabled)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.disable_linux_native_cache }}
+        run: ./gradlew :cliApp:runDebugExecutableLinuxX64 -PrunArgs="--help -v" -Pkotlin.native.cacheKind.linuxX64=none
