@@ -8,7 +8,6 @@ version = rootProject.extra["appVersionName"] as String
 kotlin {
     listOf(
         macosArm64(),
-        macosX64(),
         linuxX64(),
         mingwX64(),
     ).forEach {

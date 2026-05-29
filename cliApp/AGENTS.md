@@ -10,7 +10,7 @@ Depends directly on `:sharedLib` for all 2FA logic, cryptography, and storage in
 
 ## Platforms
 Compiles natively (Kotlin/Native) to:
-- **macOS** (`macosArm64`, `macosX64`)
+- **macOS** (`macosArm64`)
 - **Linux** (`linuxX64`)
 - **Windows** (`mingwX64`)
 

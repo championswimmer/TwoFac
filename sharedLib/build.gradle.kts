@@ -26,7 +26,6 @@ kotlin {
         watchosArm64(),
         watchosDeviceArm64(),
         watchosSimulatorArm64(),
-        macosX64(),
         macosArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
@@ -50,7 +49,6 @@ kotlin {
         linuxX64(),
         linuxArm64(),
         macosArm64(),
-        macosX64(),
         mingwX64(),
     ).forEach { nativeTarget ->
         nativeTarget.compilations.getByName("main") {
@@ -91,10 +89,10 @@ kotlin {
         // TODO: fix the gradle task name in github actions https://youtrack.jetbrains.com/projects/KT/issues/KT-80674
         enabled.set(true)
         filters {
-            included {
+            include {
                 annotatedWith.add("tech.arnav.twofac.lib.PublicApi")
             }
-            excluded {
+            exclude {
                 annotatedWith.add("tech.arnav.twofac.lib.InternalApi")
             }
         }
