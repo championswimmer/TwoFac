@@ -53,50 +53,49 @@ const props = defineProps<{
   guideLinkText: string
 }>()
 
+const jsonLdScript = (value: unknown) => ({
+  type: 'application/ld+json' as const,
+  innerHTML: JSON.stringify(value)
+})
+
 useHead(() => ({
   script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": props.faqs.map(faq => ({
-          "@type": "Question",
-          "name": faq.question,
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": faq.answer
-          }
-        }))
-      })
-    },
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://twofac.app/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Compare",
-            "item": "https://twofac.app/compare"
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": `TwoFac vs ${props.competitorName}`,
-            "item": `https://twofac.app/compare/${props.competitorName.toLowerCase().replace(/\s+/g, '-')}`
-          }
-        ]
-      })
-    }
+    jsonLdScript({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": props.faqs.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    }),
+    jsonLdScript({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://twofac.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Compare",
+          "item": "https://twofac.app/compare"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": `TwoFac vs ${props.competitorName}`,
+          "item": `https://twofac.app/compare/${props.competitorName.toLowerCase().replace(/\s+/g, '-')}`
+        }
+      ]
+    })
   ]
 }))
 </script>

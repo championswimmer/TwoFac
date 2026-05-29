@@ -15,19 +15,19 @@
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.2",
-    "@unhead/vue": "^2.1.12",
+    "@unhead/vue": "^2.1.15",
     "mermaid": "^11.13.0",
     "tailwindcss": "^4.2.2",
     "vue": "^3.5.30",
-    "vue-router": "^4.6.4"
+    "vue-router": "^5.1.0"
   },
   "devDependencies": {
-    "@types/node": "^24.12.0",
+    "@types/node": "^25.9.1",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vue/tsconfig": "^0.9.0",
     "gray-matter": "^4.0.3",
-    "marked": "^17.0.5",
-    "typescript": "~5.9.3",
+    "marked": "^18.0.4",
+    "typescript": "^6.0.3",
     "vite": "^8.0.1",
     "vite-ssg": "^28.3.0",
     "vue-tsc": "^3.2.5"
