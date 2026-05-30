@@ -61,6 +61,18 @@ class TuiNavigator {
                     message = "Storage backend set to ${nextBackend.name.lowercase()}",
                 )
             }
+
+            TuiAction.ToggleIssuerIcons -> {
+                val issuerIconsEnabled = !state.settings.issuerIconsEnabled
+                state.copy(
+                    settings = state.settings.copy(issuerIconsEnabled = issuerIconsEnabled),
+                    message = if (issuerIconsEnabled) {
+                        "Issuer icons enabled"
+                    } else {
+                        "Issuer icons disabled"
+                    },
+                )
+            }
         }
     }
 

@@ -40,10 +40,14 @@ class TuiApp(
             return
         }
 
+        val config = CliConfigStore.read()
         val initialState = TuiAppState(
             nowEpochSeconds = Clock.System.now().epochSeconds,
             home = HomeScreenState(accounts = initialAccounts),
-            settings = SettingsScreenState(backend = CliConfigStore.read().storageBackend),
+            settings = SettingsScreenState(
+                backend = config.storageBackend,
+                issuerIconsEnabled = config.issuerIconsEnabled,
+            ),
         )
 
         terminal.println()
@@ -70,15 +74,24 @@ class TuiApp(
         return when (action) {
             TuiAction.ConfirmRemoveSelectedAccount -> removeSelectedAccount(state)
             TuiAction.SubmitNewAccount -> submitNewAccount(state)
-            TuiAction.CycleStorageBackend -> {
-                val nextState = navigator.reduce(state, action)
-                if (!CliConfigStore.write(CliConfig(storageBackend = nextState.settings.backend))) {
-                    nextState.copy(message = "Failed to persist storage backend setting")
-                } else {
-                    nextState
-                }
-            }
+            TuiAction.CycleStorageBackend,
+            TuiAction.ToggleIssuerIcons -> persistSettings(navigator.reduce(state, action))
             else -> navigator.reduce(state, action)
+        }
+    }
+
+    private fun persistSettings(nextState: TuiAppState): TuiAppState {
+        return if (
+            !CliConfigStore.write(
+                CliConfig(
+                    storageBackend = nextState.settings.backend,
+                    issuerIconsEnabled = nextState.settings.issuerIconsEnabled,
+                )
+            )
+        ) {
+            nextState.copy(message = "Failed to persist CLI settings")
+        } else {
+            nextState
         }
     }
 

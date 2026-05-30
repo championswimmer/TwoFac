@@ -66,4 +66,13 @@ class TuiNavigatorTest {
 
         assertEquals(CliStorageBackend.COMMON, next.settings.backend)
     }
+
+    @Test
+    fun testToggleIssuerIconsFlipsSetting() {
+        val state = TuiAppState(settings = SettingsScreenState(issuerIconsEnabled = true))
+
+        val next = navigator.reduce(state, TuiAction.ToggleIssuerIcons)
+
+        assertFalse(next.settings.issuerIconsEnabled)
+    }
 }
