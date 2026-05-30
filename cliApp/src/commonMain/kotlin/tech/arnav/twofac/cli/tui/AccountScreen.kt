@@ -6,6 +6,7 @@ import com.github.ajalt.mordant.rendering.BorderType
 import com.github.ajalt.mordant.rendering.TextAlign
 import com.github.ajalt.mordant.table.ColumnWidth.Companion.Fixed
 import com.github.ajalt.mordant.table.table
+import tech.arnav.twofac.cli.theme.CliIssuerIcons
 import tech.arnav.twofac.cli.theme.CliThemeStyles
 
 class AccountScreen : TuiScreen {
@@ -23,7 +24,13 @@ class AccountScreen : TuiScreen {
 
         body {
             row(styles.label("account"), styles.key(selectedAccount?.accountLabel ?: "-"))
-            row(styles.label("issuer"), selectedAccount?.issuer ?: "-")
+            row(
+                styles.label("issuer"),
+                CliIssuerIcons.formatIssuerLabel(
+                    issuer = selectedAccount?.issuer,
+                    iconsEnabled = state.settings.issuerIconsEnabled,
+                )
+            )
             row(
                 styles.label("otp"),
                 styles.otp(selectedAccount?.otp?.currentOTP?.chunked(3)?.joinToString(" ") ?: "-"),

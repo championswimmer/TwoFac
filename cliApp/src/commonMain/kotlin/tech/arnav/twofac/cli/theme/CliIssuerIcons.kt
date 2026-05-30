@@ -49,4 +49,13 @@ internal object CliIssuerIcons {
         if (!iconsEnabled) return accountLabel
         return "${glyphForIssuer(issuer)}  $accountLabel"
     }
+
+    fun formatIssuerLabel(
+        issuer: String?,
+        iconsEnabled: Boolean,
+    ): String {
+        if (issuer.isNullOrBlank()) return "-"
+        if (!iconsEnabled) return issuer
+        return "${glyphForIssuer(issuer)}  $issuer"
+    }
 }

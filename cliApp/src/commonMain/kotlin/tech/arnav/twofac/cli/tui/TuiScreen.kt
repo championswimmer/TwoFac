@@ -47,6 +47,7 @@ data class AccountScreenState(
 
 data class SettingsScreenState(
     val backend: CliStorageBackend = CliStorageBackend.STANDALONE,
+    val issuerIconsEnabled: Boolean = true,
 )
 
 data class TuiAppState(
@@ -86,6 +87,7 @@ sealed interface TuiAction {
     data object SubmitNewAccount : TuiAction
 
     data object CycleStorageBackend : TuiAction
+    data object ToggleIssuerIcons : TuiAction
 }
 
 interface TuiScreen {

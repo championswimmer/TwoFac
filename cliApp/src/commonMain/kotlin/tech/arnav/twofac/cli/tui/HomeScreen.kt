@@ -7,6 +7,7 @@ import com.github.ajalt.mordant.rendering.TextAlign
 import com.github.ajalt.mordant.table.Borders
 import com.github.ajalt.mordant.table.ColumnWidth.Companion.Fixed
 import com.github.ajalt.mordant.table.table
+import tech.arnav.twofac.cli.theme.CliIssuerIcons
 import tech.arnav.twofac.cli.theme.CliThemeStyles
 import com.github.ajalt.mordant.rendering.TextStyle
 
@@ -94,7 +95,12 @@ class HomeScreen : TuiScreen {
                     val selectedMarker = if (isSelected) styles.key(">") else " "
                     val otp = account.otp.currentOTP.chunked(3).joinToString(" ")
                     val otpFormatted = styles.otp(otp)
-                    val accountLabel = if (isSelected) styles.key(account.accountLabel) else account.accountLabel
+                    val accountText = CliIssuerIcons.formatAccountLabel(
+                        accountLabel = account.accountLabel,
+                        issuer = account.issuer,
+                        iconsEnabled = state.settings.issuerIconsEnabled,
+                    )
+                    val accountLabel = if (isSelected) styles.key(accountText) else accountText
                     val issuerLabel = if (isSelected) styles.key(account.issuer ?: "-") else (account.issuer ?: "-")
 
                     val remaining = (account.nextCodeAt - state.nowEpochSeconds).coerceAtLeast(0)
