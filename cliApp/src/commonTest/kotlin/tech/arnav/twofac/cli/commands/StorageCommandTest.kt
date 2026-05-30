@@ -8,6 +8,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import tech.arnav.twofac.cli.storage.AppDirUtils
+import tech.arnav.twofac.cli.storage.CliConfig
 import tech.arnav.twofac.cli.storage.CliConfigStore
 import tech.arnav.twofac.cli.storage.CliStorageBackend
 import tech.arnav.twofac.lib.TwoFacLib
@@ -18,6 +19,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class StorageCommandTest {
@@ -113,5 +115,22 @@ class StorageCommandTest {
         assertEquals(0, result.statusCode)
         assertContains(result.output, "Storage backend set to common")
         assertEquals(CliStorageBackend.COMMON, CliConfigStore.read().storageBackend)
+    }
+
+    @Test
+    fun testStorageUseBackendPreservesIssuerIconSetting() {
+        CliConfigStore.write(
+            CliConfig(
+                storageBackend = CliStorageBackend.STANDALONE,
+                issuerIconsEnabled = false,
+            )
+        )
+
+        val result = StorageCommand().test("--use-backend=common")
+
+        assertEquals(0, result.statusCode)
+        val config = CliConfigStore.read()
+        assertEquals(CliStorageBackend.COMMON, config.storageBackend)
+        assertFalse(config.issuerIconsEnabled)
     }
 }

@@ -3,7 +3,6 @@ package tech.arnav.twofac.cli.theme
 import tech.arnav.twofac.lib.presentation.issuer.IssuerIconCatalog
 
 internal object CliIssuerIcons {
-    const val ENV_VAR_NAME = "TWOFAC_CLI_ICONS"
     private const val FALLBACK_ICON = "\uF084"
 
     /**
@@ -34,21 +33,6 @@ internal object CliIssuerIcons {
         "x_twitter" to "\uF099",
         "yahoo" to "\uF19E",
     )
-
-    fun iconsEnabled(
-        outputInteractive: Boolean,
-        noIcons: Boolean,
-        envValue: String? = null,
-    ): Boolean {
-        if (noIcons) return false
-
-        return when (envValue?.trim()?.lowercase()) {
-            null, "" -> outputInteractive
-            "1", "true", "yes", "on", "always" -> true
-            "0", "false", "no", "off", "never" -> false
-            else -> outputInteractive
-        }
-    }
 
     fun glyphForIssuer(rawIssuer: String?): String {
         val match = IssuerIconCatalog.resolveIssuerIcon(rawIssuer)

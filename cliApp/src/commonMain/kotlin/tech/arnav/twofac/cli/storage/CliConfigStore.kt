@@ -18,10 +18,12 @@ enum class CliStorageBackend(val cliValue: String) {
 
 data class CliConfig(
     val storageBackend: CliStorageBackend = CliStorageBackend.STANDALONE,
+    val issuerIconsEnabled: Boolean = true,
 )
 
 object CliConfigStore {
     private val backendRegex = Regex("\"storageBackend\"\\s*:\\s*\"([^\"]+)\"")
+    private val issuerIconsEnabledRegex = Regex("\"issuerIconsEnabled\"\\s*:\\s*(true|false)")
 
     fun read(): CliConfig {
         val path = AppDirUtils.getCliConfigFilePath()
@@ -30,7 +32,11 @@ object CliConfigStore {
         return runCatching {
             val raw = readFile(path)
             val backend = backendRegex.find(raw)?.groupValues?.getOrNull(1)
-            CliConfig(storageBackend = CliStorageBackend.fromCliValue(backend) ?: CliStorageBackend.STANDALONE)
+            val issuerIconsEnabled = issuerIconsEnabledRegex.find(raw)?.groupValues?.getOrNull(1)?.toBooleanStrictOrNull()
+            CliConfig(
+                storageBackend = CliStorageBackend.fromCliValue(backend) ?: CliStorageBackend.STANDALONE,
+                issuerIconsEnabled = issuerIconsEnabled ?: true,
+            )
         }.getOrDefault(CliConfig())
     }
 
@@ -38,7 +44,8 @@ object CliConfigStore {
         val path = AppDirUtils.getCliConfigFilePath(forceCreate = true)
         val json = """
             {
-              "storageBackend": "${config.storageBackend.cliValue}"
+              "storageBackend": "${config.storageBackend.cliValue}",
+              "issuerIconsEnabled": ${config.issuerIconsEnabled}
             }
         """.trimIndent()
 

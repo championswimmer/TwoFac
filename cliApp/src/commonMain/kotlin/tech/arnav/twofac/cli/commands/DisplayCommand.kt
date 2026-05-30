@@ -3,7 +3,6 @@ package tech.arnav.twofac.cli.commands
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
-import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.mordant.animation.animation
@@ -16,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import tech.arnav.twofac.cli.storage.CliConfigStore
 import tech.arnav.twofac.cli.theme.CliIssuerIcons
 import tech.arnav.twofac.cli.theme.CliTheme
 import tech.arnav.twofac.cli.theme.CliThemeStyles
@@ -38,10 +38,6 @@ class DisplayCommand : CliktCommand(), KoinComponent {
     private val twoFacLib: TwoFacLib by inject()
 
     val passkey by option("-p", "--passkey", help = "Passkey to display").prompt("Enter passkey", hideInput = true)
-    private val noIcons by option(
-        "--no-icons",
-        help = "Disable Nerd Font issuer icons (or set ${CliIssuerIcons.ENV_VAR_NAME}=0)",
-    ).flag(default = false)
 
     override fun run() {
         val styles = CliTheme.styles(terminal)
@@ -51,11 +47,7 @@ class DisplayCommand : CliktCommand(), KoinComponent {
         }
 
         val isInteractive = terminal.terminalInfo.inputInteractive && terminal.terminalInfo.outputInteractive
-        val iconsEnabled = CliIssuerIcons.iconsEnabled(
-            outputInteractive = terminal.terminalInfo.outputInteractive,
-            noIcons = noIcons,
-            envValue = currentContext.readEnvvar(CliIssuerIcons.ENV_VAR_NAME),
-        )
+        val iconsEnabled = CliConfigStore.read().issuerIconsEnabled
 
         runBlocking {
             twoFacLib.unlock(passkey)
