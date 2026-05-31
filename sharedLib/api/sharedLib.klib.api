@@ -15,6 +15,17 @@ final enum class tech.arnav.twofac.lib.backup/BackupRestoreDecison : kotlin/Enum
     enum entry REQUIRES_USER_CONFIRMATION // tech.arnav.twofac.lib.backup/BackupRestoreDecison.REQUIRES_USER_CONFIRMATION|null[0]
 }
 
+final enum class tech.arnav.twofac.lib.theme/AccountColorTag : kotlin/Enum<tech.arnav.twofac.lib.theme/AccountColorTag> { // tech.arnav.twofac.lib.theme/AccountColorTag|null[0]
+    enum entry BLUE // tech.arnav.twofac.lib.theme/AccountColorTag.BLUE|null[0]
+    enum entry BROWN // tech.arnav.twofac.lib.theme/AccountColorTag.BROWN|null[0]
+    enum entry GREEN // tech.arnav.twofac.lib.theme/AccountColorTag.GREEN|null[0]
+    enum entry ORANGE // tech.arnav.twofac.lib.theme/AccountColorTag.ORANGE|null[0]
+    enum entry PURPLE // tech.arnav.twofac.lib.theme/AccountColorTag.PURPLE|null[0]
+    enum entry RED // tech.arnav.twofac.lib.theme/AccountColorTag.RED|null[0]
+    enum entry TEAL // tech.arnav.twofac.lib.theme/AccountColorTag.TEAL|null[0]
+    enum entry YELLOW // tech.arnav.twofac.lib.theme/AccountColorTag.YELLOW|null[0]
+}
+
 final enum class tech.arnav.twofac.lib.theme/TimerState : kotlin/Enum<tech.arnav.twofac.lib.theme/TimerState> { // tech.arnav.twofac.lib.theme/TimerState|null[0]
     enum entry Critical // tech.arnav.twofac.lib.theme/TimerState.Critical|null[0]
     enum entry Healthy // tech.arnav.twofac.lib.theme/TimerState.Healthy|null[0]
@@ -48,6 +59,8 @@ final class tech.arnav.twofac.lib.backup/BackupService // tech.arnav.twofac.lib.
 final class tech.arnav.twofac.lib.backup/BackupTransportRegistry // tech.arnav.twofac.lib.backup/BackupTransportRegistry|null[0]
 
 final class tech.arnav.twofac.lib.backup/EncryptedAccountEntry // tech.arnav.twofac.lib.backup/EncryptedAccountEntry|null[0]
+
+final class tech.arnav.twofac.lib.backup/PlaintextAccountEntry // tech.arnav.twofac.lib.backup/PlaintextAccountEntry|null[0]
 
 final class tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/AuthyImportAdapter|null[0]
 

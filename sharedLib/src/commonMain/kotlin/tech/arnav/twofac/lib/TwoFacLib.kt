@@ -5,6 +5,7 @@ import tech.arnav.twofac.lib.crypto.sharedCryptoTools
 import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
 import tech.arnav.twofac.lib.backup.EncryptedAccountEntry
+import tech.arnav.twofac.lib.backup.PlaintextAccountEntry
 import tech.arnav.twofac.lib.otp.HOTP
 import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.lib.otp.TOTP
@@ -15,6 +16,7 @@ import tech.arnav.twofac.lib.storage.StorageUtils.toDecryptedURI
 import tech.arnav.twofac.lib.storage.StorageUtils.toOTP
 import tech.arnav.twofac.lib.storage.StorageUtils.toStoredAccount
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 import kotlin.concurrent.Volatile
 import kotlin.time.Clock
@@ -161,12 +163,13 @@ class TwoFacLib private constructor(
         }
     }
 
-    suspend fun addAccount(accountURI: String): Boolean {
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun addAccount(accountURI: String, color: AccountColorTag? = null): Boolean {
         checkUnlockedOrThrow()
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val otp = OtpAuthURI.parse(accountURI)
         val signingKey = cryptoTools.createSigningKey(currentPassKey)
-        val account = otp.toStoredAccount(signingKey)
+        val account = otp.toStoredAccount(signingKey).copy(color = color)
         val success = storage.saveAccount(account)
         if (success) {
             // Refresh the in-memory account list
@@ -193,6 +196,25 @@ class TwoFacLib private constructor(
         if (success) {
             accountList = emptyList()
             storeHasAccounts = false
+        }
+        return success
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun updateAccountColor(accountId: String, color: AccountColorTag?): Boolean {
+        checkUnlockedOrThrow()
+        val parsedAccountId = try {
+            Uuid.parse(accountId)
+        } catch (_: IllegalArgumentException) {
+            return false
+        }
+        val accounts = accountList
+            ?: error("Account list is not loaded. This should not happen when unlocked.")
+        val account = accounts.find { it.accountID == parsedAccountId } ?: return false
+        val success = storage.saveAccount(account.copy(color = color))
+        if (success) {
+            accountList = storage.getAccountList()
+            storeHasAccounts = accountList?.isNotEmpty() == true
         }
         return success
     }
@@ -278,13 +300,20 @@ class TwoFacLib private constructor(
      * @return List of plaintext otpauth:// URIs for all accounts
      */
     suspend fun exportAccountsPlaintext(): List<String> {
+        return exportAccountsPlaintextWithMetadata().map { it.uri }
+    }
+
+    suspend fun exportAccountsPlaintextWithMetadata(): List<PlaintextAccountEntry> {
         checkUnlockedOrThrow()
         val currentPassKey = passKey!! // Safe to use !! after isUnlocked() check
         val accounts = accountList
             ?: error("Account list is not loaded. This should not happen when unlocked.")
         return accounts.map { account ->
-            account.toDecryptedURI(
-                cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString())
+            PlaintextAccountEntry(
+                uri = account.toDecryptedURI(
+                    cryptoTools.createSigningKey(currentPassKey, account.salt.toByteString())
+                ),
+                color = account.color,
             )
         }
     }
