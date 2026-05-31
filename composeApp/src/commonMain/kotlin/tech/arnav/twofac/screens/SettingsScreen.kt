@@ -38,7 +38,10 @@ import tech.arnav.twofac.components.settings.BackupProvidersCard
 import tech.arnav.twofac.components.settings.CompanionSyncCard
 import tech.arnav.twofac.components.settings.DeleteStorageDialog
 import tech.arnav.twofac.components.settings.RememberPasskeyCard
+import tech.arnav.twofac.components.settings.SessionRetentionCard
 import tech.arnav.twofac.components.settings.StorageLocationCard
+import tech.arnav.twofac.session.SecureUnlockRetentionPolicy
+import tech.arnav.twofac.session.SecureUnlockRetentionScope
 import tech.arnav.twofac.storage.getStoragePath
 import tech.arnav.twofac.viewmodels.SettingsBackupAction
 import tech.arnav.twofac.viewmodels.SettingsUiState
@@ -65,6 +68,10 @@ import twofac.composeapp.generated.resources.settings_remember_passkey_descripti
 import twofac.composeapp.generated.resources.settings_remember_passkey_title
 import twofac.composeapp.generated.resources.settings_secure_unlock_description
 import twofac.composeapp.generated.resources.settings_secure_unlock_title
+import twofac.composeapp.generated.resources.settings_session_retention_app_description
+import twofac.composeapp.generated.resources.settings_session_retention_app_title
+import twofac.composeapp.generated.resources.settings_session_retention_browser_description
+import twofac.composeapp.generated.resources.settings_session_retention_browser_title
 import twofac.composeapp.generated.resources.settings_title
 import twofac.composeapp.generated.resources.settings_upcoming_code_description
 import twofac.composeapp.generated.resources.settings_upcoming_code_title
@@ -111,6 +118,7 @@ fun SettingsScreen(
             onQuit = onQuit,
             onDeleteStorageClick = viewModel::requestDeleteStorage,
             onRememberPasskeyChanged = viewModel::onRememberPasskeyToggleChanged,
+            onSessionRetentionChanged = viewModel::onSessionRetentionChanged,
             onShowUpcomingCodeChanged = viewModel::onShowUpcomingCodeChanged,
             onExportClick = { providerId -> viewModel.requestBackupExport(providerId) },
             onImportClick = viewModel::importBackup,
@@ -144,6 +152,7 @@ private fun SettingsScreenContent(
     onQuit: (() -> Unit)?,
     onDeleteStorageClick: () -> Unit,
     onRememberPasskeyChanged: (Boolean) -> Unit,
+    onSessionRetentionChanged: (Boolean) -> Unit,
     onShowUpcomingCodeChanged: (Boolean) -> Unit,
     onExportClick: (String) -> Unit,
     onImportClick: (String) -> Unit,
@@ -174,6 +183,17 @@ private fun SettingsScreenContent(
                 description = toggleDescription,
                 isEnabled = uiState.isSecureUnlockEnabled,
                 onEnabledChanged = onRememberPasskeyChanged,
+            )
+        }
+
+        if (uiState.isSecureUnlockEnabled && uiState.isSessionRetentionSupported) {
+            val (title, description) = sessionRetentionCardCopy(uiState.sessionRetentionScope)
+            SessionRetentionCard(
+                title = title,
+                description = description,
+                isEnabled = uiState.sessionRetentionPolicy ==
+                    SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+                onEnabledChanged = onSessionRetentionChanged,
             )
         }
 
@@ -375,6 +395,21 @@ private fun rememberPasskeyCardCopy(unlockMode: SettingsUnlockMode): Pair<String
         SettingsUnlockMode.REMEMBER_PASSKEY -> {
             stringResource(Res.string.settings_remember_passkey_title) to
                 stringResource(Res.string.settings_remember_passkey_description)
+        }
+    }
+}
+
+@Composable
+private fun sessionRetentionCardCopy(scope: SecureUnlockRetentionScope): Pair<String, String> {
+    return when (scope) {
+        SecureUnlockRetentionScope.APP_SESSION -> {
+            stringResource(Res.string.settings_session_retention_app_title) to
+                stringResource(Res.string.settings_session_retention_app_description)
+        }
+
+        SecureUnlockRetentionScope.BROWSER_SESSION -> {
+            stringResource(Res.string.settings_session_retention_browser_title) to
+                stringResource(Res.string.settings_session_retention_browser_description)
         }
     }
 }

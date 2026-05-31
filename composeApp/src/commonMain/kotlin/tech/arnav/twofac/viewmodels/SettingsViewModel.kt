@@ -19,7 +19,10 @@ import tech.arnav.twofac.lib.backup.BackupService
 import tech.arnav.twofac.lib.backup.EncryptedAccountEntry
 import tech.arnav.twofac.session.BiometricSessionManager
 import tech.arnav.twofac.session.SecureSessionManager
+import tech.arnav.twofac.session.SecureUnlockRetentionPolicy
+import tech.arnav.twofac.session.SecureUnlockRetentionScope
 import tech.arnav.twofac.session.SessionManager
+import tech.arnav.twofac.session.SessionRetentionCapableSecureSessionManager
 import tech.arnav.twofac.settings.AppPreferences
 import tech.arnav.twofac.settings.AppPreferencesRepository
 import twofac.composeapp.generated.resources.*
@@ -67,6 +70,9 @@ data class SettingsUiState(
     val canDeleteStorage: Boolean = false,
     val hasSecureStorage: Boolean = false,
     val isSecureUnlockEnabled: Boolean = false,
+    val isSessionRetentionSupported: Boolean = false,
+    val sessionRetentionPolicy: SecureUnlockRetentionPolicy = SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+    val sessionRetentionScope: SecureUnlockRetentionScope = SecureUnlockRetentionScope.APP_SESSION,
     val unlockMode: SettingsUnlockMode = SettingsUnlockMode.REMEMBER_PASSKEY,
 )
 
@@ -81,6 +87,8 @@ class SettingsViewModel(
 ) : ViewModel() {
     private val secureSessionManager = sessionManager as? SecureSessionManager
     private val biometricSessionManager = sessionManager as? BiometricSessionManager
+    private val retentionCapableSessionManager =
+        secureSessionManager as? SessionRetentionCapableSecureSessionManager
 
     private val _uiState = MutableStateFlow(
         SettingsUiState(
@@ -91,6 +99,9 @@ class SettingsViewModel(
             canDeleteStorage = twoFacLib != null,
             hasSecureStorage = secureSessionManager != null,
             isSecureUnlockEnabled = initialSecureUnlockEnabled(),
+            isSessionRetentionSupported = initialSessionRetentionSupported(),
+            sessionRetentionPolicy = initialSessionRetentionPolicy(),
+            sessionRetentionScope = initialSessionRetentionScope(),
             unlockMode = initialUnlockMode(),
         )
     )
@@ -136,6 +147,24 @@ class SettingsViewModel(
         } else {
             manager.setRememberPasskey(true)
             _uiState.update { it.copy(isSecureUnlockEnabled = true) }
+        }
+    }
+
+    fun onSessionRetentionChanged(enabled: Boolean) {
+        val manager = retentionCapableSessionManager ?: return
+        if (!manager.supportsSessionRetention()) return
+
+        val policy = if (enabled) {
+            SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION
+        } else {
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+        }
+        manager.setSecureUnlockRetentionPolicy(policy)
+        _uiState.update {
+            it.copy(
+                sessionRetentionPolicy = policy,
+                sessionRetentionScope = manager.getSecureUnlockRetentionScope(),
+            )
         }
     }
 
@@ -477,6 +506,26 @@ class SettingsViewModel(
         } else {
             sessionManager?.isRememberPasskeyEnabled() ?: false
         }
+    }
+
+    private fun initialSessionRetentionSupported(): Boolean {
+        return retentionCapableSessionManager?.supportsSessionRetention() == true
+    }
+
+    private fun initialSessionRetentionPolicy(): SecureUnlockRetentionPolicy {
+        if (!initialSessionRetentionSupported()) {
+            return SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+        }
+        return retentionCapableSessionManager?.getSecureUnlockRetentionPolicy()
+            ?: SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+    }
+
+    private fun initialSessionRetentionScope(): SecureUnlockRetentionScope {
+        if (!initialSessionRetentionSupported()) {
+            return SecureUnlockRetentionScope.APP_SESSION
+        }
+        return retentionCapableSessionManager?.getSecureUnlockRetentionScope()
+            ?: SecureUnlockRetentionScope.APP_SESSION
     }
 
     private fun refreshBackupProviders() {

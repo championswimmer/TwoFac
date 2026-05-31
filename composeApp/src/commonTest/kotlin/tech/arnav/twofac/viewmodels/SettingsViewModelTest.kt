@@ -6,7 +6,10 @@ import kotlinx.coroutines.test.runTest
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import tech.arnav.twofac.session.SecureSessionManager
+import tech.arnav.twofac.session.SecureUnlockRetentionPolicy
+import tech.arnav.twofac.session.SecureUnlockRetentionScope
 import tech.arnav.twofac.session.SessionManager
+import tech.arnav.twofac.session.SessionRetentionCapableSecureSessionManager
 import tech.arnav.twofac.settings.AppPreferences
 import tech.arnav.twofac.settings.AppPreferencesRepository
 import kotlin.test.Test
@@ -63,6 +66,92 @@ class SettingsViewModelTest {
             viewModel.uiState.value.pendingAction,
         )
     }
+
+    @Test
+    fun `session retention state is exposed for supported managers`() = runTest {
+        val viewModel = SettingsViewModel(
+            sessionManager = SettingsFakeSecureSessionManager(
+                secureUnlockEnabledState = true,
+                supportsSessionRetentionState = true,
+                retentionPolicyState = SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+                retentionScopeState = SecureUnlockRetentionScope.BROWSER_SESSION,
+            ),
+            appPreferencesRepository = FakeAppPreferencesRepository(),
+        )
+
+        assertTrue(viewModel.uiState.value.isSessionRetentionSupported)
+        assertEquals(
+            SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+            viewModel.uiState.value.sessionRetentionPolicy,
+        )
+        assertEquals(
+            SecureUnlockRetentionScope.BROWSER_SESSION,
+            viewModel.uiState.value.sessionRetentionScope,
+        )
+    }
+
+    @Test
+    fun `changing session retention updates manager and ui state`() = runTest {
+        val sessionManager = SettingsFakeSecureSessionManager(
+            secureUnlockEnabledState = true,
+            supportsSessionRetentionState = true,
+        )
+        val viewModel = SettingsViewModel(
+            sessionManager = sessionManager,
+            appPreferencesRepository = FakeAppPreferencesRepository(),
+        )
+
+        viewModel.onSessionRetentionChanged(true)
+
+        assertEquals(
+            SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+            sessionManager.retentionPolicyState,
+        )
+        assertEquals(
+            SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+            viewModel.uiState.value.sessionRetentionPolicy,
+        )
+
+        viewModel.onSessionRetentionChanged(false)
+
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            sessionManager.retentionPolicyState,
+        )
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            viewModel.uiState.value.sessionRetentionPolicy,
+        )
+    }
+
+    @Test
+    fun `unsupported retention managers keep setting hidden and unchanged`() = runTest {
+        val sessionManager = SettingsFakeSecureSessionManager(
+            secureUnlockEnabledState = true,
+            supportsSessionRetentionState = false,
+        )
+        val viewModel = SettingsViewModel(
+            sessionManager = sessionManager,
+            appPreferencesRepository = FakeAppPreferencesRepository(),
+        )
+
+        assertFalse(viewModel.uiState.value.isSessionRetentionSupported)
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            viewModel.uiState.value.sessionRetentionPolicy,
+        )
+
+        viewModel.onSessionRetentionChanged(true)
+
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            sessionManager.retentionPolicyState,
+        )
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            viewModel.uiState.value.sessionRetentionPolicy,
+        )
+    }
 }
 
 private class FakeAppPreferencesRepository(
@@ -98,7 +187,11 @@ private class SettingsFakeSecureSessionManager(
     var secureUnlockEnabledState: Boolean = false,
     private val secureUnlockAvailable: Boolean = true,
     private val secureUnlockReady: Boolean = false,
-) : SettingsBaseFakeSessionManager(rememberPasskeyEnabled), SecureSessionManager {
+    private val supportsSessionRetentionState: Boolean = false,
+    var retentionPolicyState: SecureUnlockRetentionPolicy = SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+    private val retentionScopeState: SecureUnlockRetentionScope = SecureUnlockRetentionScope.APP_SESSION,
+) : SettingsBaseFakeSessionManager(rememberPasskeyEnabled),
+    SessionRetentionCapableSecureSessionManager {
     override fun isSecureUnlockAvailable(): Boolean = secureUnlockAvailable
     override fun isSecureUnlockEnabled(): Boolean = secureUnlockEnabledState
     override fun isSecureUnlockReady(): Boolean = secureUnlockReady
@@ -107,4 +200,15 @@ private class SettingsFakeSecureSessionManager(
     }
 
     override suspend fun enrollPasskey(passkey: String): Boolean = true
+
+    override fun supportsSessionRetention(): Boolean = supportsSessionRetentionState
+
+    override fun getSecureUnlockRetentionPolicy(): SecureUnlockRetentionPolicy = retentionPolicyState
+
+    override fun setSecureUnlockRetentionPolicy(policy: SecureUnlockRetentionPolicy) {
+        if (!supportsSessionRetentionState) return
+        retentionPolicyState = policy
+    }
+
+    override fun getSecureUnlockRetentionScope(): SecureUnlockRetentionScope = retentionScopeState
 }
