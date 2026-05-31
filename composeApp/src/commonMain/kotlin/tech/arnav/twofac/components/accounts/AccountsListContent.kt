@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.theme.TwoFacTheme
 import twofac.composeapp.generated.resources.Res
 import twofac.composeapp.generated.resources.accounts_search_no_results
@@ -61,6 +62,7 @@ fun AccountsListContent(
                     accountLabel = account.accountLabel,
                     issuer = account.issuer,
                     onClick = { onAccountClick(account.accountID) },
+                    color = account.color,
                 )
             }
         }
@@ -77,10 +79,12 @@ private fun AccountsListContentPreview() {
                     accountID = "github-id",
                     accountLabel = "arnav@example.com",
                     issuer = "GitHub",
+                    color = AccountColorTag.PURPLE,
                 ),
                 StoredAccount.DisplayAccount(
                     accountID = "unknown-id",
                     accountLabel = "team@example.com",
+                    color = AccountColorTag.TEAL,
                 ),
             ),
             onAccountClick = {},
@@ -98,10 +102,12 @@ private fun AccountsListContentSearchPreview() {
                     accountID = "github-id",
                     accountLabel = "arnav@example.com",
                     issuer = "GitHub",
+                    color = AccountColorTag.PURPLE,
                 ),
                 StoredAccount.DisplayAccount(
                     accountID = "unknown-id",
                     accountLabel = "team@example.com",
+                    color = AccountColorTag.TEAL,
                 ),
             ),
             onAccountClick = {},
@@ -120,6 +126,7 @@ private fun AccountsListContentEmptySearchPreview() {
                     accountID = "github-id",
                     accountLabel = "arnav@example.com",
                     issuer = "GitHub",
+                    color = AccountColorTag.PURPLE,
                 ),
             ),
             onAccountClick = {},

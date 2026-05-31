@@ -11,6 +11,9 @@
     <string name="account_detail_otp_display">OTP: %1$s</string>
     <string name="account_detail_delete">Konto löschen</string>
     <string name="account_detail_export_qr">Als QR exportieren</string>
+    <string name="account_detail_color_title">Color</string>
+    <string name="account_detail_color_none">None</string>
+    <string name="account_detail_color_selected">Selected color</string>
     <string name="account_detail_not_found">Konto nicht gefunden</string>
     <string name="account_detail_delete_dialog_title">Konto löschen?</string>
     <string name="account_detail_delete_dialog_message">Dadurch wird %1$s dauerhaft aus deinem Tresor entfernt.</string>

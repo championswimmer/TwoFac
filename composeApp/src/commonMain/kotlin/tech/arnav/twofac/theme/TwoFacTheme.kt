@@ -107,4 +107,4 @@ private fun colorSchemeFromTokens(tokens: TwoFacColorTokens): ColorScheme {
     )
 }
 
-private fun ThemeColor.toComposeColor(): Color = Color(argb.toInt())
+fun ThemeColor.toComposeColor(): Color = Color(argb.toInt())

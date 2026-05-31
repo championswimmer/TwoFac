@@ -17,6 +17,7 @@ import org.jetbrains.compose.resources.stringResource
 import tech.arnav.twofac.lib.otp.OtpCodes
 import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -72,14 +73,17 @@ private val previewAccountsWithOtps = listOf(
         accountID = "google",
         accountLabel = "arnav@gmail.com",
         issuer = "Google",
+        color = AccountColorTag.BLUE,
     ) to OtpCodes(currentOTP = "123456"),
     StoredAccount.DisplayAccount(
         accountID = "github",
         accountLabel = "championswimmer",
         issuer = "GitHub",
+        color = AccountColorTag.GREEN,
     ) to OtpCodes(currentOTP = "654321"),
     StoredAccount.DisplayAccount(
         accountID = "unknown",
         accountLabel = "team@example.com",
+        color = AccountColorTag.ORANGE,
     ) to OtpCodes(currentOTP = "987654", nextOTP = "0004568")
 )
