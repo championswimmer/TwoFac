@@ -14,6 +14,7 @@ import tech.arnav.twofac.cli.theme.CliIssuerIcons
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.MemoryStorage
 import tech.arnav.twofac.lib.storage.Storage
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -47,7 +48,7 @@ class DisplayCommandTest {
                 )
             }
             twoFacLib = koinApp.koin.get()
-            twoFacLib.addAccount(GITHUB_URI)
+            twoFacLib.addAccount(GITHUB_URI, AccountColorTag.TEAL)
             twoFacLib.addAccount(CUSTOM_URI)
         }
     }
@@ -73,6 +74,21 @@ class DisplayCommandTest {
         assertEquals(0, result.statusCode)
         assertContains(result.output, "$githubIcon  alice@example.com")
         assertContains(result.output, "$fallbackIcon  carol@example.com")
+    }
+
+    @Test
+    fun testDisplayCommandShowsColorColumnAndSwatch() {
+        writeCliConfig(issuerIconsEnabled = true)
+
+        val result = DisplayCommand().test(
+            "--passkey=$PASSKEY",
+            outputInteractive = false,
+            inputInteractive = false,
+        )
+
+        assertEquals(0, result.statusCode)
+        assertContains(result.output, "Color")
+        assertContains(result.output, "[T]")
     }
 
     @Test

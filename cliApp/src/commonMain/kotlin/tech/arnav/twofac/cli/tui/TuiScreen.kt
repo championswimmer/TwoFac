@@ -5,6 +5,7 @@ import com.github.ajalt.mordant.rendering.Widget
 import tech.arnav.twofac.cli.storage.CliStorageBackend
 import tech.arnav.twofac.cli.theme.CliThemeStyles
 import tech.arnav.twofac.lib.otp.OtpCodes
+import tech.arnav.twofac.lib.theme.AccountColorTag
 
 enum class TuiScreenId {
     HOME,
@@ -24,6 +25,7 @@ data class TuiOtpEntry(
     val issuer: String?,
     val otp: OtpCodes,
     val nextCodeAt: Long,
+    val color: AccountColorTag? = null,
 )
 
 data class HomeScreenState(
@@ -42,8 +44,15 @@ data class TuiNavigatorState(
 
 data class AccountScreenState(
     val isRemoveConfirmationActive: Boolean = false,
+    val isColorPickerActive: Boolean = false,
+    val selectedColorIndex: Int = 0,
     val message: String? = null,
-)
+) {
+    val selectedPendingColor: AccountColorTag?
+        get() = accountColorChoices[selectedColorIndex.coerceIn(accountColorChoices.indices)]
+}
+
+val accountColorChoices: List<AccountColorTag?> = listOf(null) + AccountColorTag.entries
 
 data class SettingsScreenState(
     val backend: CliStorageBackend = CliStorageBackend.STANDALONE,
@@ -81,6 +90,11 @@ sealed interface TuiAction {
     data object ActivateRemoveConfirmation : TuiAction
     data object DeactivateRemoveConfirmation : TuiAction
     data object ConfirmRemoveSelectedAccount : TuiAction
+    data object ActivateColorPicker : TuiAction
+    data object DeactivateColorPicker : TuiAction
+    data object SelectNextAccountColor : TuiAction
+    data object SelectPreviousAccountColor : TuiAction
+    data object ConfirmSelectedAccountColor : TuiAction
 
     data class AppendAddAccountCharacter(val character: Char) : TuiAction
     data object RemoveAddAccountCharacter : TuiAction

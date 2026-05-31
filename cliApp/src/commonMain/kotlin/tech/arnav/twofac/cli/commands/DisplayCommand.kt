@@ -78,13 +78,13 @@ class DisplayCommand : CliktCommand(), KoinComponent {
         borderType = BorderType.SQUARE_DOUBLE_SECTION_SEPARATOR
         header {
             style = styles.header
-            row("Account", "OTP", "Validity")
+            row("Color", "Account", "OTP", "Validity")
         }
         body {
-            column(0) {
+            column(1) {
                 style = styles.key
             }
-            column(1) {
+            column(2) {
                 style = styles.otp
                 cellBorders = Borders.ALL
                 padding = Padding(0, 1, 0, 1) // Add padding to the cell
@@ -96,6 +96,7 @@ class DisplayCommand : CliktCommand(), KoinComponent {
                 val remainingProgress = (leftTimeSec.toFloat() / 30f).coerceIn(0f, 1f)
                 val timerStyle = styles.timer(timerStateByRemainingProgress(remainingProgress))
                 row {
+                    cell(styles.accountColorSwatch(account.color))
                     cell(
                         CliIssuerIcons.formatAccountLabel(
                             accountLabel = account.accountLabel,

@@ -32,6 +32,16 @@ class TuiNavigator {
                 ),
             )
             TuiAction.ConfirmRemoveSelectedAccount -> state
+            TuiAction.ActivateColorPicker -> activateColorPicker(state)
+            TuiAction.DeactivateColorPicker -> state.copy(
+                account = state.account.copy(
+                    isColorPickerActive = false,
+                    message = null,
+                ),
+            )
+            TuiAction.SelectNextAccountColor -> moveColorSelection(state, delta = 1)
+            TuiAction.SelectPreviousAccountColor -> moveColorSelection(state, delta = -1)
+            TuiAction.ConfirmSelectedAccountColor -> state
             TuiAction.SubmitNewAccount -> state
 
             is TuiAction.AppendAddAccountCharacter -> {
@@ -123,6 +133,25 @@ class TuiNavigator {
         return state.copy(home = clampSelection(updatedHome))
     }
 
+    private fun activateColorPicker(state: TuiAppState): TuiAppState {
+        val selected = state.home.accounts.firstOrNull { it.accountId == state.selectedAccountId }
+        val selectedIndex = accountColorChoices.indexOf(selected?.color).takeIf { it >= 0 } ?: 0
+        return state.copy(
+            account = state.account.copy(
+                isColorPickerActive = true,
+                isRemoveConfirmationActive = false,
+                selectedColorIndex = selectedIndex,
+                message = "Choose a color, then press Enter to save",
+            ),
+        )
+    }
+
+    private fun moveColorSelection(state: TuiAppState, delta: Int): TuiAppState {
+        if (!state.account.isColorPickerActive) return state
+        val nextIndex = (state.account.selectedColorIndex + delta).floorMod(accountColorChoices.size)
+        return state.copy(account = state.account.copy(selectedColorIndex = nextIndex, message = null))
+    }
+
     private fun clampSelection(home: HomeScreenState): HomeScreenState {
         val filteredCount = home.filteredAccounts().size
         if (filteredCount <= 0) {
@@ -132,3 +161,5 @@ class TuiNavigator {
         return home.copy(selectedIndex = home.selectedIndex.coerceIn(0, filteredCount - 1))
     }
 }
+
+private fun Int.floorMod(modulus: Int): Int = ((this % modulus) + modulus) % modulus
