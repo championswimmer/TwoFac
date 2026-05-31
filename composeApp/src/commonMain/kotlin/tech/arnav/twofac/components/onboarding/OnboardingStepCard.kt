@@ -1,6 +1,5 @@
 package tech.arnav.twofac.components.onboarding
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,12 +50,9 @@ fun OnboardingStepCard(
     }
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(
-                enabled = isCompleted,
-                onClick = onToggleExpanded,
-            ),
+        onClick = onToggleExpanded,
+        enabled = isCompleted,
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),

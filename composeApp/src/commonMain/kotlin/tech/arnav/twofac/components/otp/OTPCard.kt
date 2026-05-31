@@ -16,7 +16,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -126,15 +125,14 @@ fun OTPCard(
     )
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onCopyOtp(otpCode) },
+        onClick = { onCopyOtp(otpCode) },
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = cardContainerColor,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
-        shape = MaterialTheme.shapes.large
+        shape = MaterialTheme.shapes.large,
     ) {
         Column(
             modifier = Modifier
