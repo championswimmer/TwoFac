@@ -4,6 +4,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -37,6 +38,17 @@ class AndroidBiometricSessionManagerInstrumentedTest {
             assertFalse(manager.isBiometricEnabled())
             manager.setRememberPasskey(false)
             assertFalse(manager.isRememberPasskeyEnabled())
+
+            assertTrue(manager.supportsSessionRetention())
+            assertEquals(
+                SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+                manager.getSecureUnlockRetentionPolicy(),
+            )
+            manager.setSecureUnlockRetentionPolicy(SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION)
+            assertEquals(
+                SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+                manager.getSecureUnlockRetentionPolicy(),
+            )
 
             manager.setRememberPasskey(true)
             manager.savePasskey("test-passkey")

@@ -12,14 +12,14 @@ class IosBiometricSessionManagerTest {
 
     private fun createManager(): IosBiometricSessionManager {
         val defaults = NSUserDefaults(suiteName = "IosBiometricSessionManagerTest")
-        defaults?.removePersistentDomainForName("IosBiometricSessionManagerTest")
-        return IosBiometricSessionManager(defaults ?: NSUserDefaults.standardUserDefaults)
+        defaults.removePersistentDomainForName("IosBiometricSessionManagerTest")
+        return IosBiometricSessionManager(defaults)
     }
 
     @Test
-    fun isAvailableReturnsTrue() {
+    fun isAvailableMatchesBiometricAvailability() {
         val manager = createManager()
-        assertTrue(manager.isAvailable())
+        assertEquals(manager.isBiometricAvailable(), manager.isAvailable())
     }
 
     @Test
@@ -72,5 +72,33 @@ class IosBiometricSessionManagerTest {
             manager.setBiometricEnabled(false)
             assertFalse(manager.isSecureUnlockReady())
         }
+    }
+
+    @Test
+    fun sessionRetentionDefaultsToPromptEveryTime() {
+        val manager = createManager()
+
+        assertTrue(manager.supportsSessionRetention())
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            manager.getSecureUnlockRetentionPolicy(),
+        )
+    }
+
+    @Test
+    fun sessionRetentionPolicyRoundTripsThroughUserDefaults() {
+        val manager = createManager()
+
+        manager.setSecureUnlockRetentionPolicy(SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION)
+        assertEquals(
+            SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+            manager.getSecureUnlockRetentionPolicy(),
+        )
+
+        manager.setSecureUnlockRetentionPolicy(SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME)
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            manager.getSecureUnlockRetentionPolicy(),
+        )
     }
 }
