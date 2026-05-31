@@ -1,6 +1,6 @@
 ---
 name: Cross-Platform Session-Scoped Auth Retention Plan
-status: In Progress
+status: Completed
 progress:
   - "[x] Re-evaluate browser-extension plan against shared KMP architecture"
   - "[x] Inspect current common/session contracts and platform managers"
@@ -9,7 +9,7 @@ progress:
   - "[x] Phase 3 - Refactor platform session managers to use the shared retention policy"
   - "[x] Phase 4 - Implement browser-extension backend using extension storage.session"
   - "[x] Phase 5 - Expose a common settings/UI flow with platform capability gating"
-  - "[ ] Phase 6 - Add tests and cross-platform verification"
+  - "[x] Phase 6 - Add tests and cross-platform verification"
 ---
 
 # Cross-Platform Session-Scoped Auth Retention Plan
