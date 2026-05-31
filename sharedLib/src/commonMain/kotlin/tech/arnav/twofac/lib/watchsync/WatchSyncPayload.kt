@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib.watchsync
 
 import kotlinx.serialization.Serializable
 import tech.arnav.twofac.lib.presentation.issuer.IssuerIconCatalog
+import tech.arnav.twofac.lib.theme.AccountColorTag
 
 @Serializable
 data class WatchSyncSnapshot(
@@ -17,4 +18,5 @@ data class WatchSyncAccount(
     val issuerIconKey: String = IssuerIconCatalog.resolveIssuerIconKey(issuer),
     val accountLabel: String,
     val otpAuthUri: String,
+    val color: AccountColorTag? = null,
 )

@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
 import kotlin.time.Duration.Companion.seconds
 
@@ -22,7 +23,8 @@ class WatchOtpProviderTest {
             accountId = "1",
             issuer = "GitHub",
             accountLabel = "test@example.com",
-            otpAuthUri = "otpauth://totp/GitHub:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"
+            otpAuthUri = "otpauth://totp/GitHub:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub",
+            color = AccountColorTag.TEAL,
         )
         
         val snapshot = WatchSyncSnapshot(
@@ -41,6 +43,7 @@ class WatchOtpProviderTest {
         val validEntry = entry as WatchOtpEntry.Valid
         assertEquals("GitHub", validEntry.issuer)
         assertEquals("test@example.com", validEntry.account.accountLabel)
+        assertEquals(AccountColorTag.TEAL, validEntry.account.color)
         assertEquals(30L, validEntry.periodSec)
     }
 

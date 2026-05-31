@@ -1,5 +1,6 @@
 package tech.arnav.twofac.lib.watchsync
 
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -18,6 +19,7 @@ class WatchSyncSnapshotCodecTest {
                     issuerIconKey = "github",
                     accountLabel = "user@example.com",
                     otpAuthUri = "otpauth://totp/GitHub:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub",
+                    color = AccountColorTag.PURPLE,
                 ),
             ),
         )
@@ -26,6 +28,29 @@ class WatchSyncSnapshotCodecTest {
         val decoded = WatchSyncSnapshotCodec.decode(bytes)
 
         assertEquals(snapshot, decoded)
+    }
+
+    @Test
+    fun testDecodeOldPayloadWithoutColorDefaultsToNull() {
+        val json = """
+            {
+              "version": 1,
+              "generatedAtEpochSec": 1700000000,
+              "accounts": [
+                {
+                  "accountId": "github:user@example.com",
+                  "issuer": "GitHub",
+                  "issuerIconKey": "github",
+                  "accountLabel": "user@example.com",
+                  "otpAuthUri": "otpauth://totp/GitHub:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"
+                }
+              ]
+            }
+        """.trimIndent()
+
+        val decoded = WatchSyncSnapshotCodec.decode(json.encodeToByteArray())
+
+        assertEquals(null, decoded.accounts.single().color)
     }
 
     @Test
@@ -46,6 +71,7 @@ class WatchSyncSnapshotCodecTest {
         )
 
         assertEquals("github", account.issuerIconKey)
+        assertEquals(null, account.color)
         assertTrue(account.issuerIconKey.isNotBlank())
     }
 }

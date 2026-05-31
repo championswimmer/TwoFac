@@ -6,6 +6,7 @@ import tech.arnav.twofac.lib.watchsync.WatchSyncAccount
 import tech.arnav.twofac.lib.watchsync.WatchSyncSnapshot
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.presentation.issuer.IssuerIconCatalog
+import tech.arnav.twofac.lib.theme.AccountColorTag
 
 interface CompanionSyncCoordinator {
     val companionDisplayName: String
@@ -26,6 +27,7 @@ data class CompanionSyncSourceAccount(
     val accountId: String,
     val accountLabel: String,
     val otpAuthUri: String,
+    val color: AccountColorTag? = null,
 )
 
 suspend fun loadCompanionSyncSourceAccounts(
@@ -43,6 +45,7 @@ suspend fun loadCompanionSyncSourceAccounts(
             accountId = account.accountID,
             accountLabel = account.accountLabel,
             otpAuthUri = uri,
+            color = account.color,
         )
     }
 }
@@ -59,6 +62,7 @@ fun buildCompanionSyncSnapshot(
             issuerIconKey = IssuerIconCatalog.resolveIssuerIconKey(issuer),
             accountLabel = source.accountLabel,
             otpAuthUri = source.otpAuthUri,
+            color = source.color,
         )
     }
     return WatchSyncSnapshot(
