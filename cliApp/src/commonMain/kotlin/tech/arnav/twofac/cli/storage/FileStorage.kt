@@ -1,7 +1,6 @@
 package tech.arnav.twofac.cli.storage
 
 import io.github.xxfast.kstore.extensions.getOrEmpty
-import io.github.xxfast.kstore.extensions.plus
 import io.github.xxfast.kstore.file.extensions.listStoreOf
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -25,10 +24,21 @@ class FileStorage(
     override suspend fun getAccount(accountID: Uuid): StoredAccount? =
         kstore.getOrEmpty().firstOrNull { it.accountID == accountID }
 
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun saveAccount(account: StoredAccount): Boolean {
-        // TODO: handle duplicates and/or update existing accounts
-        kstore.plus(account)
-        return true
+        return try {
+            val currentAccounts = kstore.getOrEmpty().toMutableList()
+            val existingIndex = currentAccounts.indexOfFirst { it.accountID == account.accountID }
+            if (existingIndex >= 0) {
+                currentAccounts[existingIndex] = account
+            } else {
+                currentAccounts.add(account)
+            }
+            kstore.set(currentAccounts)
+            true
+        } catch (_: Exception) {
+            false
+        }
     }
 
     @OptIn(ExperimentalUuidApi::class)

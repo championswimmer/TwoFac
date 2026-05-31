@@ -50,6 +50,7 @@ import twofac.composeapp.generated.resources.action_cancel
 import twofac.composeapp.generated.resources.account_detail_export_qr
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import tech.arnav.twofac.components.accounts.AccountColorSelector
 import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.viewmodels.AccountsViewModel
 
@@ -118,6 +119,15 @@ fun AccountDetailScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+
+                AccountColorSelector(
+                    selectedColor = account.color,
+                    onColorSelected = { selectedColor ->
+                        viewModel.updateAccountColor(accountId, selectedColor)
+                    },
+                    enabled = isLibUnlocked && !isLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
                 Button(
                     onClick = {

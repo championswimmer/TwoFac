@@ -13,6 +13,7 @@ import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.lib.storage.StoredAccount
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.qr.CameraQRCodeReader
 import tech.arnav.twofac.qr.ClipboardQRCodeReader
 import tech.arnav.twofac.session.SecureSessionManager
@@ -147,6 +148,38 @@ class AccountsViewModel(
                 }
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to add account"
+                onComplete(false)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun updateAccountColor(accountId: String, color: AccountColorTag?, onComplete: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+
+            try {
+                if (!twoFacLibUnlocked) {
+                    _error.value = "Passkey is required to update an account color while vault is locked"
+                    onComplete(false)
+                    return@launch
+                }
+
+                val success = twoFacLib.updateAccountColor(accountId, color)
+                if (success) {
+                    val accountOtpList = twoFacLib.getAllAccountOTPs()
+                    _accountOtps.value = accountOtpList
+                    _accounts.value = accountOtpList.map { it.first }
+                    companionSyncCoordinator?.onAccountsChanged()
+                    onComplete(true)
+                } else {
+                    _error.value = "Failed to update account color"
+                    onComplete(false)
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to update account color"
                 onComplete(false)
             } finally {
                 _isLoading.value = false

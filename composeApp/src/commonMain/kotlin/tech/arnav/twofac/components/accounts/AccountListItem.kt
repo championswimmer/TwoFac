@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tech.arnav.twofac.components.icons.IssuerBrandIcon
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.theme.TwoFacTheme
 
 @Composable
@@ -21,6 +22,7 @@ fun AccountListItem(
     issuer: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    color: AccountColorTag? = null,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -31,6 +33,7 @@ fun AccountListItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            AccountColorSwatch(color = color)
             IssuerBrandIcon(
                 issuer = issuer,
                 size = 28.dp,
@@ -52,6 +55,7 @@ private fun AccountListItemPreview() {
             accountLabel = "arnav@example.com",
             issuer = "GitHub",
             onClick = {},
+            color = AccountColorTag.GREEN,
         )
     }
 }

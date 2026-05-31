@@ -11,6 +11,9 @@
     <string name="account_detail_otp_display">OTP : %1$s</string>
     <string name="account_detail_delete">Supprimer le compte</string>
     <string name="account_detail_export_qr">Exporter en QR</string>
+    <string name="account_detail_color_title">Color</string>
+    <string name="account_detail_color_none">None</string>
+    <string name="account_detail_color_selected">Selected color</string>
     <string name="account_detail_not_found">Compte introuvable</string>
     <string name="account_detail_delete_dialog_title">Supprimer le compte ?</string>
     <string name="account_detail_delete_dialog_message">Cela supprimera definitivement %1$s de votre coffre.</string>

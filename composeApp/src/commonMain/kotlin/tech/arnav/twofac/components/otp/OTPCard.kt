@@ -17,6 +17,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,10 +49,12 @@ import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import twofac.composeapp.generated.resources.*
 import tech.arnav.twofac.components.icons.IssuerBrandIcon
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.lib.theme.TimerState
 import tech.arnav.twofac.lib.theme.timerStateByElapsedProgress
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.theme.TwoFacTheme
+import tech.arnav.twofac.theme.toComposeColor
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -107,6 +110,10 @@ fun OTPCard(
     val timeRemaining = timeInterval - (currentTime % timeInterval)
     val timerState = timerStateByElapsedProgress(progress)
     val extendedColors = TwoFacTheme.extendedColors
+    val cardContainerColor = account.color
+        ?.color(isDarkTheme = isSystemInDarkTheme())
+        ?.toComposeColor()
+        ?: MaterialTheme.colorScheme.surface
 
     val progressColor by animateColorAsState(
         targetValue = when (timerState) {
@@ -123,6 +130,10 @@ fun OTPCard(
             .fillMaxWidth()
             .clickable { onCopyOtp(otpCode) },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = cardContainerColor,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
         shape = MaterialTheme.shapes.large
     ) {
         Column(
@@ -272,6 +283,7 @@ fun OTPCardPreview() {
                 accountID = "google-account",
                 accountLabel = "arnav@gmail.com",
                 issuer = "Google",
+                color = AccountColorTag.BLUE,
             ),
             otpCode = "123456",
             nextOtp = "987654"

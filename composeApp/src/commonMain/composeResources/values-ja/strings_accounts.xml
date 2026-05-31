@@ -11,6 +11,9 @@
     <string name="account_detail_otp_display">OTP: %1$s</string>
     <string name="account_detail_delete">アカウントを削除</string>
     <string name="account_detail_export_qr">QRとしてエクスポート</string>
+    <string name="account_detail_color_title">Color</string>
+    <string name="account_detail_color_none">None</string>
+    <string name="account_detail_color_selected">Selected color</string>
     <string name="account_detail_not_found">アカウントが見つかりません</string>
     <string name="account_detail_delete_dialog_title">アカウントを削除しますか？</string>
     <string name="account_detail_delete_dialog_message">%1$s を保管庫から完全に削除します。</string>
