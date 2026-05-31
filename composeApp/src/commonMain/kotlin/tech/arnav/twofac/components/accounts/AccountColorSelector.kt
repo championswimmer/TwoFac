@@ -3,15 +3,15 @@ package tech.arnav.twofac.components.accounts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -58,10 +58,31 @@ fun AccountColorSelector(
             fontWeight = FontWeight.SemiBold,
         )
 
+        AccountColorTag.entries.chunked(4).forEach { rowColors ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.Top,
+            ) {
+                rowColors.forEach { colorTag ->
+                    AccountColorOption(
+                        label = colorTag.displayName,
+                        color = colorTag,
+                        selected = selectedColor == colorTag,
+                        enabled = enabled,
+                        onClick = { onColorSelected(colorTag) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                repeat(4 - rowColors.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+
         Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
         ) {
             AccountColorOption(
                 label = stringResource(Res.string.account_detail_color_none),
@@ -70,16 +91,6 @@ fun AccountColorSelector(
                 enabled = enabled,
                 onClick = { onColorSelected(null) },
             )
-
-            AccountColorTag.entries.forEach { colorTag ->
-                AccountColorOption(
-                    label = colorTag.displayName,
-                    color = colorTag,
-                    selected = selectedColor == colorTag,
-                    enabled = enabled,
-                    onClick = { onColorSelected(colorTag) },
-                )
-            }
         }
     }
 }
