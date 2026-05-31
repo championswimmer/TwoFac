@@ -188,20 +188,11 @@ jobs:
       - name: Build CLI (macOS arm64)
         run: ./gradlew :cliApp:linkReleaseExecutableMacosArm64
 
-      - name: Build CLI (macOS x64)
-        run: ./gradlew :cliApp:linkReleaseExecutableMacosX64
-
       - name: Upload CLI (macOS arm64)
         uses: actions/upload-artifact@v4
         with:
           name: cli-macos-arm64
           path: cliApp/build/bin/macosArm64/releaseExecutable/2fac.kexe
-
-      - name: Upload CLI (macOS x64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: cli-macos-x64
-          path: cliApp/build/bin/macosX64/releaseExecutable/2fac.kexe
 
       - name: Build macOS Desktop (DMG)
         run: ./gradlew :composeApp:packageDmg

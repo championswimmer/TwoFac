@@ -40,7 +40,8 @@ class StorageCommand : CliktCommand(name = "storage") {
         selectedBackend?.let { backendValue ->
             val backend = CliStorageBackend.fromCliValue(backendValue)
                 ?: throw UsageError("Unsupported backend '$backendValue'")
-            if (!CliConfigStore.write(CliConfig(storageBackend = backend))) {
+            val existingConfig = CliConfigStore.read()
+            if (!CliConfigStore.write(existingConfig.copy(storageBackend = backend))) {
                 throw UsageError("Failed to persist backend selection")
             }
             echo("✓ Storage backend set to ${backend.cliValue}")

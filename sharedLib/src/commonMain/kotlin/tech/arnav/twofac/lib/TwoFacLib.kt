@@ -1,8 +1,7 @@
 package tech.arnav.twofac.lib
 
-import dev.whyoleg.cryptography.CryptographyProvider
-import tech.arnav.twofac.lib.crypto.DefaultCryptoTools
 import tech.arnav.twofac.lib.crypto.Encoding.toByteString
+import tech.arnav.twofac.lib.crypto.sharedCryptoTools
 import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
 import tech.arnav.twofac.lib.backup.EncryptedAccountEntry
@@ -66,7 +65,7 @@ class TwoFacLib private constructor(
         }
     }
 
-    private val cryptoTools = DefaultCryptoTools(CryptographyProvider.Default)
+    private val cryptoTools = sharedCryptoTools
 
     @Volatile
     private var accountList: List<StoredAccount>? = null

@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "declaration": false,
     "sourceMap": false,
+    "rootDir": "./src",
     "outDir": "../../../build/generated/wasmJs/resources"
   },
   "include": ["src/**/*.mts"]

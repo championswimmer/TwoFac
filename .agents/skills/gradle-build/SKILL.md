@@ -28,7 +28,6 @@ Native CLI executables for desktop platforms:
 
 | Platform | Build Debug | Build Release | Output Location |
 |----------|-------------|---------------|-----------------|
-| macOS (Intel) | `./gradlew :cliApp:linkDebugExecutableMacosX64` | `./gradlew :cliApp:linkReleaseExecutableMacosX64` | `cliApp/build/bin/macosX64/` |
 | macOS (Apple Silicon) | `./gradlew :cliApp:linkDebugExecutableMacosArm64` | `./gradlew :cliApp:linkReleaseExecutableMacosArm64` | `cliApp/build/bin/macosArm64/` |
 | Linux | `./gradlew :cliApp:linkDebugExecutableLinuxX64` | `./gradlew :cliApp:linkReleaseExecutableLinuxX64` | `cliApp/build/bin/linuxX64/` |
 | Windows | `./gradlew :cliApp:linkDebugExecutableMingwX64` | `./gradlew :cliApp:linkReleaseExecutableMingwX64` | `cliApp/build/bin/mingwX64/` |

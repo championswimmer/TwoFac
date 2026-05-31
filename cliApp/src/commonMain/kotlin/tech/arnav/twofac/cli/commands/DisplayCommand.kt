@@ -15,6 +15,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import tech.arnav.twofac.cli.storage.CliConfigStore
+import tech.arnav.twofac.cli.theme.CliIssuerIcons
 import tech.arnav.twofac.cli.theme.CliTheme
 import tech.arnav.twofac.cli.theme.CliThemeStyles
 import tech.arnav.twofac.lib.TwoFacLib
@@ -45,6 +47,7 @@ class DisplayCommand : CliktCommand(), KoinComponent {
         }
 
         val isInteractive = terminal.terminalInfo.inputInteractive && terminal.terminalInfo.outputInteractive
+        val iconsEnabled = CliConfigStore.read().issuerIconsEnabled
 
         runBlocking {
             twoFacLib.unlock(passkey)
@@ -52,7 +55,7 @@ class DisplayCommand : CliktCommand(), KoinComponent {
 
             if (isInteractive) {
                 val animation = terminal.animation<DisplayAccountsStatic> { displayAccounts ->
-                    createTable(displayAccounts, styles)
+                    createTable(displayAccounts, styles, iconsEnabled)
                 }
                 echo("\n")
                 repeat(2.minutes.inWholeSeconds.toInt()) {
@@ -61,15 +64,16 @@ class DisplayCommand : CliktCommand(), KoinComponent {
                 }
                 echo(styles.footer("Exiting display command after 2 minutes of inactivity."))
             } else {
-                echo(createTable(displayAccounts, styles))
+                echo(createTable(displayAccounts, styles, iconsEnabled))
             }
         }
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun createTable(
+    internal fun createTable(
         displayAccounts: DisplayAccountsStatic,
-        styles: CliThemeStyles
+        styles: CliThemeStyles,
+        iconsEnabled: Boolean,
     ) = table {
         borderType = BorderType.SQUARE_DOUBLE_SECTION_SEPARATOR
         header {
@@ -92,7 +96,13 @@ class DisplayCommand : CliktCommand(), KoinComponent {
                 val remainingProgress = (leftTimeSec.toFloat() / 30f).coerceIn(0f, 1f)
                 val timerStyle = styles.timer(timerStateByRemainingProgress(remainingProgress))
                 row {
-                    cell(account.accountLabel)
+                    cell(
+                        CliIssuerIcons.formatAccountLabel(
+                            accountLabel = account.accountLabel,
+                            issuer = account.issuer,
+                            iconsEnabled = iconsEnabled,
+                        )
+                    )
                     cell(otp.currentOTP.split("").joinToString(" "))
                     cell(
                         ProgressBar(

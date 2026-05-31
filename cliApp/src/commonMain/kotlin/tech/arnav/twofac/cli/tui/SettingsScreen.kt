@@ -21,11 +21,15 @@ class SettingsScreen : TuiScreen {
 
         body {
             row(styles.label("storage backend"), styles.key(state.settings.backend.cliValue))
+            row(
+                styles.label("issuer icons"),
+                styles.key(if (state.settings.issuerIconsEnabled) "enabled" else "disabled"),
+            )
             row(styles.label("backup provider"), styles.label("local (available)"))
         }
 
         val messageLine = state.message?.let { styles.key(it) + "\n" } ?: ""
-        val footerText = messageLine + styles.footer("u toggle backend • h home • b/Esc back • q quit")
+        val footerText = messageLine + styles.footer("i toggle icons • u toggle backend • h home • b/Esc back • q quit")
         captionBottom(footerText, align = TextAlign.LEFT)
     }
 
@@ -34,6 +38,7 @@ class SettingsScreen : TuiScreen {
 
         return when (event.key) {
             "q", "Q" -> TuiAction.Quit
+            "i", "I" -> TuiAction.ToggleIssuerIcons
             "u", "U" -> TuiAction.CycleStorageBackend
             "h", "H" -> TuiAction.Navigate(TuiScreenId.HOME)
             "Escape", "Backspace", "b", "B" -> TuiAction.Back

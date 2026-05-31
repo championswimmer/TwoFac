@@ -1,3 +1,7 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCacheApi::class)
+
+import java.net.URI
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
 }
@@ -8,14 +12,20 @@ version = rootProject.extra["appVersionName"] as String
 kotlin {
     listOf(
         macosArm64(),
-        macosX64(),
         linuxX64(),
         mingwX64(),
-    ).forEach {
-        it.apply {
+    ).forEach { target ->
+        target.apply {
             binaries.executable {
                 baseName = "2fac"
                 entryPoint = "tech.arnav.twofac.cli.main"
+                if (target.name == "linuxX64") {
+                    disableNativeCache(
+                        version = org.jetbrains.kotlin.gradle.plugin.mpp.DisableCacheInKotlinVersion.`2_3_21`,
+                        reason = "Clikt has duplicate symbol",
+                        issueUrl = URI("https://github.com/ajalt/clikt/issues/598"),
+                    )
+                }
             }
         }
     }
