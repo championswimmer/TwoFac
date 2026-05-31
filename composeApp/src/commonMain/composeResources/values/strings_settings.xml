@@ -24,7 +24,7 @@
     <string name="settings_session_retention_browser_title">Remember authentication for this browser session</string>
     <string name="settings_session_retention_browser_description">After a successful secure unlock, keep the vault unlocked until the browser closes. Security warning: this keeps the decrypted passkey accessible to extension code in this browser session.</string>
     <string name="settings_session_retention_browser_warning_title">Keep TwoFac unlocked for this browser session?</string>
-    <string name="settings_session_retention_browser_warning_message">If you turn this on, TwoFac can stay unlocked until you close your browser, so you will not need to use WebAuthn every time you reopen it. Only use this on a browser you trust, and do not paste random code into the extension DevTools console while this is enabled.</string>
+    <string name="settings_session_retention_browser_warning_message">If you turn this on, TwoFac can stay unlocked until you close your browser, so you will not need to use Biometric unlock every time you reopen it. Only use this on a browser you trust, and do not paste random code into the extension DevTools console while this is enabled.</string>
     <string name="settings_session_retention_browser_warning_confirm">Keep It Unlocked</string>
     <string name="settings_upcoming_code_title">Show Upcoming Code</string>
     <string name="settings_upcoming_code_description">Show the next TOTP code a few seconds before it becomes active.</string>
