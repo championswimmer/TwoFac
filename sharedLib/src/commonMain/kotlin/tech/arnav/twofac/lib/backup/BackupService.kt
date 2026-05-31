@@ -38,6 +38,7 @@ class BackupService(
                         accountLabel = account.accountLabel,
                         salt = account.salt,
                         encryptedURI = account.encryptedURI,
+                        color = account.color,
                     )
                 }
                 BackupPayload(
@@ -46,10 +47,10 @@ class BackupService(
                     encryptedAccounts = encryptedAccounts,
                 )
             } else {
-                val uris = twoFacLib.exportAccountsPlaintext()
+                val accounts = twoFacLib.exportAccountsPlaintextWithMetadata()
                 BackupPayload(
                     createdAt = Clock.System.now().epochSeconds,
-                    accounts = uris,
+                    plaintextAccounts = accounts,
                 )
             }
         } catch (e: Throwable) {
@@ -121,15 +122,18 @@ class BackupService(
             }
         }
 
-        val uris = if (payload.encrypted) {
+        val accountEntries = if (payload.encrypted) {
             val normalizedBackupPasskey = backupPasskey?.takeIf(String::isNotBlank)
                 ?: return BackupResult.Failure("Encrypted backups require the backup passkey")
             if (normalizedCurrentPasskey == null) {
                 return BackupResult.Failure("Encrypted backups require the current app passkey")
             }
-            val decryptedUris = try {
+            try {
                 payload.encryptedAccounts.map { entry ->
-                    twoFacLib.decryptEncryptedBackupAccount(entry, normalizedBackupPasskey)
+                    PlaintextAccountEntry(
+                        uri = twoFacLib.decryptEncryptedBackupAccount(entry, normalizedBackupPasskey),
+                        color = entry.color,
+                    )
                 }
             } catch (e: Throwable) {
                 return BackupResult.Failure(
@@ -137,12 +141,13 @@ class BackupService(
                     e,
                 )
             }
-            decryptedUris
         } else {
-            payload.accounts
+            payload.plaintextAccounts.ifEmpty {
+                payload.accounts.map { uri -> PlaintextAccountEntry(uri = uri) }
+            }
         }
         val parsedBackupAccounts = try {
-            uris.map(OtpAuthURI::parse)
+            accountEntries.map { OtpAuthURI.parse(it.uri) }
         } catch (e: Throwable) {
             val message = if (payload.encrypted) {
                 "Incorrect backup passkey — could not decrypt the backup accounts."
@@ -165,10 +170,10 @@ class BackupService(
         }
 
         var imported = 0
-        for ((uri, parsedBackupAccount) in uris.zip(parsedBackupAccounts)) {
+        for ((entry, parsedBackupAccount) in accountEntries.zip(parsedBackupAccounts)) {
             if (existingAccounts.any { it.isEquivalent(parsedBackupAccount) }) continue
             try {
-                val added = twoFacLib.addAccount(uri)
+                val added = twoFacLib.addAccount(entry.uri, entry.color)
                 if (added) {
                     existingAccounts += parsedBackupAccount
                     imported++

@@ -1,10 +1,10 @@
 ---
 name: Account Color Tags Plan
-status: Planned
+status: In Progress
 progress:
-  - "[ ] Phase 0 - Finalize Canonical Palette and Storage Semantics"
-  - "[ ] Phase 1 - Add Shared Account Color Domain Model"
-  - "[ ] Phase 2 - Persist Optional Color on Stored Accounts"
+  - "[x] Phase 0 - Finalize Canonical Palette and Storage Semantics"
+  - "[x] Phase 1 - Add Shared Account Color Domain Model"
+  - "[x] Phase 2 - Persist Optional Color on Stored Accounts"
   - "[ ] Phase 3 - Expose Color Update APIs and ViewModel State"
   - "[ ] Phase 4 - Apply Colors in Compose UI Cards and Account Management"
   - "[ ] Phase 5 - Add CLI/TUI Color Selection and Display"

@@ -3,6 +3,7 @@ package tech.arnav.twofac.lib.backup
 import kotlinx.coroutines.test.runTest
 import tech.arnav.twofac.lib.TwoFacLib
 import tech.arnav.twofac.lib.storage.MemoryStorage
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -95,7 +96,8 @@ class BackupServiceTest {
         assertTrue(createResult is BackupResult.Success)
         val payload = BackupPayloadCodec.decode(transport.store.getValue(createResult.value.id).content)
         assertFalse(payload.encrypted)
-        assertEquals(lib.exportAccountsPlaintext(), payload.accounts)
+        assertTrue(payload.accounts.isEmpty())
+        assertEquals(lib.exportAccountsPlaintextWithMetadata(), payload.plaintextAccounts)
         assertTrue(payload.encryptedAccounts.isEmpty())
     }
 
@@ -114,9 +116,11 @@ class BackupServiceTest {
         val payload = BackupPayloadCodec.decode(transport.store.getValue(createResult.value.id).content)
         assertTrue(payload.encrypted)
         assertTrue(payload.accounts.isEmpty())
+        assertTrue(payload.plaintextAccounts.isEmpty())
         assertEquals(lib.exportAccountsEncrypted().map { it.accountLabel }, payload.encryptedAccounts.map { it.accountLabel })
         assertEquals(lib.exportAccountsEncrypted().map { it.salt }, payload.encryptedAccounts.map { it.salt })
         assertEquals(lib.exportAccountsEncrypted().map { it.encryptedURI }, payload.encryptedAccounts.map { it.encryptedURI })
+        assertEquals(lib.exportAccountsEncrypted().map { it.color }, payload.encryptedAccounts.map { it.color })
     }
 
     @Test
@@ -180,7 +184,7 @@ class BackupServiceTest {
         )
         val corruptPayload = BackupPayload(
             createdAt = 0,
-            accounts = listOf("this-is-not-an-otpauth-uri"),
+            plaintextAccounts = listOf(PlaintextAccountEntry(uri = "this-is-not-an-otpauth-uri")),
         )
         transport.store[descriptor.id] = BackupBlob(
             content = BackupPayloadCodec.encode(corruptPayload),
@@ -337,6 +341,59 @@ class BackupServiceTest {
             originalEncryptedAccounts.zip(freshLib.exportAccountsEncrypted())
                 .any { (before, after) -> before.salt != after.salt || before.encryptedURI != after.encryptedURI }
         )
+    }
+
+    @Test
+    fun testPlaintextBackupPreservesAccountColors() = runTest {
+        val sourceLib = buildLib()
+        sourceLib.unlock(TEST_PASSKEY)
+        sourceLib.addAccount(sampleUris[0], AccountColorTag.BLUE)
+        sourceLib.addAccount(sampleUris[1])
+
+        val transport = FakeTransport()
+        val sourceService = BackupService(sourceLib, BackupTransportRegistry(listOf(transport)))
+        val createResult = sourceService.createBackup(transport.id, encrypted = false)
+        assertTrue(createResult is BackupResult.Success)
+
+        val payload = BackupPayloadCodec.decode(transport.store.getValue(createResult.value.id).content)
+        assertEquals(listOf(AccountColorTag.BLUE, null), payload.plaintextAccounts.map { it.color })
+
+        val freshLib = buildLib(CURRENT_PASSKEY)
+        freshLib.unlock(CURRENT_PASSKEY)
+        val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
+        val restoreResult = restoreService.restoreBackup(transport.id, createResult.value.id)
+
+        assertTrue(restoreResult is BackupResult.Success)
+        assertEquals(listOf(AccountColorTag.BLUE, null), freshLib.getAllAccounts().map { it.color })
+    }
+
+    @Test
+    fun testEncryptedBackupPreservesAccountColors() = runTest {
+        val sourceLib = buildLib(BACKUP_PASSKEY)
+        sourceLib.unlock(BACKUP_PASSKEY)
+        sourceLib.addAccount(sampleUris[0], AccountColorTag.PURPLE)
+        sourceLib.addAccount(sampleUris[1], AccountColorTag.TEAL)
+
+        val transport = FakeTransport()
+        val sourceService = BackupService(sourceLib, BackupTransportRegistry(listOf(transport)))
+        val createResult = sourceService.createBackup(transport.id, encrypted = true)
+        assertTrue(createResult is BackupResult.Success)
+
+        val payload = BackupPayloadCodec.decode(transport.store.getValue(createResult.value.id).content)
+        assertEquals(listOf(AccountColorTag.PURPLE, AccountColorTag.TEAL), payload.encryptedAccounts.map { it.color })
+
+        val freshLib = buildLib(CURRENT_PASSKEY)
+        freshLib.unlock(CURRENT_PASSKEY)
+        val restoreService = BackupService(freshLib, BackupTransportRegistry(listOf(transport)))
+        val restoreResult = restoreService.restoreBackup(
+            providerId = transport.id,
+            backupId = createResult.value.id,
+            backupPasskey = BACKUP_PASSKEY,
+            currentPasskey = CURRENT_PASSKEY,
+        )
+
+        assertTrue(restoreResult is BackupResult.Success)
+        assertEquals(listOf(AccountColorTag.PURPLE, AccountColorTag.TEAL), freshLib.getAllAccounts().map { it.color })
     }
 
     @Test

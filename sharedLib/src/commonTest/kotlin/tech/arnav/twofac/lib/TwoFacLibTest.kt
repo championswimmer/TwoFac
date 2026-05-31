@@ -2,6 +2,7 @@ package tech.arnav.twofac.lib
 
 import kotlinx.coroutines.test.runTest
 import tech.arnav.twofac.lib.storage.MemoryStorage
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -192,6 +193,49 @@ class TwoFacLibTest {
 
         // Now we know it has accounts
         assertTrue(lib.isStoreInitialized)
+    }
+
+    @Test
+    fun testUpdateAccountColorPersistsOptionalTag() = runTest {
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        lib.unlock("testpasskey")
+        assertTrue(
+            lib.addAccount(
+                "otpauth://totp/GitHub:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"
+            )
+        )
+        val accountId = lib.getAllAccounts().single().accountID
+
+        assertTrue(lib.updateAccountColor(accountId, AccountColorTag.TEAL))
+        assertEquals(AccountColorTag.TEAL, lib.getAllAccounts().single().color)
+        assertEquals(AccountColorTag.TEAL, lib.getAllAccountOTPs().single().first.color)
+
+        assertTrue(lib.updateAccountColor(accountId, null))
+        assertNull(lib.getAllAccounts().single().color)
+    }
+
+    @Test
+    fun testUpdateAccountColorReturnsFalseForUnknownOrMalformedId() = runTest {
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        lib.unlock("testpasskey")
+
+        assertFalse(lib.updateAccountColor("not-a-uuid", AccountColorTag.RED))
+        assertFalse(lib.updateAccountColor("00000000-0000-0000-0000-000000000000", AccountColorTag.RED))
+    }
+
+    @Test
+    fun testAddAccountCanSeedInitialColor() = runTest {
+        val lib = TwoFacLib.initialise(storage = MemoryStorage(), passKey = "testpasskey")
+        lib.unlock("testpasskey")
+
+        assertTrue(
+            lib.addAccount(
+                "otpauth://totp/GitHub:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub",
+                AccountColorTag.BLUE,
+            )
+        )
+
+        assertEquals(AccountColorTag.BLUE, lib.getAllAccounts().single().color)
     }
 
     @Test
