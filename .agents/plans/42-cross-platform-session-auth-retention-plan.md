@@ -6,8 +6,8 @@ progress:
   - "[x] Inspect current common/session contracts and platform managers"
   - "[x] Phase 1 - Add common session-auth-retention contract in commonMain"
   - "[x] Phase 2 - Add shared session-passkey-cache abstraction with default in-memory implementation"
-  - "[ ] Phase 3 - Refactor platform session managers to use the shared retention policy"
-  - "[ ] Phase 4 - Implement browser-extension backend using extension storage.session"
+  - "[x] Phase 3 - Refactor platform session managers to use the shared retention policy"
+  - "[x] Phase 4 - Implement browser-extension backend using extension storage.session"
   - "[ ] Phase 5 - Expose a common settings/UI flow with platform capability gating"
   - "[ ] Phase 6 - Add tests and cross-platform verification"
 ---
