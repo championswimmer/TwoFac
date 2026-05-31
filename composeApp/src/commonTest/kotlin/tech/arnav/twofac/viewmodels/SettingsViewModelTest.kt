@@ -125,6 +125,65 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `browser session retention requires explicit warning confirmation`() = runTest {
+        val sessionManager = SettingsFakeSecureSessionManager(
+            secureUnlockEnabledState = true,
+            supportsSessionRetentionState = true,
+            retentionScopeState = SecureUnlockRetentionScope.BROWSER_SESSION,
+        )
+        val viewModel = SettingsViewModel(
+            sessionManager = sessionManager,
+            appPreferencesRepository = FakeAppPreferencesRepository(),
+        )
+
+        viewModel.onSessionRetentionChanged(true)
+
+        assertTrue(viewModel.uiState.value.showSessionRetentionRiskDialog)
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            sessionManager.retentionPolicyState,
+        )
+
+        viewModel.confirmSessionRetentionRisk()
+
+        assertFalse(viewModel.uiState.value.showSessionRetentionRiskDialog)
+        assertEquals(
+            SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+            sessionManager.retentionPolicyState,
+        )
+        assertEquals(
+            SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION,
+            viewModel.uiState.value.sessionRetentionPolicy,
+        )
+    }
+
+    @Test
+    fun `dismissing browser retention warning keeps prompt every time policy`() = runTest {
+        val sessionManager = SettingsFakeSecureSessionManager(
+            secureUnlockEnabledState = true,
+            supportsSessionRetentionState = true,
+            retentionScopeState = SecureUnlockRetentionScope.BROWSER_SESSION,
+        )
+        val viewModel = SettingsViewModel(
+            sessionManager = sessionManager,
+            appPreferencesRepository = FakeAppPreferencesRepository(),
+        )
+
+        viewModel.onSessionRetentionChanged(true)
+        viewModel.dismissSessionRetentionRiskDialog()
+
+        assertFalse(viewModel.uiState.value.showSessionRetentionRiskDialog)
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            sessionManager.retentionPolicyState,
+        )
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            viewModel.uiState.value.sessionRetentionPolicy,
+        )
+    }
+
+    @Test
     fun `unsupported retention managers keep setting hidden and unchanged`() = runTest {
         val sessionManager = SettingsFakeSecureSessionManager(
             secureUnlockEnabledState = true,

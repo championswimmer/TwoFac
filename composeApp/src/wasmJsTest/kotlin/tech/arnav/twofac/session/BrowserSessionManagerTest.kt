@@ -278,38 +278,8 @@ class BrowserSessionManagerTest {
     }
 
     @Test
-    fun browserBuildNeverSupportsSessionRetention() = runTest {
-        val storage = FakeStorageClient()
-        val client = FakeWebAuthnClient(
-            supported = true,
-            capabilities = supportedCapabilities(),
-            createResult = WebAuthnOperationResult(
-                status = WebAuthnOperationStatus.SUCCESS,
-                credentialId = "cred-1",
-                prfFirstOutputBase64Url = "cHJmLWtleS1ieXRlcw",
-            ),
-            authenticateResult = successfulAuthResult(),
-        )
-        val manager = BrowserSessionManager(
-            storageClient = storage,
-            webAuthnClient = client,
-            webCryptoClient = FakeWebCryptoClient(),
-            encryptedPasskeyStore = FakeEncryptedPasskeyStore(),
-        )
-
-        manager.setRememberPasskey(true)
-        manager.setSecureUnlockRetentionPolicy(SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION)
-
-        assertFalse(manager.supportsSessionRetention())
-        assertEquals(
-            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
-            manager.getSecureUnlockRetentionPolicy(),
-        )
-        assertNull(storage.snapshot["twofac_secure_unlock_retention_policy"])
-    }
-
-    @Test
-    fun repeatedBrowserUnlockStillRequiresWebAuthnPrompt() = runTest {
+    fun retainedSessionCacheSkipsRepeatedAuthWhenPolicyEnabled() = runTest {
+        val cache = FakeSessionPasskeyCache()
         val client = FakeWebAuthnClient(
             supported = true,
             capabilities = supportedCapabilities(),
@@ -325,18 +295,58 @@ class BrowserSessionManagerTest {
             webAuthnClient = client,
             webCryptoClient = FakeWebCryptoClient(),
             encryptedPasskeyStore = FakeEncryptedPasskeyStore(),
+            sessionPasskeyCache = cache,
+            sessionRetentionSupported = true,
         )
 
         manager.setRememberPasskey(true)
+        manager.setSecureUnlockRetentionPolicy(SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION)
         assertTrue(manager.enrollPasskey("pass-123"))
+        assertEquals("pass-123", cache.value)
 
         client.lastAuthenticateCredentialId = null
-        assertEquals("pass-123", manager.getSavedPasskey())
-        assertEquals("cred-1", client.lastAuthenticateCredentialId)
+        val unlockedPasskey = manager.getSavedPasskey()
 
-        client.lastAuthenticateCredentialId = null
-        assertEquals("pass-123", manager.getSavedPasskey())
+        assertEquals("pass-123", unlockedPasskey)
+        assertNull(client.lastAuthenticateCredentialId)
+    }
+
+    @Test
+    fun unsupportedSessionRetentionFallsBackToPromptEveryTime() = runTest {
+        val cache = FakeSessionPasskeyCache(initialValue = "cached-passkey")
+        val client = FakeWebAuthnClient(
+            supported = true,
+            capabilities = supportedCapabilities(),
+            createResult = WebAuthnOperationResult(
+                status = WebAuthnOperationStatus.SUCCESS,
+                credentialId = "cred-1",
+                prfFirstOutputBase64Url = "cHJmLWtleS1ieXRlcw",
+            ),
+            authenticateResult = successfulAuthResult(),
+        )
+        val manager = BrowserSessionManager(
+            storageClient = FakeStorageClient(),
+            webAuthnClient = client,
+            webCryptoClient = FakeWebCryptoClient(),
+            encryptedPasskeyStore = FakeEncryptedPasskeyStore(),
+            sessionPasskeyCache = cache,
+            sessionRetentionSupported = false,
+        )
+
+        manager.setRememberPasskey(true)
+        manager.setSecureUnlockRetentionPolicy(SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION)
+        assertEquals(
+            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
+            manager.getSecureUnlockRetentionPolicy(),
+        )
+        assertNull(cache.value)
+
+        assertTrue(manager.enrollPasskey("pass-123"))
+        val unlockedPasskey = manager.getSavedPasskey()
+
+        assertEquals("pass-123", unlockedPasskey)
         assertEquals("cred-1", client.lastAuthenticateCredentialId)
+        assertNull(cache.value)
     }
 
     private fun supportedCapabilities(): WebAuthnCapabilities {
@@ -353,6 +363,22 @@ class BrowserSessionManagerTest {
             status = WebAuthnOperationStatus.SUCCESS,
             prfFirstOutputBase64Url = "cHJmLWtleS1ieXRlcw",
         )
+    }
+}
+
+private class FakeSessionPasskeyCache(
+    initialValue: String? = null,
+) : SessionPasskeyCache {
+    var value: String? = initialValue
+
+    override suspend fun read(): String? = value
+
+    override fun write(passkey: String) {
+        value = passkey
+    }
+
+    override fun clear() {
+        value = null
     }
 }
 

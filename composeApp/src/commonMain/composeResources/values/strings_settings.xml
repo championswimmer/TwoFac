@@ -22,7 +22,10 @@
     <string name="settings_session_retention_app_title">Keep unlocked for this app session</string>
     <string name="settings_session_retention_app_description">After a successful secure unlock, keep the vault unlocked for the rest of this app session. This clears automatically when the app restarts.</string>
     <string name="settings_session_retention_browser_title">Remember authentication for this browser session</string>
-    <string name="settings_session_retention_browser_description">After a successful secure unlock, keep the vault unlocked until the browser closes. This clears automatically when the browser restarts.</string>
+    <string name="settings_session_retention_browser_description">After a successful secure unlock, keep the vault unlocked until the browser closes. Security warning: this keeps the decrypted passkey accessible to extension code in this browser session.</string>
+    <string name="settings_session_retention_browser_warning_title">Enable browser-session unlock retention?</string>
+    <string name="settings_session_retention_browser_warning_message">This will keep the decrypted passkey available to the extension for the rest of this browser session so reopening the extension will not ask for WebAuthn every time. Only enable this if you accept the risk from pasted DevTools scripts or other code that can run inside the extension context.</string>
+    <string name="settings_session_retention_browser_warning_confirm">Enable Anyway</string>
     <string name="settings_upcoming_code_title">Show Upcoming Code</string>
     <string name="settings_upcoming_code_description">Show the next TOTP code a few seconds before it becomes active.</string>
 

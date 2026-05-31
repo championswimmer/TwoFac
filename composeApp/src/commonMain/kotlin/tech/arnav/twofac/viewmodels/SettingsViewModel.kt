@@ -71,6 +71,7 @@ data class SettingsUiState(
     val hasSecureStorage: Boolean = false,
     val isSecureUnlockEnabled: Boolean = false,
     val isSessionRetentionSupported: Boolean = false,
+    val showSessionRetentionRiskDialog: Boolean = false,
     val sessionRetentionPolicy: SecureUnlockRetentionPolicy = SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
     val sessionRetentionScope: SecureUnlockRetentionScope = SecureUnlockRetentionScope.APP_SESSION,
     val unlockMode: SettingsUnlockMode = SettingsUnlockMode.REMEMBER_PASSKEY,
@@ -136,6 +137,7 @@ class SettingsViewModel(
                 it.copy(
                     isSecureUnlockEnabled = false,
                     showEnrollmentDialog = false,
+                    showSessionRetentionRiskDialog = false,
                     enrollmentError = null,
                 )
             }
@@ -154,18 +156,29 @@ class SettingsViewModel(
         val manager = retentionCapableSessionManager ?: return
         if (!manager.supportsSessionRetention()) return
 
-        val policy = if (enabled) {
-            SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION
-        } else {
-            SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+        if (!enabled) {
+            updateSessionRetentionPolicy(SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME)
+            return
         }
-        manager.setSecureUnlockRetentionPolicy(policy)
-        _uiState.update {
-            it.copy(
-                sessionRetentionPolicy = policy,
-                sessionRetentionScope = manager.getSecureUnlockRetentionScope(),
-            )
+
+        if (manager.getSecureUnlockRetentionScope() == SecureUnlockRetentionScope.BROWSER_SESSION) {
+            _uiState.update { it.copy(showSessionRetentionRiskDialog = true) }
+            return
         }
+
+        updateSessionRetentionPolicy(SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION)
+    }
+
+    fun confirmSessionRetentionRisk() {
+        val manager = retentionCapableSessionManager ?: return
+        if (!manager.supportsSessionRetention()) return
+
+        updateSessionRetentionPolicy(SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION)
+        _uiState.update { it.copy(showSessionRetentionRiskDialog = false) }
+    }
+
+    fun dismissSessionRetentionRiskDialog() {
+        _uiState.update { it.copy(showSessionRetentionRiskDialog = false) }
     }
 
     fun onShowUpcomingCodeChanged(enabled: Boolean) {
@@ -505,6 +518,17 @@ class SettingsViewModel(
             secureSessionManager.isSecureUnlockEnabled()
         } else {
             sessionManager?.isRememberPasskeyEnabled() ?: false
+        }
+    }
+
+    private fun updateSessionRetentionPolicy(policy: SecureUnlockRetentionPolicy) {
+        val manager = retentionCapableSessionManager ?: return
+        manager.setSecureUnlockRetentionPolicy(policy)
+        _uiState.update {
+            it.copy(
+                sessionRetentionPolicy = policy,
+                sessionRetentionScope = manager.getSecureUnlockRetentionScope(),
+            )
         }
     }
 

@@ -39,6 +39,7 @@ import tech.arnav.twofac.components.settings.CompanionSyncCard
 import tech.arnav.twofac.components.settings.DeleteStorageDialog
 import tech.arnav.twofac.components.settings.RememberPasskeyCard
 import tech.arnav.twofac.components.settings.SessionRetentionCard
+import tech.arnav.twofac.components.settings.SessionRetentionRiskDialog
 import tech.arnav.twofac.components.settings.StorageLocationCard
 import tech.arnav.twofac.session.SecureUnlockRetentionPolicy
 import tech.arnav.twofac.session.SecureUnlockRetentionScope
@@ -132,6 +133,8 @@ fun SettingsScreen(
         uiState = uiState,
         onDeleteDialogDismiss = viewModel::dismissDeleteStorageDialog,
         onDeleteConfirm = viewModel::confirmDeleteStorage,
+        onSessionRetentionRiskDismiss = viewModel::dismissSessionRetentionRiskDialog,
+        onSessionRetentionRiskConfirm = viewModel::confirmSessionRetentionRisk,
         onExportModeDismiss = viewModel::dismissBackupExportDialog,
         onPlaintextExportSelected = { viewModel.onBackupExportModeSelected(encrypted = false) },
         onEncryptedExportSelected = { viewModel.onBackupExportModeSelected(encrypted = true) },
@@ -251,6 +254,8 @@ private fun SettingsDialogs(
     uiState: SettingsUiState,
     onDeleteDialogDismiss: () -> Unit,
     onDeleteConfirm: () -> Unit,
+    onSessionRetentionRiskDismiss: () -> Unit,
+    onSessionRetentionRiskConfirm: () -> Unit,
     onExportModeDismiss: () -> Unit,
     onPlaintextExportSelected: () -> Unit,
     onEncryptedExportSelected: () -> Unit,
@@ -267,6 +272,13 @@ private fun SettingsDialogs(
             onDismissRequest = onDeleteDialogDismiss,
             onConfirm = onDeleteConfirm,
             isDeleteInProgress = uiState.isDeleteStorageInProgress,
+        )
+    }
+
+    if (uiState.showSessionRetentionRiskDialog) {
+        SessionRetentionRiskDialog(
+            onDismissRequest = onSessionRetentionRiskDismiss,
+            onConfirm = onSessionRetentionRiskConfirm,
         )
     }
 
