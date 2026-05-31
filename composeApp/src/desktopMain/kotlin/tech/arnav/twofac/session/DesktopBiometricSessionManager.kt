@@ -12,11 +12,13 @@ import kotlinx.serialization.Serializable
 data class BiometricPreferences(
     val biometricEnabled: Boolean = false,
     val rememberPasskeyEnabled: Boolean = false,
+    val secureUnlockRetentionPolicy: SecureUnlockRetentionPolicy = SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME,
 )
 
 class DesktopBiometricSessionManager(
     private val backend: DesktopSecureUnlockBackend,
-) : BiometricSessionManager {
+    private val sessionPasskeyCache: SessionPasskeyCache = InMemorySessionPasskeyCache(),
+) : BiometricSessionManager, SessionRetentionCapableSecureSessionManager {
 
     private val appDirs = AppDirs {
         appName = "TwoFac"
@@ -54,7 +56,7 @@ class DesktopBiometricSessionManager(
         }
     }
 
-    override fun isAvailable(): Boolean = true
+    override fun isAvailable(): Boolean = isBiometricAvailable()
 
     override fun isBiometricAvailable(): Boolean {
         return backend.isAvailable() && backend.supportsStrongUserPresence()
@@ -70,29 +72,44 @@ class DesktopBiometricSessionManager(
     }
 
     override fun setBiometricEnabled(enabled: Boolean) {
-        updatePreferences { it.copy(biometricEnabled = enabled) }
+        updatePreferences {
+            it.copy(
+                biometricEnabled = enabled,
+                rememberPasskeyEnabled = enabled,
+            )
+        }
         if (!enabled) {
             clearPasskey()
         }
     }
 
-    override fun isRememberPasskeyEnabled(): Boolean {
-        val prefs = getPreferences()
-        val biometricEnabled = prefs.biometricEnabled && isBiometricAvailable()
-        return biometricEnabled || prefs.rememberPasskeyEnabled
-    }
+    override fun isRememberPasskeyEnabled(): Boolean = isBiometricEnabled()
 
     override fun setRememberPasskey(enabled: Boolean) {
-        updatePreferences { it.copy(rememberPasskeyEnabled = enabled) }
-        if (!enabled) {
-            clearPasskey()
+        setBiometricEnabled(enabled)
+    }
+
+    override fun supportsSessionRetention(): Boolean = true
+
+    override fun getSecureUnlockRetentionPolicy(): SecureUnlockRetentionPolicy {
+        return getPreferences().secureUnlockRetentionPolicy
+    }
+
+    override fun setSecureUnlockRetentionPolicy(policy: SecureUnlockRetentionPolicy) {
+        updatePreferences { it.copy(secureUnlockRetentionPolicy = policy) }
+        if (policy != SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION) {
+            clearRetainedPasskey(sessionPasskeyCache)
         }
     }
 
     override suspend fun getSavedPasskey(): String? {
         if (!isRememberPasskeyEnabled()) return null
+
+        readRetainedPasskey(sessionPasskeyCache)?.let { return it }
+        if (!isSecureUnlockReady()) return null
+
         return try {
-            backend.getSavedPasskey()
+            backend.getSavedPasskey()?.also { writeRetainedPasskey(sessionPasskeyCache, it) }
         } catch (e: Exception) {
             null
         }
@@ -100,14 +117,11 @@ class DesktopBiometricSessionManager(
 
     override fun savePasskey(passkey: String) {
         if (!isRememberPasskeyEnabled()) return
-        try {
-            backend.savePasskey(passkey)
-        } catch (e: Exception) {
-            // ignore
-        }
+        writeRetainedPasskey(sessionPasskeyCache, passkey)
     }
 
     override fun clearPasskey() {
+        clearRetainedPasskey(sessionPasskeyCache)
         try {
             backend.clearPasskey()
         } catch (e: Exception) {
@@ -118,7 +132,11 @@ class DesktopBiometricSessionManager(
     override suspend fun enrollPasskey(passkey: String): Boolean {
         if (!isBiometricAvailable()) return false
         return try {
-            backend.enrollPasskey(passkey)
+            backend.enrollPasskey(passkey).also { enrolled ->
+                if (enrolled) {
+                    writeRetainedPasskey(sessionPasskeyCache, passkey)
+                }
+            }
         } catch (e: Exception) {
             false
         }

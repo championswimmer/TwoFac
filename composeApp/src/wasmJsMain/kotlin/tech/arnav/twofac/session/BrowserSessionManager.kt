@@ -14,6 +14,7 @@ import tech.arnav.twofac.session.interop.WebStorageClient
 
 private const val REMEMBER_PASSKEY_KEY = "twofac_remember_passkey"
 private const val SECURE_UNLOCK_ENABLED_KEY = "twofac_secure_unlock_enabled"
+private const val SECURE_UNLOCK_RETENTION_POLICY_KEY = "twofac_secure_unlock_retention_policy"
 private const val ENROLLED_CREDENTIAL_ID_KEY = "twofac_webauthn_credential_id"
 private const val ENCRYPTED_PASSKEY_BLOB_KEY = "twofac_webauthn_encrypted_passkey_blob"
 private const val ENCRYPTED_PAYLOAD_VERSION = 1
@@ -78,8 +79,9 @@ data class SecureUnlockAttempt(
 /**
  * Browser implementation of [SecureSessionManager] using WebAuthn as the unlock gate.
  *
- * This phase stores only encrypted passkey payloads + metadata in persistent web storage
- * and keeps decrypted passkeys in memory for the current session lifetime.
+ * Encrypted passkey payloads remain in persistent browser storage, while decrypted
+ * passkeys can optionally be retained for the current browser session when running
+ * inside a browser extension context.
  */
 internal class BrowserSessionManager(
     private val storageClient: WebStorageClient = LocalStorageClient(),
@@ -89,9 +91,10 @@ internal class BrowserSessionManager(
         storageClient = storageClient,
         storageKey = ENCRYPTED_PASSKEY_BLOB_KEY,
     ),
- ) : SecureSessionManager {
+    private val sessionPasskeyCache: SessionPasskeyCache = defaultBrowserSessionPasskeyCache(),
+    private val sessionRetentionSupported: Boolean = supportsBrowserExtensionSessionRetention(),
+ ) : SessionRetentionCapableSecureSessionManager {
 
-    private var sessionPasskey: String? = null
     private var enrolledCredentialId: String? = safeStorageGet(ENROLLED_CREDENTIAL_ID_KEY)
     private var encryptedPasskeyBlob: EncryptedPasskeyBlob? = null
 
@@ -113,13 +116,12 @@ internal class BrowserSessionManager(
     }
 
     override fun savePasskey(passkey: String) {
-        if (isRememberPasskeyEnabled()) {
-            sessionPasskey = passkey
-        }
+        if (!isRememberPasskeyEnabled()) return
+        writeRetainedPasskey(sessionPasskeyCache, passkey)
     }
 
     override fun clearPasskey() {
-        sessionPasskey = null
+        clearRetainedPasskey(sessionPasskeyCache)
         enrolledCredentialId = null
         encryptedPasskeyBlob = null
         safeStorageRemove(ENROLLED_CREDENTIAL_ID_KEY)
@@ -132,6 +134,33 @@ internal class BrowserSessionManager(
 
     override fun isSecureUnlockReady(): Boolean {
         return isSecureUnlockEnabled() && isPasskeyEnrolled()
+    }
+
+    override fun supportsSessionRetention(): Boolean = sessionRetentionSupported
+
+    override fun getSecureUnlockRetentionPolicy(): SecureUnlockRetentionPolicy {
+        if (!supportsSessionRetention()) return SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+        val storedValue = safeStorageGet(SECURE_UNLOCK_RETENTION_POLICY_KEY)
+        return storedValue
+            ?.let { value -> SecureUnlockRetentionPolicy.entries.firstOrNull { it.name == value } }
+            ?: SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+    }
+
+    override fun setSecureUnlockRetentionPolicy(policy: SecureUnlockRetentionPolicy) {
+        if (!supportsSessionRetention()) {
+            clearRetainedPasskey(sessionPasskeyCache)
+            safeStorageRemove(SECURE_UNLOCK_RETENTION_POLICY_KEY)
+            return
+        }
+
+        safeStorageSet(SECURE_UNLOCK_RETENTION_POLICY_KEY, policy.name)
+        if (policy != SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION) {
+            clearRetainedPasskey(sessionPasskeyCache)
+        }
+    }
+
+    override fun getSecureUnlockRetentionScope(): SecureUnlockRetentionScope {
+        return SecureUnlockRetentionScope.BROWSER_SESSION
     }
 
     fun isPasskeyEnrolled(): Boolean {
@@ -242,7 +271,7 @@ internal class BrowserSessionManager(
             return lastEnrollOutcome
         }
 
-        sessionPasskey = passkey
+        writeRetainedPasskey(sessionPasskeyCache, passkey)
         enrolledCredentialId = credentialId
         safeStorageSet(ENROLLED_CREDENTIAL_ID_KEY, credentialId)
         setSecureUnlockEnabled(true)
@@ -255,7 +284,16 @@ internal class BrowserSessionManager(
             lastUnlockOutcome = SecureUnlockOutcome.UNAVAILABLE
             return SecureUnlockAttempt(
                 SecureUnlockOutcome.UNAVAILABLE,
-                detail = "Secure unlock disabled"
+                detail = "Secure unlock disabled",
+            )
+        }
+
+        readRetainedPasskey(sessionPasskeyCache)?.let { retainedPasskey ->
+            lastUnlockOutcome = SecureUnlockOutcome.SUCCESS
+            return SecureUnlockAttempt(
+                outcome = SecureUnlockOutcome.SUCCESS,
+                passkey = retainedPasskey,
+                detail = "Retained passkey cache hit",
             )
         }
 
@@ -264,7 +302,7 @@ internal class BrowserSessionManager(
             lastUnlockOutcome = SecureUnlockOutcome.UNAVAILABLE
             return SecureUnlockAttempt(
                 SecureUnlockOutcome.UNAVAILABLE,
-                detail = "No encrypted passkey"
+                detail = "No encrypted passkey",
             )
         }
 
@@ -279,7 +317,7 @@ internal class BrowserSessionManager(
             lastUnlockOutcome = SecureUnlockOutcome.UNAVAILABLE
             return SecureUnlockAttempt(
                 SecureUnlockOutcome.UNAVAILABLE,
-                detail = "No enrolled credential"
+                detail = "No enrolled credential",
             )
         }
 
@@ -287,7 +325,7 @@ internal class BrowserSessionManager(
             lastUnlockOutcome = SecureUnlockOutcome.UNAVAILABLE
             return SecureUnlockAttempt(
                 SecureUnlockOutcome.UNAVAILABLE,
-                detail = "Credential mismatch"
+                detail = "Credential mismatch",
             )
         }
 
@@ -295,7 +333,7 @@ internal class BrowserSessionManager(
             lastUnlockOutcome = SecureUnlockOutcome.UNAVAILABLE
             return SecureUnlockAttempt(
                 SecureUnlockOutcome.UNAVAILABLE,
-                detail = "Unsupported encrypted payload version"
+                detail = "Unsupported encrypted payload version",
             )
         }
 
@@ -312,7 +350,7 @@ internal class BrowserSessionManager(
             lastUnlockOutcome = SecureUnlockOutcome.UNAVAILABLE
             return SecureUnlockAttempt(
                 SecureUnlockOutcome.UNAVAILABLE,
-                detail = "PRF output unavailable"
+                detail = "PRF output unavailable",
             )
         }
 
@@ -333,7 +371,7 @@ internal class BrowserSessionManager(
             )
         }
 
-        sessionPasskey = decryptedPasskey
+        writeRetainedPasskey(sessionPasskeyCache, decryptedPasskey)
         return SecureUnlockAttempt(
             SecureUnlockOutcome.SUCCESS,
             passkey = decryptedPasskey,

@@ -18,17 +18,18 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import org.jetbrains.compose.resources.getString
 import twofac.composeapp.generated.resources.Res
-import twofac.composeapp.generated.resources.biometric_enrollment_title
-import twofac.composeapp.generated.resources.biometric_enrollment_subtitle
-import twofac.composeapp.generated.resources.biometric_unlock_title
-import twofac.composeapp.generated.resources.biometric_unlock_subtitle
-import twofac.composeapp.generated.resources.biometric_use_passkey_instead
 import twofac.composeapp.generated.resources.action_cancel
+import twofac.composeapp.generated.resources.biometric_enrollment_subtitle
+import twofac.composeapp.generated.resources.biometric_enrollment_title
+import twofac.composeapp.generated.resources.biometric_unlock_subtitle
+import twofac.composeapp.generated.resources.biometric_unlock_title
+import twofac.composeapp.generated.resources.biometric_use_passkey_instead
 
 class AndroidBiometricSessionManager(
     private val context: Context,
     private val activityProvider: () -> FragmentActivity,
-) : BiometricSessionManager {
+    private val sessionPasskeyCache: SessionPasskeyCache = InMemorySessionPasskeyCache(),
+) : BiometricSessionManager, SessionRetentionCapableSecureSessionManager {
 
     companion object {
         private const val TAG = "AndroidBiometricSession"
@@ -37,6 +38,7 @@ class AndroidBiometricSessionManager(
         private const val KEY_REMEMBER_ENABLED = "remember_passkey_enabled"
         private const val KEY_ENCRYPTED_PASSKEY = "encrypted_passkey"
         private const val KEY_PASSKEY_IV = "passkey_iv"
+        private const val KEY_RETENTION_POLICY = "secure_unlock_retention_policy"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
         // After a successful biometric prompt, the key remains usable for this duration.
         private const val AUTH_VALIDITY_SECONDS = 15 * 60
@@ -46,15 +48,15 @@ class AndroidBiometricSessionManager(
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
-    override fun isAvailable(): Boolean = true
+    override fun isAvailable(): Boolean = isBiometricAvailable()
 
     override fun isRememberPasskeyEnabled(): Boolean {
-        // On Android, "remember passkey" is synonymous with biometric unlock
+        // On Android, "remember passkey" is synonymous with biometric unlock.
         return isBiometricEnabled()
     }
 
     override fun setRememberPasskey(enabled: Boolean) {
-        // Delegate to biometric toggle — the two are synonymous on secure platforms
+        // Delegate to biometric toggle — the two are synonymous on secure platforms.
         setBiometricEnabled(enabled)
     }
 
@@ -72,6 +74,22 @@ class AndroidBiometricSessionManager(
         setRememberEnabled(enabled && isBiometricAvailable())
     }
 
+    override fun supportsSessionRetention(): Boolean = true
+
+    override fun getSecureUnlockRetentionPolicy(): SecureUnlockRetentionPolicy {
+        val storedValue = prefs.getString(KEY_RETENTION_POLICY, null)
+        return storedValue
+            ?.let { value -> SecureUnlockRetentionPolicy.entries.firstOrNull { it.name == value } }
+            ?: SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+    }
+
+    override fun setSecureUnlockRetentionPolicy(policy: SecureUnlockRetentionPolicy) {
+        prefs.edit().putString(KEY_RETENTION_POLICY, policy.name).apply()
+        if (policy != SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION) {
+            clearRetainedPasskey(sessionPasskeyCache)
+        }
+    }
+
     private fun setRememberEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_REMEMBER_ENABLED, enabled).apply()
         if (!enabled) {
@@ -83,17 +101,22 @@ class AndroidBiometricSessionManager(
     override suspend fun getSavedPasskey(): String? {
         if (!isRememberPasskeyEnabled()) return null
 
+        readRetainedPasskey(sessionPasskeyCache)?.let { return it }
+
         val encryptedData = prefs.getString(KEY_ENCRYPTED_PASSKEY, null) ?: return null
         val iv = prefs.getString(KEY_PASSKEY_IV, null) ?: return null
-        return authenticateAndDecrypt(encryptedData, iv)
+        val decryptedPasskey = authenticateAndDecrypt(encryptedData, iv) ?: return null
+        writeRetainedPasskey(sessionPasskeyCache, decryptedPasskey)
+        return decryptedPasskey
     }
 
     override fun savePasskey(passkey: String) {
-        // No-op: on Android, passkeys are only stored via enrollPasskey() with biometric
-        // protection. Plain-text persistence is not supported.
+        if (!isRememberPasskeyEnabled()) return
+        writeRetainedPasskey(sessionPasskeyCache, passkey)
     }
 
     override fun clearPasskey() {
+        clearRetainedPasskey(sessionPasskeyCache)
         prefs.edit()
             .remove(KEY_ENCRYPTED_PASSKEY)
             .remove(KEY_PASSKEY_IV)
@@ -111,14 +134,14 @@ class AndroidBiometricSessionManager(
         if (!isBiometricAvailable()) return false
 
         return try {
-            // Start fresh: delete old key and data
+            // Start fresh: delete old key and data.
             deleteKey()
             clearPasskey()
 
-            // Create a new key
+            // Create a new key.
             val key = getOrCreateKey()
 
-            // Prompt biometric to authenticate the time-based key
+            // Prompt biometric to authenticate the time-based key.
             val authenticated = promptBiometric(
                 title = getString(Res.string.biometric_enrollment_title),
                 subtitle = getString(Res.string.biometric_enrollment_subtitle),
@@ -126,7 +149,7 @@ class AndroidBiometricSessionManager(
             )
             if (!authenticated) return false
 
-            // Key is now authenticated for AUTH_VALIDITY_SECONDS — encrypt and save
+            // Key is now authenticated for AUTH_VALIDITY_SECONDS — encrypt and save.
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.ENCRYPT_MODE, key)
             val encrypted = cipher.doFinal(passkey.toByteArray())
@@ -137,6 +160,7 @@ class AndroidBiometricSessionManager(
                 .putString(KEY_PASSKEY_IV, Base64.encodeToString(iv, Base64.NO_WRAP))
                 .apply()
 
+            writeRetainedPasskey(sessionPasskeyCache, passkey)
             true
         } catch (e: Exception) {
             Log.w(TAG, "Biometric enrollment failed", e)
@@ -144,8 +168,6 @@ class AndroidBiometricSessionManager(
             false
         }
     }
-
-    // ── Private helpers ──
 
     private suspend fun promptBiometric(
         title: String,
@@ -160,6 +182,7 @@ class AndroidBiometricSessionManager(
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     continuation.resume(true)
                 }
+
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     continuation.resume(false)
                 }
