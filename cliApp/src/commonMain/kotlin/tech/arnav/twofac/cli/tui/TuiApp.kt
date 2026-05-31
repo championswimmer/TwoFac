@@ -73,6 +73,7 @@ class TuiApp(
     private fun applyAction(state: TuiAppState, action: TuiAction): TuiAppState {
         return when (action) {
             TuiAction.ConfirmRemoveSelectedAccount -> removeSelectedAccount(state)
+            TuiAction.ConfirmSelectedAccountColor -> updateSelectedAccountColor(state)
             TuiAction.SubmitNewAccount -> submitNewAccount(state)
             TuiAction.CycleStorageBackend,
             TuiAction.ToggleIssuerIcons -> persistSettings(navigator.reduce(state, action))
@@ -134,6 +135,46 @@ class TuiApp(
         return navigator.reduce(refreshedState, TuiAction.Back)
     }
 
+    private fun updateSelectedAccountColor(state: TuiAppState): TuiAppState {
+        val accountId = state.selectedAccountId
+            ?: return state.copy(
+                account = state.account.copy(
+                    isColorPickerActive = false,
+                    message = "No account selected",
+                ),
+            )
+        val color = state.account.selectedPendingColor
+
+        val updated = runCatching {
+            runBlocking { twoFacLib.updateAccountColor(accountId, color) }
+        }.getOrElse { error ->
+            return state.copy(
+                account = state.account.copy(
+                    isColorPickerActive = false,
+                    message = "Color update failed: ${error.message}",
+                ),
+            )
+        }
+
+        if (!updated) {
+            return state.copy(
+                account = state.account.copy(
+                    isColorPickerActive = false,
+                    message = "Account not found",
+                ),
+            )
+        }
+
+        return refreshHomeAccounts(
+            state.copy(
+                account = state.account.copy(
+                    isColorPickerActive = false,
+                    message = "Color set to ${color?.displayName ?: "default"}",
+                ),
+            )
+        )
+    }
+
     private fun submitNewAccount(state: TuiAppState): TuiAppState {
         val uri = state.addAccount.uriInput.trim()
         if (uri.isBlank()) {
@@ -180,6 +221,7 @@ class TuiApp(
                 issuer = account.issuer,
                 otp = otp,
                 nextCodeAt = account.nextCodeAt,
+                color = account.color,
             )
         }
     }

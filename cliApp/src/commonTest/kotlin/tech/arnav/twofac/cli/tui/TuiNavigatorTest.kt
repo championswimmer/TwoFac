@@ -1,6 +1,8 @@
 package tech.arnav.twofac.cli.tui
 
 import tech.arnav.twofac.cli.storage.CliStorageBackend
+import tech.arnav.twofac.lib.otp.OtpCodes
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -56,6 +58,34 @@ class TuiNavigatorTest {
         val next = navigator.reduce(state, TuiAction.DeactivateRemoveConfirmation)
 
         assertFalse(next.account.isRemoveConfirmationActive)
+    }
+
+    @Test
+    fun testActivateColorPickerSelectsCurrentAccountColor() {
+        val state = TuiAppState(
+            home = HomeScreenState(
+                accounts = listOf(
+                    TuiOtpEntry("1", "alice@example.com", "GitHub", OtpCodes("123456"), 30, AccountColorTag.BLUE),
+                ),
+            ),
+            selectedAccountId = "1",
+        )
+
+        val next = navigator.reduce(state, TuiAction.ActivateColorPicker)
+
+        assertTrue(next.account.isColorPickerActive)
+        assertEquals(AccountColorTag.BLUE, next.account.selectedPendingColor)
+    }
+
+    @Test
+    fun testColorPickerCyclesThroughNoneAndPalette() {
+        val state = TuiAppState(account = AccountScreenState(isColorPickerActive = true, selectedColorIndex = 0))
+
+        val next = navigator.reduce(state, TuiAction.SelectNextAccountColor)
+        val previous = navigator.reduce(next, TuiAction.SelectPreviousAccountColor)
+
+        assertEquals(AccountColorTag.RED, next.account.selectedPendingColor)
+        assertEquals(null, previous.account.selectedPendingColor)
     }
 
     @Test

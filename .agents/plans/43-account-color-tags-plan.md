@@ -7,7 +7,7 @@ progress:
   - "[x] Phase 2 - Persist Optional Color on Stored Accounts"
   - "[x] Phase 3 - Expose Color Update APIs and ViewModel State"
   - "[x] Phase 4 - Apply Colors in Compose UI Cards and Account Management"
-  - "[ ] Phase 5 - Add CLI/TUI Color Selection and Display"
+  - "[x] Phase 5 - Add CLI/TUI Color Selection and Display"
   - "[ ] Phase 6 - Propagate Color Through Backups and Companion Sync"
   - "[ ] Phase 7 - Testing, ABI Updates, and Cross-Platform Validation"
 ---

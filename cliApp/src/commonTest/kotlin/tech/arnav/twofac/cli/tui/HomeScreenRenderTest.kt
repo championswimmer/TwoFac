@@ -5,13 +5,14 @@ import com.github.ajalt.mordant.terminal.TerminalRecorder
 import tech.arnav.twofac.cli.theme.CliIssuerIcons
 import tech.arnav.twofac.cli.theme.CliTheme
 import tech.arnav.twofac.lib.otp.OtpCodes
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertFalse
 
 class HomeScreenRenderTest {
     private val accounts = listOf(
-        TuiOtpEntry("1", "alice@example.com", "GitHub", OtpCodes("123456"), 30),
+        TuiOtpEntry("1", "alice@example.com", "GitHub", OtpCodes("123456"), 30, AccountColorTag.TEAL),
         TuiOtpEntry("2", "bob@example.com", "Google", OtpCodes("654321"), 30),
     )
 
@@ -26,6 +27,19 @@ class HomeScreenRenderTest {
         )
 
         assertContains(output, "${CliIssuerIcons.glyphForIssuer("GitHub")}  alice@example.com")
+    }
+
+    @Test
+    fun testHomeScreenShowsColorColumnAndSwatch() {
+        val output = renderHomeScreen(
+            TuiAppState(
+                home = HomeScreenState(accounts = accounts),
+                nowEpochSeconds = 0,
+            )
+        )
+
+        assertContains(output, "Color")
+        assertContains(output, "██")
     }
 
     @Test

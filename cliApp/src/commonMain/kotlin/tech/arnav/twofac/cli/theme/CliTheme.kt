@@ -6,6 +6,7 @@ import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextStyle
 import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.ajalt.mordant.terminal.Terminal
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.lib.theme.ThemeColor
 import tech.arnav.twofac.lib.theme.TimerState
 import tech.arnav.twofac.lib.theme.TwoFacThemeTokens
@@ -22,11 +23,25 @@ data class CliThemeStyles(
     val timerCritical: TextStyle,
     val timerTrack: TextStyle,
     val danger: TextStyle,
+    val accountColorStyles: Map<AccountColorTag, TextStyle>,
+    val accountColorOutputEnabled: Boolean,
 ) {
     fun timer(state: TimerState): TextStyle = when (state) {
         TimerState.Healthy -> timerHealthy
         TimerState.Warning -> timerWarning
         TimerState.Critical -> timerCritical
+    }
+
+    fun accountColorSwatch(color: AccountColorTag?): String {
+        if (color == null) return "-"
+        if (!accountColorOutputEnabled) return "[${color.displayName.first()}]"
+        val style = accountColorStyles[color] ?: TextStyle()
+        return style("██")
+    }
+
+    fun accountColorLabel(color: AccountColorTag?): String {
+        if (color == null) return "-"
+        return "${accountColorSwatch(color)} ${color.displayName}"
     }
 }
 
@@ -54,6 +69,8 @@ object CliTheme {
         timerCritical = trueColor(tokens.timer.critical),
         timerTrack = TextStyles.dim + trueColor(tokens.timerTrack),
         danger = TextStyles.bold + trueColor(tokens.danger),
+        accountColorStyles = AccountColorTag.entries.associateWith { trueColor(it.darkColor) },
+        accountColorOutputEnabled = true,
     )
 
     private fun ansi256Styles() = CliThemeStyles(
@@ -68,6 +85,17 @@ object CliTheme {
         timerCritical = ansi256(203), // xterm-256 #ff5f5f (salmon red)
         timerTrack = TextStyles.dim + ansi256(242), // xterm-256 #6c6c6c (mid gray)
         danger = TextStyles.bold + ansi256(203), // xterm-256 #ff5f5f (salmon red)
+        accountColorStyles = mapOf(
+            AccountColorTag.RED to ansi256(167),
+            AccountColorTag.ORANGE to ansi256(173),
+            AccountColorTag.YELLOW to ansi256(179),
+            AccountColorTag.GREEN to ansi256(65),
+            AccountColorTag.TEAL to ansi256(73),
+            AccountColorTag.BLUE to ansi256(68),
+            AccountColorTag.PURPLE to ansi256(97),
+            AccountColorTag.BROWN to ansi256(130),
+        ),
+        accountColorOutputEnabled = true,
     )
 
     private fun ansi16Styles() = CliThemeStyles(
@@ -82,6 +110,17 @@ object CliTheme {
         timerCritical = TextColors.red, // ANSI 31 red
         timerTrack = TextStyles.dim + TextColors.blue, // ANSI 34 blue (dimmed track)
         danger = TextStyles.bold + TextColors.red, // ANSI 31 red
+        accountColorStyles = mapOf(
+            AccountColorTag.RED to TextColors.red,
+            AccountColorTag.ORANGE to TextColors.yellow,
+            AccountColorTag.YELLOW to TextColors.yellow,
+            AccountColorTag.GREEN to TextColors.green,
+            AccountColorTag.TEAL to TextColors.cyan,
+            AccountColorTag.BLUE to TextColors.blue,
+            AccountColorTag.PURPLE to TextColors.magenta,
+            AccountColorTag.BROWN to TextColors.yellow,
+        ),
+        accountColorOutputEnabled = true,
     )
 
     private fun noColorStyles() = CliThemeStyles(
@@ -96,6 +135,8 @@ object CliTheme {
         timerCritical = TextStyle(),
         timerTrack = TextStyles.dim.style,
         danger = TextStyles.bold.style,
+        accountColorStyles = emptyMap(),
+        accountColorOutputEnabled = false,
     )
 
     private fun ansi256(index: Int): TextStyle = TextColors.color(Ansi256(index), AnsiLevel.ANSI256)

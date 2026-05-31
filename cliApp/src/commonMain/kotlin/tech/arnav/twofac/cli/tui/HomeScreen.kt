@@ -70,7 +70,12 @@ class HomeScreen : TuiScreen {
             cellBorders = Borders.NONE
         }
 
-        column(4) {
+        column(1) {
+            width = Fixed(5)
+            cellBorders = Borders.ALL
+        }
+
+        column(5) {
             width = Fixed(24)
             cellBorders = Borders.ALL
         }
@@ -78,6 +83,7 @@ class HomeScreen : TuiScreen {
         header {
             row(
                 styles.header(" "),
+                styles.header("Color"),
                 styles.header("Account"),
                 styles.header("Issuer"),
                 styles.header("OTP"),
@@ -88,7 +94,7 @@ class HomeScreen : TuiScreen {
         body {
             val filteredAccounts = state.home.filteredAccounts()
             if (filteredAccounts.isEmpty()) {
-                row("", styles.label("No matching accounts"), "", "", "")
+                row("", "", styles.label("No matching accounts"), "", "", "")
             } else {
                 filteredAccounts.forEachIndexed { index, account ->
                     val isSelected = index == state.home.selectedIndex
@@ -103,10 +109,11 @@ class HomeScreen : TuiScreen {
                     val accountLabel = if (isSelected) styles.key(accountText) else accountText
                     val issuerLabel = if (isSelected) styles.key(account.issuer ?: "-") else (account.issuer ?: "-")
 
+                    val colorSwatch = styles.accountColorSwatch(account.color)
                     val remaining = (account.nextCodeAt - state.nowEpochSeconds).coerceAtLeast(0)
                     val progressBar = renderProgressBar(account, state.nowEpochSeconds, styles)
                     val progressCol = progressStyle(remaining, styles)(progressBar)
-                    row(selectedMarker, accountLabel, issuerLabel, otpFormatted, progressCol)
+                    row(selectedMarker, colorSwatch, accountLabel, issuerLabel, otpFormatted, progressCol)
                 }
             }
         }
