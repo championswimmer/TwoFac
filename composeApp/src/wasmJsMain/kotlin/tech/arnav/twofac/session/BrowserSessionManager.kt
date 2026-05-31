@@ -79,10 +79,9 @@ data class SecureUnlockAttempt(
 /**
  * Browser implementation of [SecureSessionManager] using WebAuthn as the unlock gate.
  *
- * Encrypted passkey payloads remain in persistent browser storage. Plaintext passkey
- * retention is intentionally disabled in browser/extension builds because any value
- * kept in page/extension JavaScript state (including `storage.session`) would remain
- * readable to code running inside that same browser context.
+ * Encrypted passkey payloads remain in persistent browser storage. Decrypted passkeys
+ * may be retained for the current browser session only when the user explicitly opts
+ * into browser-session retention inside an extension context.
  */
 internal class BrowserSessionManager(
     private val storageClient: WebStorageClient = LocalStorageClient(),
@@ -92,6 +91,8 @@ internal class BrowserSessionManager(
         storageClient = storageClient,
         storageKey = ENCRYPTED_PASSKEY_BLOB_KEY,
     ),
+    private val sessionPasskeyCache: SessionPasskeyCache = defaultBrowserSessionPasskeyCache(),
+    private val sessionRetentionSupported: Boolean = supportsBrowserExtensionSessionRetention(),
  ) : SessionRetentionCapableSecureSessionManager {
 
     private var enrolledCredentialId: String? = safeStorageGet(ENROLLED_CREDENTIAL_ID_KEY)
@@ -114,9 +115,13 @@ internal class BrowserSessionManager(
         return unlockAttempt.passkey
     }
 
-    override fun savePasskey(passkey: String) = Unit
+    override fun savePasskey(passkey: String) {
+        if (!isRememberPasskeyEnabled()) return
+        writeRetainedPasskey(sessionPasskeyCache, passkey)
+    }
 
     override fun clearPasskey() {
+        clearRetainedPasskey(sessionPasskeyCache)
         enrolledCredentialId = null
         encryptedPasskeyBlob = null
         safeStorageRemove(ENROLLED_CREDENTIAL_ID_KEY)
@@ -131,14 +136,27 @@ internal class BrowserSessionManager(
         return isSecureUnlockEnabled() && isPasskeyEnrolled()
     }
 
-    override fun supportsSessionRetention(): Boolean = false
+    override fun supportsSessionRetention(): Boolean = sessionRetentionSupported
 
     override fun getSecureUnlockRetentionPolicy(): SecureUnlockRetentionPolicy {
-        return SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+        if (!supportsSessionRetention()) return SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
+        val storedValue = safeStorageGet(SECURE_UNLOCK_RETENTION_POLICY_KEY)
+        return storedValue
+            ?.let { value -> SecureUnlockRetentionPolicy.entries.firstOrNull { it.name == value } }
+            ?: SecureUnlockRetentionPolicy.PROMPT_EVERY_TIME
     }
 
     override fun setSecureUnlockRetentionPolicy(policy: SecureUnlockRetentionPolicy) {
-        safeStorageRemove(SECURE_UNLOCK_RETENTION_POLICY_KEY)
+        if (!supportsSessionRetention()) {
+            clearRetainedPasskey(sessionPasskeyCache)
+            safeStorageRemove(SECURE_UNLOCK_RETENTION_POLICY_KEY)
+            return
+        }
+
+        safeStorageSet(SECURE_UNLOCK_RETENTION_POLICY_KEY, policy.name)
+        if (policy != SecureUnlockRetentionPolicy.RETAIN_FOR_CURRENT_SESSION) {
+            clearRetainedPasskey(sessionPasskeyCache)
+        }
     }
 
     override fun getSecureUnlockRetentionScope(): SecureUnlockRetentionScope {
@@ -253,6 +271,7 @@ internal class BrowserSessionManager(
             return lastEnrollOutcome
         }
 
+        writeRetainedPasskey(sessionPasskeyCache, passkey)
         enrolledCredentialId = credentialId
         safeStorageSet(ENROLLED_CREDENTIAL_ID_KEY, credentialId)
         setSecureUnlockEnabled(true)
@@ -266,6 +285,15 @@ internal class BrowserSessionManager(
             return SecureUnlockAttempt(
                 SecureUnlockOutcome.UNAVAILABLE,
                 detail = "Secure unlock disabled",
+            )
+        }
+
+        readRetainedPasskey(sessionPasskeyCache)?.let { retainedPasskey ->
+            lastUnlockOutcome = SecureUnlockOutcome.SUCCESS
+            return SecureUnlockAttempt(
+                outcome = SecureUnlockOutcome.SUCCESS,
+                passkey = retainedPasskey,
+                detail = "Retained passkey cache hit",
             )
         }
 
@@ -343,6 +371,7 @@ internal class BrowserSessionManager(
             )
         }
 
+        writeRetainedPasskey(sessionPasskeyCache, decryptedPasskey)
         return SecureUnlockAttempt(
             SecureUnlockOutcome.SUCCESS,
             passkey = decryptedPasskey,
