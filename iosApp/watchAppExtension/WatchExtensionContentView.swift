@@ -98,6 +98,10 @@ struct WatchExtensionContentView: View {
                                 }
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                        .fill(WatchThemeTokens.accountBackgroundColor(for: account.color))
+                                )
                             }
                         }
                         .tabViewStyle(.verticalPage)

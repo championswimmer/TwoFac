@@ -36,6 +36,7 @@ class WatchOtpProvider(
                                 accountID = account.accountId,
                                 accountLabel = account.accountLabel,
                                 nextCodeAt = nextCodeAt,
+                                color = account.color,
                             ),
                             issuer = account.issuer,
                             otpCode = otp.generateOTP(nowEpochSec),
@@ -48,6 +49,7 @@ class WatchOtpProvider(
                         account = StoredAccount.DisplayAccount(
                             accountID = account.accountId,
                             accountLabel = account.accountLabel,
+                            color = account.color,
                         ),
                         issuer = account.issuer,
                         otpCode = otp.generateOTP(0),
@@ -59,6 +61,7 @@ class WatchOtpProvider(
                         account = StoredAccount.DisplayAccount(
                             accountID = account.accountId,
                             accountLabel = account.accountLabel,
+                            color = account.color,
                         ),
                         issuer = account.issuer,
                         reason = "Unsupported OTP type",
@@ -69,6 +72,7 @@ class WatchOtpProvider(
                     account = StoredAccount.DisplayAccount(
                         accountID = account.accountId,
                         accountLabel = account.accountLabel,
+                        color = account.color,
                     ),
                     issuer = account.issuer,
                     reason = error.message ?: "Invalid otpauth URI",

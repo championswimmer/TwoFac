@@ -35,6 +35,11 @@ enum WatchThemeTokens {
         Color(themeColor: tokens().background)
     }
 
+    static func accountBackgroundColor(for colorTag: AccountColorTag?) -> Color {
+        guard let colorTag else { return backgroundColor() }
+        return Color(themeColor: colorTag.darkColor)
+    }
+
     private static func timerState(for remainingProgress: Double) -> TimerState {
         let clamped = min(max(remainingProgress, 0.0), 1.0)
         return TimerColorSemanticsKt.timerStateByRemainingProgress(remainingProgress: Float(clamped))

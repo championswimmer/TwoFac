@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
+import tech.arnav.twofac.lib.theme.AccountColorTag
 import tech.arnav.twofac.lib.theme.colorForState
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.lib.theme.timerStateByRemainingProgress
@@ -38,10 +39,15 @@ fun OtpAccountScreen(
     entry: WatchOtpEntry,
     currentEpochMillis: Long,
 ) {
+    val backgroundColor = entry.account.color
+        ?.color(isDarkTheme = true)
+        ?.toComposeColor()
+        ?: MaterialTheme.colors.background
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background),
+            .background(backgroundColor),
         contentAlignment = Alignment.Center,
     ) {
         if (entry is WatchOtpEntry.Valid && entry.nextRefreshAtEpochSec != null && entry.periodSec != null) {
@@ -173,6 +179,7 @@ private fun OtpAccountScreenPreview() {
                     accountID = "preview-account",
                     accountLabel = "arnav@example.com",
                     issuer = "GitHub",
+                    color = AccountColorTag.PURPLE,
                 ),
                 issuer = "GitHub",
                 otpCode = "123456",
