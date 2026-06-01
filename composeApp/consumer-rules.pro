@@ -28,7 +28,12 @@
 -keep class tech.arnav.twofac.composeapp.generated.** { *; }
 
 # ── Cryptography-kotlin (ServiceLoader providers) ────────────────────────────
--keep class dev.whyoleg.cryptography.** { *; }
+# Android R8 already understands ServiceLoader and keeps provider implementations
+# automatically. Avoid blanket -keep rules for the whole package here: the JDK
+# provider contains optional BouncyCastle bridge classes, and keeping everything
+# forces R8 to resolve those optional types during release builds.
+# Desktop packaging uses composeApp/proguard-desktop.pro with the upstream,
+# minimal keep rules instead.
 
 # ── FileKit ───────────────────────────────────────────────────────────────────
 -keep class io.github.vinceglb.filekit.** { *; }
