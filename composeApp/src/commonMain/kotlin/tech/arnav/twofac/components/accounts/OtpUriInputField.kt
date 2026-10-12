@@ -25,9 +25,11 @@ fun OtpUriInputField(
     onFocusChanged: (Boolean) -> Unit,
     onPasteShortcut: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     OutlinedTextField(
         value = value,
+        enabled = enabled,
         onValueChange = onValueChange,
         label = { Text(stringResource(Res.string.add_account_uri_label)) },
         placeholder = { Text(stringResource(Res.string.add_account_uri_placeholder)) },

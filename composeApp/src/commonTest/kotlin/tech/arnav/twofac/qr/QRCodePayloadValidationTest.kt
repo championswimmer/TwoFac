@@ -48,7 +48,7 @@ class QRCodePayloadValidationTest {
         val result = decodedPayloadToQRCodeReadResult(validOtpAuthUri)
 
         val success = assertIs<QRCodeReadResult.Success>(result)
-        assertEquals(validOtpAuthUri, success.otpAuthUri)
+        assertEquals(listOf(validOtpAuthUri), success.otpAuthUris)
     }
 
     @Test
@@ -58,7 +58,7 @@ class QRCodePayloadValidationTest {
         )
 
         val success = assertIs<QRCodeReadResult.Success>(result)
-        assertEquals(validOtpAuthUri, success.otpAuthUri)
+        assertEquals(listOf(validOtpAuthUri), success.otpAuthUris)
     }
 
     @Test
@@ -69,7 +69,25 @@ class QRCodePayloadValidationTest {
         )
 
         val success = assertIs<QRCodeReadResult.Success>(result)
-        assertEquals(validOtpAuthUri, success.otpAuthUri)
+        assertEquals(listOf(validOtpAuthUri), success.otpAuthUris)
+    }
+
+    @Test
+    fun migrationPayloadMapsToCanonicalUrisAndMetadata() {
+        val payload = "otpauth-migration://offline?data=CjEKCkhlbGxvId6tvu8SGEV4YW1wbGU6YWxpY2VAZ29vZ2xlLmNvbRoHRXhhbXBsZTAC"
+        val result = assertIs<QRCodeReadResult.Success>(decodedPayloadToQRCodeReadResult(payload))
+        assertEquals(1, result.otpAuthUris.size)
+        assertEquals(1, result.migrationBatch?.batchSize)
+        assertIs<QRCodeReadResult.Success>(QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult("QR: $payload"))
+        assertIs<QRCodeReadResult.Success>(QRCodeUtils.decodedPayloadCandidatesToQRCodeReadResult(null, payload.toNullInterleavedBytes()))
+    }
+
+    @Test
+    fun malformedMigrationFailsWithoutExposingPayload() {
+        val result = assertIs<QRCodeReadResult.DecodeFailure>(decodedPayloadToQRCodeReadResult(
+            "otpauth-migration://offline?data=PRIVATE_SECRET",
+        ))
+        assertEquals(INVALID_OTP_AUTH_URI_REASON, result.reason)
     }
 
     private fun String.toNullInterleavedBytes(): ByteArray {

@@ -55,4 +55,13 @@
     <!-- Accounts search -->
     <string name="accounts_search_placeholder">Konten durchsuchen</string>
     <string name="accounts_search_no_results">Keine Konten entsprechen deiner Suche</string>
+    <string name="add_account_migration_ready">Konten bereit zum Importieren: %1$d</string>
+    <string name="add_account_migration_progress">%1$d von %2$d Exportcodes gescannt</string>
+    <string name="add_account_migration_reset">Import zurücksetzen</string>
+    <string name="add_account_migration_import">Konten importieren (%1$d)</string>
+    <string name="add_account_migration_invalid">Ungültiger oder nicht unterstützter Authenticator-QR-Inhalt</string>
+    <string name="add_account_migration_mismatch">Dieser Code gehört nicht zum aktuellen Export. Setze den Import zurück, um einen anderen Export zu starten.</string>
+    <string name="add_account_migration_partial">%1$d Konten importiert; %2$d fehlgeschlagen. Erneut versuchen, um nur die verbleibenden Konten zu importieren.</string>
+    <string name="add_account_migration_failed">Konten konnten nicht importiert werden. Entsperre den Tresor und prüfe die Importdaten.</string>
+    <string name="add_account_migration_refresh_failed">Konten wurden gespeichert, aber Aktualisierung oder Synchronisierung ist fehlgeschlagen. Öffne die Kontenansicht erneut.</string>
 </resources>

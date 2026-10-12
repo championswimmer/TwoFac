@@ -55,4 +55,13 @@
     <!-- Accounts search -->
     <string name="accounts_search_placeholder">Buscar cuentas</string>
     <string name="accounts_search_no_results">Ninguna cuenta coincide con tu búsqueda</string>
+    <string name="add_account_migration_ready">Cuentas listas para importar: %1$d</string>
+    <string name="add_account_migration_progress">Se han escaneado %1$d de %2$d códigos de exportación</string>
+    <string name="add_account_migration_reset">Reiniciar importación</string>
+    <string name="add_account_migration_import">Importar cuentas (%1$d)</string>
+    <string name="add_account_migration_invalid">Contenido QR de autenticador no válido o no compatible</string>
+    <string name="add_account_migration_mismatch">Este código no coincide con la exportación actual. Reinicia la importación para empezar otra exportación.</string>
+    <string name="add_account_migration_partial">Se han importado %1$d cuentas; %2$d han fallado. Reintenta para importar solo las cuentas restantes.</string>
+    <string name="add_account_migration_failed">No se pudieron importar las cuentas. Desbloquea la bóveda y comprueba los datos de importación.</string>
+    <string name="add_account_migration_refresh_failed">Las cuentas se guardaron, pero falló la actualización o sincronización. Vuelve a abrir la pantalla de cuentas.</string>
 </resources>

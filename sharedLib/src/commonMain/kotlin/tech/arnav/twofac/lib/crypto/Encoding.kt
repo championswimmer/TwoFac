@@ -109,30 +109,42 @@ object Encoding {
      * Encode a string for use in a URI.
      */
     internal fun encodeURIComponent(s: String): String {
-        return s.replace(" ", "%20")
-            .replace(":", "%3A")
-            .replace("/", "%2F")
-            .replace("?", "%3F")
-            .replace("&", "%26")
-            .replace("=", "%3D")
-            .replace("+", "%2B")
-            .replace("#", "%23")
-            .replace("@", "%40")
+        return buildString {
+            for (byte in s.encodeToByteArray()) {
+                val value = byte.toInt() and 0xFF
+                val char = value.toChar()
+                if (char in 'a'..'z' || char in 'A'..'Z' || char in '0'..'9' || char in "-._~") {
+                    append(char)
+                } else {
+                    append('%')
+                    append("0123456789ABCDEF"[value shr 4])
+                    append("0123456789ABCDEF"[value and 15])
+                }
+            }
+        }
     }
 
     /**
      * Decode a URI-encoded string.
      */
     internal fun decodeURIComponent(s: String): String {
-        return s.replace("%20", " ")
-            .replace("%3A", ":")
-            .replace("%2F", "/")
-            .replace("%3F", "?")
-            .replace("%26", "&")
-            .replace("%3D", "=")
-            .replace("%2B", "+")
-            .replace("%23", "#")
-            .replace("%40", "@")
+        val source = s.encodeToByteArray()
+        val decoded = ByteArray(source.size)
+        var input = 0
+        var output = 0
+        while (input < source.size) {
+            if (source[input] == '%'.code.toByte()) {
+                require(input + 2 < source.size) { "Invalid URI escape" }
+                val high = source[input + 1].toInt().toChar().digitToIntOrNull(16)
+                val low = source[input + 2].toInt().toChar().digitToIntOrNull(16)
+                require(high != null && low != null) { "Invalid URI escape" }
+                decoded[output++] = ((high shl 4) or low).toByte()
+                input += 3
+            } else {
+                decoded[output++] = source[input++]
+            }
+        }
+        return decoded.copyOf(output).decodeToString(throwOnInvalidSequence = true)
     }
 
     /**

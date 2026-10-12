@@ -55,4 +55,13 @@
     <!-- Accounts search -->
     <string name="accounts_search_placeholder">Поиск аккаунтов</string>
     <string name="accounts_search_no_results">Ни один аккаунт не соответствует вашему запросу</string>
+    <string name="add_account_migration_ready">Аккаунтов готово к импорту: %1$d</string>
+    <string name="add_account_migration_progress">Отсканировано %1$d из %2$d кодов экспорта</string>
+    <string name="add_account_migration_reset">Сбросить импорт</string>
+    <string name="add_account_migration_import">Импортировать аккаунты (%1$d)</string>
+    <string name="add_account_migration_invalid">Недопустимое или неподдерживаемое содержимое QR-кода аутентификатора</string>
+    <string name="add_account_migration_mismatch">Этот код не соответствует текущему экспорту. Сбросьте импорт, чтобы начать другой экспорт.</string>
+    <string name="add_account_migration_partial">Импортировано %1$d аккаунтов; не удалось импортировать %2$d. Повторите попытку только для оставшихся аккаунтов.</string>
+    <string name="add_account_migration_failed">Не удалось импортировать аккаунты. Разблокируйте хранилище и проверьте данные импорта.</string>
+    <string name="add_account_migration_refresh_failed">Аккаунты сохранены, но обновление или синхронизация не удались. Откройте экран аккаунтов заново.</string>
 </resources>

@@ -110,6 +110,7 @@ kotlin {
                 implementation(libs.crypto.kt.core)
                 api(libs.kotlinx.serialization.core)
                 implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.serialization.protobuf)
             }
         }
 

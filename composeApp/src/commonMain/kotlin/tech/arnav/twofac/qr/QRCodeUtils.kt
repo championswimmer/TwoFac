@@ -54,8 +54,9 @@ private fun buildOtpAuthPayloadCandidates(
 }
 
 private fun extractOtpAuthSubstring(payload: String): String? {
-    val prefixIndex = payload.indexOf("otpauth://", ignoreCase = true)
-    if (prefixIndex < 0) return null
+    val prefixIndex = listOf("otpauth://", "otpauth-migration://")
+        .map { payload.indexOf(it, ignoreCase = true) }.filter { it >= 0 }.minOrNull()
+        ?: return null
     return payload.substring(prefixIndex).trim()
 }
 

@@ -55,4 +55,14 @@
     <!-- Accounts search -->
     <string name="accounts_search_placeholder">Search accounts</string>
     <string name="accounts_search_no_results">No accounts match your search</string>
+    <!-- Google Authenticator migration -->
+    <string name="add_account_migration_ready">Accounts ready to import: %1$d</string>
+    <string name="add_account_migration_progress">Scanned %1$d of %2$d export codes</string>
+    <string name="add_account_migration_reset">Reset import</string>
+    <string name="add_account_migration_import">Import accounts (%1$d)</string>
+    <string name="add_account_migration_invalid">Invalid or unsupported authenticator QR payload</string>
+    <string name="add_account_migration_mismatch">This code does not match the current export. Reset the import to start another export.</string>
+    <string name="add_account_migration_partial">Imported %1$d accounts; %2$d failed. Retry to import only the remaining accounts.</string>
+    <string name="add_account_migration_failed">Failed to import accounts. Unlock the vault and check the import data.</string>
+    <string name="add_account_migration_refresh_failed">Accounts were saved, but refreshing or syncing failed. Reopen the accounts screen.</string>
 </resources>

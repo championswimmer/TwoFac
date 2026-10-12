@@ -55,4 +55,13 @@
     <!-- Accounts search -->
     <string name="accounts_search_placeholder">搜索账户</string>
     <string name="accounts_search_no_results">没有与您的搜索匹配的账户</string>
+    <string name="add_account_migration_ready">准备导入 %1$d 个账户</string>
+    <string name="add_account_migration_progress">已扫描 %1$d 个导出码，共 %2$d 个</string>
+    <string name="add_account_migration_reset">重置导入</string>
+    <string name="add_account_migration_import">导入 %1$d 个账户</string>
+    <string name="add_account_migration_invalid">验证器二维码内容无效或不受支持</string>
+    <string name="add_account_migration_mismatch">此二维码与当前导出不匹配。请重置导入以开始另一次导出。</string>
+    <string name="add_account_migration_partial">已导入 %1$d 个账户，%2$d 个失败。重试将只导入剩余账户。</string>
+    <string name="add_account_migration_failed">无法导入账户。请解锁保险库并检查导入数据。</string>
+    <string name="add_account_migration_refresh_failed">账户已保存，但刷新或同步失败。请重新打开账户页面。</string>
 </resources>

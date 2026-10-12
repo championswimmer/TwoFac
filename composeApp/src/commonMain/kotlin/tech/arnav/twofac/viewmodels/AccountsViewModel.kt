@@ -2,6 +2,7 @@ package tech.arnav.twofac.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,11 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import tech.arnav.twofac.companion.CompanionSyncCoordinator
 import tech.arnav.twofac.lib.TwoFacLib
+import tech.arnav.twofac.lib.importer.BulkImportResult
+import org.jetbrains.compose.resources.getString
+import twofac.composeapp.generated.resources.Res
+import twofac.composeapp.generated.resources.add_account_migration_failed
+import twofac.composeapp.generated.resources.add_account_migration_refresh_failed
 import tech.arnav.twofac.lib.otp.OtpCodes
 import tech.arnav.twofac.lib.storage.StoredAccount
 import tech.arnav.twofac.lib.theme.AccountColorTag
@@ -149,6 +155,49 @@ class AccountsViewModel(
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to add account"
                 onComplete(false)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private var bulkImportJob: Job? = null
+
+    fun importAccounts(
+        uris: List<String>,
+        passkey: String?,
+        onComplete: (BulkImportResult?) -> Unit,
+    ) {
+        if (bulkImportJob?.isActive == true) return
+        bulkImportJob = viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            try {
+                if (!twoFacLibUnlocked) {
+                    require(!passkey.isNullOrBlank())
+                    twoFacLib.unlock(passkey)
+                }
+                val result = twoFacLib.addAccounts(uris)
+                // Refresh even after partial persistence. A sync/refresh failure must not
+                // turn already-saved records into retry candidates.
+                try {
+                    val accountsWithOtps = twoFacLib.getAllAccountOTPs()
+                    _accountOtps.value = accountsWithOtps
+                    _accounts.value = accountsWithOtps.map { it.first }
+                    if (result.importedIndices.isNotEmpty()) companionSyncCoordinator?.onAccountsChanged()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (failure: Throwable) {
+                    if (failure is Error) throw failure
+                    _error.value = getString(Res.string.add_account_migration_refresh_failed)
+                }
+                onComplete(result)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (failure: Throwable) {
+                if (failure is Error) throw failure
+                _error.value = getString(Res.string.add_account_migration_failed)
+                onComplete(null)
             } finally {
                 _isLoading.value = false
             }

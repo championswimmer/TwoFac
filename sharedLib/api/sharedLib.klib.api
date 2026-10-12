@@ -68,6 +68,10 @@ final class tech.arnav.twofac.lib.importer.adapters/EnteImportAdapter : tech.arn
 
 final class tech.arnav.twofac.lib.importer.adapters/TwoFasImportAdapter : tech.arnav.twofac.lib.importer/ImportAdapter // tech.arnav.twofac.lib.importer.adapters/TwoFasImportAdapter|null[0]
 
+final class tech.arnav.twofac.lib.importer.google/GoogleAuthenticatorMigrationBatch // tech.arnav.twofac.lib.importer.google/GoogleAuthenticatorMigrationBatch|null[0]
+
+final class tech.arnav.twofac.lib.importer/BulkImportResult // tech.arnav.twofac.lib.importer/BulkImportResult|null[0]
+
 final class tech.arnav.twofac.lib.presentation.issuer/IssuerIconMatch // tech.arnav.twofac.lib.presentation.issuer/IssuerIconMatch|null[0]
 
 final class tech.arnav.twofac.lib.storage/StoredAccount // tech.arnav.twofac.lib.storage/StoredAccount|null[0]
@@ -89,6 +93,8 @@ final object tech.arnav.twofac.lib.backup/BackupPayloadCodec // tech.arnav.twofa
 final object tech.arnav.twofac.lib.backup/BackupProviderIds // tech.arnav.twofac.lib.backup/BackupProviderIds|null[0]
 
 final object tech.arnav.twofac.lib.backup/BackupRestorePolicy // tech.arnav.twofac.lib.backup/BackupRestorePolicy|null[0]
+
+final object tech.arnav.twofac.lib.importer.google/GoogleAuthenticatorMigrationDecoder // tech.arnav.twofac.lib.importer.google/GoogleAuthenticatorMigrationDecoder|null[0]
 
 final object tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog { // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog|null[0]
     final fun glyphForIconKey(kotlin/String): kotlin/String? // tech.arnav.twofac.lib.presentation.issuer/IssuerIconCatalog.glyphForIconKey|glyphForIconKey(kotlin.String){}[0]

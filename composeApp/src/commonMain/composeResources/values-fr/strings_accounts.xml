@@ -55,4 +55,13 @@
     <!-- Accounts search -->
     <string name="accounts_search_placeholder">Rechercher des comptes</string>
     <string name="accounts_search_no_results">Aucun compte ne correspond à votre recherche</string>
+    <string name="add_account_migration_ready">Comptes prêts à importer : %1$d</string>
+    <string name="add_account_migration_progress">%1$d codes scannés sur %2$d codes d’exportation</string>
+    <string name="add_account_migration_reset">Réinitialiser l’importation</string>
+    <string name="add_account_migration_import">Importer des comptes (%1$d)</string>
+    <string name="add_account_migration_invalid">Contenu QR d’authentificateur invalide ou non pris en charge</string>
+    <string name="add_account_migration_mismatch">Ce code ne correspond pas à l’exportation actuelle. Réinitialisez l’importation pour commencer une autre exportation.</string>
+    <string name="add_account_migration_partial">%1$d comptes importés ; %2$d ont échoué. Réessayez pour importer uniquement les comptes restants.</string>
+    <string name="add_account_migration_failed">Échec de l’importation des comptes. Déverrouillez le coffre et vérifiez les données d’importation.</string>
+    <string name="add_account_migration_refresh_failed">Les comptes ont été enregistrés, mais l’actualisation ou la synchronisation a échoué. Rouvrez l’écran des comptes.</string>
 </resources>

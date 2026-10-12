@@ -193,6 +193,22 @@ class OtpAuthURITest {
         assertEquals(originalOtp, parsedOtpValue, "Generated OTPs should match")
     }
 
+    @Test
+    fun issuerlessAccountRoundTrips() {
+        val otp = TOTP(secret = testSecret, accountName = "alice", issuer = null)
+        val parsed = OtpAuthURI.parse(OtpAuthURI.create(otp))
+        assertEquals(null, parsed.issuer)
+        assertEquals("alice", parsed.accountName)
+    }
+
+    @Test
+    fun utf8AndLiteralPercentRoundTripWithoutDoubleDecoding() {
+        val otp = TOTP(secret = testSecret, accountName = "100%20user+测试", issuer = "工程")
+        val parsed = OtpAuthURI.parse(OtpAuthURI.create(otp))
+        assertEquals(otp.issuer, parsed.issuer)
+        assertEquals(otp.accountName, parsed.accountName)
+    }
+
     // ── Phase 0 regression tests ──────────────────────────────────────────────
 
     @Test

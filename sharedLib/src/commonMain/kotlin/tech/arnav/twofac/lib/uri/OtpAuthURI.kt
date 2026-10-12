@@ -111,7 +111,7 @@ object OtpAuthURI {
         val decodedLabel = decodeURIComponent(label)
 
         // Extract the issuer from the label if present
-        val labelIssuer = decodedLabel.substringBefore(":", "")
+        val labelIssuer = decodedLabel.substringBefore(":", "").takeIf { it.isNotEmpty() }
         val accountName = decodedLabel.substringAfter(":", decodedLabel).trim()
 
 
@@ -128,9 +128,9 @@ object OtpAuthURI {
         val secret = params["secret"] ?: throw IllegalArgumentException("Missing required parameter: secret")
         val issuer = params["issuer"]?.let { decodeURIComponent(it) } ?: labelIssuer // Use label as issuer if not provided
 
-        require(issuer.isNotEmpty()) { "Issuer cannot be empty" }
-        // Only check if labelIssuer is not empty
-        if (labelIssuer.isNotEmpty()) {
+        // Issuer is optional. If supplied in both places, they must agree.
+        require(issuer == null || issuer.isNotEmpty()) { "Issuer cannot be empty" }
+        if (labelIssuer != null) {
             require(issuer == labelIssuer) { "Issuer does not match label: $issuer != $labelIssuer" }
         }
 

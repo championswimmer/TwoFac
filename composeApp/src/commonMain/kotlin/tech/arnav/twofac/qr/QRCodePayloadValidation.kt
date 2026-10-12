@@ -1,5 +1,6 @@
 package tech.arnav.twofac.qr
 
+import tech.arnav.twofac.lib.importer.google.GoogleAuthenticatorMigrationDecoder
 import tech.arnav.twofac.lib.uri.OtpAuthURI
 
 private const val OTP_AUTH_URI_SCHEME = "otpauth://"
@@ -20,10 +21,18 @@ fun validateOtpAuthUriPayload(payload: String): String? {
     }.getOrNull()
 }
 
-fun decodedPayloadToQRCodeReadResult(payload: String): QRCodeReadResult =
-    validateOtpAuthUriPayload(payload)
-        ?.let(QRCodeReadResult::Success)
+fun decodedPayloadToQRCodeReadResult(payload: String): QRCodeReadResult {
+    val normalized = normalizeQrDecodedPayload(payload)
+    if (normalized.startsWith("otpauth-migration://", ignoreCase = true)) {
+        return runCatching {
+            val batch = GoogleAuthenticatorMigrationDecoder.decode(normalized)
+            QRCodeReadResult.Success(batch.otpAuthUris, batch)
+        }.getOrElse { QRCodeReadResult.DecodeFailure(INVALID_OTP_AUTH_URI_REASON) }
+    }
+    return validateOtpAuthUriPayload(normalized)
+        ?.let { QRCodeReadResult.Success(listOf(it)) }
         ?: QRCodeReadResult.DecodeFailure(INVALID_OTP_AUTH_URI_REASON)
+}
 
 private fun canonicalizeOtpAuthScheme(payload: String): String {
     if (!payload.startsWith(OTP_AUTH_URI_SCHEME, ignoreCase = true)) {

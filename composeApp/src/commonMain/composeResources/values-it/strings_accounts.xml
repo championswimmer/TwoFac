@@ -55,4 +55,13 @@
     <!-- Accounts search -->
     <string name="accounts_search_placeholder">Cerca account</string>
     <string name="accounts_search_no_results">Nessun account corrisponde alla tua ricerca</string>
+    <string name="add_account_migration_ready">Account pronti per l’importazione: %1$d</string>
+    <string name="add_account_migration_progress">Scansionati %1$d di %2$d codici di esportazione</string>
+    <string name="add_account_migration_reset">Reimposta importazione</string>
+    <string name="add_account_migration_import">Importa account (%1$d)</string>
+    <string name="add_account_migration_invalid">Contenuto QR dell’autenticatore non valido o non supportato</string>
+    <string name="add_account_migration_mismatch">Questo codice non corrisponde all’esportazione corrente. Reimposta l’importazione per iniziare un’altra esportazione.</string>
+    <string name="add_account_migration_partial">Importati %1$d account; %2$d non riusciti. Riprova per importare solo gli account rimanenti.</string>
+    <string name="add_account_migration_failed">Impossibile importare gli account. Sblocca la cassaforte e controlla i dati di importazione.</string>
+    <string name="add_account_migration_refresh_failed">Gli account sono stati salvati, ma l’aggiornamento o la sincronizzazione non è riuscito. Riapri la schermata degli account.</string>
 </resources>

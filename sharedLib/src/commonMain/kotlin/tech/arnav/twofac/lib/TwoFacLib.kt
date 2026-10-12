@@ -2,6 +2,8 @@ package tech.arnav.twofac.lib
 
 import tech.arnav.twofac.lib.crypto.Encoding.toByteString
 import tech.arnav.twofac.lib.crypto.sharedCryptoTools
+import kotlin.coroutines.cancellation.CancellationException
+import tech.arnav.twofac.lib.importer.BulkImportResult
 import tech.arnav.twofac.lib.importer.ImportAdapter
 import tech.arnav.twofac.lib.importer.ImportResult
 import tech.arnav.twofac.lib.backup.EncryptedAccountEntry
@@ -177,6 +179,60 @@ class TwoFacLib private constructor(
             storeHasAccounts = accountList?.isNotEmpty() == true
         }
         return success
+    }
+
+    /**
+     * Validates the entire input before writing. Storage has no transaction contract:
+     * write failures are reported by index so callers can retry only failed records.
+     */
+    suspend fun addAccounts(accountURIs: List<String>): BulkImportResult {
+        checkUnlockedOrThrow()
+        require(accountURIs.isNotEmpty()) { "No accounts to import" }
+        val otps = try {
+            accountURIs.map { OtpAuthURI.parse(it) }
+        } catch (_: IllegalArgumentException) {
+            throw IllegalArgumentException("Invalid account import data")
+        }
+        // unlock() only loads encrypted records. Verify the current key before adding
+        // any new record, otherwise a wrong password could mix keys in one vault.
+        try {
+            if (accountList == null) accountList = storage.getAccountList()
+            getAllAccounts()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (failure: Throwable) {
+            // WebCrypto rejects with a JS Throwable rather than a Kotlin Exception.
+            if (failure is Error) throw failure
+            passKey = null
+            accountList = null
+            throw IllegalStateException("Unable to unlock vault for import")
+        }
+        val imported = mutableListOf<Int>()
+        val failed = mutableListOf<Int>()
+        val currentPassKey = passKey ?: error("Vault is locked")
+        val savedAccounts = mutableListOf<StoredAccount>()
+        try {
+            otps.forEachIndexed { index, otp ->
+                try {
+                    val account = otp.toStoredAccount(cryptoTools.createSigningKey(currentPassKey))
+                    if (storage.saveAccount(account)) {
+                        imported.add(index)
+                        savedAccounts.add(account)
+                    } else failed.add(index)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (failure: Throwable) {
+                    if (failure is Error) throw failure
+                    failed.add(index)
+                }
+            }
+        } finally {
+            // Preserve known successful writes even if cancellation interrupts the batch.
+            // A later cache reload failure must not turn saved records into retry candidates.
+            accountList = accountList.orEmpty() + savedAccounts
+            storeHasAccounts = accountList?.isNotEmpty() == true
+        }
+        return BulkImportResult(imported, failed)
     }
 
     @OptIn(ExperimentalUuidApi::class)

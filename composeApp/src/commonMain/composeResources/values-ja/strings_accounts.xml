@@ -55,4 +55,13 @@
     <!-- Accounts search -->
     <string name="accounts_search_placeholder">アカウントを検索</string>
     <string name="accounts_search_no_results">検索に一致するアカウントはありません</string>
+    <string name="add_account_migration_ready">%1$d 件のアカウントをインポートできます</string>
+    <string name="add_account_migration_progress">%2$d 個のエクスポートコードのうち %1$d 個をスキャンしました</string>
+    <string name="add_account_migration_reset">インポートをリセット</string>
+    <string name="add_account_migration_import">%1$d 件のアカウントをインポート</string>
+    <string name="add_account_migration_invalid">認証アプリの QR コードの内容が無効、または非対応です</string>
+    <string name="add_account_migration_mismatch">このコードは現在のエクスポートと一致しません。別のエクスポートを開始するにはインポートをリセットしてください。</string>
+    <string name="add_account_migration_partial">%1$d 件をインポートしました。%2$d 件に失敗しました。再試行すると残りのアカウントのみインポートします。</string>
+    <string name="add_account_migration_failed">アカウントをインポートできませんでした。保管庫をロック解除し、インポートデータを確認してください。</string>
+    <string name="add_account_migration_refresh_failed">アカウントは保存されましたが、更新または同期に失敗しました。アカウント画面を開き直してください。</string>
 </resources>

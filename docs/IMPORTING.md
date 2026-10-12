@@ -55,6 +55,37 @@ otpauth://totp/GitHub:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub
 otpauth://totp/Google:test@gmail.com?secret=GEZDGNBVGY3TQOJQ&issuer=Google
 ```
 
+### 4. **Google Authenticator**
+- **Format**: Export QR codes containing `otpauth-migration://offline?data=...` (Base64 protobuf, decoded locally)
+- **Decoder**: `GoogleAuthenticatorMigrationDecoder` in `sharedLib`
+- **Supported records**: TOTP and HOTP, SHA1/SHA256/SHA512, six/eight digits; HOTP counters are preserved
+- **Unsupported records**: MD5 and unknown OTP parameters reject the entire QR chunk instead of silently changing the algorithm
+
+#### Import in the app
+
+1. In Google Authenticator, choose **Transfer accounts → Export accounts**.
+2. In TwoFac, open **Add Account** and scan the export QR (Android/iOS) or paste its image from the clipboard (Desktop/Web).
+3. If the export spans several codes, scan/paste every code from the same export. Codes may be scanned in any order; repeated chunks do not duplicate accounts.
+4. TwoFac shows the number of accounts ready to import. Unlock the vault if required, then choose **Import accounts**.
+5. A storage failure leaves only failed accounts pending for retry. **Reset import** discards the current batch.
+
+You can also paste a migration URI into the URI field to preview a single chunk. Editing that field resets the current batch; use QR scan/paste for multi-code collection.
+
+The import does not deduplicate against accounts already in the vault. Export QR codes contain secrets: do not share them, upload them to online decoders, or include them in bug reports.
+
+#### Shared-library usage
+
+```kotlin
+import tech.arnav.twofac.lib.importer.google.GoogleAuthenticatorMigrationDecoder
+
+// The library must already be unlocked.
+val chunk = GoogleAuthenticatorMigrationDecoder.decode(migrationUri)
+// For multi-QR exports, collect all matching chunks before importing.
+val result = lib.addAccounts(chunk.otpAuthUris)
+// Retry only these indices; storage writes are not transactional.
+val retryUris = result.failedIndices.map(chunk.otpAuthUris::get)
+```
+
 ## Usage Example
 
 ```kotlin
